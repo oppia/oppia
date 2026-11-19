@@ -73,6 +73,12 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   subtopicSummaryIsShown: boolean = false;
   isPracticeTabDisplayed: boolean = false;
   currentSubtopicId!: number;
+  // Indices of the study guide sections whose content is currently shown.
+  // Each section is toggled independently, so several can be open at once.
+  expandedSectionIndices: Set<number> = new Set();
+  // Index of the section targeted by the 'section' URL query parameter, or
+  // null if the page was not opened through a link to a specific section.
+  highlightedSectionIndex: number | null = null;
 
   constructor(
     private alertsService: AlertsService,
@@ -146,6 +152,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       ([subtopicDataObject, topicDataObject]) => {
         if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
           this.sections = subtopicDataObject.getSections();
+          this.initializeSectionExpansionState();
         } else {
           this.pageContents = subtopicDataObject.getPageContents();
         }
@@ -225,6 +232,50 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
         this.parentTopicTitleTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  /**
+   * Collapses all the study guide sections except one, so that learners are
+   * not overwhelmed by seeing the whole study guide at once. By default the
+   * first section is expanded. If the page is opened through a link to a
+   * specific section (e.g. '?section=2', where sections are numbered from 1
+   * as shown to learners), that section is expanded and highlighted instead.
+   */
+  initializeSectionExpansionState(): void {
+    this.expandedSectionIndices = new Set();
+    this.highlightedSectionIndex = null;
+    if (this.sections === null || this.sections.length === 0) {
+      return;
+    }
+    const sectionNumber = Number(this.urlService.getUrlParams().section);
+    if (
+      Number.isInteger(sectionNumber) &&
+      sectionNumber >= 1 &&
+      sectionNumber <= this.sections.length
+    ) {
+      this.highlightedSectionIndex = sectionNumber - 1;
+      this.expandedSectionIndices.add(this.highlightedSectionIndex);
+    } else {
+      this.expandedSectionIndices.add(0);
+    }
+  }
+
+  isSectionExpanded(sectionIndex: number): boolean {
+    return this.expandedSectionIndices.has(sectionIndex);
+  }
+
+  isSectionHighlighted(sectionIndex: number): boolean {
+    return this.highlightedSectionIndex === sectionIndex;
+  }
+
+  // Opening or closing a section does not change the state of the other
+  // sections.
+  toggleSection(sectionIndex: number): void {
+    if (this.expandedSectionIndices.has(sectionIndex)) {
+      this.expandedSectionIndices.delete(sectionIndex);
+    } else {
+      this.expandedSectionIndices.add(sectionIndex);
+    }
   }
 
   openStudyGuide(event?: MouseEvent): void {
