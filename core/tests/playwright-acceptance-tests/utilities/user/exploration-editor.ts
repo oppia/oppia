@@ -410,14 +410,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to add a math interaction to the card.
-   * @param {string} interactionToAdd - The math interaction to add to the card.
-   */
-  async addMathInteraction(interactionToAdd: string): Promise<void> {
-    await this.addInteraction(interactionToAdd);
-  }
-
-  /**
    * Adds the response details in the response modal.
    * @param {string} feedback The feedback to be added in the response modal.
    * @param {string} destination The destination to be added in the response modal.

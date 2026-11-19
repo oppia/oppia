@@ -95,9 +95,7 @@ test.describe('Logged-out User', function () {
     // Navigate to the new card and add a fraction conversion problem.
     await explorationEditor.navigateToCard('Fraction Con...');
     await explorationEditor.updateCardContent('Express 50% as a fraction.');
-    await explorationEditor.addMathInteraction(
-      INTERACTION_TYPES.FRACTION_INPUT
-    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.FRACTION_INPUT,
       '2',

@@ -758,6 +758,14 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the next card in the exploration player.
    */
   async continueToNextCard(): Promise<void> {
+    const currentCardContentSelector = `${stateConversationContent} p`;
+    const cardContentLocator = this.page
+      .locator(currentCardContentSelector)
+      .first();
+    await cardContentLocator.waitFor({state: 'visible'});
+    const currentCardContent =
+      (await cardContentLocator.textContent())?.trim() ?? '';
+
     const continueBtn = this.page.locator(nextCardButton);
 
     await this.page
@@ -770,6 +778,16 @@ export class LoggedOutUser extends BaseUser {
     } else {
       await this.clickOnElementWithSelector(nextCardArrowButton);
     }
+
+    await this.page.waitForFunction(
+      (args: [string, string]) => {
+        const [selector, previousText] = args;
+        const element = document.querySelector(selector);
+        const text = element?.textContent?.trim();
+        return Boolean(text && text !== previousText);
+      },
+      [currentCardContentSelector, currentCardContent]
+    );
   }
 
   /**
@@ -785,12 +803,11 @@ export class LoggedOutUser extends BaseUser {
    * Function to verify if the page does not have any input fields.
    */
   async verifyCannotAnswerPreviouslyAnsweredQuestion(): Promise<void> {
-    await this.waitForPageToFullyLoad();
-    const inputCount = await this.page.locator('input').count();
-    if (inputCount > 0) {
-      throw new Error('The page should not have any input fields.');
-    }
-    showMessage('The page does not have any input fields, as expected.');
+    await this.expectElementToBeVisible(stateConversationContent);
+    await expect(
+      this.page.locator(submitResponseToInteractionInput)
+    ).toHaveCount(0);
+    showMessage('The interaction does not have any input fields, as expected.');
   }
 
   /**
