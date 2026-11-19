@@ -364,7 +364,7 @@ def get_stories_by_ids(
                     % story_ids[index]
                 )
             stories.append(story_model)
-        elif story_model is not None:
+        else:
             stories.append(get_story_from_model(story_model))
     return stories
 
@@ -538,21 +538,16 @@ def get_user_progress_in_story_chapters(
                 visited_checkpoints = (
                     all_checkpoints.index(most_recently_visited_checkpoint) + 1
                 )
-        found_story_id: Optional[str] = None
-        found_node_id: Optional[str] = None
-        for story in all_valid_stories:
-            for node in story.story_contents.nodes:
-                if node.exploration_id == exp_id:
-                    found_story_id = story.id
-                    found_node_id = node.id
-                    break
-            if found_story_id:
-                break
-
-        is_completed = (
-            found_story_id is not None
-            and found_node_id
-            in completed_node_ids_by_story.get(found_story_id, [])
+        # Every exp_id was collected from a node of one of the valid
+        # stories above, so a matching (story, node) pair always exists.
+        found_story_id, found_node_id = next(
+            (story.id, node.id)
+            for story in all_valid_stories
+            for node in story.story_contents.nodes
+            if node.exploration_id == exp_id
+        )
+        is_completed = found_node_id in completed_node_ids_by_story.get(
+            found_story_id, []
         )
 
         all_chapters_progress.append(
