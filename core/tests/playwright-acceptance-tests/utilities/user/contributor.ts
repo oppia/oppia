@@ -29,8 +29,8 @@ const reviewCommentTextareaSelector = '.e2e-test-suggestion-review-message';
 export class Contributor extends ExplorationEditor {
   /**
    * Checks if the opportunity is visible and matches the expected values.
-   * @param heading - The expected heading of the opportunity.
-   * @param subheading - The expected subheading of the opportunity.
+   * @param {string} heading - The expected heading of the opportunity.
+   * @param {string} subheading - The expected subheading of the opportunity.
    */
   async expectOpportunityToBePresent(
     heading: string,
@@ -58,7 +58,7 @@ export class Contributor extends ExplorationEditor {
 
   /**
    * Fills the review comment textarea with the given comment.
-   * @param comment - The comment to fill the textarea with.
+   * @param {string} comment - The comment to fill the textarea with.
    */
   async fillReviewComment(comment: string): Promise<void> {
     await this.expectElementToBeVisible(reviewCommentTextareaSelector);

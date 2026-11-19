@@ -56,7 +56,7 @@ export class ContributorAdmin extends BaseUser {
 
   /**
    * Switches to the tab in the contributor dashboard admin page.
-   * @param tabName - The name of the tab to switch to.
+   * @param {string} tabName - The name of the tab to switch to.
    */
   async switchToTabInContributorAdminPage(
     tabName:
@@ -70,10 +70,8 @@ export class ContributorAdmin extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       const modifiedName = tabName.replace(/s$/, '');
       await this.expectElementToBeVisible(tabSelectionDropdownMobileSelector);
-      await this.updateMatOption(
-        tabSelectionDropdownMobileSelector,
-        modifiedName
-      );
+      await this.clickOnElementWithSelector(tabSelectionDropdownMobileSelector);
+      await this.selectMatOption(modifiedName);
     } else {
       const tabNameInLowerCase = tabName.toLocaleLowerCase().replace(' ', '-');
       const tabSelector = `.e2e-test-${tabNameInLowerCase}-tab`;
@@ -104,7 +102,7 @@ export class ContributorAdmin extends BaseUser {
 
   /**
    * Adds a username in the username input modal and clicks on the add rights button.
-   * @param username - The username to add.
+   * @param {string} username - The username to add.
    */
   async addUsernameInUsernameInputModal(username: string): Promise<void> {
     await this.expectElementToBeVisible(commonModalContainerSelector);
@@ -136,7 +134,7 @@ export class ContributorAdmin extends BaseUser {
 
   /**
    * Checks if the number of contributor stats rows in the table is as expected.
-   * @param number - The expected number of stats rows.
+   * @param {number} number - The expected number of stats rows.
    */
   async expectNumberOfStatsRowsToBe(number: number): Promise<void> {
     await expect(this.page.locator(statsListItemSelector)).toHaveCount(number);

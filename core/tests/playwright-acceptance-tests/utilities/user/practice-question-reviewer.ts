@@ -28,8 +28,8 @@ const reviewModalHeaderSelector =
 export class PracticeQuestionReviewer extends Contributor {
   /**
    * Starts a question review.
-   * @param question - The question to review.
-   * @param skill - The skill the question belongs to.
+   * @param {string} question - The question to review.
+   * @param {string} skill - The skill the question belongs to.
    */
   async startQuestionReview(question: string, skill: string): Promise<void> {
     const questionElement = await this.expectOpportunityToBePresent(
@@ -47,8 +47,8 @@ export class PracticeQuestionReviewer extends Contributor {
 
   /**
    * Submits a question review.
-   * @param reviewType - The type of review to submit.
-   * @param reviewMessage - The message to submit.
+   * @param {'accept' | 'reject'} reviewType - The type of review to submit.
+   * @param {string} [reviewMessage] - The message to submit.
    */
   async submitReview(
     reviewType: 'accept' | 'reject',
@@ -67,7 +67,7 @@ export class PracticeQuestionReviewer extends Contributor {
 
   /**
    * Checks if the question review modal is present or not.
-   * @param visible - Whether the modal should be visible or not.
+   * @param {boolean} visible - Whether the modal should be visible or not.
    */
   async expectQuestionReviewModalToBePresent(
     visible: boolean = true

@@ -20,7 +20,7 @@ import {Page} from '@playwright/test';
 import {showMessage} from '../common/show-message';
 import {Contributor} from './contributor';
 
-const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
+const submitQuestionTab = '.e2e-test-submitQuestionTab';
 const suggestQuestionButton = 'button.e2e-test-opportunity-list-item-button';
 const confirmSkillDifficultyButton =
   'button.e2e-test-confirm-skill-difficulty-button';
@@ -51,8 +51,8 @@ const questionDifficultySelectionModalSelector =
 export class PracticeQuestionSubmitter extends Contributor {
   /**
    * Opens the suggest questions modal and selects a specific skill and topic.
-   * @param skillName - The name of the skill to suggest questions for.
-   * @param topicName - The name of the topic to suggest questions for.
+   * @param {string} skillName - The name of the skill to suggest questions for.
+   * @param {string} topicName - The name of the topic to suggest questions for.
    */
   async suggestQuestionsForSkillandTopic(
     skillName: string,
@@ -74,7 +74,7 @@ export class PracticeQuestionSubmitter extends Contributor {
 
   /**
    * Selects the difficulty level of the question to be suggested.
-   * @param difficulty - The difficulty level of the question.
+   * @param {'Easy' | 'Medium' | 'Hard'} difficulty - The difficulty level of the question.
    */
   async selectQuestionDifficultyInPracticeQuestionSubmission(
     difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
@@ -90,7 +90,7 @@ export class PracticeQuestionSubmitter extends Contributor {
 
   /**
    * Seeds text to the question.
-   * @param text - The text to be added to the question.
+   * @param {string} text - The text to be added to the question.
    */
   async seedTextToQuestion(text: string): Promise<void> {
     await this.expectElementToBeVisible(textStateEditSelector);
@@ -106,7 +106,7 @@ export class PracticeQuestionSubmitter extends Contributor {
 
   /**
    * Adds a multiple choice interaction to the question.
-   * @param options - The options to be added to the multiple choice interaction.
+   * @param {string[]} options - The options to be added to the multiple choice interaction.
    */
   async addMultipleChoiceInteractionByQuestionSubmitter(
     options: string[]
@@ -146,7 +146,7 @@ export class PracticeQuestionSubmitter extends Contributor {
 
   /**
    * Adds feedback for default responses of a state interaction.
-   * @param defaultResponseFeedback - The feedback for the default responses.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
    */
   async editDefaultResponseFeedbackInQuestionEditorPage(
     defaultResponseFeedback: string
@@ -177,13 +177,13 @@ export class PracticeQuestionSubmitter extends Contributor {
 
   /**
    * Starts a question suggestion and completes it.
-   * @param skill - The skill to suggest questions for.
-   * @param topic - The topic to suggest questions for.
-   * @param question - The question to be added.
-   * @param multipleChoiceOptions - The options to be added.
-   * @param difficulty - The difficulty level of the question.
-   * @param defaultResponseFeedback - The feedback for default responses.
-   * @param hint - The hint to be added to the current state card.
+   * @param {string} skill - The skill to suggest questions for.
+   * @param {string} topic - The topic to suggest questions for.
+   * @param {string} question - The question to be added.
+   * @param {string[]} [multipleChoiceOptions] - The options to be added.
+   * @param {'Easy' | 'Medium' | 'Hard'} [difficulty] - The difficulty level of the question.
+   * @param {string} [defaultResponseFeedback] - The feedback for default responses.
+   * @param {string} [hint] - The hint to be added to the current state card.
    */
   async startAndCompleteQuestionSuggestion(
     skill: string,

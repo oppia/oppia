@@ -30,8 +30,8 @@ const totalQuestionReviewersSelector = '.e2e-test-total-question-reviewers';
 export class QuestionCoordinator extends BaseUser {
   /**
    * Clicks on the add reviewer or submitter button.
-   * @param right - The right to add or remove.
-   * @param action - The action to perform.
+   * @param {'Submitter' | 'Reviewer'} right - The right to add or remove.
+   * @param {'add' | 'remove'} action - The action to perform.
    */
   async addOrRemoveQuestionRightsInQuestionRoleEditorModal(
     right: 'Submitter' | 'Reviewer',
@@ -90,7 +90,7 @@ export class QuestionCoordinator extends BaseUser {
 
   /**
    * Checks if the total number of question reviewers is as expected.
-   * @param number - The expected number of question reviewers.
+   * @param {number} number - The expected number of question reviewers.
    */
   async expectTotalQuestionReviewersToBe(number: number): Promise<void> {
     await this.expectTextContentToBe(

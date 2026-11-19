@@ -37,6 +37,8 @@ const ROLES = testConstants.Roles;
 test.describe.configure({mode: 'serial'});
 
 test.describe('Practice Question Coordinator', function () {
+  // TODO(#28167): Remove this skip once the contributor admin dashboard
+  // stops re-creating the stats table in a loop on mobile viewport.
   test.skip(
     () => process.env.MOBILE === 'true',
     'Test skipped in mobile viewport'
