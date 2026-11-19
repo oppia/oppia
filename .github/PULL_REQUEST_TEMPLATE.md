@@ -24,18 +24,25 @@ Please follow the [instructions for making a code change](https://github.com/opp
 - [ ] The **PR title** starts with "Fix #bugnum: " or "Fix part of #bugnum: ...", followed by a short, clear summary of the changes.
 - [ ] I have assigned the correct reviewers to this PR (or will leave a comment with the phrase "@{{reviewer_username}} PTAL" if I can't assign them directly).
 
-## Testing doc (for PRs with Beam jobs that modify production server data)
+## Testing & Production Impact Doc (for PRs affecting production data, schemas, indexes, or infrastructure)
 
 <!--
-If this PR affects production server data, please follow
-[these instructions](https://github.com/oppia/oppia/wiki/Testing-jobs-and-other-features-on-production#submitting-a-pr-with-a-new-job-or-feature-that-requires-third-party-api)
-and link to the job request doc here.
+If this PR involves any of the following changes, it can cause release regressions if not validated live:
+- Apache Beam jobs or data migration scripts that modify production server data.
+- Database model modifications, schema changes, or data backfills.
+- Database indexes (e.g., index.yaml) or third-party service changes (e.g., Elasticsearch, Redis, etc.)
+- Any changes to datastore queries, since this may require new indexes to be built.
+- Core infrastructure, cron job adjustments, or third-party API changes.
 
-Otherwise, please delete this section.
+Because the develop branch must always be releasable, these changes must be thoroughly tested on the Oppia backup server prior to merging. Please follow [these instructions](https://github.com/oppia/oppia/wiki/Testing-jobs-and-other-features-on-production) and link your testing/job request doc in the text for the first checkbox below. Ask the server admin to tick the boxes once they have confirmed that the changes are safe.
+
+If your PR does NOT affect production data, schemas, datastore queries, indexes, or infrastructure, please delete this "Testing & Production Impact Doc" section fully (including the heading and the checkboxes below).
 -->
 
-- [ ] A testing doc has been written: ... (ADD LINK) ...
-- [ ] _(To be confirmed by the server admin)_ All jobs in this PR have been verified on a live server, and the PR is safe to merge.
+(To be filled in by a server admin)
+
+- [ ] **Backup Server Testing Completed:** [Link to your testing doc / job request spreadsheet]
+- [ ] **Release Safety Verified:** Confirmed that merging this PR will not cause regressions or break deployments due to missing indexes, unapplied migrations, or service deprecations.
 
 ## Proof that changes are correct
 
