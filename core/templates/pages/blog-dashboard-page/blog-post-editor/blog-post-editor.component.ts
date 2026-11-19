@@ -229,7 +229,10 @@ export class BlogPostEditorComponent implements OnInit {
     const millisSinceEpoch = new Date(
       `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${millis}Z`
     ).getTime();
-    return this.dateTimeFormatService.getDateTimeInWords(millisSinceEpoch);
+    return this.dateTimeFormatService.getDateTimeInWords(
+      millisSinceEpoch,
+      false
+    );
   }
 
   updateLocalTitleValue(): void {

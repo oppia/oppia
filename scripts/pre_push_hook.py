@@ -54,9 +54,9 @@ sys.path.append(os.getcwd())
 
 # These imports must come after sys.path modification,
 # so the pylint import-position rules are disabled.
-from scripts import common  # pylint: disable=wrong-import-position
-from scripts import git_changes_utils  # pylint: disable=wrong-import-position
 from scripts import (  # pylint: disable=wrong-import-position
+    common,  # pylint: disable=wrong-import-position
+    git_changes_utils,  # pylint: disable=wrong-import-position
     install_python_prod_dependencies,
 )
 

@@ -84,9 +84,7 @@
       </div>
       <td mat-cell *matCellDef="let element">
         <span class="mobile-label">{{getLastContributedType(this.inputs.activeTab)}}:</span>
-        {{element.lastContributedInDays === 0 ? "Today" : element.lastContributedInDays + " " +
-              (element.lastContributedInDays === 1 ? "day" : "days") + " ago"
-        }}
+        {{getLastContributedText(element)}}
       </td>
     </ng-container>
 
