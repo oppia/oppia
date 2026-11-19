@@ -305,6 +305,8 @@ const watchAVideoButtonInDonationModal =
   'a.e2e-test-thanks-for-donating-page-watch-a-video-button';
 const readOurBlogButtonInDonationModal =
   'a.e2e-test-thanks-for-donating-page-read-our-blog-button';
+const donateThanksWatchAVideoUrl =
+  testConstants.URLs.DonatePageThanksModalWatchAVideoUrl;
 
 // Navbar and sidebar selectors for Donate.
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
@@ -3934,10 +3936,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Clicks the "Watch a video" button in the donation thanks modal and verifies
-   * that it links to Oppia's video page.
+   * Checks that the "Watch a video" button in the donation thanks modal has
+   * the correct text and links to the Oppia video page.
    */
-  async clickWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
+  async expectWatchAVideoButtonInDonationThanksModalToHaveCorrectLink(): Promise<void> {
     await this.expectElementToBeVisible(watchAVideoButtonInDonationModal);
     await this.expectTextContentToBe(
       watchAVideoButtonInDonationModal,
@@ -3945,7 +3947,7 @@ export class LoggedOutUser extends BaseUser {
     );
     await this.expectLinkToHaveHref(
       watchAVideoButtonInDonationModal,
-      'https://www.facebook.com/oppiaorg/videos/189487953721583/'
+      donateThanksWatchAVideoUrl
     );
     showMessage('The Watch A Video button has the right link.');
   }
@@ -3960,8 +3962,10 @@ export class LoggedOutUser extends BaseUser {
       readOurBlogButtonInDonationModal,
       'Read our blog'
     );
-    await this.clickOnElementWithSelector(readOurBlogButtonInDonationModal);
-    await this.expectElementToBeVisible(blogWelcomeHeadingSelector);
+    await this.clickButtonToNavigateToNewPage(
+      readOurBlogButtonInDonationModal,
+      blogUrl
+    );
     showMessage('The Read Our Blog button opens the blog page.');
   }
 

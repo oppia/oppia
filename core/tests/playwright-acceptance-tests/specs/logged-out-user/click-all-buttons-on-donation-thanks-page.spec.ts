@@ -34,8 +34,8 @@ test.describe('Logged-out User in Thanks for Donating page', function () {
     await loggedOutUser.navigateToDonationThanksModalOnDonatePage();
   });
 
-  test('should open the right page with the Watch A Video button.', async function () {
-    await loggedOutUser.clickWatchAVideoButtonInDonationThanksModalOnDonatePage();
+  test('should have the correct link for the Watch A Video button.', async function () {
+    await loggedOutUser.expectWatchAVideoButtonInDonationThanksModalToHaveCorrectLink();
   });
 
   test('should open the Blog page with the Read Our Blog button.', async function () {
