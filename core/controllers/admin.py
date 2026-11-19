@@ -933,7 +933,7 @@ class AdminHandler(
             state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             linked_skill_ids,
             [],
             content_id_generator.next_content_id_index,
@@ -2494,7 +2494,7 @@ class AdminHandler(
                     ),
                     'question_dict': {
                         'id': '',
-                        'version': 0,
+                        'version': feconf.INITIAL_ENTITY_VERSION,
                         'question_state_data': state.to_dict(),
                         'language_code': 'en',
                         'question_state_data_schema_version': 1,
