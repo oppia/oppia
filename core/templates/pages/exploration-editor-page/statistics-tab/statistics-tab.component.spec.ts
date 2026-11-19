@@ -125,7 +125,6 @@ describe('Statistics Tab Component', () => {
             {
               outcome: {
                 missing_prerequisite_skill_id: null,
-                refresher_exploration_id: null,
                 labelled_as_correct: false,
                 feedback: {
                   content_id: 'feedback_1',
@@ -152,7 +151,6 @@ describe('Statistics Tab Component', () => {
           ],
           default_outcome: {
             missing_prerequisite_skill_id: null,
-            refresher_exploration_id: null,
             labelled_as_correct: false,
             feedback: {
               content_id: 'default_outcome',
@@ -220,7 +218,6 @@ describe('Statistics Tab Component', () => {
             {
               outcome: {
                 missing_prerequisite_skill_id: null,
-                refresher_exploration_id: null,
                 labelled_as_correct: false,
                 feedback: {
                   content_id: 'feedback_1',
@@ -247,7 +244,6 @@ describe('Statistics Tab Component', () => {
           ],
           default_outcome: {
             missing_prerequisite_skill_id: null,
-            refresher_exploration_id: null,
             labelled_as_correct: false,
             feedback: {
               content_id: 'default_outcome',

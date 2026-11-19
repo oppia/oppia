@@ -139,7 +139,6 @@ describe('Exploration Warnings Service', () => {
                 outcome: {
                   labelled_as_correct: true,
                   param_changes: [],
-                  refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
                   dest_if_really_stuck: null,
@@ -153,7 +152,6 @@ describe('Exploration Warnings Service', () => {
             default_outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
               dest_if_really_stuck: null,
@@ -240,7 +238,6 @@ describe('Exploration Warnings Service', () => {
                 outcome: {
                   labelled_as_correct: true,
                   param_changes: [],
-                  refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
                   dest_if_really_stuck: null,
@@ -257,7 +254,6 @@ describe('Exploration Warnings Service', () => {
                 outcome: {
                   labelled_as_correct: true,
                   param_changes: [],
-                  refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
                   dest_if_really_stuck: null,
@@ -271,7 +267,6 @@ describe('Exploration Warnings Service', () => {
             default_outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
               dest_if_really_stuck: null,
@@ -367,7 +362,6 @@ describe('Exploration Warnings Service', () => {
             default_outcome: {
               labelled_as_correct: true,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
               dest_if_really_stuck: null,
@@ -452,7 +446,6 @@ describe('Exploration Warnings Service', () => {
                 outcome: {
                   labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
                   dest_if_really_stuck: null,
@@ -468,7 +461,6 @@ describe('Exploration Warnings Service', () => {
             default_outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
               dest_if_really_stuck: null,
@@ -587,7 +579,6 @@ describe('Exploration Warnings Service', () => {
                 outcome: {
                   labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
                   dest_if_really_stuck: null,
@@ -601,7 +592,6 @@ describe('Exploration Warnings Service', () => {
             default_outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
               dest_if_really_stuck: null,
@@ -716,7 +706,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: '',
                     dest_if_really_stuck: null,
@@ -732,7 +721,6 @@ describe('Exploration Warnings Service', () => {
               default_outcome: {
                 labelled_as_correct: true,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State',
                 dest_if_really_stuck: null,
@@ -851,7 +839,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: '',
                     dest_if_really_stuck: null,
@@ -865,7 +852,6 @@ describe('Exploration Warnings Service', () => {
               default_outcome: {
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'Hola',
                 dest_if_really_stuck: null,
@@ -918,7 +904,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: '',
                     dest_if_really_stuck: null,
@@ -932,7 +917,6 @@ describe('Exploration Warnings Service', () => {
               default_outcome: {
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State',
                 dest_if_really_stuck: null,
@@ -1042,7 +1026,6 @@ describe('Exploration Warnings Service', () => {
                 outcome: {
                   labelled_as_correct: true,
                   param_changes: [],
-                  refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
                   dest_if_really_stuck: null,
@@ -1056,7 +1039,6 @@ describe('Exploration Warnings Service', () => {
             default_outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
               dest_if_really_stuck: null,
@@ -1113,7 +1095,6 @@ describe('Exploration Warnings Service', () => {
                 outcome: {
                   labelled_as_correct: true,
                   param_changes: [],
-                  refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
                   dest_if_really_stuck: null,
@@ -1127,7 +1108,6 @@ describe('Exploration Warnings Service', () => {
             default_outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'End',
               dest_if_really_stuck: null,
@@ -1178,7 +1158,6 @@ describe('Exploration Warnings Service', () => {
                 outcome: {
                   labelled_as_correct: true,
                   param_changes: [],
-                  refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
                   dest_if_really_stuck: null,
@@ -1244,7 +1223,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State1',
                     dest_if_really_stuck: null,
@@ -1261,7 +1239,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State2',
                     dest_if_really_stuck: null,
@@ -1278,7 +1255,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State3',
                     dest_if_really_stuck: null,
@@ -1326,7 +1302,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State4',
                     dest_if_really_stuck: null,
@@ -1375,7 +1350,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State4',
                     dest_if_really_stuck: null,
@@ -1424,7 +1398,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State4',
                     dest_if_really_stuck: null,
@@ -1473,7 +1446,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State5',
                     dest_if_really_stuck: null,
@@ -1522,7 +1494,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State6',
                     dest_if_really_stuck: null,
@@ -1571,7 +1542,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State7',
                     dest_if_really_stuck: null,
@@ -1620,7 +1590,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'End',
                     dest_if_really_stuck: null,
@@ -1667,7 +1636,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: '',
                     dest_if_really_stuck: null,
@@ -1775,7 +1743,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State1',
                     dest_if_really_stuck: null,
@@ -1792,7 +1759,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State2',
                     dest_if_really_stuck: null,
@@ -1840,7 +1806,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State3',
                     dest_if_really_stuck: null,
@@ -1889,7 +1854,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State5',
                     dest_if_really_stuck: null,
@@ -1938,7 +1902,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State4',
                     dest_if_really_stuck: null,
@@ -1987,7 +1950,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State6',
                     dest_if_really_stuck: null,
@@ -2036,7 +1998,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'End',
                     dest_if_really_stuck: null,
@@ -2085,7 +2046,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'State7',
                     dest_if_really_stuck: null,
@@ -2099,7 +2059,6 @@ describe('Exploration Warnings Service', () => {
               default_outcome: {
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'Hola',
                 dest_if_really_stuck: null,
@@ -2145,7 +2104,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'End',
                     dest_if_really_stuck: null,
@@ -2162,7 +2120,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: 'Hola',
                     dest_if_really_stuck: null,
@@ -2209,7 +2166,6 @@ describe('Exploration Warnings Service', () => {
                   outcome: {
                     labelled_as_correct: true,
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     dest: '',
                     dest_if_really_stuck: null,

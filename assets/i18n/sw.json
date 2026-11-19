@@ -777,7 +777,6 @@
   "I18N_MODAL_CONTINUE_BUTTON": "Endelea",
   "I18N_MULTIPLE_LESSONS": "Masomo",
   "I18N_NEXT_LESSON": "Somo Linalofuata",
-  "I18N_NO": "Hapana",
   "I18N_ONE_SUBSCRIBER_TEXT": "Una mchangiaji 1.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Ushirikiano",
   "I18N_PARTNERSHIPS_PAGE_TITLE": "Ushirikiano | Oppia",
@@ -847,7 +846,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "Asante!",
   "I18N_PLAYER_REPORT_TOOLTIP": "Ripoti Uchunguzi",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "Rudi kwenye Maktaba",
-  "I18N_PLAYER_RETURN_TO_PARENT": "Rudi kwenye Somo Kuu",
   "I18N_PLAYER_RETURN_TO_STORY": "Rudi kwenye Hadithi",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "Gawa mkusanyiko huu",
   "I18N_PLAYER_STAY_ANONYMOUS": "Usijulikane",
@@ -910,8 +908,6 @@
   "I18N_QUESTION_PLAYER_NEW_SESSION": "Cheza tena",
   "I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL": "Kagua Ustadi wa Alama ya Chini Zaidi",
   "I18N_QUESTION_PLAYER_TEST_PASSED": "Kikao kimekamilika. Umefanya vizuri!",
-  "I18N_REFRESHER_EXPLORATION_MODAL_BODY": "Inaonekana unatatizika na swali hili. Je, ungependa kujaribu uchunguzi mfupi ili kuonyesha upya kumbukumbu yako,na kurudi hapa baada ya kukamilisha hilo?",
-  "I18N_REFRESHER_EXPLORATION_MODAL_TITLE": "Je, ungependa kionyesha upya?",
   "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Kipindi cha Usajili Kimeisha",
   "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Samahani, kipindi chako cha usajili kimeisha.Tafadhali bofya \"Endelea Usajili\" ili kuanzisha upya mchakato.",
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Jopo la Mratibu wa Kutolewa kwa Oppia",
@@ -1162,6 +1158,5 @@
   "I18N_VOLUNTEER_PAGE_BREADCRUMB": "Ujitolee",
   "I18N_VOLUNTEER_PAGE_TITLE": "Ujitolee | Oppia",
   "I18N_WARNING_MODAL_DESCRIPTION": "Hii itaonyesha suluhisho kamili. Una uhakika?",
-  "I18N_WARNING_MODAL_TITLE": "Onyo!",
-  "I18N_YES": "Ndiyo"
+  "I18N_WARNING_MODAL_TITLE": "Onyo!"
 }

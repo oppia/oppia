@@ -65,7 +65,6 @@ describe('DragAndDropSortInputValidationService', () => {
       missing_prerequisite_skill_id: null,
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null,
     });
 
     customOutcome = Outcome.createFromBackendDict({
@@ -77,7 +76,6 @@ describe('DragAndDropSortInputValidationService', () => {
       },
       labelled_as_correct: true,
       param_changes: [],
-      refresher_exploration_id: null,
       missing_prerequisite_skill_id: '',
     });
 

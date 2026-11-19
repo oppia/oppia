@@ -48,7 +48,6 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
             'feedback': {'content_id': 'feedback_1', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -70,7 +69,6 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
             'feedback': {'content_id': 'feedback_2', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -118,7 +116,6 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
                     'html': 'Correct Answer',
                 },
                 'param_changes': [],
-                'refresher_exploration_id': None,
                 'labelled_as_correct': True,
                 'missing_prerequisite_skill_id': None,
             },
@@ -238,7 +235,6 @@ class AuditPopulateQuestionSummaryVersionOneOffJobTests(
             'feedback': {'content_id': 'feedback_1', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -260,7 +256,6 @@ class AuditPopulateQuestionSummaryVersionOneOffJobTests(
             'feedback': {'content_id': 'feedback_2', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -308,7 +303,6 @@ class AuditPopulateQuestionSummaryVersionOneOffJobTests(
                     'html': 'Correct Answer',
                 },
                 'param_changes': [],
-                'refresher_exploration_id': None,
                 'labelled_as_correct': True,
                 'missing_prerequisite_skill_id': None,
             },
@@ -411,7 +405,6 @@ class MigrateQuestionJobTests(job_test_utils.JobTestBase):
             'feedback': {'content_id': 'feedback_1', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -432,7 +425,6 @@ class MigrateQuestionJobTests(job_test_utils.JobTestBase):
             'feedback': {'content_id': 'feedback_2', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -452,7 +444,6 @@ class MigrateQuestionJobTests(job_test_utils.JobTestBase):
             'feedback': {'content_id': 'feedback_0', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -496,7 +487,6 @@ class MigrateQuestionJobTests(job_test_utils.JobTestBase):
                     'html': 'Correct Answer',
                 },
                 'param_changes': [],
-                'refresher_exploration_id': None,
                 'labelled_as_correct': True,
                 'missing_prerequisite_skill_id': None,
             },
@@ -555,7 +545,6 @@ class MigrateQuestionJobTests(job_test_utils.JobTestBase):
                     'html': 'Correct Answer',
                 },
                 'param_changes': [],
-                'refresher_exploration_id': None,
                 'labelled_as_correct': True,
                 'missing_prerequisite_skill_id': None,
             },
@@ -760,7 +749,6 @@ class AuditQuestionMigrationJobTests(job_test_utils.JobTestBase):
             'feedback': {'content_id': 'feedback_1', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -782,7 +770,6 @@ class AuditQuestionMigrationJobTests(job_test_utils.JobTestBase):
             'feedback': {'content_id': 'feedback_2', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -803,7 +790,6 @@ class AuditQuestionMigrationJobTests(job_test_utils.JobTestBase):
             'feedback': {'content_id': 'feedback_0', 'html': '<p>Feedback</p>'},
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         },
         'rule_specs': [
@@ -848,7 +834,6 @@ class AuditQuestionMigrationJobTests(job_test_utils.JobTestBase):
                     'html': 'Correct Answer',
                 },
                 'param_changes': [],
-                'refresher_exploration_id': None,
                 'labelled_as_correct': True,
                 'missing_prerequisite_skill_id': None,
             },
@@ -908,7 +893,6 @@ class AuditQuestionMigrationJobTests(job_test_utils.JobTestBase):
                     'html': 'Correct Answer',
                 },
                 'param_changes': [],
-                'refresher_exploration_id': None,
                 'labelled_as_correct': True,
                 'missing_prerequisite_skill_id': None,
             },

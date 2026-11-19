@@ -247,7 +247,6 @@
   "I18N_MODAL_CANCEL_BUTTON": "Отмена",
   "I18N_MODAL_CONTINUE_BUTTON": "Продолжить",
   "I18N_MULTIPLE_LESSONS": "Уроки",
-  "I18N_NO": "Нет",
   "I18N_ONE_SUBSCRIBER_TEXT": "У вас 1 подписчик.",
   "I18N_PARTNERSHIPS_PAGE_OUR_PARTNERS": "Наши партнеры",
   "I18N_PLAYER_AUDIO_EXPAND_TEXT": "Послушай урок",
@@ -274,7 +273,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_CLOSE": "Закрыть",
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "Спасибо!",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "Вернуться в библиотеку",
-  "I18N_PLAYER_RETURN_TO_PARENT": "Вернуться к основному уроку",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "Поделиться коллекцией",
   "I18N_PLAYER_STAY_ANONYMOUS": "Остаться анонимным",
   "I18N_PLAYER_SUBMIT_BUTTON": "Отправить",
@@ -380,6 +378,5 @@
   "I18N_VOLUNTEER_PAGE_TITLE": "Волонтёр | Oppia",
   "I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "Программное обеспечение",
   "I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION": "Перевод",
-  "I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_EXPECTATIONS_HEADING": "Ожидания волонтеров-переводчиков",
-  "I18N_YES": "Да"
+  "I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_EXPECTATIONS_HEADING": "Ожидания волонтеров-переводчиков"
 }

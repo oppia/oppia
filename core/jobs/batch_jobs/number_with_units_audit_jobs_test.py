@@ -158,7 +158,6 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
                         state_domain.SubtitledHtml('feedback_8', ''),
                         default_outcome.labelled_as_correct,
                         default_outcome.param_changes,
-                        default_outcome.refresher_exploration_id,
                         default_outcome.missing_prerequisite_skill_id,
                     ),
                     [
@@ -211,7 +210,6 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
                         state_domain.SubtitledHtml('feedback_9', ''),
                         default_outcome.labelled_as_correct,
                         default_outcome.param_changes,
-                        default_outcome.refresher_exploration_id,
                         default_outcome.missing_prerequisite_skill_id,
                     ),
                     [
@@ -504,7 +502,6 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
                         state_domain.SubtitledHtml('feedback_2', ''),
                         default_outcome.labelled_as_correct,
                         default_outcome.param_changes,
-                        default_outcome.refresher_exploration_id,
                         default_outcome.missing_prerequisite_skill_id,
                     ),
                     [

@@ -32,7 +32,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '12'
@@ -57,7 +56,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: CodeRepl
       solution: null
@@ -105,7 +103,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -183,7 +180,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
@@ -215,7 +211,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -258,7 +253,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -295,7 +289,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: MusicNotesInput
       solution: null
@@ -329,7 +322,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             g:
@@ -396,7 +388,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: GraphInput
       solution: null
@@ -428,7 +419,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 6.0
@@ -445,7 +435,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -477,7 +466,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -502,7 +490,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: SetInput
       solution: null
@@ -538,7 +525,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -564,7 +550,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -600,7 +585,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -626,7 +610,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -662,7 +645,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             d: 3300.0
@@ -688,7 +670,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: InteractiveMap
       solution: null

@@ -926,7 +926,6 @@ class AdminHandler(
                 True,
                 [],
                 None,
-                None,
             )
         )
         question = question_domain.Question(

@@ -1009,7 +1009,6 @@
   "I18N_MULTIPLE_LESSONS": "Leçons",
   "I18N_NEW_HINT_TITLE": "Indice <[hintIndex]>",
   "I18N_NEXT_LESSON": "Leçon suivante",
-  "I18N_NO": "Non",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "Aucun résultat trouvé pour le nom d’utilisateur correspondant.",
   "I18N_ONE_SUBSCRIBER_TEXT": "Vous avez 1 abonné.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Partenariats",
@@ -1135,7 +1134,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "Merci !",
   "I18N_PLAYER_REPORT_TOOLTIP": "Signaler l’exploration",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "Retour à la Bibliothèque",
-  "I18N_PLAYER_RETURN_TO_PARENT": "Retourner à la leçon principale",
   "I18N_PLAYER_RETURN_TO_STORY": "Retour au récit",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "Partager cette collection",
   "I18N_PLAYER_STAY_ANONYMOUS": "Rester anonyme",
@@ -1208,8 +1206,6 @@
   "I18N_QUESTION_PLAYER_SCORE_CALCULATION": "Ce score est basé sur le nombre d'astuces que vous avez utilisées et de réponses incorrectes que vous avez saisies au cours de cette session.",
   "I18N_QUESTION_PLAYER_TEST_PASSED": "Session terminée. Bien joué !",
   "I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE": "On dirait que vous êtes un peu coincé ici. Passons en revue les concepts via un court chemin de révision.",
-  "I18N_REFRESHER_EXPLORATION_MODAL_BODY": "Il semble que vous ayez des difficultés avec cette question. Voudriez-vous essayer une courte exploration pour vous rafraîchir la mémoire et revenir ici après l’avoir terminée ?",
-  "I18N_REFRESHER_EXPLORATION_MODAL_TITLE": "Voudriez-vous un rappel pour vous aider ?",
   "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Session d’inscription expirée",
   "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Désolé mais votre session d’inscription a expiré. Veuillez cliquer sur « Continuer l’inscription » pour redémarrer le processus.",
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Panneau du coordinateur de publication d’Oppia",
@@ -1677,6 +1673,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "Des projets qui ont du sens",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Votre travail aide directement les étudiants mal desservis du monde entier à accéder à une éducation gratuite et de haute qualité.",
   "I18N_WARNING_MODAL_DESCRIPTION": "Cela affichera toute la solution. Est-ce vraiment ce que vous souhaitez ?",
-  "I18N_WARNING_MODAL_TITLE": "Attention !",
-  "I18N_YES": "Oui"
+  "I18N_WARNING_MODAL_TITLE": "Attention !"
 }

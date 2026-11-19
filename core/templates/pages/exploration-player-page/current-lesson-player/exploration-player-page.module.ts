@@ -28,7 +28,6 @@ import {FlagExplorationModalComponent} from './modals/flag-exploration-modal.com
 import {ExplorationSuccessfullyFlaggedModalComponent} from './modals/exploration-successfully-flagged-modal.component';
 import {LearnerViewInfoComponent} from './layout-directives/learner-view-info.component';
 import {MaterialModule} from 'modules/material.module';
-import {RefresherExplorationConfirmationModal} from './modals/refresher-exploration-confirmation-modal.component';
 import {ExplorationPlayerPageComponent} from './exploration-player-page.component';
 import {ExplorationPlayerPageRootComponent} from './exploration-player-page-root.component';
 import {ProgressReminderModalComponent} from './templates/progress-reminder-modal.component';
@@ -71,7 +70,6 @@ import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.gua
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
-    RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     ExplorationPlayerPageComponent,
@@ -81,7 +79,6 @@ import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.gua
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
-    RefresherExplorationConfirmationModal,
   ],
   providers: [HintAndSolutionModalService, FatigueDetectionService],
   exports: [LearnerLocalNavComponent, LearnerViewInfoComponent],

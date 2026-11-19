@@ -700,7 +700,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -729,7 +728,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -764,7 +762,6 @@ title: Old Title
                             'labelled_as_correct': False,
                             'missing_prerequisite_skill_id': None,
                             'param_changes': [],
-                            'refresher_exploration_id': None,
                         },
                         'rule_specs': [
                             {
@@ -797,7 +794,6 @@ title: Old Title
                     'labelled_as_correct': False,
                     'missing_prerequisite_skill_id': None,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                 },
                 'hints': [],
                 'id': 'TextInput',
@@ -1071,7 +1067,6 @@ title: Old Title
                     'labelled_as_correct': False,
                     'missing_prerequisite_skill_id': None,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                 },
                 'hints': [],
                 'id': 'Continue',

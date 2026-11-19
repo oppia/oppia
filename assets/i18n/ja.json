@@ -312,7 +312,6 @@
   "I18N_LICENSE_TERMS_HEADING": "ライセンス条項",
   "I18N_MODAL_CANCEL_BUTTON": "キャンセル",
   "I18N_MODAL_REMOVE_BUTTON": "除去",
-  "I18N_NO": "いいえ",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "ユーザー名に一致する結果が見つかりませんでした。",
   "I18N_ONE_SUBSCRIBER_TEXT": "サブスクライブしている人は1人です。",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "パートナーシップ",
@@ -353,7 +352,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "ありがとうございました！",
   "I18N_PLAYER_REPORT_TOOLTIP": "探検を報告",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "ライブラリに戻る",
-  "I18N_PLAYER_RETURN_TO_PARENT": "メインレッスンに戻る",
   "I18N_PLAYER_RETURN_TO_STORY": "ストーリーに戻る",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "このコレクションを共有",
   "I18N_PLAYER_STAY_ANONYMOUS": "匿名にする",
@@ -472,6 +470,5 @@
   "I18N_TOPNAV_SIGN_IN": "サインイン",
   "I18N_TOTAL_SUBSCRIBERS_TEXT": "サブスクライブしている人は合計<[totalSubscribers]>人です。",
   "I18N_UNSUBSCRIBE_BUTTON_TEXT": "サブスクライブ解除",
-  "I18N_VOLUNTEER_PAGE_TITLE": "Oppiaでのボランティア活動 | グローバルチームに参加しよう",
-  "I18N_YES": "はい"
+  "I18N_VOLUNTEER_PAGE_TITLE": "Oppiaでのボランティア活動 | グローバルチームに参加しよう"
 }

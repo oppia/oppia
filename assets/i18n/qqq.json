@@ -1151,7 +1151,6 @@
   "I18N_MY_SUGGESTION_SUBMITTED_ON": "Label displayed for the date when the feedback was submitted.",
   "I18N_NEW_HINT_TITLE": "Title of the modal that shows a hint to the learner.",
   "I18N_NEXT_LESSON": "Title of the section that shows the next lesson in a story once a chapter is completed.",
-  "I18N_NO": "Text on button to reject the content of a modal.\n\n{{Identical|No}}",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "Text shown on learners progress tab on edit learner group page when no learners are found to have username matching the searched keyword.",
   "I18N_ONE_SUBSCRIBER_TEXT": "Text displayed under the subscribers tab in creator dashboard. If the creator has one subscriber, this text is displayed which informs him/her about the same.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Text displayed in the Partnerships page. - Text shown in the top left corner of the nav bar.",
@@ -1277,7 +1276,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "Text displayed when the user has successfully reported an exploration. - Text shown in the header of the 'exploration successfully flagged' modal.\n{{Identical|Thank}}",
   "I18N_PLAYER_REPORT_TOOLTIP": "Text displayed when the user is playing an exploration. - Tooltip for the button that opens the a popup to send report on exploration to the moderators.",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "Text displayed when the user has finished an exploration outside of a collection. - Text shown inside a button after the user finishes playing an exploration outside a collection. When the user clicks the button, the library page is loaded.",
-  "I18N_PLAYER_RETURN_TO_PARENT": "Text displayed when the user has finished a refresher exploration. - Text shown inside a button after the user finishes playing a refresher exploration. When the user clicks the button, the parent exploration is loaded.",
   "I18N_PLAYER_RETURN_TO_STORY": "Text displayed when the user has finished an exploration of a story. - Text shown inside a button after the user finishes playing an exploration of a story. When the user clicks the button, the story viewer page is loaded.",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "Text displayed when the user is viewing a collection. - this text is shown in the lower right hand side of the screen next to social media buttons used to share the collection.",
   "I18N_PLAYER_STAY_ANONYMOUS": "Text displayed when the user is playing an exploration. - When the user clicks the feedback button in the navigation bar, a dialog appears. This text is shown to the right of a check button. If the user checks the box, then his personal information will not be included in the feedback.",
@@ -1353,8 +1351,6 @@
   "I18N_QUESTION_PLAYER_SCORE_CALCULATION": "Text displayed in Review Test pages. - Text that is shown after the breakdown of the score that indicates how the score is calculated.",
   "I18N_QUESTION_PLAYER_TEST_PASSED": "Text displayed in Practice Session and Review Test pages. - Text that is shown above the score wheel when the user passes the test.",
   "I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE": "Oppia's response when the learner is being redirected to the stuck state for refreshing concepts.",
-  "I18N_REFRESHER_EXPLORATION_MODAL_BODY": "Body of modal that redirects the learner to a separate exploration to refresh certain concepts.",
-  "I18N_REFRESHER_EXPLORATION_MODAL_TITLE": "Title of the modal that redirects the learner to a separate exploration to refresh certain concepts.",
   "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Text which appears as the heading for registration session expired modal on Signup page.",
   "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Text which appears on registration session expired modal on Signup page - This message informs user that their registration session has expired and they need to click on Continue Registration to restart the registration.",
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Text displayed on the browser tab when on the release coordinator page.",
@@ -1903,6 +1899,5 @@
   "I18N_WARNING_MODAL_DESCRIPTION": "Text shown in the warning modal before the solution is displayed",
   "I18N_WARNING_MODAL_TITLE": "Title of the modal shown before the modal that displays the solution, to warn the user\n\n{{Identical|Warning}}",
   "I18N_WARNING_PLAIN_TEXT_MATH_EXPRESSION": "Warning text shown in the editor to indicate that a math expression was typed as plain text.",
-  "I18N_WARNING_TRANSLATOR_PLAIN_TEXT_MATH_EXPRESSION": "Warning text shown to translators to indicate that a math expression was typed as plain text.",
-  "I18N_YES": "Text for the option Yes, when a user wants to proceed with some action.\n{{Identical|Yes}}"
+  "I18N_WARNING_TRANSLATOR_PLAIN_TEXT_MATH_EXPRESSION": "Warning text shown to translators to indicate that a math expression was typed as plain text."
 }

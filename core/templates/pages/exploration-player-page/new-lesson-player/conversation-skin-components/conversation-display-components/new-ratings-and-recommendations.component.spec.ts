@@ -77,7 +77,6 @@ describe('New Ratings and recommendations component', () => {
   let userService: UserService;
   let explorationModeService: ExplorationModeService;
   let urlInterpolationService: UrlInterpolationService;
-  let conversationFlowService: ConversationFlowService;
   let localStorageService: LocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -169,7 +168,6 @@ describe('New Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
-    conversationFlowService = TestBed.inject(ConversationFlowService);
     explorationModeService = TestBed.inject(ExplorationModeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     localStorageService = TestBed.inject(LocalStorageService);
@@ -557,32 +555,6 @@ describe('New Ratings and recommendations component', () => {
       expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
     })
   );
-
-  it('should return the value from getIsRefresherExploration', () => {
-    const expectedValue = true;
-    spyOn(conversationFlowService, 'getIsRefresherExploration').and.returnValue(
-      expectedValue
-    );
-
-    const result = componentInstance.getIsRefresherExploration();
-
-    expect(
-      conversationFlowService.getIsRefresherExploration
-    ).toHaveBeenCalled();
-    expect(result).toBe(expectedValue);
-  });
-
-  it('should return the value from getParentExplorationIds', () => {
-    const expectedIds = ['exp1', 'exp2'];
-    spyOn(conversationFlowService, 'getParentExplorationIds').and.returnValue(
-      expectedIds
-    );
-
-    const result = componentInstance.getParentExplorationIds();
-
-    expect(conversationFlowService.getParentExplorationIds).toHaveBeenCalled();
-    expect(result).toBe(expectedIds);
-  });
 
   it("should save user's sign up section preference to localStorage", () => {
     spyOn(localStorageService, 'updateEndChapterSignUpSectionHiddenPreference');

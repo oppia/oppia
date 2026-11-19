@@ -1004,7 +1004,6 @@
   "I18N_MULTIPLE_LESSONS": "Lesins",
   "I18N_NEW_HINT_TITLE": "Hint <[hintIndex]>",
   "I18N_NEXT_LESSON": "Next Lesson",
-  "I18N_NO": "No",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "No results found for matching username.",
   "I18N_ONE_SUBSCRIBER_TEXT": "You get 1 subscriber.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Partnerships",
@@ -1130,7 +1129,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "Thanks!",
   "I18N_PLAYER_REPORT_TOOLTIP": "Report Exploration",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "Return to Library",
-  "I18N_PLAYER_RETURN_TO_PARENT": "Return to Main Lesson",
   "I18N_PLAYER_RETURN_TO_STORY": "Return to Story",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "Share this collection",
   "I18N_PLAYER_STAY_ANONYMOUS": "Stay Anonymous",
@@ -1203,8 +1201,6 @@
   "I18N_QUESTION_PLAYER_SCORE_CALCULATION": "Dis score wey you get so na because of di hints wey you use and di answers wey you nor get for inside di session.",
   "I18N_QUESTION_PLAYER_TEST_PASSED": "You don finish di session. You try no be small!",
   "I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE": "E be like say you don hook. Make we review di concepts for short revision pathway.",
-  "I18N_REFRESHER_EXPLORATION_MODAL_BODY": "E be like say you don dey get problem with dis queshun. You go wan try learn short exploration make you fit refresh your memory, wen you finish am, you 'o come back here come try am again?",
-  "I18N_REFRESHER_EXPLORATION_MODAL_TITLE": "You go like do refresher?",
   "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Your registration session don expire oh.",
   "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Nor vex, your registration session don expire. Abeg click \"continue Registration\" make you fit restart di process.",
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Oppia Release Coordinator Panel",
@@ -1672,6 +1668,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "Projects wey matter",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Di work wey you dey do dey straight help student dem wey dem no dey help well well for di whole world to fit see free-free, better learning.",
   "I18N_WARNING_MODAL_DESCRIPTION": "This go show the full solution.You dey sure?",
-  "I18N_WARNING_MODAL_TITLE": "Warning!",
-  "I18N_YES": "Yes"
+  "I18N_WARNING_MODAL_TITLE": "Warning!"
 }

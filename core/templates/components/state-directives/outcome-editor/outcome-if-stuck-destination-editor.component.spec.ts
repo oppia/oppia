@@ -159,7 +159,6 @@ describe('Outcome Destination If Stuck Editor', () => {
         new SubtitledHtml('<p> HTML string </p>', 'Id'),
         false,
         [],
-        null,
         null
       );
       component.outcomeNewStateName = 'End';
@@ -264,7 +263,6 @@ describe('Outcome Destination If Stuck Editor', () => {
         new SubtitledHtml('<p> HTML string </p>', 'Id'),
         false,
         [],
-        null,
         null
       );
       spyOn(focusManagerService, 'setFocus');
@@ -284,7 +282,6 @@ describe('Outcome Destination If Stuck Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
 
@@ -296,7 +293,6 @@ describe('Outcome Destination If Stuck Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
 
@@ -321,7 +317,6 @@ describe('Outcome Destination If Stuck Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
     spyOn(component.getChanges, 'emit');
