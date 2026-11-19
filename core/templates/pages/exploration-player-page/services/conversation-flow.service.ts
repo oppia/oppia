@@ -829,8 +829,8 @@ export class ConversationFlowService {
       };
       this.explorationSummaryBackendApiService
         .loadPublicExplorationSummariesAsync([refresherExplorationId])
-        .then(response => {
-          if (response.summaries.length > 0) {
+        .then(summaries => {
+          if (summaries.length > 0) {
             this.refresherExplorationConfirmationModalService.displayRedirectConfirmationModal(
               refresherExplorationId,
               confirmRedirection
