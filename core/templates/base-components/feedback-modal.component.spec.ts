@@ -76,6 +76,8 @@ class MockImageReceiverComponent {
 }
 
 class MockWindowRef {
+  reloadSpy: jasmine.Spy = jasmine.createSpy('reload');
+
   nativeWindow: {
     // When signIn() redirects with a login URL, production assigns the URL
     // string directly to nativeWindow.location. When loginUrl is empty, it
@@ -97,7 +99,7 @@ class MockWindowRef {
   } = {
     location: {
       href: 'https://www.oppia.org/learn/math',
-      reload: jasmine.createSpy('reload'),
+      reload: this.reloadSpy,
     },
     navigator: {
       userAgent: 'test-agent',
@@ -647,10 +649,7 @@ describe('FeedbackModalComponent', () => {
     component.signIn();
     flushMicrotasks();
 
-    expect(typeof windowRef.nativeWindow.location).not.toBe('string');
-    if (typeof windowRef.nativeWindow.location !== 'string') {
-      expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
-    }
+    expect(windowRef.reloadSpy).toHaveBeenCalled();
   }));
 
   it('should select typo category and disable technical logs checkbox', () => {
