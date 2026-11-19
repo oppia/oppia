@@ -23,7 +23,6 @@ import {SuperAdmin} from '../../utilities/user/super-admin';
 import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import testConstants from '../../utilities/common/test-constants';
-import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
 const NUM_OF_DUMMY_BLOGS = 30;
@@ -41,9 +40,6 @@ test.describe('Logged-out User', function () {
   let blogPostEditor: BlogPostEditor & LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
-    if (process.env.PROD_ENV === 'true') {
-      return;
-    }
     loggedOutUser = await UserFactory.createLoggedOutUser(browser);
     superAdmin = await UserFactory.createNewSuperAdmin(browser);
     blogPostEditor = await UserFactory.createNewUser(
@@ -53,35 +49,24 @@ test.describe('Logged-out User', function () {
       [ROLES.BLOG_POST_EDITOR]
     );
 
-    const isInProdMode = await superAdmin.isInProdMode();
-    if (!isInProdMode) {
-      await superAdmin.navigateToAdminPageActivitiesTab();
-      await superAdmin.generateDummyBlogPosts(NUM_OF_DUMMY_BLOGS);
+    await superAdmin.generateDummyBlogPosts(NUM_OF_DUMMY_BLOGS);
 
-      await blogPostEditor.navigateToBlogDashboardPage();
-      await blogPostEditor.openBlogEditorPage();
-      await blogPostEditor.uploadBlogPostThumbnailImage();
-      await blogPostEditor.updateBlogPostTitle('Recipe Post');
-      await blogPostEditor.updateBodyTextTo(
-        'This is a special recipe that uses a secret ingredient called Pineapple to make it sweet.'
-      );
-      await blogPostEditor.selectTag('News');
-      await blogPostEditor.saveBlogBodyChanges();
-      await blogPostEditor.publishTheBlogPost();
-    } else {
-      showMessage(
-        'The application is currently running in production mode. Skipping dummy blog post generation.'
-      );
-    }
+    await blogPostEditor.navigateToBlogDashboardPage();
+    await blogPostEditor.openBlogEditorPage();
+    await blogPostEditor.uploadBlogPostThumbnailImage();
+    await blogPostEditor.updateBlogPostTitle('Recipe Post');
+    await blogPostEditor.updateBodyTextTo(
+      'This is a special recipe that uses a secret ingredient called Pineapple to make it sweet.'
+    );
+    await blogPostEditor.selectTag('News');
+    await blogPostEditor.saveBlogBodyChanges();
+    await blogPostEditor.publishTheBlogPost();
 
-    await UserFactory.closeBrowserForUser(superAdmin);
+    await UserFactory.closeSuperAdminBrowser();
     await UserFactory.closeBrowserForUser(blogPostEditor);
   });
 
   test.beforeEach(async function () {
-    if (process.env.PROD_ENV === 'true') {
-      return;
-    }
     await loggedOutUser.navigateToBlogPage();
   });
 

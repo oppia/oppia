@@ -249,13 +249,6 @@ export class SuperAdmin extends LoggedInUser {
   }
 
   /**
-   * Function to check if the application is running in production mode.
-   */
-  async isInProdMode(): Promise<boolean> {
-    return process.env.PROD_ENV === 'true';
-  }
-
-  /**
    * Navigates to the admin page activities tab.
    */
   async navigateToAdminPageActivitiesTab(): Promise<void> {
@@ -282,7 +275,9 @@ export class SuperAdmin extends LoggedInUser {
     await this.expectElementToBeVisible(generateBlogPostButton);
     const responsePromise = this.page.waitForResponse(
       response =>
-        response.url().includes('/adminhandler') && response.status() === 200
+        response.url().includes('/adminhandler') &&
+        response.request().method() === 'POST' &&
+        response.status() === 200
     );
     await this.clickOnElementWithSelector(generateBlogPostButton);
     await responsePromise;
