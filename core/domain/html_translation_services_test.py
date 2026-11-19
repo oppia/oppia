@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import html
 import json
 
 from core.domain import html_translation_services
@@ -192,6 +193,190 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertIn('Hint', restored)
         self.assertIn('&lt;p&gt;Try&lt;/p&gt;', restored)
         self.assertIn('Hint 2', restored)
+
+    def test_process_collapsible_restores_nested_and_outer_links_separately(
+        self,
+    ) -> None:
+        nested_link = (
+            '<oppia-noninteractive-link text-with-value="Read more" '
+            'url-with-value="https://oppia.org/nested">'
+            '</oppia-noninteractive-link>'
+        )
+        source = (
+            '<div><p><oppia-noninteractive-link text-with-value="Outside" '
+            'url-with-value="https://oppia.org/outside">'
+            '</oppia-noninteractive-link></p></div>'
+            '<oppia-noninteractive-collapsible heading-with-value="Show" '
+            'content-with-value="%s"></oppia-noninteractive-collapsible>'
+            % html.escape(nested_link, quote=True)
+        )
+        protected = html_translation_services.preprocess_html_for_translation(
+            source
+        )
+        translated = (
+            protected.replace('Read more', 'Lire la suite')
+            .replace('Outside', 'Dehors')
+            .replace('Show', 'Afficher')
+        )
+
+        restored = html_translation_services.postprocess_translated_html(
+            translated
+        )
+
+        soup = bs4.BeautifulSoup(restored, 'html.parser')
+        outer_link = soup.find('oppia-noninteractive-link')
+        self.assertEqual(outer_link['text-with-value'], 'Dehors')
+        self.assertEqual(
+            outer_link['url-with-value'], 'https://oppia.org/outside'
+        )
+        collapsible = soup.find('oppia-noninteractive-collapsible')
+        self.assertEqual(collapsible['heading-with-value'], 'Afficher')
+        inner_soup = bs4.BeautifulSoup(
+            html.unescape(collapsible['content-with-value']), 'html.parser'
+        )
+        restored_link = inner_soup.find('oppia-noninteractive-link')
+        self.assertEqual(restored_link['text-with-value'], 'Lire la suite')
+        self.assertEqual(
+            restored_link['url-with-value'], 'https://oppia.org/nested'
+        )
+        self.assertNotIn('data-temp-', restored)
+        self.assertNotIn('translate=', restored)
+
+    def test_process_collapsible_preserves_json_encoded_nested_link(
+        self,
+    ) -> None:
+        soup = bs4.BeautifulSoup('', 'html.parser')
+        link = soup.new_tag('oppia-noninteractive-link')
+        link['url-with-value'] = json.dumps('https://oppia.org')
+        link['text-with-value'] = json.dumps('Learn more')
+        collapsible = soup.new_tag('oppia-noninteractive-collapsible')
+        collapsible['heading-with-value'] = json.dumps('Hint')
+        collapsible['content-with-value'] = json.dumps('<p>%s</p>' % link)
+        protected = html_translation_services.preprocess_html_for_translation(
+            str(collapsible)
+        )
+
+        restored = html_translation_services.postprocess_translated_html(
+            protected
+        )
+
+        restored_soup = bs4.BeautifulSoup(restored, 'html.parser')
+        restored_collapsible = restored_soup.find(
+            'oppia-noninteractive-collapsible'
+        )
+        self.assertEqual(restored_collapsible.attrs, collapsible.attrs)
+        self.assertNotIn('data-temp-', restored)
+        self.assertNotIn('translate=', restored)
+
+    def test_process_tabs_restores_links_in_separate_tabs(self) -> None:
+        tabs = [
+            {
+                'title': 'First',
+                'content': (
+                    '<oppia-noninteractive-link text-with-value="First link" '
+                    'url-with-value="https://oppia.org/first">'
+                    '</oppia-noninteractive-link>'
+                ),
+            },
+            {
+                'title': 'Second',
+                'content': (
+                    '<oppia-noninteractive-link text-with-value="Second link" '
+                    'url-with-value="https://oppia.org/second">'
+                    '</oppia-noninteractive-link>'
+                ),
+            },
+        ]
+        source = (
+            '<oppia-noninteractive-tabs tab_contents-with-value="%s">'
+            '</oppia-noninteractive-tabs>'
+            % html.escape(json.dumps(tabs), quote=True)
+        )
+        protected = html_translation_services.preprocess_html_for_translation(
+            source
+        )
+        translated = protected.replace('First', 'Premier').replace(
+            'Second', 'Deuxieme'
+        )
+
+        restored = html_translation_services.postprocess_translated_html(
+            translated
+        )
+
+        soup = bs4.BeautifulSoup(restored, 'html.parser')
+        restored_tabs = json.loads(
+            soup.find('oppia-noninteractive-tabs')['tab_contents-with-value']
+        )
+        self.assertEqual(len(restored_tabs), 2)
+        for tab, title, url in zip(
+            restored_tabs,
+            ['Premier', 'Deuxieme'],
+            ['https://oppia.org/first', 'https://oppia.org/second'],
+        ):
+            self.assertEqual(tab['title'], title)
+            inner_soup = bs4.BeautifulSoup(tab['content'], 'html.parser')
+            restored_link = inner_soup.find('oppia-noninteractive-link')
+            self.assertEqual(
+                restored_link['text-with-value'], '%s link' % title
+            )
+            self.assertEqual(restored_link['url-with-value'], url)
+        self.assertNotIn('data-temp-', restored)
+        self.assertNotIn('translate=', restored)
+
+    def test_process_workedexample_restores_nested_image_attributes(
+        self,
+    ) -> None:
+        image = (
+            '<oppia-noninteractive-image filepath-with-value="img.png" '
+            'alt-with-value="A red car" caption-with-value="Figure 1">'
+            '</oppia-noninteractive-image>'
+        )
+        source = (
+            '<oppia-noninteractive-workedexample question-with-value="Question" '
+            'answer-with-value="%s"></oppia-noninteractive-workedexample>'
+            % html.escape(image, quote=True)
+        )
+        protected = html_translation_services.preprocess_html_for_translation(
+            source
+        )
+        translated = protected.replace(
+            'A red car', 'Une voiture rouge'
+        ).replace('Figure 1', 'Image 1')
+
+        restored = html_translation_services.postprocess_translated_html(
+            translated
+        )
+
+        soup = bs4.BeautifulSoup(restored, 'html.parser')
+        workedexample = soup.find('oppia-noninteractive-workedexample')
+        self.assertEqual(workedexample['question-with-value'], 'Question')
+        inner_soup = bs4.BeautifulSoup(
+            html.unescape(workedexample['answer-with-value']), 'html.parser'
+        )
+        restored_image = inner_soup.find('oppia-noninteractive-image')
+        self.assertEqual(restored_image['alt-with-value'], 'Une voiture rouge')
+        self.assertEqual(restored_image['caption-with-value'], 'Image 1')
+        self.assertEqual(restored_image['filepath-with-value'], 'img.png')
+        self.assertNotIn('data-temp-', restored)
+        self.assertNotIn('translate=', restored)
+
+    def test_postprocess_removes_orphaned_container_with_nested_helpers(
+        self,
+    ) -> None:
+        source = (
+            '<div data-temp-comp-id="99" '
+            'data-temp-attr-name="content-with-value" '
+            'data-temp-is-encoded="true">'
+            '<span data-temp-comp-id="99" '
+            'data-temp-attr-name="text-with-value">Orphan</span>'
+            '<oppia-noninteractive-link data-temp-comp-id="99" '
+            'url-with-value="https://oppia.org">'
+            '</oppia-noninteractive-link></div>'
+        )
+
+        restored = html_translation_services.postprocess_translated_html(source)
+
+        self.assertEqual(restored, '')
 
     def test_protect_html_with_invalid_tabs_json_skips_processing(self) -> None:
         source = (

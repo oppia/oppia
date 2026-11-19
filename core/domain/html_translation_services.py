@@ -254,13 +254,23 @@ def postprocess_translated_html(translated_html: str) -> str:
     # Build a map from component ID to its tag for fast restoration lookup.
     comp_id_to_tag = {}
     for tag in soup.find_all(attrs={_TEMP_DATA_COMP_ID: True}):
+        # Encoded subtrees are restored recursively in their own ID scope.
+        if tag.find_parent(attrs={_TEMP_DATA_IS_ENCODED: 'true'}) is not None:
+            continue
         if tag.name and tag.name.startswith('oppia-noninteractive-'):
             comp_id_to_tag[tag.get(_TEMP_DATA_COMP_ID)] = tag
 
     # Collect tabs data separately since reconstruction requires all tabs.
     tabs_data: Dict[str, Dict[str, str]] = {}
 
-    for temp_tag in list(soup.find_all(attrs={_TEMP_DATA_ATTR_NAME: True})):
+    # Snapshot only this scope so decomposing a container cannot invalidate
+    # nested helpers that would otherwise remain in the iteration list.
+    temp_tags = [
+        tag
+        for tag in soup.find_all(attrs={_TEMP_DATA_ATTR_NAME: True})
+        if tag.find_parent(attrs={_TEMP_DATA_IS_ENCODED: 'true'}) is None
+    ]
+    for temp_tag in temp_tags:
         comp_id = temp_tag.get(_TEMP_DATA_COMP_ID)
         attr_name = temp_tag.get(_TEMP_DATA_ATTR_NAME)
         is_encoded = temp_tag.get(_TEMP_DATA_IS_ENCODED) == 'true'
