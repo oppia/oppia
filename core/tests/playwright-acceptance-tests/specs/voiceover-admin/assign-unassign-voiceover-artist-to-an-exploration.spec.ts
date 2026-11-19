@@ -34,6 +34,11 @@ enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
 
+// TODO(#26974): Once ConsoleReporter is ported to Playwright, re-add the
+// suppression for the expected 400 from adding an invalid user ID as a
+// voiceover artist.
+// The frontend toast message for this case is asserted directly below.
+
 // ConsoleReporter.setConsoleErrorsToIgnore([
 //   new RegExp(
 //     'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
