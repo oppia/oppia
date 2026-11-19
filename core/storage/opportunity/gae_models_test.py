@@ -310,6 +310,8 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_incomplete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
             opportunity_models.SkillOpportunityModel.get_export_policy(),
@@ -322,11 +324,10 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
                 5, None
             )
         )
-        # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0].id, 'opportunity_id1')
-        self.assertEqual(results[1].id, 'opportunity_id2')
+        self.assertEqual(results[0].id, 'opportunity_id2')
+        self.assertEqual(results[1].id, 'opportunity_id1')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
 
@@ -342,10 +343,9 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
                 1, None
             )
         )
-        # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].id, 'opportunity_id1')
+        self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertTrue(more)
         self.assertTrue(isinstance(cursor, str))
 
@@ -354,10 +354,9 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
                 1, cursor
             )
         )
-        # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].id, 'opportunity_id2')
+        self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
 

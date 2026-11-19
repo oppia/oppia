@@ -21,6 +21,7 @@ from __future__ import annotations
 import itertools
 import logging
 
+from core.constants import constants
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -255,6 +256,161 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
         return opportunities_results | 'Transform Results to JobRunResults' >> (
             job_result_transforms.ResultsToJobRunResults()
+        )
+
+
+class PopulateSkillOpportunityModelPropertiesJob(base_jobs.JobBase):
+    """Job that populates topic_is_published and is_incomplete on
+    existing SkillOpportunityModel entities.
+    """
+
+    @staticmethod
+    def _populate_properties(
+        model: opportunity_models.SkillOpportunityModel,
+        topic_rights_models: List[topic_models.TopicRightsModel],
+        topic_models_list: List[topic_models.TopicModel],
+    ) -> result.Result[opportunity_models.SkillOpportunityModel, Exception]:
+        """Populates the new properties on the given model."""
+        try:
+            # Calculate is_incomplete.
+            model.is_incomplete = (
+                model.question_count < constants.MAX_QUESTIONS_PER_SKILL
+            )
+
+            # Find if any topic it belongs to is published.
+            topic_is_published = False
+
+            # Map topic IDs to their published status.
+            topic_published_status = {
+                tr.id: tr.topic_is_published
+                for tr in topic_rights_models
+                if tr is not None
+            }
+
+            for topic in topic_models_list:
+                if (
+                    topic is not None
+                    and model.id in topic.uncategorized_skill_ids
+                ):
+                    if topic_published_status.get(topic.id, False):
+                        topic_is_published = True
+                        break
+                if topic is not None:
+                    for subtopic in topic.subtopics:
+                        if model.id in subtopic['skill_ids']:
+                            if topic_published_status.get(topic.id, False):
+                                topic_is_published = True
+                                break
+                    if topic_is_published:
+                        break
+
+            model.topic_is_published = topic_is_published
+
+            with datastore_services.get_ndb_context():
+                model.update_timestamps()
+            return result.Ok(model)
+        except Exception as e:
+            return result.Err(e)
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results."""
+        skill_opportunity_models = (
+            self.pipeline
+            | 'Get all non-deleted skill opportunity models'
+            >> ndb_io.GetModels(
+                opportunity_models.SkillOpportunityModel.get_all(
+                    include_deleted=False
+                )
+            )
+        )
+
+        topic_rights_models = (
+            self.pipeline
+            | 'Get all non-deleted topic rights models'
+            >> ndb_io.GetModels(
+                topic_models.TopicRightsModel.get_all(include_deleted=False)
+            )
+        )
+
+        topic_models_list = (
+            self.pipeline
+            | 'Get all non-deleted topic models'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
+        )
+
+        topic_rights_list = beam.pvalue.AsList(topic_rights_models)
+        topic_models_as_list = beam.pvalue.AsList(topic_models_list)
+
+        populated_models_results = skill_opportunity_models | beam.Map(
+            self._populate_properties,
+            topic_rights_models=topic_rights_list,
+            topic_models_list=topic_models_as_list,
+        )
+
+        unused_put_result = (
+            populated_models_results
+            | 'Filter OK results' >> beam.Filter(lambda res: res.is_ok())
+            | 'Unwrap results' >> beam.Map(lambda res: res.unwrap())
+            | 'Put models into datastore' >> ndb_io.PutModels()
+        )
+
+        return populated_models_results | 'Transform to JobRunResults' >> (
+            job_result_transforms.ResultsToJobRunResults()
+        )
+
+
+class AuditPopulateSkillOpportunityModelPropertiesJob(base_jobs.JobBase):
+    """Job that audits PopulateSkillOpportunityModelPropertiesJob."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the audit."""
+        skill_opportunity_models = (
+            self.pipeline
+            | 'Get all non-deleted skill opportunity models'
+            >> ndb_io.GetModels(
+                opportunity_models.SkillOpportunityModel.get_all(
+                    include_deleted=False
+                )
+            )
+        )
+
+        topic_rights_models = (
+            self.pipeline
+            | 'Get all non-deleted topic rights models'
+            >> ndb_io.GetModels(
+                topic_models.TopicRightsModel.get_all(include_deleted=False)
+            )
+        )
+
+        topic_models_list = (
+            self.pipeline
+            | 'Get all non-deleted topic models'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
+        )
+
+        topic_rights_list = beam.pvalue.AsList(topic_rights_models)
+        topic_models_as_list = beam.pvalue.AsList(topic_models_list)
+
+        populated_models_results = skill_opportunity_models | beam.Map(
+            PopulateSkillOpportunityModelPropertiesJob._populate_properties,  # pylint: disable=protected-access
+            topic_rights_models=topic_rights_list,
+            topic_models_list=topic_models_as_list,
+        )
+
+        unused_updated_models = (
+            populated_models_results
+            | 'Filter OK results' >> beam.Filter(lambda res: res.is_ok())
+            | 'Unwrap results' >> beam.Map(lambda res: res.unwrap())
+        )
+
+        return populated_models_results | 'Transform to JobRunResults' >> (
+            job_result_transforms.ResultsToJobRunResults(
+                'SKILL OPPORTUNITY MODEL AUDITED'
+            )
         )
 
 
