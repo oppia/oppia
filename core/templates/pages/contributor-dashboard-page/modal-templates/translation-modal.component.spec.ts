@@ -1786,6 +1786,18 @@ describe('Translation Modal Component', () => {
       expect(component.hasSubmitValidationErrors()).toBe(true);
     });
 
+    it('should reject a topic description over the allowed length', () => {
+      translateTextService.activeContentId = 'topic_description';
+      component.textToTranslate = 'Original topic description';
+
+      component.updateHtml(
+        'A'.repeat(AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION + 1)
+      );
+
+      expect(component.hasLengthValidationError).toBe(true);
+      expect(component.hasSubmitValidationErrors()).toBe(true);
+    });
+
     it('should accept a topic description within the allowed length', () => {
       translateTextService.activeContentId = 'topic_description';
       component.textToTranslate = 'Original topic description';

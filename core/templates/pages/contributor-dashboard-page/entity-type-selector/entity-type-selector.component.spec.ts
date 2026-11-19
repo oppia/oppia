@@ -114,6 +114,11 @@ describe('EntityTypeSelectorComponent', () => {
 
     component.activeEntityType = AppConstants.ENTITY_TYPE.TOPIC;
     expect(component.getActiveEntityTypeLabel()).toBe('Topics');
+
+    // An unrecognized entity type falls back to the "All" label
+    // rather than returning an undefined label.
+    component.activeEntityType = 'unrecognized_type';
+    expect(component.getActiveEntityTypeLabel()).toBe('All');
   });
 
   it('should close dropdown when clicking outside component', () => {
