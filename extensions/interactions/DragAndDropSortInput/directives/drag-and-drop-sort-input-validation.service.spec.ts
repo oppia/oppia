@@ -432,6 +432,57 @@ describe('DragAndDropSortInputValidationService', () => {
     ]);
   });
 
+  it('should ignore the order of items in the same position', () => {
+    var rule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEqualToOrdering',
+        inputs: {
+          x: [['ca_0', 'ca_1'], ['ca_2'], ['ca_3']],
+        },
+      },
+      'DragAndDropSortInput'
+    );
+    var sameRuleWithItemsSwapped = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEqualToOrdering',
+        inputs: {
+          x: [['ca_1', 'ca_0'], ['ca_2'], ['ca_3']],
+        },
+      },
+      'DragAndDropSortInput'
+    );
+    answerGroups = [
+      AnswerGroup.createNew([rule], customOutcome, [], null),
+      AnswerGroup.createNew(
+        [sameRuleWithItemsSwapped],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 1 from Oppia response 2 will never be ' +
+          'matched because it is identical to answer 1 from response 1',
+      },
+    ]);
+    // The rule inputs themselves should not be modified.
+    expect(sameRuleWithItemsSwapped.inputs.x).toEqual([
+      ['ca_1', 'ca_0'],
+      ['ca_2'],
+      ['ca_3'],
+    ]);
+  });
+
   it('should report each repeated rule only once', () => {
     answerGroups = [
       AnswerGroup.createNew(

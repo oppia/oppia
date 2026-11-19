@@ -124,6 +124,23 @@ export class DragAndDropSortInputValidationService {
       return noOfMismatches === 1;
     };
 
+    // The ordering inputs are lists of sets, so the order of the items in
+    // the same position does not matter when comparing two rules.
+    const getNormalizedInputs = (
+      rule: Rule
+    ): {[inputName: string]: unknown} => {
+      const normalizedInputs: {[inputName: string]: unknown} = {};
+      Object.keys(rule.inputs).forEach(inputName => {
+        const input = rule.inputs[inputName];
+        normalizedInputs[inputName] = Array.isArray(input)
+          ? (input as unknown[]).map(position =>
+              Array.isArray(position) ? [...position].sort() : position
+            )
+          : input;
+      });
+      return normalizedInputs;
+    };
+
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
@@ -268,12 +285,15 @@ export class DragAndDropSortInputValidationService {
 
         // A rule identical to an earlier one (same type and inputs) can
         // never be matched, and the backend rejects it on save.
-        for (var k = 0; k < ranges.length; k++) {
+        for (let k = 0; k < ranges.length; k++) {
           const previousRule =
             answerGroups[ranges[k].answerGroupIndex].rules[ranges[k].ruleIndex];
           if (
             previousRule.type === rule.type &&
-            isEqual(previousRule.inputs, rule.inputs)
+            isEqual(
+              getNormalizedInputs(previousRule),
+              getNormalizedInputs(rule)
+            )
           ) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
