@@ -71,10 +71,17 @@ export class DateTimeFormatService {
   /**
    * This function converts a millisecond date to date in words.
    * @param {number} millisSinceEpoch - The millisecond date to be converted
+   * @param {boolean} [includeDayOfWeek=true] - Whether to include day of week
    * @returns {string} a date and time string
    */
-  getDateTimeInWords(millisSinceEpoch: number): string {
+  getDateTimeInWords(
+    millisSinceEpoch: number,
+    includeDayOfWeek: boolean = true
+  ): string {
     let date = new Date(millisSinceEpoch);
+    if (!includeDayOfWeek) {
+      return dayjs(date).format('MMMM D, YYYY [at] h:mm A');
+    }
     // Dayjs will return Monday, January 18, 2021 at 12:30 PM.
     return dayjs(date).format('dddd, MMMM D, YYYY [at] h:mm A');
   }
