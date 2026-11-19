@@ -852,11 +852,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       .then(response => {
         const openFeedbackCount = response.lesson_feedback_counts.open;
 
-        if (
-          openFeedbackCount === 0 ||
-          !this.isModalOpenable ||
-          this.feedbackPromptModalHasBeenShown
-        ) {
+        if (openFeedbackCount === 0) {
           return;
         }
 
@@ -869,9 +865,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           windowClass: 'oppia-confirm-or-cancel-modal',
         });
 
-        if (modalRef.componentInstance) {
-          modalRef.componentInstance.openThreadsCount = openFeedbackCount;
-        }
+        modalRef.componentInstance.openThreadsCount = openFeedbackCount;
 
         modalRef.result.then(
           () => {

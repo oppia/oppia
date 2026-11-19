@@ -354,6 +354,8 @@ describe('Exploration editor page component', () => {
   });
 
   beforeEach(() => {
+    mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+      false;
     fixture = TestBed.createComponent(ExplorationEditorPageComponent);
     component = fixture.componentInstance;
 
@@ -1370,6 +1372,9 @@ describe('Exploration editor page component', () => {
       expect(component.maybeShowFeedbackPromptModal).toHaveBeenCalled();
       flush();
       discardPeriodicTasks();
+
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        false;
     }));
 
     it('should navigate to feedback tab in initExplorationPage when new creator feedback tab is disabled and there are open threads', fakeAsync(() => {
