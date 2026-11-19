@@ -36,7 +36,7 @@ if MYPY:  # pragma: no cover
 
 FEATURE_FLAG_NAME = 'android_enable_fast_language_switching_in_lesson'
 REQUEST_HEADERS = {
-    'app_version_name': '1.2-abcdef-ga',
+    'app_version_name': '0.19-rc03-ga-9faec1d609',
     'installation_id': 'installation-1',
     'app_package_name': 'org.oppia.android',
 }
@@ -189,7 +189,9 @@ class AndroidFeatureFlagsHandlerTest(test_utils.GenericTestBase):
                     '/android_feature_flags',
                     headers={
                         **REQUEST_HEADERS,
-                        'app_version_name': '1.2-abcdef-%s' % flavor,
+                        'app_version_name': (
+                            '0.19-rc03-%s-9faec1d609' % flavor
+                        ),
                     },
                 )
                 self.assertEqual(response, {'feature_flags': []})
