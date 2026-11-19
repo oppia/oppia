@@ -4687,6 +4687,70 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_submitted_translations_are_filtered_by_topic_with_new_models(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        explanation = skill.skill_contents.explanation
+        skill_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            self.SKILL_ID,
+            skill.version,
+            self.author_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                'content_id': explanation.content_id,
+                'language_code': 'hi',
+                'content_html': explanation.html,
+                'translation_html': '<p>Skill explanation in Hindi</p>',
+                'data_format': 'html',
+            },
+            'Adds a skill translation',
+        )
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_SKILL,
+            entity_id=self.SKILL_ID,
+            topic_ids=[self.TOPIC_ID],
+            content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_ID,
+            topic_ids=[],
+            content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+
+        url = '/getsubmittedsuggestions/all/translate_content'
+        params = {
+            'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+            'offset': 0,
+            'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            'language_code': 'hi',
+        }
+        unfiltered_response = self.get_json(url, params)
+        self.assertEqual(len(unfiltered_response['suggestions']), 2)
+
+        filtered_response = self.get_json(
+            url, {**params, 'topic_name': 'topic'}
+        )
+        self.assertEqual(
+            [s['suggestion_id'] for s in filtered_response['suggestions']],
+            [skill_suggestion.suggestion_id],
+        )
+        self.assertEqual(filtered_response['next_offset'], 2)
+
 
 class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ReviewableSuggestionsHandler."""
