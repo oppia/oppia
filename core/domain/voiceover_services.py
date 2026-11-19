@@ -916,8 +916,7 @@ def extract_english_voiceover_texts_from_exploration(
         for translatable_content in content_id_to_translatable_content.values():
             content_id = translatable_content.content_id
 
-            # Rule inputs are not considered for voiceover generation.
-            if content_id.startswith('rule_input'):
+            if is_rule_input_content_id(content_id):
                 continue
 
             content_value = translatable_content.content_value
@@ -952,8 +951,7 @@ def extract_translated_voiceover_texts_from_entity_translations(
 
         for content_id, translated_content in translations.items():
 
-            # Rule inputs are not considered for voiceover generation.
-            if content_id.startswith('rule_input'):
+            if is_rule_input_content_id(content_id):
                 continue
 
             # Voiceovers should only be regenerated if the translation is
@@ -969,6 +967,21 @@ def extract_translated_voiceover_texts_from_entity_translations(
             ] = content_value
 
     return language_code_to_contents_mapping
+
+
+def is_rule_input_content_id(content_id: str) -> bool:
+    """Returns whether a content ID belongs to an interaction rule input.
+
+    Args:
+        content_id: str. The content ID to check.
+
+    Returns:
+        bool. Whether the content ID identifies a rule input, which should not
+        be included in automatic voiceover generation.
+    """
+    # Rule input content IDs use the singular prefix (e.g. rule_input_Equals).
+    # Matching the common prefix also covers IDs with the rule_inputs_ form.
+    return content_id.startswith('rule_input')
 
 
 def regenerate_voiceovers_for_given_contents(
@@ -997,6 +1010,20 @@ def regenerate_voiceovers_for_given_contents(
         specific_language_accent_code: Optional[str]. The specific language
             accent code to use for voiceover regeneration, if provided.
     """
+    # Filter rule-input content IDs before creating task status records or
+    # enqueueing regeneration tasks. Some callers provide content maps directly
+    # from commit diffs or suggestions instead of the filtered extraction APIs.
+    language_code_to_contents_mapping = {
+        language_code: {
+            content_id: content_html
+            for content_id, content_html in content_id_to_contents.items()
+            if not is_rule_input_content_id(content_id)
+        }
+        for language_code, content_id_to_contents in (
+            language_code_to_contents_mapping.items()
+        )
+    }
+
     # Get all language codes that need voiceover regeneration in this request.
     language_codes = list(language_code_to_contents_mapping.keys())
 
