@@ -384,12 +384,13 @@ def apply_change_list(
                         update_node_first_publication_date_cmd.node_id,
                         update_node_first_publication_date_cmd.new_value,
                     )
-                elif (
-                    change.property_name
-                    == story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON
-                ):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
+                else:
+                    assert (
+                        change.property_name
+                        == story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON
+                    )
+                    # Here we use cast because the assert above forces
+                    # change to have type
                     # UpdateStoryNodePropertyUnpublishingReasonCmd.
                     update_node_unpublishing_reason_cmd = cast(
                         story_domain.UpdateStoryNodePropertyUnpublishingReasonCmd,
@@ -450,10 +451,11 @@ def apply_change_list(
                     story.update_url_fragment(
                         update_story_property_cmd.new_value
                     )
-                elif (
-                    update_story_property_cmd.property_name
-                    == story_domain.STORY_PROPERTY_META_TAG_CONTENT
-                ):
+                else:
+                    assert (
+                        update_story_property_cmd.property_name
+                        == story_domain.STORY_PROPERTY_META_TAG_CONTENT
+                    )
                     story.update_meta_tag_content(
                         update_story_property_cmd.new_value
                     )
@@ -523,10 +525,11 @@ def apply_change_list(
                     == story_domain.ARC_PROPERTY_TITLE
                 ):
                     arc.title = update_arc_cmd.new_value
-                elif (
-                    update_arc_cmd.property_name
-                    == story_domain.ARC_PROPERTY_DESCRIPTION
-                ):
+                else:
+                    assert (
+                        update_arc_cmd.property_name
+                        == story_domain.ARC_PROPERTY_DESCRIPTION
+                    )
                     arc.description = update_arc_cmd.new_value
             elif (
                 change.cmd == story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION
@@ -726,10 +729,9 @@ def validate_explorations_for_story(
                 validation_error_messages.append(error_string)
 
     if exps_dict:
-        for exp_id in exp_ids:
-            if exp_id in exps_dict:
-                sample_exp_id = exp_id
-                break
+        sample_exp_id = next(
+            exp_id for exp_id in exp_ids if exp_id in exps_dict
+        )
         common_exp_category = exps_dict[sample_exp_id].category
         for exp_id, exp in exps_dict.items():
             if exp.category != common_exp_category:
