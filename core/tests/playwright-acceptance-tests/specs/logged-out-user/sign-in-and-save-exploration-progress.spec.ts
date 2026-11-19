@@ -42,8 +42,6 @@ test.describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(900000);
-
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com',
@@ -111,8 +109,6 @@ test.describe('Logged-out User', function () {
   });
 
   test('should be able to play the exploration without signing in, sign in at any point, save progress, and clear progress', async function () {
-    test.setTimeout(900000);
-
     await loggedOutUser.navigateToCommunityLibraryPage();
     await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
     await loggedOutUser.continueToNextCard();
