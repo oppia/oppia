@@ -695,6 +695,11 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         self.language_code = language_code
         self.reviewer_only_content_count = reviewer_only_content_count
 
+    @property
+    def chapter_title(self) -> str:
+        """Returns the chapter title (for exploration opportunities)."""
+        return self.entity_description
+
     def to_dict(self) -> TranslationOpportunityCardInfoDict:
         """Returns a dict representation of the card info."""
         return {

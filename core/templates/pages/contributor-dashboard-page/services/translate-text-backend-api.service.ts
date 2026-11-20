@@ -27,7 +27,6 @@ import {
   ImageLocalStorageService,
   ImagesData,
 } from 'services/image-local-storage.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AppConstants} from 'app.constants';
 
 /**
@@ -81,8 +80,7 @@ interface Data {
 export class TranslateTextBackendApiService {
   constructor(
     private http: HttpClient,
-    private imageLocalStorageService: ImageLocalStorageService,
-    private platformFeatureService: PlatformFeatureService
+    private imageLocalStorageService: ImageLocalStorageService
   ) {}
 
   async getTranslatableTextsAsync(
@@ -90,37 +88,17 @@ export class TranslateTextBackendApiService {
     languageCode: string,
     entityType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<TranslatableTexts> {
-    if (
-      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
-        .isEnabled
-    ) {
-      return this.http
-        .get<TranslatableTextsBackendDictV2>(
-          '/gettranslatablecontentshandlerv2',
-          {
-            params: {
-              entity_id: entityId,
-              entity_type: entityType,
-              language_code: languageCode,
-            },
-          }
-        )
-        .toPromise()
-        .then((backendDict: TranslatableTextsBackendDictV2) => {
-          return TranslatableTexts.createFromBackendDictV2(backendDict);
-        });
-    }
-
     return this.http
-      .get<TranslatableTextsBackendDict>('/gettranslatabletexthandler', {
+      .get<TranslatableTextsBackendDictV2>('/gettranslatablecontentshandler', {
         params: {
-          exp_id: entityId,
+          entity_id: entityId,
+          entity_type: entityType,
           language_code: languageCode,
         },
       })
       .toPromise()
-      .then((backendDict: TranslatableTextsBackendDict) => {
-        return TranslatableTexts.createFromBackendDict(backendDict);
+      .then((backendDict: TranslatableTextsBackendDictV2) => {
+        return TranslatableTexts.createFromBackendDictV2(backendDict);
       });
   }
 

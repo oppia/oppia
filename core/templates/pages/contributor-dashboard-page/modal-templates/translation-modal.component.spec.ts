@@ -120,15 +120,48 @@ interface MockBeforeUnloadEvent {
 class MockPlatformFeatureService {
   get status() {
     return {
-      EnableTranslationOppsWithNewOppModels: {
-        isEnabled: false,
-      },
       EnableAutomaticTranslationSuggestions: {
         isEnabled: true,
       },
     };
   }
 }
+
+const createTranslatableContentsResponse = (
+  mapping: Record<
+    string,
+    Record<
+      string,
+      {
+        content_value?: string | string[];
+        content_format?: string;
+        content_type?: string;
+        interaction_id?: string | null;
+        rule_type?: string | null;
+      }
+    >
+  >
+) => {
+  const translatable_contents = [];
+  for (const [stateName, contentIds] of Object.entries(mapping)) {
+    for (const [contentId, item] of Object.entries(contentIds)) {
+      translatable_contents.push({
+        content_id: contentId,
+        content_type: item.content_type || 'content',
+        content_format: item.content_format || 'html',
+        content_value: item.content_value || '',
+        interaction_id:
+          item.interaction_id !== undefined ? item.interaction_id : null,
+        rule_type: item.rule_type !== undefined ? item.rule_type : null,
+        grouping_key: stateName,
+      });
+    }
+  }
+  return {
+    translatable_contents,
+    version: 1,
+  };
+};
 
 describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
@@ -326,14 +359,15 @@ describe('Translation Modal Component', () => {
     component.ngOnInit();
 
     const req = httpTestingController.expectOne(
-      '/gettranslatabletexthandler?exp_id=1&language_code=es'
+      '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=es'
     );
-    req.flush({
-      state_names_to_content_id_mapping: {
-        stateName1: {contentId1: {content_value: 'text1', data_format: 'html'}},
-      },
-      version: 1,
-    });
+    req.flush(
+      createTranslatableContentsResponse({
+        stateName1: {
+          contentId1: {content_value: 'text1', content_format: 'html'},
+        },
+      })
+    );
     tick();
 
     // Check initial state.
@@ -419,8 +453,10 @@ describe('Translation Modal Component', () => {
     // The ngOnInit is still called by Angular Ivy's lifecycle mechanism despite
     // the spy, so flush the HTTP request it creates.
     httpTestingController
-      .expectOne('/gettranslatabletexthandler?exp_id=1&language_code=es')
-      .flush({state_names_to_content_id_mapping: {}, version: 1});
+      .expectOne(
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=es'
+      )
+      .flush({translatable_contents: [], version: 1});
 
     const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
       '.e2e-test-save-button'
@@ -446,8 +482,10 @@ describe('Translation Modal Component', () => {
     // The ngOnInit is still called by Angular Ivy's lifecycle mechanism despite
     // the spy, so flush the HTTP request it creates.
     httpTestingController
-      .expectOne('/gettranslatabletexthandler?exp_id=1&language_code=es')
-      .flush({state_names_to_content_id_mapping: {}, version: 1});
+      .expectOne(
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=es'
+      )
+      .flush({translatable_contents: [], version: 1});
 
     const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
       '.e2e-test-save-button'
@@ -702,13 +740,12 @@ describe('Translation Modal Component', () => {
       };
 
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=es'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=es'
       );
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1,
-      });
+      req.flush(
+        createTranslatableContentsResponse(sampleStateWiseContentMapping)
+      );
       flushMicrotasks();
       expect(component.loadingData).toBe(false);
       expect(translateTextService.getTextToTranslate).toHaveBeenCalled();
@@ -902,13 +939,12 @@ describe('Translation Modal Component', () => {
         };
 
         const req = httpTestingController.expectOne(
-          '/gettranslatabletexthandler?exp_id=1&language_code=es'
+          '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=es'
         );
         expect(req.request.method).toEqual('GET');
-        req.flush({
-          state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-          version: 1,
-        });
+        req.flush(
+          createTranslatableContentsResponse(sampleStateWiseContentMapping)
+        );
         flushMicrotasks();
         component.skipActiveTranslation();
       }));
@@ -973,13 +1009,12 @@ describe('Translation Modal Component', () => {
       };
 
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=es'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=es'
       );
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1,
-      });
+      req.flush(
+        createTranslatableContentsResponse(sampleStateWiseContentMapping)
+      );
       flushMicrotasks();
       component.activeWrittenTranslation = 'texto1';
     }));

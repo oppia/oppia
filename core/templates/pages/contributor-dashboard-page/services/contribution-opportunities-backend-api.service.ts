@@ -35,7 +35,6 @@ import {
   FeaturedTranslationLanguageBackendDict,
 } from 'domain/opportunity/featured-translation-language.model';
 import {UserService} from 'services/user.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {AppConstants} from 'app.constants';
 import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
@@ -121,8 +120,7 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private userService: UserService,
-    private platformFeatureService: PlatformFeatureService
+    private userService: UserService
   ) {}
 
   private UPDATE_PINNED_OPPORTUNITY_HANDLER_URL = '/pinned-opportunities';
@@ -194,67 +192,30 @@ export class ContributionOpportunitiesBackendApiService {
     cursor: string,
     entityType?: string
   ): Promise<TranslationContributionOpportunities> {
-    if (
-      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
-        .isEnabled
-    ) {
-      const params: Record<string, string> = {
-        language_code: languageCode,
-        topic_name:
-          topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
-        cursor: cursor,
-      };
-      if (this.shouldFilterByEntityType(entityType)) {
-        params.entity_type = entityType as string;
-      }
-
-      return this.http
-        .get<TranslationContributionOpportunitiesBackendDictV2>(
-          '/opportunitieshandlerv2',
-          {params}
-        )
-        .toPromise()
-        .then(
-          data => {
-            const opportunities = data.opportunities.map(dict => {
-              const summary =
-                ExplorationOpportunitySummary.createFromBackendDictV2(dict);
-              summary.languageCode = languageCode;
-              return summary;
-            });
-
-            return {
-              opportunities: opportunities,
-              nextCursor: data.next_cursor,
-              more: data.more,
-            };
-          },
-          errorResponse => {
-            throw new Error(errorResponse.error.error);
-          }
-        );
-    }
-
-    const params = {
+    const params: Record<string, string> = {
       language_code: languageCode,
       topic_name:
         topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
       cursor: cursor,
     };
+    if (this.shouldFilterByEntityType(entityType)) {
+      params.entity_type = entityType as string;
+    }
 
     return this.http
-      .get<TranslationContributionOpportunitiesBackendDict>(
-        this.urlInterpolationService.interpolateUrl(this.urlTemplate, {
-          opportunityType: AppConstants.OPPORTUNITY_TYPE_TRANSLATION,
-        }),
+      .get<TranslationContributionOpportunitiesBackendDictV2>(
+        '/opportunitieshandler',
         {params}
       )
       .toPromise()
       .then(
         data => {
-          const opportunities = data.opportunities.map(dict =>
-            ExplorationOpportunitySummary.createFromBackendDict(dict)
-          );
+          const opportunities = data.opportunities.map(dict => {
+            const summary =
+              ExplorationOpportunitySummary.createFromBackendDictV2(dict);
+            summary.languageCode = languageCode;
+            return summary;
+          });
 
           return {
             opportunities: opportunities,
@@ -297,43 +258,11 @@ export class ContributionOpportunitiesBackendApiService {
       params.language_code = languageCode;
     }
 
-    if (
-      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
-        .isEnabled
-    ) {
-      if (this.shouldFilterByEntityType(entityType)) {
-        params.entity_type = entityType as string;
-      }
-      return this.http
-        .get<ReviewableTranslationOpportunitiesBackendDictV2>(
-          '/getreviewableopportunitieshandlerv2',
-          {
-            params,
-          } as Object
-        )
-        .toPromise()
-        .then(
-          data => {
-            const opportunities = data.opportunities.map(dict => {
-              const summary =
-                ExplorationOpportunitySummary.createFromBackendDictV2(dict);
-              if (languageCode) {
-                summary.languageCode = languageCode;
-              }
-              return summary;
-            });
-            return {
-              opportunities,
-            };
-          },
-          errorResponse => {
-            throw new Error(errorResponse.error.error);
-          }
-        );
+    if (this.shouldFilterByEntityType(entityType)) {
+      params.entity_type = entityType as string;
     }
-
     return this.http
-      .get<ReviewableTranslationOpportunitiesBackendDict>(
+      .get<ReviewableTranslationOpportunitiesBackendDictV2>(
         '/getreviewableopportunitieshandler',
         {
           params,
@@ -342,9 +271,14 @@ export class ContributionOpportunitiesBackendApiService {
       .toPromise()
       .then(
         data => {
-          const opportunities = data.opportunities.map(dict =>
-            ExplorationOpportunitySummary.createFromBackendDict(dict)
-          );
+          const opportunities = data.opportunities.map(dict => {
+            const summary =
+              ExplorationOpportunitySummary.createFromBackendDictV2(dict);
+            if (languageCode) {
+              summary.languageCode = languageCode;
+            }
+            return summary;
+          });
           return {
             opportunities,
           };

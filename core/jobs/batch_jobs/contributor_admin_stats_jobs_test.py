@@ -1169,44 +1169,44 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
         )
 
         self.exp_opportunity_model_1 = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.target_id,
-            topic_id='topic1',
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.target_id}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.target_id,
+            topic_ids=['topic1'],
             content_count=1,
-            story_id='story1',
-            story_title='story title',
-            topic_name='name1',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         self.exp_opportunity_model_2 = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.target_id_2,
-            topic_id='topic2',
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.target_id_2}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.target_id_2,
+            topic_ids=['topic2'],
             content_count=1,
-            story_id='story2',
-            story_title='story title',
-            topic_name='name2',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         self.exp_opportunity_model_3 = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.target_id_3,
-            topic_id='topic3',
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.target_id_3}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.target_id_3,
+            topic_ids=['topic3'],
             content_count=1,
-            story_id='story3',
-            story_title='story title',
-            topic_name='name3',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         self.exp_opportunity_model_4 = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.target_id,
-            topic_id='topic4',
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.target_id}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.target_id,
+            topic_ids=['topic4'],
             content_count=1,
-            story_id='story4',
-            story_title='story title',
-            topic_name='name4',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         self.skill_opportunity_model_1 = self.create_model(
             opportunity_models.SkillOpportunityModel,
@@ -2088,14 +2088,14 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         models_to_put.append(contrib)
 
         exp_opportunity_model_x = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id='expX',
-            topic_id='topicx',
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.expX',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='expX',
+            topic_ids=['topicx'],
             content_count=1,
-            story_id='storyx',
-            story_title='story title',
-            topic_name='namex',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         exp_opportunity_model_x.update_timestamps()
         models_to_put.append(exp_opportunity_model_x)
@@ -2255,14 +2255,14 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         models_to_put.append(topic)
 
         exp_opportunity_model_x = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id='expX',
-            topic_id='topicx',
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.expX',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='expX',
+            topic_ids=['topicx'],
             content_count=1,
-            story_id='storyx',
-            story_title='story title',
-            topic_name='namex',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         exp_opportunity_model_x.update_timestamps()
         models_to_put.append(exp_opportunity_model_x)
@@ -2349,27 +2349,27 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         models_to_put.append(bad_contrib)
 
         exp_opportunity_model_1 = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id='exp1',
-            topic_id='topicx',
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.exp1',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exp1',
+            topic_ids=['topicx'],
             content_count=1,
-            story_id='storyx',
-            story_title='story title',
-            topic_name='namex',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         exp_opportunity_model_1.update_timestamps()
         models_to_put.append(exp_opportunity_model_1)
 
         exp_opportunity_model_2 = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id='exp2',
-            topic_id='topicx',
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.exp2',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exp2',
+            topic_ids=['topicx'],
             content_count=1,
-            story_id='storyx',
-            story_title='story title',
-            topic_name='namex',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         exp_opportunity_model_2.update_timestamps()
         models_to_put.append(exp_opportunity_model_2)
@@ -2603,14 +2603,14 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         recent_review_outcomes: List[str] = []
 
         exp_opportunity_model_x = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id='expX',
-            topic_id='topicx',
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.expX',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='expX',
+            topic_ids=['topicx'],
             content_count=1,
-            story_id='storyx',
-            story_title='story title',
-            topic_name='namex',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         exp_opportunity_model_x.update_timestamps()
         models_to_put.append(exp_opportunity_model_x)
@@ -3047,14 +3047,14 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
 
         # 1) Create an exploration opportunity so the suggestion is considered.
         exp_opportunity = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id='exp_missing_total',
-            topic_id='topic_missing',
-            chapter_title='irrelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.exp_missing_total',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exp_missing_total',
+            topic_ids=['topic_missing'],
             content_count=1,
-            story_id='story_missing',
-            story_title='story title',
-            topic_name='topic_missing',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         exp_opportunity.update_timestamps()
         models_to_put.append(exp_opportunity)

@@ -47,6 +47,8 @@ export interface TranslatableContentBackendDictV2 {
   content_type: string;
   content_format: string;
   content_value: string | string[];
+  interaction_id?: string | null;
+  rule_type?: string | null;
   grouping_key?: string | null;
 }
 
@@ -97,8 +99,8 @@ export class TranslatableTexts {
           content.content_value,
           content.content_format,
           content.content_type,
-          null,
-          null
+          content.interaction_id || null,
+          content.rule_type || null
         );
     }
     const orderedStateNamesToContentIdMapping: StateNamesToContentIdMapping =

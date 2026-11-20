@@ -24,7 +24,6 @@ from core import feconf
 from core.domain import (
     exp_domain,
     html_cleaner,
-    opportunity_domain,
     opportunity_services,
     skill_services,
     suggestion_registry,
@@ -168,15 +167,11 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all non-deleted opportunity models'
             >> ndb_io.GetModels(
-                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                opportunity_models.TranslationOpportunityModel.get_all(
                     include_deleted=False
                 )
             )
-            | 'Transform to opportunity domain object'
-            >> beam.Map(
-                opportunity_services.get_exploration_opportunity_summary_from_model
-            )
-            | 'Group by ID' >> beam.GroupBy(lambda m: m.id)
+            | 'Group by ID' >> beam.GroupBy(lambda m: m.entity_id)
         )
         skill_opportunities_by_id = (
             self.pipeline
@@ -479,7 +474,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
     @staticmethod
     def _generate_translation_stats(
         suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
-        opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary],
+        opportunity: Optional[opportunity_models.TranslationOpportunityModel],
         model: Union[
             Type[suggestion_models.TranslationContributionStatsModel],
             Type[suggestion_models.TranslationReviewStatsModel],
@@ -492,8 +487,8 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         Args:
             suggestions: iter(SuggestionTranslateContent). Suggestions for which
                 the stats should be generated.
-            opportunity: ExplorationOpportunitySummary. Opportunity for which
-                were the suggestions generated. Used to extract topic ID.
+            opportunity: TranslationOpportunityModel. Opportunity for which
+                the suggestions were generated. Used to extract topic ID.
             model: TranslationStatsModel. A reference to the model which the
                 stats are generated.
 
@@ -511,7 +506,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         # When opportunity is not available we leave the topic ID empty.
         topic_id = ''
         if opportunity is not None:
-            topic_id = opportunity.topic_id
+            topic_id = opportunity.topic_ids[0] if opportunity.topic_ids else ''
 
             for suggestion in suggestions:
                 user_id = (

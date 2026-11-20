@@ -784,7 +784,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         # Accepting should succeed because the existing translation is stale.
         # We mock pre_accept_validate and accept to avoid needing the
-        # ExplorationOpportunitySummaryModel which requires a story setup.
+        # opportunity setup which requires a story setup.
         with self.swap(
             suggestion_registry.SuggestionTranslateContent,
             'pre_accept_validate',
@@ -873,11 +873,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             updated_suggestion.status, suggestion_models.STATUS_ACCEPTED
         )
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
     def test_accepting_skill_translation_updates_translation_counts(
         self,
     ) -> None:
@@ -2517,20 +2512,16 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         audio_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
         )
-        model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id='exploration1',
-            topic_id='topic_id',
-            topic_name='topic_name',
-            story_id='story_id',
-            story_title='story_title',
-            chapter_title='chapter_title',
+        model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.exploration1',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exploration1',
+            topic_ids=['topic_id'],
             content_count=2,
-            incomplete_translation_language_codes=(
+            incomplete_translation_language_codes=list(
                 audio_language_codes - set(['en'])
             ),
             translation_counts={},
-            language_codes_needing_voice_artists=audio_language_codes,
-            language_codes_with_assigned_voice_artists=[],
         )
         model.update_timestamps()
         model.put()
@@ -7586,20 +7577,16 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         audio_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
         )
-        model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=exploration.id,
-            topic_id='topic_id',
-            topic_name='topic_name',
-            story_id='story_id',
-            story_title='story_title',
-            chapter_title='chapter_title',
+        model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{exploration.id}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=exploration.id,
+            topic_ids=['topic_id'],
             content_count=2,
-            incomplete_translation_language_codes=(
+            incomplete_translation_language_codes=list(
                 audio_language_codes - set(['en'])
             ),
             translation_counts={},
-            language_codes_needing_voice_artists=audio_language_codes,
-            language_codes_with_assigned_voice_artists=[],
         )
         model.update_timestamps()
         model.put()
@@ -8385,20 +8372,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         audio_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
         )
-        model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=exploration.id,
-            topic_id='topic_id',
-            topic_name='topic_name',
-            story_id='story_id',
-            story_title='story_title',
-            chapter_title='chapter_title',
+        model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{exploration.id}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=exploration.id,
+            topic_ids=['topic_id'],
             content_count=2,
-            incomplete_translation_language_codes=(
+            incomplete_translation_language_codes=list(
                 audio_language_codes - set(['en'])
             ),
             translation_counts={},
-            language_codes_needing_voice_artists=audio_language_codes,
-            language_codes_with_assigned_voice_artists=[],
         )
         model.update_timestamps()
         model.put()

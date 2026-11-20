@@ -70,9 +70,6 @@ class MockPlatformFeatureService {
     CdAllowUndoingTranslationReview: {
       isEnabled: false,
     },
-    EnableTranslationOppsWithNewOppModels: {
-      isEnabled: false,
-    },
   };
 }
 
@@ -360,32 +357,22 @@ describe('Translation Suggestion Review Modal Component', function () {
       }
     );
 
-    it(
-      'should set subheading and chapterTitle correctly when ' +
-        'EnableTranslationOppsWithNewOppModels is enabled',
-      () => {
-        mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-          true;
-        component.suggestionIdToContribution = {
-          suggestion_1: {
-            suggestion: suggestion1,
-            details: {
-              topic_name: 'topic_1',
-              entity_description: 'entity_description_1',
-            },
+    it('should set subheading and chapterTitle correctly', () => {
+      component.suggestionIdToContribution = {
+        suggestion_1: {
+          suggestion: suggestion1,
+          details: {
+            topic_name: 'topic_1',
+            entity_description: 'entity_description_1',
           },
-        };
-        component.initialSuggestionId = 'suggestion_1';
-        component.ngOnInit();
+        },
+      };
+      component.initialSuggestionId = 'suggestion_1';
+      component.ngOnInit();
 
-        expect(component.subheading).toBe('topic_1 / entity_description_1');
-        expect(component.chapterTitle).toBe('entity_description_1');
-
-        // Reset the flag.
-        mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-          false;
-      }
-    );
+      expect(component.subheading).toBe('topic_1 / entity_description_1');
+      expect(component.chapterTitle).toBe('entity_description_1');
+    });
   });
 
   describe('when reviewing suggestion when flag CdAllowUndoingTranslationReview is enabled', function () {

@@ -21,7 +21,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -3889,11 +3889,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
         self.assertEqual(response['next_offset'], 1)
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
     def test_exploration_handler_returns_data_with_new_opportunity_models(
         self,
     ) -> None:
@@ -3925,11 +3920,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(response, {})
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
     def test_exploration_handler_returns_data_with_new_opportunity_models_coverage_edge_cases(
         self,
     ) -> None:
@@ -3968,53 +3958,30 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.AUTHOR_EMAIL)
         opportunity_services.create_translation_opportunity(
-            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_no_opp']}
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_no_opp']},
+            topic_ids=[self.TOPIC_ID],
         )
         csrf_token = self.get_new_csrf_token()
-        allowed_language_codes = [
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
-        ]
-        dummy_opp_no_opp = opportunity_domain.ExplorationOpportunitySummary(
-            'exp_no_opp',
-            self.TOPIC_ID,
-            'Topic',
-            self.STORY_ID,
-            'Story',
-            'Node',
-            1,
-            allowed_language_codes,
-            {},
-            [],
-            [],
-            {},
-        )
-        with self.swap(
-            opportunity_services,
-            'get_exploration_opportunity_summary_by_id',
-            lambda exp_id: dummy_opp_no_opp,
-        ):
-            self.post_json(
-                '%s/' % feconf.SUGGESTION_URL_PREFIX,
-                {
-                    'suggestion_type': (
-                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                    ),
-                    'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
-                    'target_id': 'exp_no_opp',
-                    'target_version_at_submission': 1,
-                    'change_cmd': {
-                        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                        'state_name': 'Introduction',
-                        'content_id': 'content_0',
-                        'language_code': 'hi',
-                        'content_html': '<p>new content html</p>',
-                        'translation_html': '<p>new content html in Hindi</p>',
-                        'data_format': 'html',
-                    },
-                    'description': 'Adds translation for no opp',
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
+                'target_id': 'exp_no_opp',
+                'target_version_at_submission': 1,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'Introduction',
+                    'content_id': 'content_0',
+                    'language_code': 'hi',
+                    'content_html': '<p>new content html</p>',
+                    'translation_html': '<p>new content html in Hindi</p>',
+                    'data_format': 'html',
                 },
-                csrf_token=csrf_token,
-            )
+                'description': 'Adds translation for no opp',
+            },
+            csrf_token=csrf_token,
+        )
 
         # 2. Setup 'exp_empty_topics' (opportunity but no topics / story).
         self.save_new_valid_exploration(
@@ -4049,54 +4016,31 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.AUTHOR_EMAIL)
         opportunity_services.create_translation_opportunity(
-            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_empty_topics']}
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_empty_topics']},
+            topic_ids=[],
         )
 
         csrf_token = self.get_new_csrf_token()
-        allowed_language_codes = [
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
-        ]
-        dummy_opp_empty = opportunity_domain.ExplorationOpportunitySummary(
-            'exp_empty_topics',
-            self.TOPIC_ID,
-            'Topic',
-            self.STORY_ID,
-            'Story',
-            'Node',
-            1,
-            allowed_language_codes,
-            {},
-            [],
-            [],
-            {},
-        )
-        with self.swap(
-            opportunity_services,
-            'get_exploration_opportunity_summary_by_id',
-            lambda exp_id: dummy_opp_empty,
-        ):
-            self.post_json(
-                '%s/' % feconf.SUGGESTION_URL_PREFIX,
-                {
-                    'suggestion_type': (
-                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                    ),
-                    'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
-                    'target_id': 'exp_empty_topics',
-                    'target_version_at_submission': 1,
-                    'change_cmd': {
-                        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                        'state_name': 'Introduction',
-                        'content_id': 'content_0',
-                        'language_code': 'hi',
-                        'content_html': '<p>new content html</p>',
-                        'translation_html': '<p>new content html in Hindi</p>',
-                        'data_format': 'html',
-                    },
-                    'description': 'Adds translation for empty topics',
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
+                'target_id': 'exp_empty_topics',
+                'target_version_at_submission': 1,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'Introduction',
+                    'content_id': 'content_0',
+                    'language_code': 'hi',
+                    'content_html': '<p>new content html</p>',
+                    'translation_html': '<p>new content html in Hindi</p>',
+                    'data_format': 'html',
                 },
-                csrf_token=csrf_token,
-            )
+                'description': 'Adds translation for empty topics',
+            },
+            csrf_token=csrf_token,
+        )
 
         # 3. Setup 'exp_not_in_targets' (maps in topic summary but has no suggestions).
         self.save_new_valid_exploration(
@@ -4206,11 +4150,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             )
         self.assertEqual(len(response['suggestions']), 3)
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
     def test_exploration_handler_returns_none_opportunity_for_missing_card(
         self,
     ) -> None:
@@ -4221,7 +4160,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         # the response mapped to None.
         with self.swap_to_always_return(
             opportunity_services,
-            'get_translation_opportunity_cards_by_entity_ids_with_new_models',
+            'get_translation_opportunity_cards_by_entity_ids',
             [],
         ):
             response = self.get_json(
@@ -4518,11 +4457,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400,
         )
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
     def test_exploration_handler_returns_data_with_v2_feature_flag_enabled(
         self,
     ) -> None:
@@ -4964,58 +4898,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['next_offset'], 1)
 
     def test_exploration_handler_returns_data_with_valid_exploration_id(
-        self,
-    ) -> None:
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content',
-            params={
-                'entity_id': self.EXP_ID,
-                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
-            },
-        )
-        self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(response['next_offset'], 1)
-        suggestion = response['suggestions'][0]
-        self.assertDictEqual(
-            suggestion['change_cmd'], self.translate_suggestion_change
-        )
-        self.assertEqual(
-            suggestion['suggestion_type'],
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-        )
-        self.assertEqual(
-            suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION
-        )
-        self.assertEqual(suggestion['target_id'], self.EXP_ID)
-        self.assertEqual(suggestion['language_code'], 'hi')
-        self.assertEqual(suggestion['author_name'], 'author')
-        self.assertEqual(suggestion['status'], 'review')
-        self.assertDictEqual(
-            response['target_id_to_opportunity_dict'],
-            {
-                'exp1': {
-                    'chapter_title': 'Node1',
-                    'content_count': 1,
-                    'reviewer_only_content_count': 0,
-                    'id': 'exp1',
-                    'is_pinned': False,
-                    'story_title': 'A story',
-                    'topic_name': 'topic',
-                    'translation_counts': {},
-                    'translation_in_review_counts': {},
-                }
-            },
-        )
-        self.assertEqual(response['next_offset'], 1)
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_exploration_handler_returns_data_with_new_opportunity_models(
         self,
     ) -> None:
         topic_services.generate_topic_summary(self.TOPIC_ID)

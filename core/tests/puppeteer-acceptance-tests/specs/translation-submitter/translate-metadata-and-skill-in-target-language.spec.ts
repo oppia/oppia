@@ -25,18 +25,17 @@
  * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit?gid=659609865#gid=659609865
  */
 
-import testConstants from '../../../utilities/common/test-constants';
-import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../utilities/common/test-constants';
+import {UserFactory} from '../../utilities/common/user-factory';
 import {
   Contributor,
   CONTENT_TYPE_FILTER,
-} from '../../../utilities/user/contributor';
-import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../../utilities/user/logged-in-user';
-import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
-import {TopicManager} from '../../../utilities/user/topic-manager';
-import {TranslationSubmitter} from '../../../utilities/user/translation-submitter';
+} from '../../utilities/user/contributor';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {TopicManager} from '../../utilities/user/topic-manager';
+import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 
@@ -94,7 +93,6 @@ const MAX_ITEMS_TO_SKIP = 15;
 describe('Translation Submitter', function () {
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
-  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     translationSubmitter = await UserFactory.createNewUser(
@@ -105,15 +103,6 @@ describe('Translation Submitter', function () {
       'curriculumAdm',
       'curriculumAdm@example.com',
       [ROLES.CURRICULUM_ADMIN]
-    );
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'releaseCoordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
-
-    await releaseCoordinator.enableFeatureFlag(
-      'enable_translation_opps_with_new_opp_models'
     );
 
     await curriculumAdm.setUpCuratedLessonWithSkill({

@@ -29,29 +29,14 @@ import {
   TranslateTextService,
 } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import {TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING} from 'domain/exploration/written-translation.model';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {AppConstants} from 'app.constants';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-
-class MockPlatformFeatureService {
-  isTranslationOppsEnabled = false;
-
-  get status() {
-    return {
-      EnableTranslationOppsWithNewOppModels: {
-        isEnabled: this.isTranslationOppsEnabled,
-      },
-    };
-  }
-}
 
 describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
   let stateContent: StateAndContent;
   let httpTestingController: HttpTestingController;
-  let mockPlatformFeatureService: MockPlatformFeatureService;
   let readOnlyExplorationBackendApiService: jasmine.SpyObj<ReadOnlyExplorationBackendApiService>;
   let computeGraphService: jasmine.SpyObj<ComputeGraphService>;
   const getTranslatableItem = (text: string) => {
@@ -64,8 +49,38 @@ describe('TranslateTextService', () => {
     };
   };
 
+  const createTranslatableContentsResponse = (
+    mapping: Record<
+      string,
+      Record<
+        string,
+        {
+          content_value: string | string[];
+          content_format?: string;
+          content_type?: string;
+        }
+      >
+    >
+  ) => {
+    const translatable_contents = [];
+    for (const [stateName, contentIds] of Object.entries(mapping)) {
+      for (const [contentId, item] of Object.entries(contentIds)) {
+        translatable_contents.push({
+          content_id: contentId,
+          content_type: item.content_type || 'content',
+          content_format: item.content_format || 'html',
+          content_value: item.content_value,
+          grouping_key: stateName,
+        });
+      }
+    }
+    return {
+      translatable_contents,
+      version: '1',
+    };
+  };
+
   beforeEach(() => {
-    mockPlatformFeatureService = new MockPlatformFeatureService();
     readOnlyExplorationBackendApiService = jasmine.createSpyObj(
       'ReadOnlyExplorationBackendApiService',
       ['fetchExplorationAsync']
@@ -82,10 +97,6 @@ describe('TranslateTextService', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService,
-        },
         {
           provide: ReadOnlyExplorationBackendApiService,
           useValue: readOnlyExplorationBackendApiService,
@@ -131,12 +142,11 @@ describe('TranslateTextService', () => {
 
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
-      req.flush({
-        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1,
-      });
+      req.flush(
+        createTranslatableContentsResponse(sampleStateWiseContentMapping)
+      );
       flushMicrotasks();
 
       expect(
@@ -165,17 +175,16 @@ describe('TranslateTextService', () => {
       ]);
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
-      req.flush({
-        state_names_to_content_id_mapping: {
+      req.flush(
+        createTranslatableContentsResponse({
           start: {stateContent: getTranslatableItem('state text')},
           [AppConstants.DEFAULT_SUGGESTION_STATE_NAME]: {
             genericContent: getTranslatableItem('generic text'),
           },
-        },
-        version: 1,
-      });
+        })
+      );
       flushMicrotasks();
 
       expect(
@@ -190,15 +199,14 @@ describe('TranslateTextService', () => {
       const successCallback = jasmine.createSpy('successCallback');
       translateTextService.init('1', 'en', successCallback);
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
-      req.flush({
-        state_names_to_content_id_mapping: {
+      req.flush(
+        createTranslatableContentsResponse({
           tail: {tailContent: getTranslatableItem('tail text')},
           start: {startContent: getTranslatableItem('start text')},
-        },
-        version: 1,
-      });
+        })
+      );
       flushMicrotasks();
 
       expect(successCallback).toHaveBeenCalled();
@@ -206,10 +214,9 @@ describe('TranslateTextService', () => {
     }));
 
     it('should keep backend order for non-exploration content', fakeAsync(() => {
-      mockPlatformFeatureService.isTranslationOppsEnabled = true;
       translateTextService.init('skill1', 'en', () => {}, 'skill');
       const req = httpTestingController.expectOne(
-        '/gettranslatablecontentshandlerv2?entity_id=skill1&entity_type=skill&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=skill1&entity_type=skill&language_code=en'
       );
       req.flush({
         translatable_contents: [
@@ -249,13 +256,12 @@ describe('TranslateTextService', () => {
       };
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1,
-      });
+      req.flush(
+        createTranslatableContentsResponse(sampleStateWiseContentMapping)
+      );
       flushMicrotasks();
 
       const expectedTextAndAvailability3 = {
@@ -340,13 +346,12 @@ describe('TranslateTextService', () => {
       };
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1,
-      });
+      req.flush(
+        createTranslatableContentsResponse(sampleStateWiseContentMapping)
+      );
       flushMicrotasks();
 
       const textAndAvailability = translateTextService.getTextToTranslate();
@@ -371,13 +376,12 @@ describe('TranslateTextService', () => {
       };
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1,
-      });
+      req.flush(
+        createTranslatableContentsResponse(sampleStateWiseContentMapping)
+      );
       flushMicrotasks();
 
       const textAndAvailability = translateTextService.getTextToTranslate();
@@ -404,13 +408,12 @@ describe('TranslateTextService', () => {
       };
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1,
-      });
+      req.flush(
+        createTranslatableContentsResponse(sampleStateWiseContentMapping)
+      );
       flushMicrotasks();
 
       const textAndAvailability = translateTextService.getTextToTranslate();
@@ -418,13 +421,7 @@ describe('TranslateTextService', () => {
       expect(textAndAvailability.translation).toEqual([]);
     }));
 
-    it('should initialize correctly for V2 when feature flag is enabled', fakeAsync(() => {
-      spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
-        EnableTranslationOppsWithNewOppModels: {
-          isEnabled: true,
-        },
-      } as unknown as FeatureStatusChecker);
-
+    it('should initialize correctly for exploration', fakeAsync(() => {
       const sampleDataResults = {
         translatable_contents: [
           {
@@ -440,7 +437,7 @@ describe('TranslateTextService', () => {
 
       translateTextService.init('1', 'en', () => {}, 'exploration');
       const req = httpTestingController.expectOne(
-        '/gettranslatablecontentshandlerv2?entity_id=1&entity_type=exploration&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
@@ -533,13 +530,12 @@ describe('TranslateTextService', () => {
 
       translateTextService.init('1', 'en', () => {});
       let req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1,
-      });
+      req.flush(
+        createTranslatableContentsResponse(sampleStateWiseContentMapping)
+      );
       flushMicrotasks();
 
       translateTextService.getTextToTranslate();
@@ -578,13 +574,12 @@ describe('TranslateTextService', () => {
 
       translateTextService.init('1', 'en', () => {});
       let req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+        '/gettranslatablecontentshandler?entity_id=1&entity_type=exploration&language_code=en'
       );
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1,
-      });
+      req.flush(
+        createTranslatableContentsResponse(sampleStateWiseContentMapping)
+      );
       flushMicrotasks();
 
       translateTextService.getTextToTranslate();

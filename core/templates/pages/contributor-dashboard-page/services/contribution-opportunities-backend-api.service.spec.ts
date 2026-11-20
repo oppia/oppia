@@ -31,32 +31,18 @@ import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {UserService} from 'services/user.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translation-language.model';
 import {
   ExplorationOpportunitySummary,
   TranslationCountsDict,
-  ExplorationOpportunitySummaryBackendDict,
   TranslationOpportunityCardInfoBackendDict,
 } from 'domain/opportunity/exploration-opportunity-summary.model';
-
-class MockPlatformFeatureService {
-  get status() {
-    return {
-      EnableTranslationOppsWithNewOppModels: {
-        isEnabled: false,
-      },
-    };
-  }
-}
 
 describe('Contribution Opportunities backend API service', function () {
   let contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService;
   let httpTestingController: HttpTestingController;
   let urlInterpolationService: UrlInterpolationService;
   let userService: UserService;
-  let mockPlatformFeatureService: MockPlatformFeatureService;
   const invalidCursor = 'invalidCursor';
   const skillOpportunityResponse = {
     opportunities: [
@@ -71,46 +57,7 @@ describe('Contribution Opportunities backend API service', function () {
     next_cursor: '6',
     more: true,
   };
-  const translationOpportunities: ExplorationOpportunitySummaryBackendDict[] = [
-    {
-      id: 'exp_id_1',
-      topic_name: 'Topic 1',
-      story_title: 'A new story',
-      chapter_title: 'Introduction',
-      content_count: 100,
-      translation_counts: {
-        hi: 15,
-      } as TranslationCountsDict,
-      translation_in_review_counts: {
-        hi: 15,
-      } as TranslationCountsDict,
-      language_code: 'hi',
-      is_pinned: true,
-      reviewer_only_content_count: 0,
-    },
-    {
-      id: 'exp_id_2',
-      topic_name: 'Topic 2',
-      story_title: 'Another story',
-      chapter_title: 'Another chapter',
-      content_count: 50,
-      translation_counts: {
-        da: 8,
-      } as TranslationCountsDict,
-      translation_in_review_counts: {
-        da: 2,
-      } as TranslationCountsDict,
-      language_code: 'da',
-      is_pinned: false,
-      reviewer_only_content_count: 0,
-    },
-  ];
-  const translationOpportunityResponse = {
-    opportunities: translationOpportunities,
-    next_cursor: '6',
-    more: true,
-  };
-  const translationOpportunitiesV2: TranslationOpportunityCardInfoBackendDict[] =
+  const translationOpportunities: TranslationOpportunityCardInfoBackendDict[] =
     [
       {
         topic_ids: ['topic_id_1'],
@@ -147,8 +94,8 @@ describe('Contribution Opportunities backend API service', function () {
         } as TranslationCountsDict,
       },
     ];
-  const translationOpportunityResponseV2 = {
-    opportunities: translationOpportunitiesV2,
+  const translationOpportunityResponse = {
+    opportunities: translationOpportunities,
     next_cursor: '6',
     more: true,
   };
@@ -202,15 +149,8 @@ describe('Contribution Opportunities backend API service', function () {
   };
 
   beforeEach(() => {
-    mockPlatformFeatureService = new MockPlatformFeatureService();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService,
-        },
-      ],
     });
     contributionOpportunitiesBackendApiService = TestBed.inject(
       ContributionOpportunitiesBackendApiService
@@ -229,7 +169,7 @@ describe('Contribution Opportunities backend API service', function () {
     ];
     sampleTranslationOpportunitiesResponse =
       translationOpportunityResponse.opportunities.map(opportunity =>
-        ExplorationOpportunitySummary.createFromBackendDict(opportunity)
+        ExplorationOpportunitySummary.createFromBackendDictV2(opportunity)
       );
   });
 
@@ -451,31 +391,29 @@ describe('Contribution Opportunities backend API service', function () {
       )
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      urlInterpolationService.interpolateUrl(
-        '/opportunitiessummaryhandler/<opportunityType>',
-        {opportunityType: 'translation'}
-      ) + '?language_code=hi&topic_name=&cursor='
+      '/opportunitieshandler?language_code=hi&topic_name=&cursor='
     );
     expect(req.request.method).toEqual('GET');
     req.flush(translationOpportunityResponse);
 
     flushMicrotasks();
 
+    const expectedOpportunities = translationOpportunities.map(opportunity => {
+      const summary =
+        ExplorationOpportunitySummary.createFromBackendDictV2(opportunity);
+      summary.languageCode = 'hi';
+      return summary;
+    });
+
     expect(successHandler).toHaveBeenCalledWith({
-      opportunities: sampleTranslationOpportunitiesResponse,
+      opportunities: expectedOpportunities,
       nextCursor: translationOpportunityResponse.next_cursor,
       more: translationOpportunityResponse.more,
     });
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should successfully fetch the V2 translation opportunities data when feature flag is enabled', fakeAsync(() => {
-    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
-      EnableTranslationOppsWithNewOppModels: {
-        isEnabled: true,
-      },
-    } as unknown as FeatureStatusChecker);
-
+  it('should fail to fetch the translation opportunities data when calling fetchTranslationOpportunitiesAsync', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
@@ -487,80 +425,28 @@ describe('Contribution Opportunities backend API service', function () {
       )
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor='
+      '/opportunitieshandler?language_code=hi&topic_name=&cursor='
     );
+
     expect(req.request.method).toEqual('GET');
-    req.flush(translationOpportunityResponseV2);
-
-    flushMicrotasks();
-
-    const expectedOpportunities = translationOpportunitiesV2.map(
-      opportunity => {
-        const summary =
-          ExplorationOpportunitySummary.createFromBackendDictV2(opportunity);
-        summary.languageCode = 'hi';
-        return summary;
+    req.flush(
+      {
+        error: 'Failed to fetch translation opportunities data.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
       }
     );
+    flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      opportunities: expectedOpportunities,
-      nextCursor: translationOpportunityResponseV2.next_cursor,
-      more: translationOpportunityResponseV2.more,
-    });
-    expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to fetch translation opportunities data.')
+    );
   }));
 
-  it(
-    'should fail to fetch the V2 translation opportunities data ' +
-      "when calling 'fetchTranslationOpportunitiesAsync' and feature flag is enabled",
-    fakeAsync(() => {
-      spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
-        EnableTranslationOppsWithNewOppModels: {
-          isEnabled: true,
-        },
-      } as unknown as FeatureStatusChecker);
-
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      contributionOpportunitiesBackendApiService
-        .fetchTranslationOpportunitiesAsync(
-          'hi',
-          AppConstants.TOPIC_SENTINEL_NAME_ALL,
-          ''
-        )
-        .then(successHandler, failHandler);
-      const req = httpTestingController.expectOne(
-        '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor='
-      );
-
-      expect(req.request.method).toEqual('GET');
-      req.flush(
-        {
-          error: 'Failed to fetch V2 translation opportunities data.',
-        },
-        {
-          status: 500,
-          statusText: 'Internal Server Error',
-        }
-      );
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        new Error('Failed to fetch V2 translation opportunities data.')
-      );
-    })
-  );
-
   it('should omit entity_type from the request when entityType is all', fakeAsync(() => {
-    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
-      EnableTranslationOppsWithNewOppModels: {
-        isEnabled: true,
-      },
-    } as unknown as FeatureStatusChecker);
-
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
@@ -571,23 +457,17 @@ describe('Contribution Opportunities backend API service', function () {
     // "all" means "do not filter by entity type", so the parameter is left
     // off the request entirely rather than being sent as a literal value.
     const req = httpTestingController.expectOne(
-      '/opportunitieshandlerv2?language_code=hi&topic_name=Topic%201&cursor='
+      '/opportunitieshandler?language_code=hi&topic_name=Topic%201&cursor='
     );
     expect(req.request.method).toEqual('GET');
     expect(req.request.params.has('entity_type')).toBeFalse();
-    req.flush(translationOpportunityResponseV2);
+    req.flush(translationOpportunityResponse);
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
   }));
 
-  it('should fetch V2 translation opportunities with a specific entityType', fakeAsync(() => {
-    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
-      EnableTranslationOppsWithNewOppModels: {
-        isEnabled: true,
-      },
-    } as unknown as FeatureStatusChecker);
-
+  it('should fetch translation opportunities with a specific entityType', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
@@ -601,59 +481,15 @@ describe('Contribution Opportunities backend API service', function () {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/opportunitieshandlerv2?language_code=hi&topic_name=Topic%201&cursor=' +
+      '/opportunitieshandler?language_code=hi&topic_name=Topic%201&cursor=' +
         '&entity_type=skill'
     );
     expect(req.request.method).toEqual('GET');
-    req.flush(translationOpportunityResponseV2);
+    req.flush(translationOpportunityResponse);
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
   }));
-
-  it(
-    'should fail to fetch the translation opportunities data ' +
-      'given invalid language code ' +
-      "when calling 'fetchTranslationOpportunitiesAsync'",
-    fakeAsync(() => {
-      const topicName = translationOpportunities[0].topic_name;
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      contributionOpportunitiesBackendApiService
-        .fetchTranslationOpportunitiesAsync(
-          'invlaidCode',
-          topicName,
-          invalidCursor
-        )
-        .then(successHandler, failHandler);
-      const req = httpTestingController.expectOne(
-        urlInterpolationService.interpolateUrl(
-          '/opportunitiessummaryhandler/<opportunityType>' +
-            '?language_code=invlaidCode' +
-            '&topic_name=<topicName>&cursor=<invalidCursor>',
-          {opportunityType: 'translation', topicName, invalidCursor}
-        )
-      );
-
-      expect(req.request.method).toEqual('GET');
-      req.flush(
-        {
-          error: 'Failed to fetch translation opportunities data.',
-        },
-        {
-          status: 500,
-          statusText: 'Internal Server Error',
-        }
-      );
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        new Error('Failed to fetch translation opportunities data.')
-      );
-    })
-  );
 
   it('should successfully pin reviewable pinned translation opportunities', fakeAsync(() => {
     const topicName = translationOpportunities[0].topic_name;
@@ -719,13 +555,7 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should fetch V2 reviewable translation opportunities when feature flag is enabled', fakeAsync(() => {
-    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
-      EnableTranslationOppsWithNewOppModels: {
-        isEnabled: true,
-      },
-    } as unknown as FeatureStatusChecker);
-
+  it('should fetch reviewable translation opportunities when language code is provided', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
@@ -738,18 +568,18 @@ describe('Contribution Opportunities backend API service', function () {
     // No entity type is supplied, so the parameter is left off and the
     // handler returns opportunities of every entity type.
     const req = httpTestingController.expectOne(
-      '/getreviewableopportunitieshandlerv2?language_code=hi'
+      '/getreviewableopportunitieshandler?language_code=hi'
     );
     expect(req.request.method).toEqual('GET');
 
     req.flush({
-      opportunities: [translationOpportunitiesV2[0]],
+      opportunities: [translationOpportunities[0]],
     });
     flushMicrotasks();
 
     const expectedOpportunity =
       ExplorationOpportunitySummary.createFromBackendDictV2(
-        translationOpportunitiesV2[0]
+        translationOpportunities[0]
       );
     expectedOpportunity.languageCode = 'hi';
 
@@ -759,13 +589,7 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should fetch V2 reviewable translation opportunities of a single entity type', fakeAsync(() => {
-    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
-      EnableTranslationOppsWithNewOppModels: {
-        isEnabled: true,
-      },
-    } as unknown as FeatureStatusChecker);
-
+  it('should fetch reviewable translation opportunities of a single entity type', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
@@ -778,7 +602,7 @@ describe('Contribution Opportunities backend API service', function () {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/getreviewableopportunitieshandlerv2?language_code=hi&entity_type=skill'
+      '/getreviewableopportunitieshandler?language_code=hi&entity_type=skill'
     );
     expect(req.request.method).toEqual('GET');
     expect(req.request.params.get('entity_type')).toBe(
@@ -794,14 +618,8 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should fetch V2 reviewable translation opportunities from a topic when feature flag is enabled', fakeAsync(() => {
-    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
-      EnableTranslationOppsWithNewOppModels: {
-        isEnabled: true,
-      },
-    } as unknown as FeatureStatusChecker);
-
-    const topicName = translationOpportunitiesV2[1].topic_name;
+  it('should fetch reviewable translation opportunities from a topic', fakeAsync(() => {
+    const topicName = translationOpportunities[1].topic_name;
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
@@ -809,18 +627,18 @@ describe('Contribution Opportunities backend API service', function () {
       .fetchReviewableTranslationOpportunitiesAsync(topicName, 'hi')
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/getreviewableopportunitieshandlerv2?topic_name=Topic%202&language_code=hi'
+      '/getreviewableopportunitieshandler?topic_name=Topic%202&language_code=hi'
     );
     expect(req.request.method).toEqual('GET');
 
     req.flush({
-      opportunities: [translationOpportunitiesV2[1]],
+      opportunities: [translationOpportunities[1]],
     });
     flushMicrotasks();
 
     const expectedOpportunity =
       ExplorationOpportunitySummary.createFromBackendDictV2(
-        translationOpportunitiesV2[1]
+        translationOpportunities[1]
       );
     expectedOpportunity.languageCode = 'hi';
 
@@ -830,153 +648,38 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should fail to fetch the V2 reviewable translation opportunities ' +
-      "when calling 'fetchReviewableTranslationOpportunitiesAsync' and feature flag is enabled",
-    fakeAsync(() => {
-      spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
-        EnableTranslationOppsWithNewOppModels: {
-          isEnabled: true,
-        },
-      } as unknown as FeatureStatusChecker);
-
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      contributionOpportunitiesBackendApiService
-        .fetchReviewableTranslationOpportunitiesAsync(
-          AppConstants.TOPIC_SENTINEL_NAME_ALL,
-          'hi'
-        )
-        .then(successHandler, failHandler);
-
-      const req = httpTestingController.expectOne(
-        '/getreviewableopportunitieshandlerv2?language_code=hi'
-      );
-      expect(req.request.method).toEqual('GET');
-
-      req.flush(
-        {
-          error: 'Failed to fetch V2 reviewable translation opportunities.',
-        },
-        {
-          status: 500,
-          statusText: 'Internal Server Error',
-        }
-      );
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        new Error('Failed to fetch V2 reviewable translation opportunities.')
-      );
-    })
-  );
-
-  it('should fetch reviewable translation opportunities from a topic', fakeAsync(() => {
-    const topicName = translationOpportunities[1].topic_name;
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    contributionOpportunitiesBackendApiService
-      .fetchReviewableTranslationOpportunitiesAsync(topicName)
-      .then(successHandler, failHandler);
-    const req = httpTestingController.expectOne(
-      urlInterpolationService.interpolateUrl(
-        '/getreviewableopportunitieshandler?topic_name=<topicName>',
-        {topicName}
-      )
-    );
-    expect(req.request.method).toEqual('GET');
-
-    req.flush({
-      opportunities: translationOpportunities.filter(
-        opportunity => opportunity.topic_name === topicName
-      ),
-    });
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith({
-      opportunities: sampleTranslationOpportunitiesResponse.filter(
-        opportunity => opportunity.topicName === topicName
-      ),
-    });
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should fetch reviewable translation opportunities by language', fakeAsync(() => {
-    const languageCode = translationOpportunities[0].language_code;
+  it('should fail to fetch the reviewable translation opportunities when calling fetchReviewableTranslationOpportunitiesAsync', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
       .fetchReviewableTranslationOpportunitiesAsync(
         AppConstants.TOPIC_SENTINEL_NAME_ALL,
-        languageCode
+        'hi'
       )
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      urlInterpolationService.interpolateUrl(
-        '/getreviewableopportunitieshandler?language_code=<languageCode>',
-        {languageCode}
-      )
+      '/getreviewableopportunitieshandler?language_code=hi'
     );
     expect(req.request.method).toEqual('GET');
 
-    req.flush({
-      opportunities: translationOpportunities.filter(
-        opportunity => opportunity.language_code === languageCode
-      ),
-    });
+    req.flush(
+      {
+        error: 'Failed to fetch reviewable translation opportunities.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      opportunities: sampleTranslationOpportunitiesResponse.filter(
-        opportunity => opportunity.languageCode === languageCode
-      ),
-    });
-    expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to fetch reviewable translation opportunities.')
+    );
   }));
-
-  it(
-    'should fail to fetch reviewable translation opportunities ' +
-      'given invalid topic name when calling ' +
-      'fetchReviewableTranslationOpportunitiesAsync',
-    fakeAsync(() => {
-      const invalidTopicName = 'invalid';
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      contributionOpportunitiesBackendApiService
-        .fetchReviewableTranslationOpportunitiesAsync(invalidTopicName)
-        .then(successHandler, failHandler);
-
-      const req = httpTestingController.expectOne(
-        urlInterpolationService.interpolateUrl(
-          '/getreviewableopportunitieshandler?topic_name=<invalidTopicName>',
-          {invalidTopicName}
-        )
-      );
-      expect(req.request.method).toEqual('GET');
-
-      req.flush(
-        {
-          error: 'Failed to fetch reviewable translation opportunities.',
-        },
-        {
-          status: 500,
-          statusText: 'Internal Server Error',
-        }
-      );
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        new Error('Failed to fetch reviewable translation opportunities.')
-      );
-    })
-  );
 
   it('should successfully fetch the featured translation languages', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');

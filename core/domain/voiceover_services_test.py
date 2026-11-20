@@ -2079,9 +2079,11 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             ),
         ):
             with self.swap(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                'get_by_id',
-                lambda _exploration_id: SimpleNamespace(topic_id='topic_1'),
+                opportunity_models.TranslationOpportunityModel,
+                'get',
+                lambda _model_id, strict=True: SimpleNamespace(
+                    topic_ids=['topic_1']
+                ),
             ):
                 with self.swap(
                     topic_fetchers,
@@ -2146,9 +2148,9 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             ),
         ):
             with self.swap(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                'get_by_id',
-                lambda _exploration_id: (_ for _ in ()).throw(
+                opportunity_models.TranslationOpportunityModel,
+                'get',
+                lambda _model_id, strict=True: (_ for _ in ()).throw(
                     Exception('topic lookup failed')
                 ),
             ):

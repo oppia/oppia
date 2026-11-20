@@ -1188,20 +1188,17 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'edited_by_reviewer': False,
         }
 
-        opportunity_models.ExplorationOpportunitySummaryModel(
-            id='exp1',
-            topic_id='Topic1',
-            topic_name='New Topic',
-            story_id='Story1',
-            story_title='New Story',
-            chapter_title='New chapter',
+        opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.exp1',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exp1',
+            topic_ids=['Topic1'],
             content_count=10,
-            translation_counts={},
             incomplete_translation_language_codes=[
                 language['id']
                 for language in constants.SUPPORTED_AUDIO_LANGUAGES
             ],
-            language_codes_needing_voice_artists=['en'],
+            translation_counts={},
         ).put()
 
     def test_pre_update_validate_fails_for_invalid_change_cmd(self) -> None:

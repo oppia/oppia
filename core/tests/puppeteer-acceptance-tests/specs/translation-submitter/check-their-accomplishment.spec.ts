@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -83,8 +83,10 @@ describe('Translation Submitter', function () {
 
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
       'Save and translate another'
@@ -92,6 +94,9 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOnElementWithText('Save and close');
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
@@ -99,11 +104,11 @@ describe('Translation Submitter', function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
     await translationReviewer.startTranslationReview(
       'सामग्री 0',
-      'Fractions / The Picnic'
+      'Fractions / Cutting the Pies'
     );
     await translationReviewer.submitTranslationReview('accept');
     await translationReviewer.submitTranslationReview('accept');
