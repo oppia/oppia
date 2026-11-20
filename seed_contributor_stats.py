@@ -38,13 +38,14 @@ cloud_datastore_services.NdbClientSingleton()._client = ndb.Client(
 
 
 def seed() -> None:
-    print('Connecting to Datastore Emulator and seeding demo stats data...')
+    print('Connecting to Datastore Emulator and seeding demo stats data across multiple languages...')
     now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
     past_stalled = now - datetime.timedelta(days=45)
     recent = now - datetime.timedelta(days=2)
 
     with cloud_datastore_services.get_ndb_context():
-        # 1. Topic 1: Fractions (Near-Complete in Hindi: 85% Submissions, 70% Reviews)
+        # 1. Topic 1: Fractions
+        # Near-Complete in Hindi (85%) & French (90%), In-Progress in Spanish (42%) & Swahili (80%)
         r1 = topic_models.TopicRightsModel(id='fractions_topic', topic_is_published=True)
         super(topic_models.base_models.VersionedModel, r1).put()
 
@@ -74,10 +75,10 @@ def seed() -> None:
             story_title='Adventures with Fractions',
             chapter_title='Chapter 1: Pizza Slices & Halves',
             content_count=20,
-            incomplete_translation_language_codes=['hi', 'es'],
-            translation_counts={'hi': 18, 'es': 12},
+            incomplete_translation_language_codes=['hi', 'es', 'fr', 'ar', 'sw', 'bn'],
+            translation_counts={'hi': 18, 'es': 12, 'fr': 19, 'ar': 15, 'sw': 17, 'bn': 6},
             language_codes_with_assigned_voice_artists=[],
-            language_codes_needing_voice_artists=['hi']
+            language_codes_needing_voice_artists=['hi', 'es', 'fr', 'ar']
         )
         exp1.put()
 
@@ -89,10 +90,10 @@ def seed() -> None:
             story_title='Adventures with Fractions',
             chapter_title='Chapter 2: Common Denominators',
             content_count=20,
-            incomplete_translation_language_codes=['hi', 'es'],
-            translation_counts={'hi': 16, 'es': 5},
+            incomplete_translation_language_codes=['hi', 'es', 'fr', 'ar', 'sw', 'bn'],
+            translation_counts={'hi': 16, 'es': 5, 'fr': 17, 'ar': 13, 'sw': 15, 'bn': 4},
             language_codes_with_assigned_voice_artists=[],
-            language_codes_needing_voice_artists=['hi']
+            language_codes_needing_voice_artists=['hi', 'es', 'fr', 'ar']
         )
         exp2.put()
 
@@ -110,7 +111,8 @@ def seed() -> None:
         )
         s2.put()
 
-        # 2. Topic 2: Place Value (Needs Reviewers: 90% Submissions, 45% Reviews)
+        # 2. Topic 2: Place Value
+        # Near-Complete in Spanish (86%) & Bangla (93%), Needs Reviewers in Hindi (47%)
         r2 = topic_models.TopicRightsModel(id='place_value_topic', topic_is_published=True)
         super(topic_models.base_models.VersionedModel, r2).put()
 
@@ -140,10 +142,10 @@ def seed() -> None:
             story_title='Counting Blocks',
             chapter_title='Chapter 1: The Magic of Tens',
             content_count=30,
-            incomplete_translation_language_codes=['hi', 'es'],
-            translation_counts={'hi': 14, 'es': 8},
+            incomplete_translation_language_codes=['hi', 'es', 'fr', 'ar', 'sw', 'bn'],
+            translation_counts={'hi': 14, 'es': 26, 'fr': 12, 'ar': 15, 'sw': 24, 'bn': 28},
             language_codes_with_assigned_voice_artists=[],
-            language_codes_needing_voice_artists=['hi']
+            language_codes_needing_voice_artists=['hi', 'es', 'fr', 'ar']
         )
         exp3.put()
 
@@ -191,10 +193,10 @@ def seed() -> None:
             story_title='Below Zero',
             chapter_title='Chapter 1: Sub-zero Temperatures',
             content_count=25,
-            incomplete_translation_language_codes=['hi'],
-            translation_counts={'hi': 6},
+            incomplete_translation_language_codes=['hi', 'es'],
+            translation_counts={'hi': 6, 'es': 5},
             language_codes_with_assigned_voice_artists=[],
-            language_codes_needing_voice_artists=['hi']
+            language_codes_needing_voice_artists=['hi', 'es']
         )
         exp4.put()
 
@@ -236,7 +238,7 @@ def seed() -> None:
             chapter_title='Chapter 1: 1 plus 1',
             content_count=15,
             incomplete_translation_language_codes=[],
-            translation_counts={'hi': 15, 'es': 15},
+            translation_counts={'hi': 15, 'es': 15, 'fr': 15, 'ar': 15, 'sw': 15, 'bn': 15},
             language_codes_with_assigned_voice_artists=[],
             language_codes_needing_voice_artists=[]
         )
@@ -249,7 +251,7 @@ def seed() -> None:
         )
         s6.put()
 
-        print('\n>>> SUCCESS: Demo topics, skills, and translations seeded into datastore! <<<\n')
+        print('\n>>> SUCCESS: Demo topics, skills, and translations seeded into datastore across Hindi, Spanish, French, Arabic, Swahili, and Bangla! <<<\n')
 
 
 if __name__ == '__main__':
