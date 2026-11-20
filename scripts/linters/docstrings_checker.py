@@ -192,7 +192,12 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     Guide.
     """
 
-    re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
+    # Pylint's container type only matches contents on a single line,
+    # so a type wrapping onto the next line is not recognised as a type.
+    # Allow container contents to span lines, matching the shortest valid type.
+    re_multiple_type = (
+        _check_docs_utils.GoogleDocstring.re_multiple_type.replace(
+            r'[^\n]+', r'[\s\S]+?'))
     re_param_line = re.compile(
         r"""
         \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
