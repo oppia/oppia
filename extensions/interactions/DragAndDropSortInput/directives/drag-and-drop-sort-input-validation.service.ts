@@ -283,8 +283,9 @@ export class DragAndDropSortInputValidationService {
           default:
         }
 
-        // A rule identical to an earlier one (same type and inputs) can
-        // never be matched, and the backend rejects it on save.
+        // A rule with the same type and equivalent inputs as an earlier one
+        // (ignoring the order of the items in the same position) can never
+        // be matched.
         for (let k = 0; k < ranges.length; k++) {
           const previousRule =
             answerGroups[ranges[k].answerGroupIndex].rules[ranges[k].ruleIndex];
