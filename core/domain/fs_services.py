@@ -447,16 +447,19 @@ def get_static_asset_url(filepath: str) -> str:
     # This inline import is required because of the following cicrular
     # import happening without it:
     # exp_domain -> html_validation_service -> fs_services ->
-    # platform_parameter_services -> platform_parameter_registry ->
+    # web_platform_parameter_services -> web_platform_parameter_registry ->
     # caching_services -> exp_domain.
     # Caching services should be refactored to eliminate dependency on
     # multiple domain objects.
-    from core.domain import platform_parameter_list, platform_parameter_services
+    from core.domain import (
+        web_platform_parameter_list,
+        web_platform_parameter_services,
+    )
 
     # TODO(release-scripts#137): Remove once site URL is verified on all
     # servers.
-    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    oppia_site_url = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     logging.info(
         'Logging OPPIA_SITE_URL_FOR_EMAILS for debugging: %s' % oppia_site_url

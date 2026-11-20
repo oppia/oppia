@@ -31,7 +31,7 @@ from core.domain import (
     story_domain,
     topic_domain,
 )
-from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_domain as parameter_domain
 from core.platform import models
 from core.tests import test_utils
 

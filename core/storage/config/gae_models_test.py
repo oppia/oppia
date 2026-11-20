@@ -26,8 +26,8 @@ from typing import List
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    # Here, we are importing 'platform_parameter_domain' only for type checking.
-    from core.domain import platform_parameter_domain
+    # We import web_platform_parameter_domain only for type checking.
+    from core.domain import web_platform_parameter_domain
     from mypy_imports import base_models, config_models
 
 (base_models, config_models) = models.Registry.import_models(
@@ -42,6 +42,61 @@ class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
             config_models.PlatformParameterSnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE,
         )
+
+
+class WebPlatformParameterConfigSnapshotMetadataModelTests(
+    test_utils.GenericTestBase
+):
+    """Tests for WebPlatformParameterConfigSnapshotMetadataModel."""
+
+    def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
+        self.assertEqual(
+            config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE,
+        )
+
+    def test_create_model(self) -> None:
+        snapshot_model = config_models.WebPlatformParameterConfigSnapshotMetadataModel.create(
+            'parameter_name-1',
+            'committer_id',
+            feconf.COMMIT_TYPE_CREATE,
+            'initial commit',
+            [],
+        )
+
+        self.assertIsInstance(
+            snapshot_model,
+            config_models.WebPlatformParameterConfigSnapshotMetadataModel,
+        )
+        self.assertEqual(snapshot_model.id, 'parameter_name-1')
+        self.assertEqual(snapshot_model.committer_id, 'committer_id')
+        self.assertEqual(snapshot_model.commit_message, 'initial commit')
+
+
+class WebPlatformParameterConfigSnapshotContentModelTests(
+    test_utils.GenericTestBase
+):
+    """Tests for WebPlatformParameterConfigSnapshotContentModel."""
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            config_models.WebPlatformParameterConfigSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_create_model(self) -> None:
+        snapshot_content = (
+            config_models.WebPlatformParameterConfigSnapshotContentModel.create(
+                'parameter_name-1', {'default_value': False}
+            )
+        )
+
+        self.assertIsInstance(
+            snapshot_content,
+            config_models.WebPlatformParameterConfigSnapshotContentModel,
+        )
+        self.assertEqual(snapshot_content.id, 'parameter_name-1')
+        self.assertEqual(snapshot_content.content, {'default_value': False})
 
 
 class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
@@ -75,7 +130,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
     def test_commit(self) -> None:
         parameter_name = 'parameter_name'
         rule_dicts: List[
-            platform_parameter_domain.PlatformParameterRuleDict
+            web_platform_parameter_domain.PlatformParameterRuleDict
         ] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
@@ -97,7 +152,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
-        new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
+        new_rules: List[
+            web_platform_parameter_domain.PlatformParameterRuleDict
+        ] = [
             {
                 'filters': [
                     {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
@@ -122,7 +179,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
     def test_commit_is_persistent_in_storage(self) -> None:
         parameter_name = 'parameter_name'
         rule_dicts: List[
-            platform_parameter_domain.PlatformParameterRuleDict
+            web_platform_parameter_domain.PlatformParameterRuleDict
         ] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
@@ -146,7 +203,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
     def test_commit_with_updated_rules(self) -> None:
         parameter_name = 'parameter_name'
         rule_dicts: List[
-            platform_parameter_domain.PlatformParameterRuleDict
+            web_platform_parameter_domain.PlatformParameterRuleDict
         ] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
@@ -159,7 +216,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         )
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
-        new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
+        new_rules: List[
+            web_platform_parameter_domain.PlatformParameterRuleDict
+        ] = [
             {
                 'filters': [
                     {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
@@ -199,6 +258,60 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             config_models.PlatformParameterModel.get_export_policy(),
             expected_export_policy_dict,
         )
+
+
+class WebPlatformParameterConfigModelUnitTests(test_utils.GenericTestBase):
+    """Test WebPlatformParameterConfigModel class."""
+
+    def test_model_extends_base_platform_parameter_config_model(self) -> None:
+        self.assertTrue(
+            issubclass(
+                config_models.WebPlatformParameterConfigModel,
+                base_models.BasePlatformParameterConfigModel,
+            )
+        )
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            config_models.WebPlatformParameterConfigModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            config_models.WebPlatformParameterConfigModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            config_models.WebPlatformParameterConfigModel.get_export_policy(),
+            config_models.PlatformParameterModel.get_export_policy(),
+        )
+
+    def test_create_model_uses_distinct_storage_kind(self) -> None:
+        param_model = config_models.WebPlatformParameterConfigModel.create(
+            param_name='parameter_name',
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            default_value=False,
+        )
+        legacy_model = config_models.PlatformParameterModel.create(
+            param_name='parameter_name',
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            default_value=False,
+        )
+
+        self.assertIsInstance(
+            param_model, config_models.WebPlatformParameterConfigModel
+        )
+        self.assertNotEqual(param_model.key.kind(), legacy_model.key.kind())
+        self.assertEqual(param_model.id, legacy_model.id)
 
 
 class FeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):

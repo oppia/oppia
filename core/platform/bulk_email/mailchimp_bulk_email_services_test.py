@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core.domain import platform_parameter_list
+from core.domain import web_platform_parameter_list
 from core.platform import models
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
@@ -334,8 +334,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.MAILCHIMP_USERNAME, 'username'),
-            (platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
+            (
+                web_platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
+                'username',
+            ),
+            (web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
         ]
     )
     def test_add_or_update_mailchimp_user_status(self) -> None:
@@ -415,8 +418,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.MAILCHIMP_USERNAME, 'username'),
-            (platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
+            (
+                web_platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
+                'username',
+            ),
+            (web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
         ]
     )
     def test_android_merge_fields(self) -> None:
@@ -450,8 +456,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.MAILCHIMP_USERNAME, 'username'),
-            (platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
+            (
+                web_platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
+                'username',
+            ),
+            (web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
         ]
     )
     def test_catch_or_raise_errors_when_creating_new_invalid_user(self) -> None:
@@ -494,8 +503,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.MAILCHIMP_USERNAME, 'username'),
-            (platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
+            (
+                web_platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
+                'username',
+            ),
+            (web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
         ]
     )
     def test_permanently_delete_user(self) -> None:
