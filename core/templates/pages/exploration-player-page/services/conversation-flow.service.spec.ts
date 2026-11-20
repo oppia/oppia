@@ -22,6 +22,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   fakeAsync,
+  flush,
   TestBed,
   tick,
   waitForAsync,
@@ -843,7 +844,7 @@ describe('Conversation flow service', () => {
     });
 
     conversationFlowService.showUpcomingCard();
-    tick(ExplorationPlayerConstants.ALERT_MESSAGE_TIMEOUT);
+    flush();
 
     expect(
       explorationRecommendationsService.getRecommendedSummaryDicts
