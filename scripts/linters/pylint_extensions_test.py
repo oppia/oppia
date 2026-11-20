@@ -1375,6 +1375,31 @@ class DocstringParameterCheckerTests(CheckerTestBase):
                 node_with_no_error_message
             )
 
+    def test_args_with_long_container_type(self) -> None:
+    self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DocstringParameterChecker
+            )
+        self.checker_test_object.setup_method()
+    node = astroid.extract_node(
+                """def func(state_mapping, suggestions): #@
+                \"""Returns a copy of the supplied mapping.
+
+                Args:
+                    state_mapping: dict(str, dict(str, WrittenTranslation)).
+                        A mapping of state names to content IDs.
+                    suggestions: list(Suggestion). Suggestions.
+
+                Returns:
+                    dict(str, dict(str, WrittenTranslation)). A mapping.
+                    \"""
+                    return state_mapping
+                """
+            
+    with self.checker_test_object.assertNoMessages():
+    self.checker_test_object.checker.visit_functiondef(node)
+    )
+        
     def test_checks_args_formatting_docstring(self) -> None:
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
