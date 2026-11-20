@@ -16,8 +16,6 @@
  * @fileoverview Unit test for Answer Group Editor Component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -278,65 +276,71 @@ describe('Answer Group Editor Component', () => {
   });
 
   it('should get default input values for different variable type', () => {
-    expect(component.getDefaultInputValue('Null')).toBe(null);
-    expect(component.getDefaultInputValue('Boolean')).toBe(false);
-    expect(component.getDefaultInputValue('Int')).toBe(0);
-    expect(component.getDefaultInputValue('PositiveInt')).toBe(1);
-    expect(component.getDefaultInputValue('UnicodeString')).toBe('');
-    expect(component.getDefaultInputValue('NormalizedString')).toBe('');
-    expect(component.getDefaultInputValue('MathExpressionContent')).toBe('');
-    expect(component.getDefaultInputValue('Html')).toBe('');
-    expect(component.getDefaultInputValue('SanitizedUrl')).toBe('');
-    expect(component.getDefaultInputValue('Filepath')).toBe('');
-    expect(component.getDefaultInputValue('CodeEvaluation')).toEqual({
+    // SchemaDefaultValue, the return type of getDefaultInputValue(), is a
+    // deeply recursive union type. Passing it straight to Jasmine's expect
+    // function makes the matcher types exceed TypeScript's type instantiation
+    // depth limit. This helper returns the same value with a flat type that covers
+    // every member of SchemaDefaultValue, so the assertions stay unchanged.
+    const getDefaultInputValue = (
+      varType: string
+    ): object | string | number | boolean | null =>
+      component.getDefaultInputValue(varType);
+
+    expect(getDefaultInputValue('Null')).toBe(null);
+    expect(getDefaultInputValue('Boolean')).toBe(false);
+    expect(getDefaultInputValue('Int')).toBe(0);
+    expect(getDefaultInputValue('PositiveInt')).toBe(1);
+    expect(getDefaultInputValue('UnicodeString')).toBe('');
+    expect(getDefaultInputValue('NormalizedString')).toBe('');
+    expect(getDefaultInputValue('MathExpressionContent')).toBe('');
+    expect(getDefaultInputValue('Html')).toBe('');
+    expect(getDefaultInputValue('SanitizedUrl')).toBe('');
+    expect(getDefaultInputValue('Filepath')).toBe('');
+    expect(getDefaultInputValue('CodeEvaluation')).toEqual({
       code: '',
       error: '',
       evaluation: '',
       output: '',
     });
-    expect(component.getDefaultInputValue('CoordTwoDim')).toEqual([0, 0]);
-    expect(component.getDefaultInputValue('MusicPhrase')).toEqual([]);
-    expect(component.getDefaultInputValue('CheckedProof')).toEqual({
+    expect(getDefaultInputValue('CoordTwoDim')).toEqual([0, 0]);
+    expect(getDefaultInputValue('MusicPhrase')).toEqual([]);
+    expect(getDefaultInputValue('CheckedProof')).toEqual({
       assumptions_string: '',
       correct: false,
       proof_string: '',
       target_string: '',
     });
-    expect(component.getDefaultInputValue('Graph')).toEqual({
+    expect(getDefaultInputValue('Graph')).toEqual({
       edges: [],
       isDirected: false,
       isLabeled: false,
       isWeighted: false,
       vertices: [],
     });
-    expect(component.getDefaultInputValue('NormalizedRectangle2D')).toEqual([
+    expect(getDefaultInputValue('NormalizedRectangle2D')).toEqual([
       [0, 0],
       [0, 0],
     ]);
-    expect(component.getDefaultInputValue('ImageRegion')).toEqual({
+    expect(getDefaultInputValue('ImageRegion')).toEqual({
       area: [
         [0, 0],
         [0, 0],
       ],
       regionType: '',
     });
-    expect(component.getDefaultInputValue('ImageWithRegions')).toEqual({
+    expect(getDefaultInputValue('ImageWithRegions')).toEqual({
       imagePath: '',
       labeledRegions: [],
     });
-    expect(component.getDefaultInputValue('ClickOnImage')).toEqual({
+    expect(getDefaultInputValue('ClickOnImage')).toEqual({
       clickPosition: [0, 0],
       clickedRegions: [],
     });
-    expect(
-      component.getDefaultInputValue('TranslatableSetOfNormalizedString')
-    ).toEqual({
+    expect(getDefaultInputValue('TranslatableSetOfNormalizedString')).toEqual({
       contentId: null,
       normalizedStrSet: [],
     });
-    expect(
-      component.getDefaultInputValue('TranslatableSetOfUnicodeString')
-    ).toEqual({
+    expect(getDefaultInputValue('TranslatableSetOfUnicodeString')).toEqual({
       contentId: null,
       normalizedStrSet: [],
     });

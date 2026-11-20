@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the post chapter recommendations component.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   waitForAsync,
@@ -42,8 +40,15 @@ class MockPlatformFeatureService {
   };
 }
 
+interface MockLocation {
+  pathname: string;
+  href: string;
+  reload: jasmine.Spy;
+  assign: jasmine.Spy;
+}
+
 class MockWindowRef {
-  nativeWindow = {
+  nativeWindow: {location: MockLocation} = {
     location: {
       pathname: '/learn/math',
       href: '',
@@ -114,7 +119,12 @@ describe('End chapter check mark component', function () {
     tick();
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
-    expect(mockWindowRef.nativeWindow.location).toBe('login_url');
+    // To go to the login page, signIn() replaces window.location with the
+    // login URL string, so the location is read through a type that also
+    // allows a string.
+    const nativeWindowAfterSignIn: {location: MockLocation | string} =
+      mockWindowRef.nativeWindow;
+    expect(nativeWindowAfterSignIn.location).toBe('login_url');
   }));
 
   it(
