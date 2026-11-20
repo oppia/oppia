@@ -22,51 +22,83 @@ import {
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {QuestionBackendDict, Question} from 'domain/question/question.model';
+import {
+  QuestionSummaryForOneSkill,
+  QuestionSummaryForOneSkillBackendDict,
+} from 'domain/question/question-summary-for-one-skill-object.model';
 import {DiagnosticTestQuestionsModel} from './diagnostic-test-questions.model';
 
 describe('Question backend Api service', () => {
   let questionBackendApiService: QuestionBackendApiService;
   let httpTestingController: HttpTestingController;
-  let sampleResponse = {
+  let sampleResponse: {
+    question_summary_dicts: QuestionSummaryForOneSkillBackendDict[];
+    more: boolean;
+  } = {
     question_summary_dicts: [
       {
-        skill_descriptions: [],
+        skill_id: '1',
+        skill_description: 'Skill 1',
+        skill_difficulty: 1,
         summary: {
-          creator_id: '1',
-          created_on_msec: 0,
-          last_updated_msec: 0,
           id: '0',
           question_content: '',
+          interaction_id: 'TextInput',
+          misconception_ids: [],
         },
       },
     ],
     more: false,
   };
   // Sample question object returnable from the backend.
-  let sampleDataResults = {
+  let sampleDataResults: {
+    question_dicts: QuestionBackendDict[];
+  } = {
     question_dicts: [
       {
         id: '0',
         question_state_data: {
+          classifier_model_id: null,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           content: {
+            content_id: '1',
             html: 'Question 1',
           },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],
-            customization_args: {},
+            customization_args: {
+              rows: {
+                value: 1,
+              },
+              placeholder: {
+                value: {
+                  unicode_str: '',
+                  content_id: 'ca_placeholder_0',
+                },
+              },
+              catchMisspellings: {
+                value: false,
+              },
+            },
             default_outcome: {
               dest: null,
               dest_if_really_stuck: null,
               feedback: {
+                content_id: 'feedback_1',
                 html: 'Correct Answer',
               },
               param_changes: [],
               labelled_as_correct: true,
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
             },
             hints: [
               {
                 hint_content: {
+                  content_id: 'hint_1',
                   html: 'Hint 1',
                 },
               },
@@ -75,6 +107,7 @@ describe('Question backend Api service', () => {
               correct_answer: 'This is the correct answer',
               answer_is_exclusive: false,
               explanation: {
+                content_id: 'solution',
                 html: 'Solution explanation',
               },
             },
@@ -85,9 +118,16 @@ describe('Question backend Api service', () => {
         },
         language_code: 'en',
         version: 1,
+        question_state_data_schema_version: 45,
+        linked_skill_ids: [],
+        inapplicable_skill_misconception_ids: [],
+        next_content_id_index: 1,
       },
     ],
   };
+
+  let expectedQuestions: Question[];
+  let expectedQuestionSummaries: QuestionSummaryForOneSkill[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -96,6 +136,12 @@ describe('Question backend Api service', () => {
 
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
+    expectedQuestions = sampleDataResults.question_dicts.map(questionDict =>
+      Question.createFromBackendDict(questionDict as QuestionBackendDict)
+    );
+    expectedQuestionSummaries = sampleResponse.question_summary_dicts.map(
+      summaryDict => QuestionSummaryForOneSkill.createFromBackendDict(summaryDict)
+    );
   });
 
   afterEach(() => {
@@ -120,9 +166,7 @@ describe('Question backend Api service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(
-      sampleDataResults.question_dicts
-    );
+    expect(successHandler).toHaveBeenCalledWith(expectedQuestions);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -147,9 +191,7 @@ describe('Question backend Api service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResults.question_dicts
-      );
+      expect(successHandler).toHaveBeenCalledWith(expectedQuestions);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -380,7 +422,7 @@ describe('Question backend Api service', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
-      questionSummaries: sampleResponse.question_summary_dicts,
+      questionSummaries: expectedQuestionSummaries,
       more: false,
     });
     expect(failHandler).not.toHaveBeenCalled();
@@ -429,7 +471,7 @@ describe('Question backend Api service', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
-      questionSummaries: sampleResponse.question_summary_dicts,
+      questionSummaries: expectedQuestionSummaries,
       more: false,
     });
     expect(failHandler).not.toHaveBeenCalled();

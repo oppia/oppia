@@ -596,10 +596,7 @@ describe('Question player engine service', () => {
 
   it('should init question player', fakeAsync(() => {
     spyOn(questionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
-      Promise.resolve([singleQuestionBackendDict])
-    );
-    spyOn(Question, 'createFromBackendDict').and.returnValue(
-      singleQuestionObject
+      Promise.resolve([singleQuestionObject])
     );
     spyOn(questionPlayerEngineService.onTotalQuestionsReceived, 'emit');
 
