@@ -32,13 +32,13 @@ from core import (
     utils,
 )
 from core.constants import constants
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
-from core.domain import rules_registry  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     customization_args_util,
     feature_flag_services,
+    html_cleaner,  # pylint: disable=invalid-import-from
     interaction_registry,
     param_domain,
+    rules_registry,  # pylint: disable=invalid-import-from
     translation_domain,
 )
 from extensions import domain
