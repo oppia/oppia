@@ -21,7 +21,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import 'bootstrap';
-import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarousel, NgbSlideEvent} from '@ng-bootstrap/ng-bootstrap';
 import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
 import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -170,6 +170,7 @@ export class DonatePageComponent implements OnInit {
   ];
 
   @ViewChild('learnerCarousel') learnerCarousel!: NgbCarousel;
+  activeLearnerSlideIndex: number = 0;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -193,6 +194,14 @@ export class DonatePageComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  selectLearnerSlide(index: number): void {
+    this.learnerCarousel.select(index.toString());
+  }
+
+  onLearnerSlideChange(event: NgbSlideEvent): void {
+    this.activeLearnerSlideIndex = Number(event.current);
   }
 
   moveLearnerCarouselToPreviousSlide(): void {
