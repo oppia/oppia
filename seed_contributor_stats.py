@@ -11,10 +11,13 @@ import os
 import sys
 
 # Support running from either /home/acer/oppia or /mnt/d/gsoc/oppia
-if os.path.exists('/home/acer/oppia'):
-    sys.path.insert(0, '/home/acer/oppia')
-if os.path.exists('/mnt/d/gsoc/oppia'):
-    sys.path.insert(0, '/mnt/d/gsoc/oppia')
+for base in ['/home/acer/oppia', '/mnt/d/gsoc/oppia']:
+    if os.path.exists(base):
+        if base not in sys.path:
+            sys.path.insert(0, base)
+        third_party_libs = os.path.join(base, 'third_party', 'python_libs')
+        if os.path.exists(third_party_libs) and third_party_libs not in sys.path:
+            sys.path.insert(0, third_party_libs)
 
 os.environ['DATASTORE_DATASET'] = 'dev-project-id'
 os.environ['DATASTORE_EMULATOR_HOST'] = 'localhost:8089'
