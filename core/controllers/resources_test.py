@@ -1006,7 +1006,7 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR,
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
         )
 
     def test_get_promo_bar_data(self) -> None:

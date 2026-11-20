@@ -42,6 +42,9 @@
         "core.controllers.general_feedback_test",
         "extensions.issues.base_test",
         "core.feature_flag_list_test",
+        "core.android_feature_flag_list_test",
+        "core.domain.android_feature_flag_registry_test",
+        "core.domain.android_feature_flag_services_test",
         "core.controllers.skill_mastery_test",
         "core.controllers.improvements_test",
         "core.controllers.topics_and_skills_dashboard_test",
@@ -59,6 +62,7 @@
         "core.domain.cloud_task_domain_test",
         "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test",
         "core.jobs.batch_jobs.cloud_task_run_migration_jobs_test",
+        "core.jobs.batch_jobs.role_migration_jobs_test",
         "core.jobs.batch_jobs.voiceover_synthesis_jobs_test",
         "core.jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs_test",
         "core.platform.translate.azure_translate_services_test",
@@ -96,6 +100,7 @@
         "core.domain.general_feedback_services_test",
         "core.domain.captcha_services_test",
         "core.domain.platform_parameter_domain_test",
+        "core.domain.android_platform_parameter_domain_test",
         "core.domain.story_fetchers_test",
         "core.domain.rights_domain_test",
         "core.domain.learner_progress_domain_test",
@@ -435,6 +440,7 @@
         "core.controllers.certificate_assessment_test",
         "core.domain.certificate_assessment_services_test",
         "core.jobs.batch_jobs.classroom_migration_jobs_test",
-        "core.jobs.batch_jobs.legacy_feedback_migration_jobs_test"
+        "core.jobs.batch_jobs.legacy_feedback_migration_jobs_test",
+        "core.domain.android_feature_flag_domain_test"
     ]
 }

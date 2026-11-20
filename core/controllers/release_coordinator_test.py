@@ -115,7 +115,7 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR,
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
         )
 
     def test_get_user_group_data(self) -> None:
@@ -282,7 +282,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR,
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
         )
 
     def test_without_feature_flag_name_update_feature_flag_is_not_performed(
