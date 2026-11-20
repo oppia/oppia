@@ -35,6 +35,7 @@ import {Story} from 'domain/story/story.model';
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
   readonly MAX_TOTAL_DUMMY_EXPLORATIONS: number = 500;
+  // This must remain <= MAX_DUMMY_EXPLORATIONS_PER_REQ in admin.py.
   readonly DUMMY_EXPLORATION_BATCH_SIZE: number = 25;
   @Output() setStatusMessage = new EventEmitter<string>();
   reloadingAllExplorationPossible: boolean = false;

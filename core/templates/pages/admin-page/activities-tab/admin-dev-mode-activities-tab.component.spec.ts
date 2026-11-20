@@ -435,7 +435,7 @@ describe('Admin dev mode activities tab', () => {
 
     it('should stop and finish task if a batch fails', fakeAsync(() => {
       component.numDummyExpsToPublish = 30;
-      component.numDummyExpsToGenerate = 50;
+      component.numDummyExpsToGenerate = 75;
 
       let adminBackendSpy = spyOn(
         adminBackendApiService,
