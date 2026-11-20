@@ -140,7 +140,8 @@ describe('Question backend Api service', () => {
       Question.createFromBackendDict(questionDict as QuestionBackendDict)
     );
     expectedQuestionSummaries = sampleResponse.question_summary_dicts.map(
-      summaryDict => QuestionSummaryForOneSkill.createFromBackendDict(summaryDict)
+      summaryDict =>
+        QuestionSummaryForOneSkill.createFromBackendDict(summaryDict)
     );
   });
 

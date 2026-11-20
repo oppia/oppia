@@ -18,7 +18,6 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
 
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import {Question, QuestionBackendDict} from 'domain/question/question.model';

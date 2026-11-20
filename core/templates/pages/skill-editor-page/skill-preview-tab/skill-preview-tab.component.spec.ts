@@ -318,12 +318,7 @@ describe('Skill Preview Tab Component', () => {
   });
 
   it('should filter the questions', () => {
-    component.questionDicts = [
-      question1,
-      question2,
-      question3,
-      question4,
-    ];
+    component.questionDicts = [question1, question2, question3, question4];
 
     component.questionTextFilter = 'question1';
     component.applyFilters();
