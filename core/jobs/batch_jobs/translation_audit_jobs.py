@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.domain import translation_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
@@ -63,19 +61,7 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
             tuple(str, tuple(str, int)). A tuple of
             (exploration_id, (language_code, translation_count)).
         """
-        stored_translations = (
-            translation_domain.convert_to_stored_translations_dict(
-                translation_model.translations
-            )
-        )
-        # Only manual translations are counted, since automatic translations
-        # are drafts that are not shown to learners.
-        translation_count = sum(
-            1
-            for translations_by_type in stored_translations.values()
-            if translations_by_type[feconf.TranslationType.MANUAL.value]
-            is not None
-        )
+        translation_count = len(translation_model.translations)
         return (
             translation_model.entity_id,
             (translation_model.language_code, translation_count),

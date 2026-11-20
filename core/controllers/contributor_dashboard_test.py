@@ -42,7 +42,6 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
-    translation_fetchers,
     translation_services,
     user_services,
 )
@@ -53,54 +52,11 @@ from typing import Dict, List, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import (
-        opportunity_models,
-        suggestion_models,
-        translation_models,
-    )
+    from mypy_imports import opportunity_models, suggestion_models
 
-opportunity_models, suggestion_models, translation_models = (
-    models.Registry.import_models(
-        [
-            models.Names.OPPORTUNITY,
-            models.Names.SUGGESTION,
-            models.Names.TRANSLATION,
-        ]
-    )
+opportunity_models, suggestion_models = models.Registry.import_models(
+    [models.Names.OPPORTUNITY, models.Names.SUGGESTION]
 )
-
-
-def save_auto_translation(
-    exp_id: str, language_code: str, content_id: str, auto_translation: str
-) -> None:
-    """Saves an automatic translation for a content in the latest version
-    of an exploration.
-
-    Args:
-        exp_id: str. The ID of the exploration.
-        language_code: str. The language code of the translation.
-        content_id: str. The ID of the translated content.
-        auto_translation: str. The automatic translation.
-    """
-    exp_version = exp_fetchers.get_exploration_by_id(exp_id).version
-    entity_translation = translation_fetchers.get_entity_translation(
-        feconf.TranslatableEntityType.EXPLORATION,
-        exp_id,
-        exp_version,
-        language_code,
-    )
-    entity_translation.add_auto_translation(
-        content_id,
-        auto_translation,
-        translation_domain.TranslatableContentFormat.HTML,
-    )
-    translation_models.EntityTranslationsModel.create_new(
-        feconf.TranslatableEntityType.EXPLORATION.value,
-        exp_id,
-        exp_version,
-        language_code,
-        entity_translation.to_stored_translations_dict(),
-    ).put()
 
 
 class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
@@ -1686,7 +1642,6 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                         }
                     }
                 },
-                'auto_translations': {},
             }
 
             # Assert that the output matches the expected output.
@@ -1741,70 +1696,9 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                     }
                 },
             },
-            'auto_translations': {},
         }
 
         self.assertEqual(output, expected_output)
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS
-        ]
-    )
-    def test_handler_returns_auto_translations_to_logged_in_users(
-        self,
-    ) -> None:
-        translation_services.update_automatic_translation_status(True)
-        save_auto_translation('0', 'hi', 'content_0', '<p>Automatic</p>')
-        self.login(self.OWNER_EMAIL)
-
-        output = self.get_json(
-            '/gettranslatabletexthandler',
-            params={'language_code': 'hi', 'exp_id': '0'},
-        )
-
-        self.assertEqual(
-            output['auto_translations'], {'content_0': '<p>Automatic</p>'}
-        )
-        self.logout()
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS
-        ]
-    )
-    def test_handler_does_not_return_auto_translations_to_logged_out_users(
-        self,
-    ) -> None:
-        translation_services.update_automatic_translation_status(True)
-        save_auto_translation('0', 'hi', 'content_0', '<p>Automatic</p>')
-
-        output = self.get_json(
-            '/gettranslatabletexthandler',
-            params={'language_code': 'hi', 'exp_id': '0'},
-        )
-
-        self.assertEqual(output['auto_translations'], {})
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS
-        ]
-    )
-    def test_handler_does_not_return_auto_translations_if_admin_disabled_them(
-        self,
-    ) -> None:
-        translation_services.update_automatic_translation_status(False)
-        save_auto_translation('0', 'hi', 'content_0', '<p>Automatic</p>')
-        self.login(self.OWNER_EMAIL)
-
-        output = self.get_json(
-            '/gettranslatabletexthandler',
-            params={'language_code': 'hi', 'exp_id': '0'},
-        )
-
-        self.assertEqual(output['auto_translations'], {})
-        self.logout()
 
     def test_handler_does_not_return_in_review_content(self) -> None:
         change_dict = {
@@ -1845,7 +1739,6 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                     }
                 }
             },
-            'auto_translations': {},
         }
         self.assertEqual(output, expected_output)
 
@@ -3873,47 +3766,6 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
         self.assertNotIn('state_name', content)
         self.assertNotIn('interaction_id', content)
         self.assertNotIn('rule_type', content)
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
-            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
-        ]
-    )
-    def test_handler_returns_auto_translations(self) -> None:
-        translation_services.update_automatic_translation_status(True)
-        save_auto_translation(
-            self.exp_id, 'hi', 'content_0', '<p>Automatic</p>'
-        )
-
-        response = self.get_json(
-            '%s?language_code=hi&entity_type=exploration&entity_id=%s'
-            % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
-        )
-
-        self.assertEqual(
-            response['auto_translations'], {'content_0': '<p>Automatic</p>'}
-        )
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_handler_does_not_return_auto_translations_if_flag_is_off(
-        self,
-    ) -> None:
-        translation_services.update_automatic_translation_status(True)
-        save_auto_translation(
-            self.exp_id, 'hi', 'content_0', '<p>Automatic</p>'
-        )
-
-        response = self.get_json(
-            '%s?language_code=hi&entity_type=exploration&entity_id=%s'
-            % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
-        )
-
-        self.assertEqual(response['auto_translations'], {})
 
     @test_utils.enable_feature_flags(
         [

@@ -20,7 +20,7 @@ content and deleting translations for invalid content ID."""
 from __future__ import annotations
 
 from core import feconf, utils
-from core.domain import exp_fetchers, translation_domain
+from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -452,21 +452,13 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
             and corresponding suggestion id.
         """
         with datastore_services.get_ndb_context():
-            stored_translations = (
-                translation_domain.convert_to_stored_translations_dict(
-                    entity_translation_model.translations
-                )
-            )
-            # Only manual translations are considered, since an automatic
-            # translation is just a draft and still needs a human translation.
             content_ids_not_needing_update = []
-            for content_id, translations_by_type in stored_translations.items():
-                manual_translation = translations_by_type[
-                    feconf.TranslationType.MANUAL.value
-                ]
+            for content_id in entity_translation_model.translations.keys():
                 if (
-                    manual_translation is not None
-                    and manual_translation['needs_update'] is False
+                    entity_translation_model.translations[content_id][
+                        'needs_update'
+                    ]
+                    is False
                 ):
                     content_ids_not_needing_update.append(content_id)
 
@@ -715,18 +707,8 @@ class ComputeUpdatedExpOpportunityModel(beam.DoFn):  # type: ignore[misc]
                 )
             )
 
-            stored_translations = (
-                translation_domain.convert_to_stored_translations_dict(
-                    entity_translation_model.translations
-                )
-            )
-            # Only manual translations are counted, since automatic
-            # translations are drafts that are not shown to learners.
-            new_translation_count = sum(
-                1
-                for translations_by_type in stored_translations.values()
-                if translations_by_type[feconf.TranslationType.MANUAL.value]
-                is not None
+            new_translation_count = len(
+                entity_translation_model.translations.keys()
             )
 
             exp_opportunity_model.translation_counts[

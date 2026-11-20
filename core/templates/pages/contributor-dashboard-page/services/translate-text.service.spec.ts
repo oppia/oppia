@@ -450,46 +450,6 @@ describe('TranslateTextService', () => {
     }));
   });
 
-  describe('getAutoTranslationForActiveContent', () => {
-    it('should return null before the texts are loaded', () => {
-      expect(
-        translateTextService.getAutoTranslationForActiveContent()
-      ).toBeNull();
-    });
-
-    it('should return the automatic translation of the active content', fakeAsync(() => {
-      translateTextService.init('1', 'en', () => {});
-      const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en'
-      );
-      req.flush({
-        state_names_to_content_id_mapping: {
-          stateName1: {
-            contentId1: getTranslatableItem('text1'),
-            contentId2: getTranslatableItem('text2'),
-          },
-        },
-        version: 1,
-        auto_translations: {contentId1: 'automatic text1'},
-      });
-      flushMicrotasks();
-      // No content is active until the first text is fetched.
-      expect(
-        translateTextService.getAutoTranslationForActiveContent()
-      ).toBeNull();
-
-      translateTextService.getTextToTranslate();
-      expect(translateTextService.getAutoTranslationForActiveContent()).toBe(
-        'automatic text1'
-      );
-
-      translateTextService.getTextToTranslate();
-      expect(
-        translateTextService.getAutoTranslationForActiveContent()
-      ).toBeNull();
-    }));
-  });
-
   // Testing setters and getters of StateAndContent class.
   it('should update state name', () => {
     expect(stateContent.stateName).toBe('stateName');

@@ -317,57 +317,10 @@ class RecoverOrphanedTranslationsJobTests(
         self.assertIsNotNone(new_model)
         # The newer translation (version 10) should have won.
         self.assertEqual(
-            new_model.translations['content_0'],
-            {
-                'manual': {
-                    'content_format': 'html',
-                    'content_value': '<p>New value</p>',
-                    'needs_update': False,
-                },
-                'auto': None,
-            },
+            new_model.translations['content_0']['content_value'],
+            '<p>New value</p>',
         )
-
-    def test_newer_auto_translation_does_not_hide_older_manual_translation(
-        self,
-    ) -> None:
-        translation: feconf.TranslatedContentDict = {
-            'content_format': 'html',
-            'content_value': '<p>Translation</p>',
-            'needs_update': False,
-        }
-        self._create_exploration(self.EXP_ID, version=15)
-        self._create_translation_model(
-            self.EXP_ID, 5, 'es', {'content_0': translation}
-        )
-        self._create_translation_model(
-            self.EXP_ID,
-            10,
-            'es',
-            {'content_0': {'manual': None, 'auto': translation}},
-        )
-
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult(
-                    stdout='EXPLORATIONS TRAVERSED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='TRANSLATION MODELS UPDATED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='TRANSLATIONS RECOVERED SUCCESS: 1'
-                ),
-            ]
-        )
-
-        new_model = translation_models.EntityTranslationsModel.get_model(
-            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 15, 'es'
-        )
-        self.assertEqual(
-            new_model.translations,
-            {'content_0': {'manual': translation, 'auto': translation}},
-        )
+        self.assertFalse(new_model.translations['content_0']['needs_update'])
 
     def test_orphaned_translations_merged_into_existing_current_model(
         self,

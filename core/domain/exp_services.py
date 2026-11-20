@@ -2139,18 +2139,6 @@ def update_exploration(
         caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exploration_id]
     )
 
-    # The feature check comes first, so that the opportunity model is only
-    # fetched when automatic translations are turned on.
-    if (
-        opportunity_services.is_background_auto_translation_generation_enabled()
-        and opportunity_services.is_exploration_available_for_contribution(
-            exploration_id
-        )
-    ):
-        opportunity_services.generate_auto_translations_async_for_exploration(
-            exploration_id
-        )
-
 
 def compute_models_to_put_when_saving_new_exp_version(
     committer_id: str,

@@ -39,7 +39,6 @@ from core.domain import (
     subtopic_page_domain,
     subtopic_page_services,
     suggestion_services,
-    taskqueue_services,
     topic_domain,
     topic_services,
     translation_domain,
@@ -239,100 +238,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             ],
             'Changes.',
         )
-
-    def _get_auto_translation_task_args(self) -> List[List[str]]:
-        """Returns the arguments of the pending tasks that generate automatic
-        translations.
-
-        Returns:
-            list(list(str)). The arguments of each pending task.
-        """
-        queue_name = taskqueue_services.QUEUE_NAME_AUTO_TRANSLATION_GENERATION
-        # The emulator only knows about queues that have had a task added.
-        if self.count_jobs_in_taskqueue(queue_name) == 0:
-            return []
-        task_args = []
-        for task in self.get_pending_tasks(queue_name=queue_name):
-            # Ruling out the possibility of None for mypy type checking.
-            assert task.payload is not None
-            task_args.append(list(task.payload['args']))
-        return task_args
-
-    def _update_exploration_title(self, exp_id: str) -> None:
-        """Updates the title of the given exploration.
-
-        Args:
-            exp_id: str. The ID of the exploration.
-        """
-        exp_services.update_exploration(
-            self.owner_id,
-            exp_id,
-            [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title',
-                    }
-                )
-            ],
-            'Update title.',
-        )
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_AUTO_TRANSLATION_GENERATION
-        ]
-    )
-    def test_adding_exploration_to_story_defers_auto_translation_task(
-        self,
-    ) -> None:
-        translation_services.update_automatic_translation_status(True)
-
-        self.add_exploration_0_to_story()
-
-        self.assertEqual(self._get_auto_translation_task_args(), [['0']])
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_AUTO_TRANSLATION_GENERATION
-        ]
-    )
-    def test_updating_curated_exploration_defers_auto_translation_task(
-        self,
-    ) -> None:
-        translation_services.update_automatic_translation_status(True)
-        self.add_exploration_0_to_story()
-
-        self._update_exploration_title('0')
-        self._update_exploration_title('1')
-
-        # Exploration 1 is not curated, so only exploration 0 gets a task
-        # when it is added to the story and another one when it is updated.
-        self.assertEqual(self._get_auto_translation_task_args(), [['0'], ['0']])
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_AUTO_TRANSLATION_GENERATION
-        ]
-    )
-    def test_no_auto_translation_task_if_admin_disabled_auto_translation(
-        self,
-    ) -> None:
-        translation_services.update_automatic_translation_status(False)
-
-        self.add_exploration_0_to_story()
-        self._update_exploration_title('0')
-
-        self.assertEqual(self._get_auto_translation_task_args(), [])
-
-    def test_no_auto_translation_task_if_feature_flag_is_off(self) -> None:
-        translation_services.update_automatic_translation_status(True)
-
-        self.add_exploration_0_to_story()
-        self._update_exploration_title('0')
-
-        self.assertEqual(self._get_auto_translation_task_args(), [])
 
     def test_new_opportunity_with_adding_exploration_in_story_node(
         self,

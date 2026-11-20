@@ -877,15 +877,22 @@ class SuggestionTranslateContent(BaseSuggestion):
             self.target_type, self.target_id
         )
 
-        # A translation that a reviewer accepts is always stored as a manual
-        # translation, even if the translator started from an automatic
-        # translation, since it has now been checked by a human.
+        # Determine the data source based on whether the translation was
+        # produced by the AI auto-generation feature.  The was_auto_generated
+        # field is set to True in the change_cmd when the contributor used
+        # auto-translate; it is None (or absent) for manual translations.
+        was_auto_generated = getattr(
+            self.change_cmd, 'was_auto_generated', None
+        )
+        data_source = 'auto' if was_auto_generated else 'manual'
+
         translated_content = translation_domain.TranslatedContent(
             self.change_cmd.translation_html,
             translation_domain.TranslatableContentFormat(
                 self.change_cmd.data_format
             ),
             needs_update=False,
+            data_source=data_source,
         )
 
         translation_services.add_new_translation(

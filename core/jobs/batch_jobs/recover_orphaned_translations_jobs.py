@@ -28,8 +28,6 @@ from __future__ import annotations
 
 import collections
 
-from core import feconf
-from core.domain import translation_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -116,38 +114,12 @@ class RecoverOrphanedTranslationsJob(base_jobs.JobBase):
             # Sort by entity_version ascending so newer overwrites older.
             models_for_lang.sort(key=lambda m: int(m.entity_version))
 
-            # Merge all translations into a single dict. Manual and automatic
-            # translations are merged separately, so that a newer version that
-            # only has an automatic translation for a content does not hide an
-            # older manual translation of it.
-            merged_translations: feconf.StoredTranslationsDict = {}
+            # Merge all translations into a single dict.
+            # Here we use type Any because the translation dictionary can contain
+            # various nested structures depending on the content type.
+            merged_translations: Dict[str, Any] = {}
             for t_model in models_for_lang:
-                stored_translations = (
-                    translation_domain.convert_to_stored_translations_dict(
-                        t_model.translations
-                    )
-                )
-                for (
-                    content_id,
-                    translations_by_type,
-                ) in stored_translations.items():
-                    merged_translations_by_type = (
-                        merged_translations.setdefault(
-                            content_id,
-                            {
-                                translation_type.value: None
-                                for translation_type in feconf.TranslationType
-                            },
-                        )
-                    )
-                    for (
-                        translation_type_value,
-                        translation,
-                    ) in translations_by_type.items():
-                        if translation is not None:
-                            merged_translations_by_type[
-                                translation_type_value
-                            ] = translation
+                merged_translations.update(t_model.translations)
 
             # Find the model at the current version, if it exists.
             current_version_model = None
@@ -158,11 +130,7 @@ class RecoverOrphanedTranslationsJob(base_jobs.JobBase):
 
             if current_version_model is not None:
                 # Check if the merged dict adds anything new.
-                existing_translations = (
-                    translation_domain.convert_to_stored_translations_dict(
-                        current_version_model.translations
-                    )
-                )
+                existing_translations = current_version_model.translations
                 if merged_translations == existing_translations:
                     # Nothing new to add.
                     continue

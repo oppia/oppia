@@ -617,282 +617,6 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
             entity_translations.translations['content_id_1'].needs_update = 5  # type: ignore[assignment]
             entity_translations.validate()
 
-    def _create_entity_translation(
-        self,
-    ) -> translation_domain.EntityTranslation:
-        """Creates an EntityTranslation for the tests below.
-
-        Returns:
-            EntityTranslation. An EntityTranslation with a manual translation
-            for content_id_1, both translation types for content_id_2 and an
-            automatic translation for content_id_3.
-        """
-        return translation_domain.EntityTranslation(
-            'exp_id',
-            feconf.TranslatableEntityType.EXPLORATION,
-            1,
-            'hi',
-            {
-                'content_id_1': translation_domain.TranslatedContent(
-                    'Manual 1',
-                    translation_domain.TranslatableContentFormat.HTML,
-                    False,
-                ),
-                'content_id_2': translation_domain.TranslatedContent(
-                    'Manual 2',
-                    translation_domain.TranslatableContentFormat.HTML,
-                    True,
-                ),
-            },
-            {
-                'content_id_2': translation_domain.TranslatedContent(
-                    'Auto 2',
-                    translation_domain.TranslatableContentFormat.HTML,
-                    False,
-                ),
-                'content_id_3': translation_domain.TranslatedContent(
-                    'Auto 3',
-                    translation_domain.TranslatableContentFormat.HTML,
-                    False,
-                ),
-            },
-        )
-
-    def test_auto_translations_default_to_empty_dict(self) -> None:
-        entity_translation = translation_domain.EntityTranslation(
-            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'hi', {}
-        )
-
-        self.assertEqual(entity_translation.auto_translations, {})
-
-    def test_validate_content_id_of_auto_translation(self) -> None:
-        entity_translation = self._create_entity_translation()
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'content_id must be a string'
-        ):
-            entity_translation.auto_translations[1] = (  # type: ignore[index]
-                translation_domain.TranslatedContent(
-                    'Auto',
-                    translation_domain.TranslatableContentFormat.HTML,
-                    False,
-                )
-            )
-            entity_translation.validate()
-
-    def test_validate_auto_translation_needing_update_raises_error(
-        self,
-    ) -> None:
-        entity_translation = self._create_entity_translation()
-        entity_translation.auto_translations['content_id_3'].needs_update = True
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Automatic translations should not need an update, but the one '
-            'for content_id content_id_3 does.',
-        ):
-            entity_translation.validate()
-
-    def test_to_dict_does_not_include_auto_translations(self) -> None:
-        entity_translation = self._create_entity_translation()
-
-        self.assertEqual(
-            entity_translation.to_dict()['translations'],
-            {
-                'content_id_1': {
-                    'content_value': 'Manual 1',
-                    'content_format': 'html',
-                    'needs_update': False,
-                },
-                'content_id_2': {
-                    'content_value': 'Manual 2',
-                    'content_format': 'html',
-                    'needs_update': True,
-                },
-            },
-        )
-
-    def test_to_stored_translations_dict_groups_translations_by_type(
-        self,
-    ) -> None:
-        entity_translation = self._create_entity_translation()
-
-        self.assertEqual(
-            entity_translation.to_stored_translations_dict(),
-            {
-                'content_id_1': {
-                    'manual': {
-                        'content_value': 'Manual 1',
-                        'content_format': 'html',
-                        'needs_update': False,
-                    },
-                    'auto': None,
-                },
-                'content_id_2': {
-                    'manual': {
-                        'content_value': 'Manual 2',
-                        'content_format': 'html',
-                        'needs_update': True,
-                    },
-                    'auto': {
-                        'content_value': 'Auto 2',
-                        'content_format': 'html',
-                        'needs_update': False,
-                    },
-                },
-                'content_id_3': {
-                    'manual': None,
-                    'auto': {
-                        'content_value': 'Auto 3',
-                        'content_format': 'html',
-                        'needs_update': False,
-                    },
-                },
-            },
-        )
-
-    def test_from_stored_translations_dict_round_trip(self) -> None:
-        entity_translation = self._create_entity_translation()
-
-        recreated_entity_translation = (
-            translation_domain.EntityTranslation.from_stored_translations_dict(
-                'exp_id',
-                'exploration',
-                1,
-                'hi',
-                entity_translation.to_stored_translations_dict(),
-            )
-        )
-
-        self.assertEqual(recreated_entity_translation.entity_id, 'exp_id')
-        self.assertEqual(
-            recreated_entity_translation.entity_type, 'exploration'
-        )
-        self.assertEqual(recreated_entity_translation.entity_version, 1)
-        self.assertEqual(recreated_entity_translation.language_code, 'hi')
-        self.assertEqual(
-            recreated_entity_translation.to_stored_translations_dict(),
-            entity_translation.to_stored_translations_dict(),
-        )
-
-    def test_from_stored_translations_dict_reads_older_format_as_manual(
-        self,
-    ) -> None:
-        entity_translation = (
-            translation_domain.EntityTranslation.from_stored_translations_dict(
-                'exp_id',
-                'exploration',
-                1,
-                'hi',
-                {
-                    'content_id_1': {
-                        'content_value': 'Manual 1',
-                        'content_format': 'html',
-                        'needs_update': True,
-                    }
-                },
-            )
-        )
-
-        self.assertEqual(
-            entity_translation.translations['content_id_1'].content_value,
-            'Manual 1',
-        )
-        self.assertTrue(
-            entity_translation.translations['content_id_1'].needs_update
-        )
-        self.assertEqual(entity_translation.auto_translations, {})
-
-    def test_convert_to_stored_translations_dict_fills_missing_types(
-        self,
-    ) -> None:
-        self.assertEqual(
-            translation_domain.convert_to_stored_translations_dict(
-                {
-                    'content_id_1': {
-                        'content_value': 'Manual 1',
-                        'content_format': 'html',
-                        'needs_update': False,
-                    },
-                    'content_id_2': {
-                        'auto': {
-                            'content_value': 'Auto 2',
-                            'content_format': 'html',
-                            'needs_update': False,
-                        }
-                    },
-                }
-            ),
-            {
-                'content_id_1': {
-                    'manual': {
-                        'content_value': 'Manual 1',
-                        'content_format': 'html',
-                        'needs_update': False,
-                    },
-                    'auto': None,
-                },
-                'content_id_2': {
-                    'manual': None,
-                    'auto': {
-                        'content_value': 'Auto 2',
-                        'content_format': 'html',
-                        'needs_update': False,
-                    },
-                },
-            },
-        )
-
-    def test_add_auto_translation(self) -> None:
-        entity_translation = translation_domain.EntityTranslation(
-            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'hi', {}
-        )
-
-        entity_translation.add_auto_translation(
-            'content_id_1',
-            'Auto 1',
-            translation_domain.TranslatableContentFormat.HTML,
-        )
-
-        auto_translation = entity_translation.auto_translations['content_id_1']
-        self.assertEqual(auto_translation.content_value, 'Auto 1')
-        self.assertEqual(
-            auto_translation.content_format,
-            translation_domain.TranslatableContentFormat.HTML,
-        )
-        self.assertFalse(auto_translation.needs_update)
-        self.assertEqual(entity_translation.translations, {})
-
-    def test_remove_translations_removes_both_translation_types(self) -> None:
-        entity_translation = self._create_entity_translation()
-
-        entity_translation.remove_translations(
-            ['content_id_2', 'content_id_3', 'invalid_content_id']
-        )
-
-        self.assertEqual(
-            list(entity_translation.translations.keys()), ['content_id_1']
-        )
-        self.assertEqual(entity_translation.auto_translations, {})
-
-    def test_remove_auto_translations_keeps_manual_translations(self) -> None:
-        entity_translation = self._create_entity_translation()
-
-        entity_translation.remove_auto_translations(
-            ['content_id_2', 'invalid_content_id']
-        )
-
-        self.assertEqual(
-            list(entity_translation.translations.keys()),
-            ['content_id_1', 'content_id_2'],
-        )
-        self.assertEqual(
-            list(entity_translation.auto_translations.keys()), ['content_id_3']
-        )
-
 
 class TranslatableContentUnitTests(test_utils.GenericTestBase):
     """Test class for TranslatableContent."""
@@ -946,10 +670,12 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
             'My name is Nikhil.',
             translation_domain.TranslatableContentFormat.HTML,
             False,
+            data_source='auto',
         )
 
         self.assertEqual(translated_content.content_value, 'My name is Nikhil.')
         self.assertEqual(translated_content.needs_update, False)
+        self.assertEqual(translated_content.data_source, 'auto')
 
     def test_to_dict_method_of_translated_content_class(self) -> None:
         translated_content = translation_domain.TranslatedContent(
@@ -961,9 +687,46 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
             'content_value': 'My name is Nikhil.',
             'content_format': 'html',
             'needs_update': False,
+            'data_source': 'manual',
         }
 
         self.assertEqual(translated_content.to_dict(), translated_content_dict)
+
+    def test_auto_generated_translated_content_to_dict(self) -> None:
+        translated_content = translation_domain.TranslatedContent(
+            'In Hindi',
+            feconf.TranslatableContentFormat.HTML,
+            False,
+            data_source='auto',
+        )
+        self.assertEqual(
+            translated_content.to_dict(),
+            {
+                'content_value': 'In Hindi',
+                'content_format': feconf.TranslatableContentFormat.HTML.value,
+                'needs_update': False,
+                'data_source': 'auto',
+            },
+        )
+
+    def test_from_dict_without_data_source_defaults_to_manual(self) -> None:
+        translated_content_dict: feconf.TranslatedContentDict = {
+            'content_value': 'In Hindi',
+            'content_format': feconf.TranslatableContentFormat.HTML.value,
+            'needs_update': False,
+        }
+
+        translated_content = translation_domain.TranslatedContent.from_dict(
+            translated_content_dict
+        )
+
+        self.assertEqual(translated_content.content_value, 'In Hindi')
+        self.assertEqual(
+            translated_content.content_format,
+            feconf.TranslatableContentFormat.HTML,
+        )
+        self.assertEqual(translated_content.needs_update, False)
+        self.assertEqual(translated_content.data_source, 'manual')
 
 
 class MachineTranslationTests(test_utils.GenericTestBase):

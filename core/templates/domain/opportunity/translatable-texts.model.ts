@@ -37,16 +37,9 @@ export interface StateNamesToContentIdMapping {
   [state: string]: ContentIdToContentMapping;
 }
 
-export interface ContentIdToAutoTranslationMapping {
-  [contentId: string]: string;
-}
-
 export interface TranslatableTextsBackendDict {
   state_names_to_content_id_mapping: StateNamesToContentIdBackendDictMapping;
   version: string;
-  // The stored automatic translations of the contents. The backend only
-  // fills this in for users who can use automatic translation suggestions.
-  auto_translations?: ContentIdToAutoTranslationMapping;
 }
 
 export interface TranslatableContentBackendDictV2 {
@@ -60,16 +53,12 @@ export interface TranslatableContentBackendDictV2 {
 export interface TranslatableTextsBackendDictV2 {
   translatable_contents: TranslatableContentBackendDictV2[];
   version: string;
-  // The stored automatic translations of the contents. The backend only
-  // fills this in for users who can use automatic translation suggestions.
-  auto_translations?: ContentIdToAutoTranslationMapping;
 }
 
 export class TranslatableTexts {
   constructor(
     private readonly stateNamesToContentIdMapping: StateNamesToContentIdMapping,
-    private readonly version: string,
-    private readonly contentIdToAutoTranslation: ContentIdToAutoTranslationMapping
+    private readonly version: string
   ) {}
 
   static createFromBackendDict(
@@ -89,8 +78,7 @@ export class TranslatableTexts {
     }
     return new TranslatableTexts(
       stateNamesToContentIdMapping,
-      backendDict.version,
-      backendDict.auto_translations || {}
+      backendDict.version
     );
   }
 
@@ -129,8 +117,7 @@ export class TranslatableTexts {
 
     return new TranslatableTexts(
       orderedStateNamesToContentIdMapping,
-      backendDict.version,
-      backendDict.auto_translations || {}
+      backendDict.version
     );
   }
 
@@ -140,12 +127,5 @@ export class TranslatableTexts {
 
   get explorationVersion(): string {
     return this.version;
-  }
-
-  getAutoTranslation(contentId: string): string | null {
-    if (!this.contentIdToAutoTranslation.hasOwnProperty(contentId)) {
-      return null;
-    }
-    return this.contentIdToAutoTranslation[contentId];
   }
 }

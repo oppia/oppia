@@ -88,9 +88,6 @@ class FeatureNames(enum.Enum):
     ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS = (
         'enable_automatic_translation_suggestions'
     )
-    ENABLE_BACKGROUND_AUTO_TRANSLATION_GENERATION = (
-        'enable_background_auto_translation_generation'
-    )
     # A separate flag is used for testing the financial literacy campaign banner with early dates.
     # This allows testing the feature before the actual campaign dates that will
     # be used in production. Without a separate test flag, we would need to change
@@ -136,7 +133,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.ENABLE_DROPDOWN_PAGINATION,
-    FeatureNames.ENABLE_BACKGROUND_AUTO_TRANSLATION_GENERATION,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -388,15 +384,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables dropdown-based page navigation on the '
             'Contributor Dashboard, replacing the simple Previous/Next '
             'pagination buttons with a page selector dropdown.',
-            feature_flag_domain.ServerMode.DEV,
-        )
-    ),
-    FeatureNames.ENABLE_BACKGROUND_AUTO_TRANSLATION_GENERATION.value: (
-        (
-            'This flag enables the generation of automatic translations in '
-            'the background when a curated exploration is added to a story '
-            'or updated. The translations are stored as drafts for '
-            'translators on the Contributor Dashboard.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),

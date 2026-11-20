@@ -136,135 +136,6 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.EXP_ID = 'exp_id_123'
         self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
-    def _save_auto_translation(
-        self, language_code: str, content_id: str
-    ) -> None:
-        """Saves an automatic translation for the given content in version 5
-        of the exploration.
-
-        Args:
-            language_code: str. The language code of the translation.
-            content_id: str. The ID of the translated content.
-        """
-        entity_translation = translation_fetchers.get_entity_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            self.EXP_ID,
-            5,
-            language_code,
-        )
-        entity_translation.add_auto_translation(
-            content_id,
-            'Automatic translation',
-            translation_domain.TranslatableContentFormat.HTML,
-        )
-        translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            self.EXP_ID,
-            5,
-            language_code,
-            entity_translation.to_stored_translations_dict(),
-        ).put()
-
-    def test_add_new_translation_keeps_auto_translations(self) -> None:
-        self._save_auto_translation('hi', 'content_5')
-
-        translation_services.add_new_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            self.EXP_ID,
-            5,
-            'hi',
-            'content_5',
-            translation_domain.TranslatedContent(
-                'Translations in Hindi!',
-                translation_domain.TranslatableContentFormat.HTML,
-                False,
-            ),
-        )
-
-        entity_translation = translation_fetchers.get_entity_translation(
-            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi'
-        )
-        self.assertEqual(
-            entity_translation.translations['content_5'].content_value,
-            'Translations in Hindi!',
-        )
-        self.assertEqual(
-            entity_translation.auto_translations['content_5'].content_value,
-            'Automatic translation',
-        )
-
-    def test_marking_translations_as_needing_update_removes_auto_translations(
-        self,
-    ) -> None:
-        self._save_auto_translation('hi', 'content_5')
-        self._save_auto_translation('hi', 'content_6')
-        self._save_auto_translation('ar', 'content_5')
-        self.exp.version = 6
-        change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
-                    'content_id': 'content_5',
-                }
-            )
-        ]
-
-        entity_translation_models, _ = (
-            translation_services.compute_translation_related_change(
-                self.exp, change_list
-            )
-        )
-
-        language_code_to_model = {
-            model.language_code: model for model in entity_translation_models
-        }
-        self.assertEqual(language_code_to_model['hi'].entity_version, 6)
-        self.assertEqual(
-            language_code_to_model['hi'].translations,
-            {
-                'content_6': {
-                    'manual': None,
-                    'auto': {
-                        'content_value': 'Automatic translation',
-                        'content_format': 'html',
-                        'needs_update': False,
-                    },
-                }
-            },
-        )
-        self.assertEqual(language_code_to_model['ar'].translations, {})
-
-    def test_marking_translation_as_needing_update_for_language_keeps_auto(
-        self,
-    ) -> None:
-        self._save_auto_translation('hi', 'content_5')
-        self.exp.version = 6
-        change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': (
-                        exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE
-                    ),
-                    'content_id': 'content_5',
-                    'language_code': 'hi',
-                }
-            )
-        ]
-
-        entity_translation_models, _ = (
-            translation_services.compute_translation_related_change(
-                self.exp, change_list
-            )
-        )
-
-        self.assertEqual(len(entity_translation_models), 1)
-        self.assertEqual(
-            entity_translation_models[0].translations['content_5']['auto'][
-                'content_value'
-            ],
-            'Automatic translation',
-        )
-
     def test_add_new_translation_creats_new_model_if_needed(self) -> None:
         entity_translation_models: Sequence[
             translation_models.EntityTranslationsModel
@@ -439,7 +310,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.assertEqual(entity_translation_model.entity_version, 5)
         self.assertEqual(
             [
-                t['manual']['needs_update']
+                t['needs_update']
                 for t in entity_translation_model.translations.values()
             ],
             [False, False],
@@ -465,7 +336,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         entity_translation = entity_translation_models[0]
         self.assertItemsEqual(
             [
-                t['manual']['needs_update']
+                t['needs_update']
                 for t in entity_translation.translations.values()
             ],
             [False, True],
@@ -521,7 +392,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.assertEqual(entity_translation_model_hi.entity_version, 5)
         self.assertEqual(
             [
-                translation['manual']['needs_update']
+                translation['needs_update']
                 for translation in entity_translation_model_hi.translations.values()
             ],
             [False, False],
@@ -532,7 +403,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.assertEqual(entity_translation_model_ar.entity_version, 5)
         self.assertEqual(
             [
-                translation['manual']['needs_update']
+                translation['needs_update']
                 for translation in entity_translation_model_ar.translations.values()
             ],
             [False],
@@ -563,7 +434,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         )
         self.assertItemsEqual(
             [
-                translation['manual']['needs_update']
+                translation['needs_update']
                 for translation in entity_translation_hi.translations.values()
             ],
             [False, True],
@@ -575,7 +446,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         )
         self.assertItemsEqual(
             [
-                translation['manual']['needs_update']
+                translation['needs_update']
                 for translation in entity_translation_ar.translations.values()
             ],
             [False],
@@ -617,7 +488,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.assertEqual(entity_translation_model.entity_version, 5)
         self.assertEqual(
             [
-                t['manual']['needs_update']
+                t['needs_update']
                 for t in entity_translation_model.translations.values()
             ],
             [False, False],
@@ -648,9 +519,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation = entity_translation_models[0]
         self.assertEqual(
-            entity_translation.translations['content_5']['manual'][
-                'content_value'
-            ],
+            entity_translation.translations['content_5']['content_value'],
             'Updated translations in Hindi!',
         )
 
@@ -690,7 +559,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.assertEqual(entity_translation_model.entity_version, 5)
         self.assertEqual(
             [
-                t['manual']['needs_update']
+                t['needs_update']
                 for t in entity_translation_model.translations.values()
             ],
             [False, False],

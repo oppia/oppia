@@ -28,7 +28,6 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     feedback_services,
-    machine_translation_services,
     question_services,
     stats_services,
     suggestion_registry,
@@ -420,14 +419,6 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         fn_ids_to_names[
             'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
         ]: (voiceover_services.regenerate_voiceovers_for_batch_contents),
-        fn_ids_to_names[
-            'FUNCTION_ID_GENERATE_AUTO_TRANSLATIONS_FOR_EXPLORATION'
-        ]: (
-            machine_translation_services.generate_auto_translations_for_exploration
-        ),
-        fn_ids_to_names['FUNCTION_ID_GENERATE_AUTO_TRANSLATIONS_FOR_BATCH']: (
-            machine_translation_services.generate_auto_translations_for_batch
-        ),
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue

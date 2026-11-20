@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_audit_jobs
 from core.jobs.types import job_run_result
@@ -30,12 +29,6 @@ from core.platform import models
         models.Names.TRANSLATION,
     ]
 )
-
-TRANSLATION: feconf.TranslatedContentDict = {
-    'content_value': '<p>Translation</p>',
-    'content_format': 'html',
-    'needs_update': False,
-}
 
 
 class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
@@ -69,7 +62,7 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
             entity_type='exploration',
             entity_version=1,
             language_code='hi',
-            translations={'content_%d' % i: TRANSLATION for i in range(5)},
+            translations={'content_%d' % i: {} for i in range(5)},
         )
         translation_1.update_timestamps()
         translation_1.put()
@@ -80,7 +73,7 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
             entity_type='exploration',
             entity_version=1,
             language_code='es',
-            translations={'content_%d' % i: TRANSLATION for i in range(10)},
+            translations={'content_%d' % i: {} for i in range(10)},
         )
         translation_2.update_timestamps()
         translation_2.put()
@@ -117,7 +110,7 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
             entity_type='exploration',
             entity_version=1,
             language_code='hi',
-            translations={'content_%d' % i: TRANSLATION for i in range(4)},
+            translations={'content_%d' % i: {} for i in range(4)},
         )
         translation_1_mock.update_timestamps()
         translation_1_mock.put()
@@ -142,7 +135,7 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
             entity_type='exploration',
             entity_version=1,
             language_code='hi',
-            translations={'content_0': TRANSLATION, 'content_1': TRANSLATION},
+            translations={'content_0': {}, 'content_1': {}},
         )
         translation_model.update_timestamps()
         translation_model.put()
@@ -179,7 +172,7 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
             entity_type='exploration',
             entity_version=1,
             language_code='hi',
-            translations={'content_%d' % i: TRANSLATION for i in range(3)},
+            translations={'content_%d' % i: {} for i in range(3)},
         )
         translation_hi.update_timestamps()
         translation_hi.put()
@@ -192,7 +185,7 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
             entity_type='exploration',
             entity_version=1,
             language_code='es',
-            translations={'content_0': TRANSLATION, 'content_1': TRANSLATION},
+            translations={'content_0': {}, 'content_1': {}},
         )
         translation_es.update_timestamps()
         translation_es.put()
@@ -202,46 +195,6 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult.as_stderr(
                     'Mismatch for exploration %s in es: '
                     'stored=0 (missing), actual=2' % exp_id
-                )
-            ]
-        )
-
-    def test_automatic_translations_are_not_counted(self) -> None:
-        exp_id = 'exp_auto'
-        summary_model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=exp_id,
-            topic_id='topic1',
-            topic_name='Topic 1',
-            story_id='story_1',
-            story_title='Story 1',
-            chapter_title='Chapter 1',
-            content_count=10,
-            incomplete_translation_language_codes=['hi'],
-            translation_counts={'hi': 1},
-            language_codes_needing_voice_artists=[],
-            language_codes_with_assigned_voice_artists=[],
-        )
-        summary_model.update_timestamps()
-        summary_model.put()
-
-        translation_model = translation_models.EntityTranslationsModel(
-            id='exploration-%s-1-hi' % exp_id,
-            entity_id=exp_id,
-            entity_type='exploration',
-            entity_version=1,
-            language_code='hi',
-            translations={
-                'content_0': {'manual': TRANSLATION, 'auto': TRANSLATION},
-                'content_1': {'manual': None, 'auto': TRANSLATION},
-            },
-        )
-        translation_model.update_timestamps()
-        translation_model.put()
-
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'SUCCESS - Exploration %s counts are valid.' % exp_id
                 )
             ]
         )
