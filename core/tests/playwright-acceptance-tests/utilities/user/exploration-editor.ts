@@ -120,6 +120,9 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
+const improvementsTabButton = '.e2e-test-improvements-tab';
+const mobileImprovementsTabItem =
+  '.oppia-exploration-editor-tabs-dropdown-item:has-text("Improvements")';
 const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
 
 const previewTabButton = '.e2e-test-preview-tab';
@@ -1199,6 +1202,39 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForURL(url => url.href.includes(`${baseUrl}/create/`), {
       timeout: 10000,
     });
+  }
+
+  /**
+   * Verifies Improvements tab visibility after the main editor has loaded.
+   * The mobile Options dropdown must initially be closed and is left closed.
+   * @param {boolean} present - Whether the Improvements tab should be visible.
+   */
+  async expectImprovementsTabToBePresent(present: boolean): Promise<void> {
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+    await this.waitForPageToFullyLoad();
+
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.isElementVisible(mobileNavbarDropdown))) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      // A closed or empty menu would make the absence assertion pass without
+      // checking whether Improvements is actually available.
+      await this.expectElementToBeVisible(mobileMainTabButton);
+      await this.expectElementToBeVisible(mobileImprovementsTabItem, present);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(
+        navigationDropdownInMobileVisibleSelector,
+        false
+      );
+    } else {
+      await this.expectElementToBeVisible(mainTabButton);
+      await this.expectElementToBeVisible(improvementsTabButton, present);
+    }
   }
 
   /**
