@@ -242,6 +242,9 @@ export class UserFactory {
     args?: string | string[]
   ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     const context = await browser.newContext({
+      ...(process.env.MOBILE === 'true'
+        ? {}
+        : {viewport: {width: 1920, height: 1080}}),
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
       },
@@ -280,6 +283,9 @@ export class UserFactory {
     browser: Browser
   ): Promise<LoggedInUser & LoggedOutUser> {
     const context = await browser.newContext({
+      ...(process.env.MOBILE === 'true'
+        ? {}
+        : {viewport: {width: 1920, height: 1080}}),
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
       },
@@ -336,6 +342,9 @@ export class UserFactory {
     browser: Browser
   ): Promise<LoggedOutUser> {
     const context = await browser.newContext({
+      ...(process.env.MOBILE === 'true'
+        ? {}
+        : {viewport: {width: 1920, height: 1080}}),
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
       },
