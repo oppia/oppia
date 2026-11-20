@@ -592,7 +592,7 @@ def _get_feature_names_members_to_values() -> Dict[str, str]:
     """
     with open(FEATURE_NAMES_MODEL_FILEPATH, 'r', encoding='utf-8') as f:
         content = f.read()
-    feature_names_block = content.split('export enum FeatureNames {', 1)[1]
+    feature_names_block = content.split('export enum WebFeatureNames {', 1)[1]
     feature_names_block = feature_names_block.split('}', 1)[0]
     members_to_values = dict(
         re.findall(FEATURE_NAMES_MEMBERS_REGEX, feature_names_block)
