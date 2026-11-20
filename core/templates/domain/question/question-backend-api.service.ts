@@ -18,7 +18,6 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
