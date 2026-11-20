@@ -1394,11 +1394,11 @@ class DocstringParameterCheckerTests(CheckerTestBase):
                     dict(str, dict(str, WrittenTranslation)). A mapping.
                     \"""
                     return state_mapping
-                """
+                """        )
             
     with self.checker_test_object.assertNoMessages():
     self.checker_test_object.checker.visit_functiondef(node)
-    )
+    
         
     def test_checks_args_formatting_docstring(self) -> None:
         self.checker_test_object = testutils.CheckerTestCase()
