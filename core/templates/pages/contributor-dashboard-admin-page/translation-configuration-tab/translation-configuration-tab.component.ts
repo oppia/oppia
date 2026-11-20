@@ -23,6 +23,7 @@ import {ContributorDashboardAdminBackendApiService} from '../services/contributo
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationProviderOption} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {AlertsService} from 'services/alerts.service';
+import AUTO_TRANSLATION_PROVIDER_MAPPING from 'assets/auto_translation_provider_mapping.json';
 
 import './translation-configuration-tab.component.css';
 
@@ -42,6 +43,9 @@ export class TranslationConfigurationTabComponent implements OnInit {
 
   // All providers available in the static whitelist JSON.
   allAvailableProviders: TranslationProviderOption[] = [];
+
+  languageProviderWhitelist: Record<string, string[]> =
+    AUTO_TRANSLATION_PROVIDER_MAPPING;
 
   // Subset of allAvailableProviders relevant for the currently selected language.
   availableProvidersForLanguage: TranslationProviderOption[] = [];
@@ -100,8 +104,11 @@ export class TranslationConfigurationTabComponent implements OnInit {
 
   onLanguageChange(): void {
     this.selectedProvider = '';
-    // For now show all providers; in future can filter per language whitelist.
-    this.availableProvidersForLanguage = this.allAvailableProviders;
+    const supportedProviderIds =
+      this.languageProviderWhitelist[this.selectedLanguage] || [];
+    this.availableProvidersForLanguage = this.allAvailableProviders.filter(
+      provider => supportedProviderIds.includes(provider.id)
+    );
   }
 
   async addMapping(): Promise<void> {

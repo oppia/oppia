@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Skill Editor Navbar Component.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   fakeAsync,
@@ -253,7 +251,7 @@ describe('Skill Editor Navbar Component', () => {
     const runSpy = jasmine.createSpy('runSpy');
     const modalRef = {
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
     spyOn(ngbModal, 'open').and.returnValue(modalRef);
 
     component.confirmBeforeLeavingQuestions(runSpy);
@@ -273,12 +271,8 @@ describe('Skill Editor Navbar Component', () => {
     var runFn = jasmine.createSpy('runFn');
 
     spyOn(ngbModal, 'open').and.returnValue({
-      result: {
-        then: function (confirmCb: () => void, cancelCb: () => void) {
-          cancelCb();
-        },
-      },
-    });
+      result: Promise.reject(),
+    } as NgbModalRef);
 
     component.confirmBeforeLeavingQuestions(runFn);
     tick();
@@ -358,6 +352,25 @@ describe('Skill Editor Navbar Component', () => {
       expect(component.getWarningsCount()).toBe(3);
     }
   );
+  it('should return all skill validation warnings separated by newlines', () => {
+    spyOn(skillEditorStateService, 'getSkillValidationIssues').and.returnValue([
+      'There should be review material in the concept card.',
+      'All 3 difficulties should be addressed in rubrics.',
+    ]);
+
+    expect(component.getAllSkillWarnings()).toBe(
+      'There should be review material in the concept card.\n' +
+        'All 3 difficulties should be addressed in rubrics.'
+    );
+  });
+
+  it('should return an empty string when there are no skill warnings', () => {
+    spyOn(skillEditorStateService, 'getSkillValidationIssues').and.returnValue(
+      []
+    );
+
+    expect(component.getAllSkillWarnings()).toBe('');
+  });
 
   it(
     'should check whether the skill is saveable when ' +
