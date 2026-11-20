@@ -24,10 +24,10 @@ import re
 
 from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import fs_services  # pylint: disable=invalid-import-from
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
+    fs_services,  # pylint: disable=invalid-import-from
+    html_cleaner,  # pylint: disable=invalid-import-from
     html_validation_service,
 )
 
@@ -2013,38 +2013,6 @@ class Story:
                         acquired_skill_ids.append(skill_id)
         return acquired_skill_ids
 
-    def get_prerequisite_skill_ids_for_exp_id(
-        self, exp_id: str
-    ) -> Optional[List[str]]:
-        """Returns the prerequisite skill ids of the node having the given
-        exploration id.
-
-        Args:
-            exp_id: str. The ID of the exploration linked to the story.
-
-        Returns:
-            list(str)|None. The list of prerequisite skill ids for the
-            exploration or None, if no node is linked to it.
-        """
-        for node in self.story_contents.nodes:
-            if node.exploration_id == exp_id:
-                return node.prerequisite_skill_ids
-        return None
-
-    def has_exploration(self, exp_id: str) -> bool:
-        """Checks whether an exploration is present in the story.
-
-        Args:
-            exp_id: str. The ID of the exploration linked to the story.
-
-        Returns:
-            bool. Whether the exploration is linked to the story.
-        """
-        for node in self.story_contents.nodes:
-            if node.exploration_id == exp_id:
-                return True
-        return False
-
     def to_dict(self) -> StoryDict:
         """Returns a dict representing this Story domain object.
 
@@ -2170,7 +2138,7 @@ class Story:
     def from_dict(
         cls,
         story_dict: StoryDict,
-        story_version: int = 0,
+        story_version: int = feconf.INITIAL_ENTITY_VERSION,
         story_created_on: Optional[datetime.datetime] = None,
         story_last_updated: Optional[datetime.datetime] = None,
     ) -> Story:
@@ -2271,7 +2239,7 @@ class Story:
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE,
             corresponding_topic_id,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             url_fragment,
             str(meta_tag_content),
         )
@@ -2376,7 +2344,7 @@ class Story:
         Returns:
             dict. The converted story_contents_dict.
         """
-        next_node_id = None
+        next_node_id: Optional[str] = None
         for node in reversed(story_contents_dict['nodes']):
             if next_node_id:
                 node['destination_node_ids'] = [next_node_id]

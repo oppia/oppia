@@ -24,6 +24,7 @@ from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     caching_services,
+    contribution_stats_services,
     exp_domain,
     exp_fetchers,
     exp_services,
@@ -6508,6 +6509,71 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(filtered_translatable_suggestions), 0)
 
+    def test_first_review_sets_first_contribution_date_of_empty_stats(
+        self,
+    ) -> None:
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+        model_class.create(
+            contributor_id='uid_new_reviewer',
+            topic_ids_with_question_reviews=[],
+            reviewed_questions_count=0,
+            accepted_questions_count=0,
+            accepted_questions_with_reviewer_edits_count=0,
+            rejected_questions_count=0,
+            first_contribution_date=datetime.date(2026, 1, 1),
+            last_contribution_date=datetime.date(2026, 1, 1),
+        )
+        stats_model = model_class.get_by_id('uid_new_reviewer')
+        assert stats_model is not None
+        stats = contribution_stats_services.get_question_reviewer_total_stats_from_model(  # pylint: disable=line-too-long
+            stats_model
+        )
+        review_datetime = datetime.datetime(2026, 2, 15, 10, 0, 0)
+
+        suggestion_services.increment_question_reviewer_total_stats(
+            stats, review_datetime, True, False
+        )
+
+        expected_date = datetime.date(2026, 2, 15)
+        self.assertEqual(stats.first_contribution_date, expected_date)
+        self.assertEqual(stats.last_contribution_date, expected_date)
+        self.assertEqual(stats.reviewed_questions_count, 1)
+
+    def test_later_review_keeps_first_contribution_date(self) -> None:
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+        model_class.create(
+            contributor_id='uid_active_reviewer',
+            topic_ids_with_question_reviews=['topic_1'],
+            reviewed_questions_count=2,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=0,
+            rejected_questions_count=1,
+            first_contribution_date=datetime.date(2026, 1, 1),
+            last_contribution_date=datetime.date(2026, 1, 10),
+        )
+        stats_model = model_class.get_by_id('uid_active_reviewer')
+        assert stats_model is not None
+        stats = contribution_stats_services.get_question_reviewer_total_stats_from_model(  # pylint: disable=line-too-long
+            stats_model
+        )
+        review_datetime = datetime.datetime(2026, 2, 15, 10, 0, 0)
+
+        suggestion_services.increment_question_reviewer_total_stats(
+            stats, review_datetime, True, False
+        )
+
+        self.assertEqual(
+            stats.first_contribution_date, datetime.date(2026, 1, 1)
+        )
+        self.assertEqual(
+            stats.last_contribution_date, datetime.date(2026, 2, 15)
+        )
+        self.assertEqual(stats.reviewed_questions_count, 3)
+
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
 
@@ -9652,6 +9718,200 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             days=1
         )
 
+    def test_create_translation_reviewer_certificate_counts_all_reviews(
+        self,
+    ) -> None:
+        score_category: str = '%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+        )
+        change_cmd = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+        }
+        # self.author_id reviewed one accepted and one rejected translation
+        # authored by other users.
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1',
+            1,
+            suggestion_models.STATUS_ACCEPTED,
+            'other_author_1',
+            self.author_id,
+            change_cmd,
+            score_category,
+            'exploration.exp1.thread_7',
+            'hi',
+        )
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1',
+            1,
+            suggestion_models.STATUS_REJECTED,
+            'other_author_2',
+            self.author_id,
+            change_cmd,
+            score_category,
+            'exploration.exp1.thread_8',
+            'hi',
+        )
+
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            )
+        )
+
+        assert certificate_data is not None
+        self.assertEqual(certificate_data['translated_word_count'], 0)
+        # Accepted (3) + rejected (3) reviewed words.
+        self.assertEqual(certificate_data['reviewed_word_count'], 6)
+        self.assertEqual(certificate_data['contribution_word_count'], 6)
+
+    def test_create_combined_translator_and_reviewer_certificate(
+        self,
+    ) -> None:
+        score_category: str = '%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+        )
+        change_cmd = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+        }
+        # self.author_id authored+accepted one translation AND reviewed
+        # another author's translation.
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1',
+            1,
+            suggestion_models.STATUS_ACCEPTED,
+            self.author_id,
+            'reviewer_1',
+            change_cmd,
+            score_category,
+            'exploration.exp1.thread_9',
+            'hi',
+        )
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1',
+            1,
+            suggestion_models.STATUS_ACCEPTED,
+            'other_author',
+            self.author_id,
+            change_cmd,
+            score_category,
+            'exploration.exp1.thread_10',
+            'hi',
+        )
+
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            )
+        )
+
+        assert certificate_data is not None
+        self.assertEqual(certificate_data['translated_word_count'], 3)
+        self.assertEqual(certificate_data['reviewed_word_count'], 3)
+        # R1 invariant.
+        self.assertEqual(
+            certificate_data['contribution_word_count'],
+            certificate_data['translated_word_count']
+            + certificate_data['reviewed_word_count'],
+        )
+        self.assertEqual(
+            certificate_data['contribution_hours'],
+            self._calculate_translation_contribution_hours(6),
+        )
+
+    def test_create_question_reviewer_certificate(self) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
+        suggestion_change: Dict[
+            str, Union[str, float, question_domain.QuestionDict]
+        ] = {
+            'cmd': (question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': self._create_valid_question_data(
+                    'default_state', content_id_generator
+                ).to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION
+                ),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index
+                ),
+            },
+            'skill_id': 1,
+            'skill_difficulty': 0.3,
+        }
+        assert isinstance(suggestion_change['question_dict'], dict)
+        test_question_dict: question_domain.QuestionDict = suggestion_change[
+            'question_dict'
+        ]
+        test_question_dict['question_state_data']['content'][
+            'html'
+        ] = '<p>No image content</p>'
+        # self.author_id reviewed a question authored by another user.
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1',
+            1,
+            suggestion_models.STATUS_REJECTED,
+            'other_author',
+            self.author_id,
+            suggestion_change,
+            'category1',
+            'thread_2',
+            'en',
+        )
+
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                None,
+                self.from_date,
+                self.to_date,
+            )
+        )
+
+        assert certificate_data is not None
+        # Reviewed (rejected) question, no image -> 12 minutes.
+        self.assertEqual(
+            certificate_data['contribution_hours'],
+            self._calculate_question_contribution_hours(False),
+        )
+
     def _get_change_with_normalized_string(
         self,
     ) -> Mapping[str, change_domain.AcceptableChangeDictTypes]:
@@ -9673,7 +9933,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
     def _calculate_translation_contribution_hours(
         self, numer_of_words: int
-    ) -> str:
+    ) -> float:
         """Provides translatoin contribution hours when number of translated
         words are provided. We calculate the time taken to translate
         a word according to the following document.
@@ -9683,13 +9943,13 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             numer_of_words: int. The number of translated words.
 
         Returns:
-            str. A string that represent the translatoin contribution hours.
+            float. A float that represent the translatoin contribution hours.
         """
-        return str(round(numer_of_words / 300, 2))
+        return round(numer_of_words / 300, 2)
 
     def _calculate_question_contribution_hours(
         self, images_included: bool
-    ) -> str:
+    ) -> float:
         """Provides question contribution hours when number of questions
         are provided. We calculate the time taken to submit
         a question according to the following document.
@@ -9700,7 +9960,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 contains images.
 
         Returns:
-            str. A string that represent the question contribution hours.
+            float. A float that represent the question contribution hours.
         """
         minutes_contributed = 0
 
@@ -9708,7 +9968,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             minutes_contributed += 20
         else:
             minutes_contributed += 12
-        return str(round(minutes_contributed / 60, 2))
+        return round(minutes_contributed / 60, 2)
 
     def test_create_translation_contributor_certificate(self) -> None:
         score_category: str = '%s%sEnglish' % (

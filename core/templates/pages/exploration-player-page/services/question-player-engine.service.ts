@@ -17,8 +17,7 @@
  *
  * This service is responsible for initializing, managing, and tracking the
  * lifecycle of questions presented to the learner in a question-based
- * interaction environment. It supports both practice question sessions and
- * pretest mode.
+ * interaction environment. It supports practice question sessions.
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
@@ -127,20 +126,7 @@ export class QuestionPlayerEngineService {
   }
 
   /**
-   * Initializes the question player in pretest mode using a predefined list of question objects.
-   *
-   * @param {Question[]} pretestQuestionObjects - An array of pretest questions.
-   * @param {(initialCard: StateCard, nextFocusLabel: string) => void} callback - Called after the first question is loaded.
-   */
-  initializePretestServices(
-    pretestQuestionObjects: Question[],
-    callback: (initialCard: StateCard, nextFocusLabel: string) => void
-  ): void {
-    this.init(pretestQuestionObjects, callback, () => {});
-  }
-
-  /**
-   * Core initialization logic shared between normal and pretest modes.
+   * Core initialization logic for presenting questions to the learner.
    *
    * - Marks question player as open.
    * - Shuffles question order randomly.
