@@ -742,8 +742,8 @@
     },
     {
       "name": "logged-out-user/click-all-buttons-on-partnerships-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/select-and-play-topic-from-classroom-page",
