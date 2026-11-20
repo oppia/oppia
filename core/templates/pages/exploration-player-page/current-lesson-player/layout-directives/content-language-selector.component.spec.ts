@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the CkEditor copy toolbar component.
  */
 
-// @ts-nocheck
-
 import {
   waitForAsync,
   ComponentFixture,
@@ -237,6 +235,7 @@ describe('Content language selector component', () => {
     );
 
     let response = {
+      autoGeneratableLanguageAccentCodes: [],
       languageAccentMasterList: {
         en: {
           'en-US': 'English (United States)',

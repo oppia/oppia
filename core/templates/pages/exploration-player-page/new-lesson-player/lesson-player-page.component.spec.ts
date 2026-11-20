@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {
@@ -47,6 +45,10 @@ import {NewLessonPlayerPageComponent} from './lesson-player-page.component';
 import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
 import {CookieService} from 'ngx-cookie';
 import {TranslateCacheService} from 'ngx-translate-cache';
+import {Subscription} from 'rxjs';
+import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
+import {Interaction} from 'domain/exploration/interaction.model';
+import {InputResponsePair, StateCard} from 'domain/state_card/state-card.model';
 
 /**
  * @fileoverview Unit tests for new lesson player page component.
@@ -59,17 +61,32 @@ class MockTranslateService {
   }
 }
 
-class MockCard {
-  private inputResponsePairs: unknown[] = [];
-
-  constructor(inputResponsePairs: unknown[] = []) {
-    this.inputResponsePairs = inputResponsePairs;
-  }
-
-  getInputResponsePairs(): unknown[] {
-    return this.inputResponsePairs;
+class MockCard extends StateCard {
+  constructor(inputResponsePairs: InputResponsePair[] = []) {
+    super(
+      'Introduction',
+      '',
+      '',
+      new Interaction([], [], {}, null, [], null, null),
+      inputResponsePairs,
+      'content'
+    );
   }
 }
+
+const createPermissionsResponse = (
+  canPublish: boolean
+): ExplorationPermissions =>
+  ExplorationPermissions.createFromBackendDict({
+    can_publish: canPublish,
+    can_unpublish: false,
+    can_release_ownership: false,
+    can_voiceover: false,
+    can_delete: false,
+    can_modify_roles: false,
+    can_edit: false,
+    can_manage_voice_artist: false,
+  });
 
 class MockTranslateCacheService {
   init(): void {}
@@ -181,9 +198,7 @@ describe('New Lesson Player Page', () => {
       },
       version: 1,
     };
-    const permissionsResponse = {
-      canPublish: false,
-    };
+    const permissionsResponse = createPermissionsResponse(false);
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(
@@ -212,9 +227,7 @@ describe('New Lesson Player Page', () => {
     spyOn(
       contentTranslationManagerService.onLanguageChange,
       'subscribe'
-    ).and.returnValue({
-      unsubscribe: jasmine.createSpy('unsubscribe'),
-    });
+    ).and.returnValue(new Subscription());
 
     componentInstance.ngOnInit();
     tick();
@@ -280,9 +293,7 @@ describe('New Lesson Player Page', () => {
       },
       version: 1,
     };
-    const permissionsResponse = {
-      canPublish: true,
-    };
+    const permissionsResponse = createPermissionsResponse(true);
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(
@@ -307,9 +318,7 @@ describe('New Lesson Player Page', () => {
     spyOn(
       contentTranslationManagerService.onLanguageChange,
       'subscribe'
-    ).and.returnValue({
-      unsubscribe: jasmine.createSpy('unsubscribe'),
-    });
+    ).and.returnValue(new Subscription());
 
     componentInstance.ngOnInit();
     tick();
@@ -341,7 +350,7 @@ describe('New Lesson Player Page', () => {
     spyOn(
       explorationPermissionsBackendApiService,
       'getPermissionsAsync'
-    ).and.returnValue(Promise.resolve({canPublish: false}));
+    ).and.returnValue(Promise.resolve(createPermissionsResponse(false)));
     spyOn(entityVoiceoversService, 'init');
     spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
       Promise.resolve()
@@ -360,9 +369,7 @@ describe('New Lesson Player Page', () => {
       'subscribe'
     ).and.callFake((callback: (languageCode: string) => void) => {
       languageChangeCallback = callback;
-      return {
-        unsubscribe: jasmine.createSpy('unsubscribe'),
-      };
+      return new Subscription();
     });
 
     componentInstance.ngOnInit();
@@ -393,7 +400,7 @@ describe('New Lesson Player Page', () => {
     spyOn(
       explorationPermissionsBackendApiService,
       'getPermissionsAsync'
-    ).and.returnValue(Promise.resolve({canPublish: false}));
+    ).and.returnValue(Promise.resolve(createPermissionsResponse(false)));
     spyOn(entityVoiceoversService, 'init');
     spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
       Promise.resolve()
@@ -412,9 +419,7 @@ describe('New Lesson Player Page', () => {
       'subscribe'
     ).and.callFake((callback: (languageCode: string) => void) => {
       languageChangeCallback = callback;
-      return {
-        unsubscribe: jasmine.createSpy('unsubscribe'),
-      };
+      return new Subscription();
     });
 
     componentInstance.ngOnInit();
@@ -590,7 +595,9 @@ describe('New Lesson Player Page', () => {
   });
 
   it('should return true when shouldPromptForRefresh has input response pairs', () => {
-    const mockCard = new MockCard([{input: 'test', response: 'test'}]);
+    const mockCard = new MockCard([
+      {learnerInput: 'test', oppiaResponse: 'test', isHint: false},
+    ]);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(mockCard);
 
     const result = componentInstance.shouldPromptForRefresh();

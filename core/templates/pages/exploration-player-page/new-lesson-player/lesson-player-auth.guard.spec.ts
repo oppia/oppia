@@ -16,8 +16,6 @@
  * @fileoverview Tests for new lesson player flag guard
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {
@@ -28,6 +26,7 @@ import {
 } from '@angular/router';
 
 import {AppConstants} from 'app.constants';
+import {FeatureStatusSummary} from 'domain/feature-flag/feature-status-summary.model';
 import {LessonPlayerPageAuthGuard} from './lesson-player-auth.guard';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
@@ -100,9 +99,9 @@ describe('LessonPlayerPageAuthGuard', () => {
   });
 
   it('should redirect to 404 when flag is disabled', done => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      NewLessonPlayer: {isEnabled: false},
-    });
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+      FeatureStatusSummary.createDefault().toStatusChecker()
+    );
 
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 

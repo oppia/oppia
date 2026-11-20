@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Conversation skin component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -66,7 +64,10 @@ import {UserService} from '../../../../services/user.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
-import {CurrentInteractionService} from '../../services/current-interaction.service';
+import {
+  CurrentInteractionService,
+  OnSubmitFn,
+} from '../../services/current-interaction.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
@@ -557,7 +558,7 @@ describe('Conversation skin component', () => {
       summaries: [],
       user_email: '',
       is_topic_manager: false,
-      username: true,
+      username: 'test_username',
     };
     let newStateName = 'newState';
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
@@ -735,7 +736,7 @@ describe('Conversation skin component', () => {
       summaries: [],
       user_email: '',
       is_topic_manager: false,
-      username: true,
+      username: 'test_username',
     };
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
@@ -888,7 +889,7 @@ describe('Conversation skin component', () => {
       summaries: [],
       user_email: '',
       is_topic_manager: false,
-      username: true,
+      username: 'test_username',
     };
     let expResponse = sampleExpResponse;
     expResponse.is_logged_in = false;
@@ -1041,7 +1042,7 @@ describe('Conversation skin component', () => {
         summaries: [],
         user_email: '',
         is_topic_manager: false,
-        username: true,
+        username: 'test_username',
       };
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
@@ -1385,9 +1386,15 @@ describe('Conversation skin component', () => {
     );
 
     conversationFlowService.setNextCardIfStuck(nextCardIfStuck);
-    spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue({
-      getStateName: () => 'StateName',
-    });
+    spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+      StateCard.createNewCard(
+        'StateName',
+        '',
+        '',
+        displayedCard.getInteraction(),
+        ''
+      )
+    );
     componentInstance.triggerRedirectionToStuckState();
 
     const nextCard = conversationFlowService.getNextStateCard();
@@ -1449,11 +1456,7 @@ describe('Conversation skin component', () => {
         'pq'
       );
       spyOn(questionPlayerEngineService, 'initQuestionPlayer').and.callFake(
-        (
-          config: unknown,
-          callb: (card: StateCard, label: string) => void,
-          questionAreAvailable: () => void
-        ) => {
+        (_config, callb) => {
           callb(displayedCard, 'label');
         }
       );
@@ -1485,22 +1488,12 @@ describe('Conversation skin component', () => {
 
       spyOn(explorationEngineService, 'getStateFromStateName').and.callFake(
         (stateName: string) => {
-          if (stateName === 'Mid') {
-            return {
-              cardIsCheckpoint: true,
-              ...expResponse.exploration.states.Mid,
-            };
-          } else if (stateName === 'Start') {
-            return {
-              cardIsCheckpoint: true,
-              ...expResponse.exploration.states.Start,
-            };
-          } else if (stateName === 'End') {
-            return {
-              cardIsCheckpoint: false,
-              ...expResponse.exploration.states.End,
-            };
-          }
+          const state = State.createFromBackendDict(
+            stateName,
+            expResponse.exploration.states[stateName]
+          );
+          state.cardIsCheckpoint = stateName !== 'End';
+          return state;
         }
       );
 
@@ -1694,7 +1687,7 @@ describe('Conversation skin component', () => {
       explorationEngineService
     );
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue('1777');
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(1777);
 
     conversationFlowService.setDisplayedCard(
       new StateCard(
@@ -1874,11 +1867,7 @@ describe('Conversation skin component', () => {
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(questionPlayerEngineService, 'initQuestionPlayer').and.callFake(
-      (
-        config: unknown,
-        callb: (card: StateCard, label: string) => void,
-        questionAreAvailable: () => void
-      ) => {
+      (_config, callb) => {
         callb(displayedCard, 'label');
       }
     );
@@ -1974,17 +1963,10 @@ describe('Conversation skin component', () => {
     const cardAnimationService = TestBed.inject(CardAnimationService);
     spyOn(cardAnimationService, 'adjustPageHeightOnresize');
 
-    let onSubmitCb: (
-      answer: unknown,
-      rulesService: InteractionRulesService
-    ) => void = () => {};
-    spyOn(currentInteractionService, 'setOnSubmitFn').and.callFake(
-      (
-        cb: (answer: unknown, rulesService: InteractionRulesService) => void
-      ) => {
-        onSubmitCb = cb;
-      }
-    );
+    let onSubmitCb: OnSubmitFn = () => {};
+    spyOn(currentInteractionService, 'setOnSubmitFn').and.callFake(cb => {
+      onSubmitCb = cb;
+    });
 
     const readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
@@ -2181,10 +2163,13 @@ describe('Conversation skin component', () => {
 
   it('should check if displayed card was completed in previous session', () => {
     const prevStates = ['State1', 'State2'];
-    const displayedCardMock = {
-      getInteraction: () => true,
-      getStateName: () => 'State2',
-    };
+    const displayedCardMock = StateCard.createNewCard(
+      'State2',
+      '',
+      '',
+      displayedCard.getInteraction(),
+      ''
+    );
     spyOn(
       playerTranscriptService,
       'getPrevSessionStatesProgress'
@@ -2232,11 +2217,17 @@ describe('Conversation skin component', () => {
   });
 
   it('should call skipCurrentQuestion and update next card', () => {
-    const nextCard = {};
+    const nextCard = StateCard.createNewCard(
+      'Next',
+      '',
+      '',
+      displayedCard.getInteraction(),
+      ''
+    );
     spyOn(
       diagnosticTestPlayerEngineService,
       'skipCurrentQuestion'
-    ).and.callFake((cb: (card: {}) => void) => cb(nextCard));
+    ).and.callFake(cb => cb(nextCard));
     spyOn(conversationFlowService, 'setNextStateCard');
     spyOn(conversationFlowService, 'showPendingCard');
     componentInstance.skipCurrentQuestion();
@@ -2247,15 +2238,27 @@ describe('Conversation skin component', () => {
   });
 
   it('should trigger redirection to stuck state', () => {
-    const nextCard = {};
+    const nextCard = StateCard.createNewCard(
+      'Next',
+      '',
+      '',
+      displayedCard.getInteraction(),
+      ''
+    );
     spyOn(conversationFlowService, 'getNextCardIfStuck').and.returnValue(
       nextCard
     );
     spyOn(conversationFlowService, 'setNextStateCard');
     spyOn(conversationFlowService, 'showPendingCard');
-    spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue({
-      getStateName: () => 'StateName',
-    });
+    spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+      StateCard.createNewCard(
+        'StateName',
+        '',
+        '',
+        displayedCard.getInteraction(),
+        ''
+      )
+    );
     componentInstance.showInteraction = true;
     componentInstance.triggerRedirectionToStuckState();
     expect(conversationFlowService.setNextStateCard).toHaveBeenCalledWith(
@@ -2309,16 +2312,29 @@ describe('Conversation skin component', () => {
     spyOn(
       explorationRecommendationsService,
       'getRecommendedSummaryDicts'
-    ).and.callFake(
-      (
-        ids: string[],
-        recommendations: string[],
-        callb: (summaries: {id: string}[]) => void
-      ) => {
-        const mockSummaries = [{id: 'exp1'}, {id: 'exp2'}];
-        callb(mockSummaries);
-      }
-    );
+    ).and.callFake((_ids, _includeAutogeneratedRecommendations, callb) => {
+      const mockSummaries = ['exp1', 'exp2'].map(id =>
+        LearnerExplorationSummary.createFromBackendDict({
+          id,
+          category: '',
+          community_owned: false,
+          activity_type: 'exploration',
+          last_updated_msec: 0,
+          ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+          created_on_msec: 0,
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          num_views: 0,
+          objective: '',
+          status: 'public',
+          tags: [],
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+          title: '',
+        })
+      );
+      callb(mockSummaries);
+    });
 
     spyOn(document, 'querySelector')
       .withArgs('.oppia-exploration-checkpoints-message')
@@ -2367,8 +2383,8 @@ describe('Conversation skin component', () => {
     );
 
     spyOn(preventPageUnloadEventService, 'addListener').and.callFake(
-      (callback: () => void) => {
-        callback();
+      callback => {
+        callback?.();
       }
     );
     componentInstance.ngOnInit();

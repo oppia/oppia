@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Conversation display Component.
  */
 
-// @ts-nocheck
-
 import {SimpleChanges} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
@@ -32,7 +30,10 @@ import {
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from '../../../../../app.constants';
 import {Interaction} from '../../../../../domain/exploration/interaction.model';
-import {StateCard} from '../../../../../domain/state_card/state-card.model';
+import {
+  InputResponsePair,
+  StateCard,
+} from '../../../../../domain/state_card/state-card.model';
 import {UrlInterpolationService} from '../../../../../domain/utilities/url-interpolation.service';
 import {AudioBarStatusService} from '../../../../../services/audio-bar-status.service';
 import {AudioPlayerService} from '../../../../../services/audio-player.service';
@@ -129,11 +130,6 @@ describe('Conversation display component', () => {
       null,
       [],
       'EndExploration',
-      // This throws "Argument of type 'null' is not assignable to parameter of
-      // type 'RecordedVoiceovers'." We need to suppress this error because of
-      // the need to test validations. This throws an error only in the
-      // frontend tests and not in the frontend.
-      // @ts-ignore
       null
     ),
     [],
@@ -312,6 +308,11 @@ describe('Conversation display component', () => {
   });
 
   describe('shouldResponseHistoryBeShown', () => {
+    const responsePair: InputResponsePair = {
+      learnerInput: 'answer',
+      oppiaResponse: 'feedback',
+      isHint: false,
+    };
     beforeEach(() => {
       componentInstance.displayedCard = mockDisplayedCard;
     });
@@ -319,8 +320,8 @@ describe('Conversation display component', () => {
     it('should return false if inputOutputHistoryIsShown is false', () => {
       componentInstance.inputOutputHistoryIsShown = false;
       spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([
-        {},
-        {},
+        responsePair,
+        responsePair,
       ]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
       expect(componentInstance.shouldResponseHistoryBeShown()).toBe(false);
@@ -329,8 +330,8 @@ describe('Conversation display component', () => {
     it('should return true if interaction is inline and pairCount > 1', () => {
       componentInstance.inputOutputHistoryIsShown = true;
       spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([
-        {},
-        {},
+        responsePair,
+        responsePair,
       ]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
       expect(componentInstance.shouldResponseHistoryBeShown()).toBe(true);
@@ -338,14 +339,18 @@ describe('Conversation display component', () => {
 
     it('should return false if interaction is inline and pairCount <= 1', () => {
       componentInstance.inputOutputHistoryIsShown = true;
-      spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([{}]);
+      spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([
+        responsePair,
+      ]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
       expect(componentInstance.shouldResponseHistoryBeShown()).toBe(false);
     });
 
     it('should return true if interaction is not inline and pairCount > 0', () => {
       componentInstance.inputOutputHistoryIsShown = true;
-      spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([{}]);
+      spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([
+        responsePair,
+      ]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(false);
       expect(componentInstance.shouldResponseHistoryBeShown()).toBe(true);
     });
@@ -1110,8 +1115,17 @@ describe('Conversation display component', () => {
 
     it('should handle null interaction HTML', () => {
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
-      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(null);
-      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      const cardWithNullHtml = StateCard.createNewCard(
+        '',
+        '',
+        '',
+        mockDisplayedCard.getInteraction(),
+        ''
+      );
+      // Exercise the defensive path for an invalid runtime return value.
+      Object.assign(cardWithNullHtml, {getInteractionHtml: () => null});
+      componentInstance.displayedCard = cardWithNullHtml;
+      spyOn(cardWithNullHtml, 'isCompleted').and.returnValue(false);
       spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
 
       expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);

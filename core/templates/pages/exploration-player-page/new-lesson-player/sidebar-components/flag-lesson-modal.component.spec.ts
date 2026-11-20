@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for FlagExplorationModalComponent.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -37,7 +35,7 @@ import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {PageContextService} from '../../../../services/page-context.service';
 import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav-backend-api.service';
 import {AlertsService} from '../../../../services/alerts.service';
-import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, Injector} from '@angular/core';
 
 describe('Flag lesson modal', () => {
   let component: NewFlagExplorationModalComponent;
@@ -63,8 +61,8 @@ describe('Flag lesson modal', () => {
   }
 
   class MockLearnerLocalNavBackendApiService {
-    postReportAsync(): Promise<void> {
-      return Promise.resolve();
+    postReportAsync(): Promise<object> {
+      return Promise.resolve({});
     }
   }
 
@@ -75,6 +73,29 @@ describe('Flag lesson modal', () => {
   class MockMatBottomSheetRef {
     dismiss(): void {}
   }
+
+  const createModalWithout = (
+    service: typeof NgbActiveModal | typeof MatBottomSheetRef
+  ): NewFlagExplorationModalComponent =>
+    Injector.create({
+      providers: [
+        {provide: service, useValue: null},
+        {
+          provide: NewFlagExplorationModalComponent,
+          useClass: NewFlagExplorationModalComponent,
+          deps: [
+            NgbActiveModal,
+            MatBottomSheetRef,
+            FocusManagerService,
+            PageContextService,
+            LearnerLocalNavBackendApiService,
+            AlertsService,
+            PlayerPositionService,
+          ],
+        },
+      ],
+      parent: TestBed.inject(Injector),
+    }).get(NewFlagExplorationModalComponent);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -144,7 +165,7 @@ describe('Flag lesson modal', () => {
     let flag = true;
     let flagMessage = 'test message';
     spyOn(learnerLocalNavBackendApiService, 'postReportAsync').and.callFake(
-      () => Promise.resolve()
+      () => Promise.resolve({})
     );
 
     component.flagMessageTextareaIsShown = true;
@@ -206,11 +227,7 @@ describe('Flag lesson modal', () => {
 
   it('should close modal with MatBottomSheetRef', () => {
     spyOn(bottomSheetRef, 'dismiss');
-    // Mock the component to use bottomSheetRef instead of ngbActiveModal.
-    const componentRef = component as unknown as {
-      ngbActiveModal: NgbActiveModal | null;
-    };
-    componentRef.ngbActiveModal = null;
+    component = createModalWithout(NgbActiveModal);
 
     component.closeModal();
 
@@ -219,11 +236,7 @@ describe('Flag lesson modal', () => {
 
   it('should close modal with NgbActiveModal', () => {
     spyOn(ngbActiveModal, 'dismiss');
-    // Ensure bottomSheetRef is null so ngbActiveModal is used.
-    const componentRef = component as unknown as {
-      bottomSheetRef: MatBottomSheetRef | null;
-    };
-    componentRef.bottomSheetRef = null;
+    component = createModalWithout(MatBottomSheetRef);
 
     component.closeModal();
 
