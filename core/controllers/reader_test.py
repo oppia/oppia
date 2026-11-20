@@ -4209,6 +4209,24 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_metadata_version_history_is_none_for_first_version(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 1)
+        )
+
+        self.assertEqual(
+            response,
+            {
+                'last_edited_version_number': None,
+                'last_edited_committer_username': self.OWNER_USERNAME,
+                'metadata_dict_in_previous_version': None,
+            },
+        )
+
+        self.logout()
+
 
 class EntityTranslationHandlerTest(test_utils.GenericTestBase):
     """Unit test for the EntityTranslationHandler."""
