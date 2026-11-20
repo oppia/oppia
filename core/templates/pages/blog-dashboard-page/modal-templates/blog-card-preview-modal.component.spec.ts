@@ -36,6 +36,15 @@ import {By} from '@angular/platform-browser';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {BlogCardComponent} from '../blog-card/blog-card.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    HighlightSentencesDuringAutomaticVoiceoverPlayback: {
+      isEnabled: false,
+    },
+  };
+}
 
 class MockActiveModal {
   dismiss(): void {
@@ -107,6 +116,10 @@ describe('Blog Card Preview Modal Component', () => {
         {
           provide: TruncatePipe,
           useClass: MockTruncatePipe,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
       ],
     }).compileComponents();
