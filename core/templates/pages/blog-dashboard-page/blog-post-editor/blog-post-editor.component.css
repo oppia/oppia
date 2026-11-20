@@ -144,20 +144,21 @@
 .sub-text {
   color: #555;
   font: italic normal normal 1.2rem/1.4rem 'Roboto', Arial, sans-serif;
-  margin: 0
+  margin: 0;
 }
 
 .tag {
   border: 1px solid #333;
   border-radius: 2px;
   color: #555;
-  font: normal normal normal 1.6rem/1.9rem 'Roboto', Arial, sans-serif;
+  font: normal normal normal 1.2rem/1.4rem 'Roboto', Arial, sans-serif;
   line-height: 0;
+  margin: 4px 2px;
 }
 
 .tag-heading {
   color: #333;
-  font: normal normal bold 2.0rem/2.4rem 'Roboto', Arial, sans-serif;
+  font: normal normal bold 1.6rem/1.9rem 'Roboto', Arial, sans-serif;
 }
 
 .tag-limit-text {
@@ -166,11 +167,11 @@
 
 
 .tag /deep/ .mat-button-toggle-label-content {
-  line-height: 19px;
+  line-height: 14px;
 }
 
 .tag /deep/ .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-  padding: 4px 5px;
+  padding: 3px 6px;
 }
 
 .title-heading {

@@ -32,21 +32,8 @@ import {UrlService} from '../../../services/contextual/url.service';
 import {ExplorationModeService} from './exploration-mode.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {PlaythroughService} from '../../../services/playthrough.service';
-import {
-  Question,
-  QuestionBackendDict,
-} from '../../../domain/question/question.model';
 import {ReadOnlyExplorationBackendApiService} from '../../../domain/exploration/read-only-exploration-backend-api.service';
-import {PretestQuestionBackendApiService} from '../../../domain/question/pretest-question-backend-api.service';
 import {CurrentEngineService} from './current-engine.service';
-import {QuestionPlayerEngineService} from './question-player-engine.service';
-
-class MockQuestion {
-  constructor(private backendDict: QuestionBackendDict) {}
-  getId() {
-    return this.backendDict.id;
-  }
-}
 
 describe('ExplorationInitializationService', () => {
   let service: ExplorationInitializationService;
@@ -58,12 +45,10 @@ describe('ExplorationInitializationService', () => {
   let numberAttemptsService: jasmine.SpyObj<NumberAttemptsService>;
   let transcriptService: jasmine.SpyObj<PlayerTranscriptService>;
   let readOnlyExplorationBackendApiService: jasmine.SpyObj<ReadOnlyExplorationBackendApiService>;
-  let pretestQuestionBackendApiService: jasmine.SpyObj<PretestQuestionBackendApiService>;
   let statsReportingService: StatsReportingService;
   let playthroughService: PlaythroughService;
   let urlService: UrlService;
   let explorationModeService: ExplorationModeService;
-  let questionPlayerEngineService: jasmine.SpyObj<QuestionPlayerEngineService>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -74,17 +59,8 @@ describe('ExplorationInitializationService', () => {
         ExplorationModeService,
         StatsReportingService,
         PlaythroughService,
-        QuestionPlayerEngineService,
         ReadOnlyExplorationBackendApiService,
-        PretestQuestionBackendApiService,
         CurrentEngineService,
-        {
-          provide: Question,
-          useValue: {
-            createFromBackendDict: (dict: QuestionBackendDict) =>
-              new MockQuestion(dict),
-          },
-        },
         {
           provide: PageContextService,
           useValue: jasmine.createSpyObj('PageContextService', [
@@ -135,9 +111,6 @@ describe('ExplorationInitializationService', () => {
   beforeEach(() => {
     service = TestBed.inject(ExplorationInitializationService);
     statsReportingService = TestBed.inject(StatsReportingService);
-    questionPlayerEngineService = TestBed.inject(
-      QuestionPlayerEngineService
-    ) as jasmine.SpyObj<QuestionPlayerEngineService>;
     explorationModeService = TestBed.inject(ExplorationModeService);
     playthroughService = TestBed.inject(PlaythroughService);
     urlService = TestBed.inject(UrlService);
@@ -165,9 +138,6 @@ describe('ExplorationInitializationService', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     ) as jasmine.SpyObj<ReadOnlyExplorationBackendApiService>;
-    pretestQuestionBackendApiService = TestBed.inject(
-      PretestQuestionBackendApiService
-    ) as jasmine.SpyObj<PretestQuestionBackendApiService>;
   });
 
   it('should initialize preview player when on exploration editor page', fakeAsync(() => {
@@ -234,10 +204,6 @@ describe('ExplorationInitializationService', () => {
       readOnlyExplorationBackendApiService,
       'loadLatestExplorationAsync'
     ).and.returnValue(Promise.resolve(mockExplorationData));
-    spyOn(
-      pretestQuestionBackendApiService,
-      'fetchPretestQuestionsAsync'
-    ).and.returnValue(Promise.resolve([]));
     featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
       Promise.resolve({})
     );
@@ -268,97 +234,6 @@ describe('ExplorationInitializationService', () => {
     );
   }));
 
-  it('should initialize player in pretest mode when pretest questions are available', fakeAsync(() => {
-    pageContextService.isInExplorationEditorPage.and.returnValue(false);
-    pageContextService.getExplorationId.and.returnValue('exp123');
-    pageContextService.getExplorationVersion.and.returnValue(null);
-
-    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
-      'math'
-    );
-    spyOn(urlService, 'getUrlParams').and.returnValue({});
-
-    const mockExplorationData = {
-      exploration: {
-        title: 'Pretest Exploration',
-        init_state_name: 'Intro',
-        param_changes: [],
-        param_specs: {},
-        states: {},
-        language_code: 'en',
-        next_content_id_index: 0,
-      },
-      version: 1,
-      session_id: 'session_pretest',
-      auto_tts_enabled: true,
-      preferred_audio_language_code: null,
-      preferred_language_codes: [],
-      displayable_language_codes: [],
-      draft_change_list_id: 1,
-      record_playthrough_probability: 1.0,
-      exploration_metadata: {},
-    };
-
-    const sampleQuestionsBackendDict: QuestionBackendDict[] = [
-      {
-        id: 'question_1',
-        question_state_data: {
-          classifier_model_id: null,
-          content: {content_id: 'content_1', html: '<p>What is 2 + 2?</p>'},
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {},
-            default_outcome: null,
-            hints: [],
-            id: 'NumericInput',
-            solution: null,
-          },
-          param_changes: [],
-          solicit_answer_details: false,
-          linked_skill_id: null,
-          card_is_checkpoint: false,
-          inapplicable_skill_misconception_ids: [],
-        },
-        question_state_data_schema_version: 50,
-        language_code: 'en',
-        version: 1,
-        linked_skill_ids: ['math_basic'],
-        inapplicable_skill_misconception_ids: [],
-        next_content_id_index: 1,
-      },
-    ];
-
-    spyOn(
-      readOnlyExplorationBackendApiService,
-      'loadLatestExplorationAsync'
-    ).and.returnValue(Promise.resolve(mockExplorationData));
-
-    spyOn(
-      pretestQuestionBackendApiService,
-      'fetchPretestQuestionsAsync'
-    ).and.returnValue(Promise.resolve(sampleQuestionsBackendDict));
-
-    featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
-      Promise.resolve({})
-    );
-
-    spyOn(statsReportingService, 'initSession');
-    spyOn(playthroughService, 'initSession');
-    spyOn(explorationModeService, 'setPretestMode');
-    spyOn(questionPlayerEngineService, 'initializePretestServices');
-
-    const callback = jasmine.createSpy('callback');
-    service.initializePlayer(callback);
-
-    tick();
-
-    expect(explorationModeService.setPretestMode).toHaveBeenCalled();
-    expect(
-      questionPlayerEngineService.initializePretestServices
-    ).toHaveBeenCalledWith(jasmine.any(Array), callback);
-  }));
-
   it('should initialize player when not on exploration editor page', fakeAsync(() => {
     pageContextService.isInExplorationEditorPage.and.returnValue(false);
     pageContextService.getExplorationId.and.returnValue('exp123');
@@ -367,6 +242,7 @@ describe('ExplorationInitializationService', () => {
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       'col_123'
     );
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
 
     const mockExplorationData = {
       exploration: {
@@ -393,16 +269,13 @@ describe('ExplorationInitializationService', () => {
       readOnlyExplorationBackendApiService,
       'loadLatestExplorationAsync'
     ).and.returnValue(Promise.resolve(mockExplorationData));
-    spyOn(
-      pretestQuestionBackendApiService,
-      'fetchPretestQuestionsAsync'
-    ).and.returnValue(Promise.resolve([]));
     featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
       Promise.resolve({})
     );
 
     spyOn(statsReportingService, 'initSession');
     spyOn(playthroughService, 'initSession');
+    spyOn(explorationModeService, 'setExplorationMode');
 
     const callback = jasmine.createSpy('callback');
     service.initializePlayer(callback);
@@ -410,6 +283,8 @@ describe('ExplorationInitializationService', () => {
     expect(transcriptService.init).toHaveBeenCalled();
 
     tick();
+
+    expect(explorationModeService.setExplorationMode).toHaveBeenCalled();
 
     expect(explorationFeaturesService.init).toHaveBeenCalledWith(
       mockExplorationData.exploration,

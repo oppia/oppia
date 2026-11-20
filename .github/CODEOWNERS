@@ -82,7 +82,6 @@
 /typings/ @oppia/dev-workflow-reviewers
 /tsconfig*.json @oppia/dev-workflow-reviewers
 /scripts/run_typescript_checks*.py @oppia/dev-workflow-reviewers
-/scripts/template_strict_exclude_paths.txt @oppia/dev-workflow-reviewers
 
 
 # App Feedback Reporting project
@@ -192,8 +191,8 @@
 /.coveragerc @oppia/dev-workflow-reviewers
 /.gitattributes @oppia/dev-workflow-reviewers
 /.gitignore @oppia/dev-workflow-reviewers
-/.isort.cfg @oppia/dev-workflow-reviewers
 /.prettierignore @oppia/dev-workflow-reviewers
+
 /.prettierrc.json @oppia/dev-workflow-reviewers
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers

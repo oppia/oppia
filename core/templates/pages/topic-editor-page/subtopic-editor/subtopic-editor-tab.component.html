@@ -62,7 +62,7 @@
           <div class="subtopic-url-fragment e2e-test-subtopic-url-fragment-field" tabindex="0">
             <url-fragment-editor-component label="Url Fragment"
                                            placeholder="Enter url fragment for the subtopic."
-                                           maxLength="{{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}}"
+                                           [maxLength]="MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT"
                                            fragmentType="subtopic"
                                            [generatedUrlPrefix]="generatedUrlPrefix"
                                            [fragmentIsDuplicate]="subtopicUrlFragmentExists"
@@ -91,7 +91,8 @@
             <div *ngIf="schemaEditorIsShown">
               <schema-based-editor [schema]="SUBTOPIC_PAGE_SCHEMA"
                                    class="e2e-test-edit-subtopic-page-contents"
-                                   [(localValue)]="htmlData">
+                                   [localValue]="htmlData"
+                                   (localValueChange)="onHtmlDataChange($event)">
               </schema-based-editor>
               <div class="text-end pt-3">
                 <button class="btn btn-outline-dark"
@@ -192,7 +193,7 @@
                                                  [shortSummary]="section.getHeadingText()"
                                                  [isActive]="index === activeSectionIndex"
                                                  [isDeleteAvailable]="sections.length > 1"
-                                                 (summaryDelete)="deleteSection($event.index, $event.event)">
+                                                 (summaryDelete)="deleteSection($event.index)">
                       </oppia-summary-list-header>
                     </button>
                     <div *ngIf="activeSectionIndex === index" class="oppia-editor-card-section e2e-test-study-guide-section-{{ index }}-expanded">

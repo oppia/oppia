@@ -105,7 +105,7 @@ const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
 const discardDraftDropdownSelector = 'button.e2e-test-save-discard-toggle';
-const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
+const desktopDiscardDraftButton = 'span.e2e-test-discard-changes';
 const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const currentCardNameContainerSelector = '.e2e-test-state-name-container';
 
@@ -1799,6 +1799,7 @@ export class ExplorationEditor extends BaseUser {
 
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(expression);
+    await this.waitForElementToStabilize(algebricExpressionEditor);
   }
 
   /**
@@ -1825,6 +1826,7 @@ export class ExplorationEditor extends BaseUser {
 
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(solution);
+    await this.waitForElementToStabilize(algebricExpressionEditor);
 
     if (await this.isOnScreenKeyboardVisible()) {
       await this.hideOSK();
@@ -2155,6 +2157,7 @@ export class ExplorationEditor extends BaseUser {
 
     await equationBox.click();
     await equationBox.type(equation);
+    await this.waitForElementToStabilize(equationBox);
 
     if (this.isViewportAtMobileWidth()) {
       const onScreenKeyboardSelector = '.e2e-test-osk-hide-button';
@@ -2182,6 +2185,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToStabilize(equationBox);
     await equationBox.click();
     await equationBox.type(solution);
+    await this.waitForElementToStabilize(equationBox);
 
     if (await this.isOnScreenKeyboardVisible()) {
       await this.hideOSK();
