@@ -345,3 +345,80 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         )
 
         self.assertEqual(is_valid, False)
+
+
+    def test_match_param_docs_with_multiline_container_type(self) -> None:
+        docstring = astroid.extract_node(
+            """
+def func(state_names_to_content_id_mapping, suggestions):
+    '''Returns a copy of the supplied mapping minus any contents.
+
+    Args:
+        state_names_to_content_id_mapping: dict(str, dict(str,
+            WrittenTranslation)). A dict where state_name is the key
+            and a dict with content_id as the key and WrittenTranslation
+            as value.
+        suggestions: list(Suggestion). A list of translation suggestions.
+
+    Returns:
+        dict(str, dict(str, WrittenTranslation)). A dict where state_name
+        is the key and a dict with content_id as the key and
+        WrittenTranslation as value.
+    pass
+    '''
+                """
+        ).doc_node
+        parsed_docstring = docstrings_checker.docstringify(docstring)
+        self.assertEqual(
+            isinstance(
+                parsed_docstring, docstrings_checker.GoogleDocstring
+            ),
+            True,
+        )
+        params_with_doc, params_with_type = (
+            parsed_docstring.match_param_docs()
+        )
+        self.assertEqual(
+            params_with_doc,
+            {
+                'state_names_to_content_id_mapping',
+                'suggestions',
+            },
+        )
+        self.assertEqual(
+            params_with_type,
+            {
+                'state_names_to_content_id_mapping',
+                'suggestions',
+            },
+        )
+
+
+    def test_match_param_docs_with_plain_english_type(self) -> None:
+        docstring = astroid.extract_node(
+            """
+def func(state_names_to_content_id_mapping):
+    '''Returns a copy of the supplied mapping minus any contents.
+
+    Args:
+        state_names_to_content_id_mapping: A dict where state_name is
+            the key and a dict with content_id as the key and
+            WrittenTranslation as value.
+    pass
+    '''
+                """
+        ).doc_node
+        parsed_docstring = docstrings_checker.docstringify(docstring)
+        self.assertEqual(
+            isinstance(
+                parsed_docstring, docstrings_checker.GoogleDocstring
+            ),
+            True,
+        )
+        params_with_doc, params_with_type = (
+            parsed_docstring.match_param_docs()
+        )
+        self.assertEqual(
+            params_with_doc, {'state_names_to_content_id_mapping'}
+        )
+        self.assertEqual(params_with_type, set())
