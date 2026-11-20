@@ -30,8 +30,6 @@ const creatorDashboardCreateModeUrl =
 const blogUrl = testConstants.URLs.Blog;
 const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
-const recentlyPublishedExplorationsPageUrl =
-  testConstants.URLs.recentlyPublishedExplorations;
 const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
@@ -66,6 +64,8 @@ const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
 const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
+const donatePageThanksModalWatchAVideoUrl =
+  testConstants.URLs.DonatePageThanksModalWatchAVideoUrl;
 const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerIdealistPageUrl = testConstants.URLs.VolunteerIdealistPage;
 const volunteerUrl = testConstants.URLs.Volunteer;
@@ -315,6 +315,7 @@ const topicNameSelector = '.e2e-test-topic-name';
 const loginPromptContainer = '.story-viewer-login-container';
 const NavbarBackButton = '.oppia-navbar-back-button';
 const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
+const mobileLessonCardSelector = '.mobile-activity-summary-card';
 const nextLessonButton = '.e2e-test-next-lesson-button';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
@@ -1507,10 +1508,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Watch A Video button
-   * in the Donation thanks modal on donate page and check if it opens the right page.
+   * Function to verify the Watch A Video button
+   * in the Donation thanks modal on donate page has the correct link.
    */
-  async clickWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
+  async verifyWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(watchAVideoButton);
     const buttonText = await this.page.$eval(
       watchAVideoButton,
@@ -1519,17 +1520,11 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await this.clickAndWaitForNavigation(watchAVideoButton, true);
-    await this.waitForPageToFullyLoad();
-
-    const url = this.page.url();
-    if (!url.includes(testConstants.OppiaSocials.FaceBook.Domain)) {
-      throw new Error(
-        `The Watch A Video button should open the right page,
-          but it opens ${url} instead.`
-      );
-    }
-    showMessage('The Watch A Video button opens the right page.');
+    await this.openExternalLink(
+      watchAVideoButton,
+      donatePageThanksModalWatchAVideoUrl
+    );
+    showMessage('The Watch A Video button has the right link.');
   }
 
   /**
@@ -3940,49 +3935,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Navigates to the top rated explorations page from the community library.
-   */
-  async navigateToTopRatedLessonsPage(): Promise<void> {
-    await this.navigateToCommunityLibraryPage();
-    await this.clickAndWaitForNavigation('Top-Rated Explorations');
-  }
-
-  /**
-   * Checks if the top rated explorations are in a specific order.
-   * @param {string[]} expectedOrder - The expected order of the top rated explorations.
-   */
-  async expectLessonsInOrder(expectedOrder: string[]): Promise<void> {
-    try {
-      await this.page.waitForSelector(explorationTitleSelector);
-      const explorationTitles = await this.page.$$(explorationTitleSelector);
-      for (let i = 0; i < explorationTitles.length; i++) {
-        const titleText = await this.page.evaluate(
-          el => el.querySelector('span > span').textContent,
-          explorationTitles[i]
-        );
-        if (titleText.trim() !== expectedOrder[i]) {
-          throw new Error(
-            `Exploration at position ${i} is "${titleText.trim()}", but expected "${expectedOrder[i]}".`
-          );
-        }
-      }
-    } catch (error) {
-      const newError = new Error(
-        `Failed to check order explorations: ${error}`
-      );
-      newError.stack = error.stack;
-      throw newError;
-    }
-  }
-
-  /**
-   * Navigates to the page recently published explorations page.
-   */
-  async navigateToRecentlyPublishedLessonsPage(): Promise<void> {
-    await this.goto(recentlyPublishedExplorationsPageUrl);
-  }
-
-  /**
    * Checks if an exploration has a specific rating.
    *
    * @param {number} expectedRating - The expected rating of the exploration.
@@ -3992,33 +3944,43 @@ export class LoggedOutUser extends BaseUser {
     expectedRating: number,
     expectedExplorationName: string
   ): Promise<void> {
+    const cardSelector = this.isViewportAtMobileWidth()
+      ? mobileLessonCardSelector
+      : lessonCardSelector;
+    const cardTitleSelector = this.isViewportAtMobileWidth()
+      ? explorationTitleSelector
+      : lessonCardTitleSelector;
     try {
-      await this.page.waitForSelector(lessonCardSelector);
-      const cards = await this.page.$$(lessonCardSelector);
+      await this.page.waitForSelector(cardSelector);
+      const cards = await this.page.$$(cardSelector);
       for (const card of cards) {
-        await card.waitForSelector(lessonCardTitleSelector);
-        const titleElement = await card.$(lessonCardTitleSelector);
+        await card.waitForSelector(cardTitleSelector);
+        const titleElement = await card.$(cardTitleSelector);
         const titleText = await this.page.evaluate(
           el => el.textContent.trim(),
           titleElement
         );
         if (titleText === expectedExplorationName) {
-          await card.waitForSelector(explorationRatingSelector);
-          const ratingElement = await card.$(explorationRatingSelector);
-          if (ratingElement) {
-            const ratingSpan = await ratingElement.$('span:nth-child(2)');
-            const ratingText = await this.page.evaluate(
-              el => el.textContent.trim(),
-              ratingSpan
-            );
-            const rating = parseFloat(ratingText);
-            if (rating !== expectedRating) {
-              throw new Error(
-                `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+          // The mobile activity summary card does not render a rating, so the
+          // rating can only be checked on the desktop card.
+          if (!this.isViewportAtMobileWidth()) {
+            await card.waitForSelector(explorationRatingSelector);
+            const ratingElement = await card.$(explorationRatingSelector);
+            if (ratingElement) {
+              const ratingSpan = await ratingElement.$('span:nth-child(2)');
+              const ratingText = await this.page.evaluate(
+                el => el.textContent.trim(),
+                ratingSpan
               );
+              const rating = parseFloat(ratingText);
+              if (rating !== expectedRating) {
+                throw new Error(
+                  `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+                );
+              }
             }
-            return;
           }
+          return;
         }
       }
       throw new Error(
