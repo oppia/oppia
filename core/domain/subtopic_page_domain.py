@@ -364,7 +364,7 @@ class SubtopicPage:
             SubtopicPageContents.create_default_subtopic_page_contents(),
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
         )
 
     @classmethod
