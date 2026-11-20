@@ -2352,6 +2352,56 @@ describe('New Conversation skin component', () => {
     expect(componentInstance.isSupplementalNavShown()).toBeFalse();
   });
 
+  describe('isSubmitButtonShown', () => {
+    beforeEach(() => {
+      spyOn(
+        conversationFlowService,
+        'getAnswerIsBeingProcessed'
+      ).and.returnValue(false);
+      componentInstance.continueToReviseStateButtonIsVisible = false;
+    });
+
+    it('should show Submit for an incomplete card', () => {
+      spyOn(componentInstance, 'getDisplayedCard').and.returnValue(
+        displayedCard
+      );
+      spyOn(displayedCard, 'isCompleted').and.returnValue(false);
+
+      expect(componentInstance.isSubmitButtonShown()).toBeTrue();
+    });
+
+    it('should hide Submit for a completed card', () => {
+      spyOn(componentInstance, 'getDisplayedCard').and.returnValue(
+        displayedCard
+      );
+      spyOn(displayedCard, 'isCompleted').and.returnValue(true);
+
+      expect(componentInstance.isSubmitButtonShown()).toBeFalse();
+    });
+
+    it('should hide Submit while the continue-to-revise button is visible', () => {
+      spyOn(componentInstance, 'getDisplayedCard').and.returnValue(
+        displayedCard
+      );
+      spyOn(displayedCard, 'isCompleted').and.returnValue(false);
+      componentInstance.continueToReviseStateButtonIsVisible = true;
+
+      expect(componentInstance.isSubmitButtonShown()).toBeFalse();
+    });
+
+    it('should hide Submit while an answer is being processed', () => {
+      (
+        conversationFlowService.getAnswerIsBeingProcessed as jasmine.Spy
+      ).and.returnValue(true);
+      spyOn(componentInstance, 'getDisplayedCard').and.returnValue(
+        displayedCard
+      );
+      spyOn(displayedCard, 'isCompleted').and.returnValue(false);
+
+      expect(componentInstance.isSubmitButtonShown()).toBeFalse();
+    });
+  });
+
   it('should call changeDetectorRef.detectChanges if submitButtonIsDisabled changes in ngAfterViewChecked', () => {
     spyOn(componentInstance, 'isSubmitButtonDisabled').and.returnValues(
       false,

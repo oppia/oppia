@@ -656,6 +656,14 @@ export class NewConversationSkinComponent {
     );
   }
 
+  isSubmitButtonShown(): boolean {
+    return (
+      !this.getAnswerIsBeingProcessed() &&
+      !this.continueToReviseStateButtonIsVisible &&
+      !this.getDisplayedCard().isCompleted()
+    );
+  }
+
   getDisplayedCard(): StateCard {
     return this.conversationFlowService.getDisplayedCard();
   }

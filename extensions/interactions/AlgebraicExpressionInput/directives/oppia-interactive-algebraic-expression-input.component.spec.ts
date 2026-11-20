@@ -205,4 +205,39 @@ describe('AlgebraicExpressionInputInteractive', () => {
     ).toHaveBeenCalledOnceWith(asciiDummyValue);
     expect(component.isCurrentAnswerValid).toHaveBeenCalledTimes(1);
   });
+
+  describe('registered validity function', () => {
+    let validityFn: () => boolean;
+
+    beforeEach(() => {
+      spyOn(
+        currentInteractionService,
+        'registerCurrentInteraction'
+      ).and.callFake((submitFn, validateFn) => {
+        validityFn = validateFn as () => boolean;
+      });
+      component.ngOnInit();
+    });
+
+    it('should be false for an empty value without validating', () => {
+      const validitySpy = spyOn(component, 'isCurrentAnswerValid');
+      component.value = '';
+
+      expect(validityFn()).toBeFalse();
+      expect(validitySpy).not.toHaveBeenCalled();
+    });
+
+    it('should defer to isCurrentAnswerValid for a non-empty value', () => {
+      const validitySpy = spyOn(
+        component,
+        'isCurrentAnswerValid'
+      ).and.returnValue(true);
+      component.value = 'x+1';
+
+      expect(validityFn()).toBeTrue();
+
+      validitySpy.and.returnValue(false);
+      expect(validityFn()).toBeFalse();
+    });
+  });
 });

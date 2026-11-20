@@ -1,3 +1,13 @@
+.modal-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.close-modal-btn {
+  margin-left: auto;
+}
+
 textarea {
   margin-bottom: 10px;
   padding: 8px;
