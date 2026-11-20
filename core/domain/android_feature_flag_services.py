@@ -207,11 +207,6 @@ def update_android_feature_flag(
             % feature_flag_name
         )
 
-    updated_min_app_version = (
-        min_app_version
-        if min_app_version is not None
-        else current_flag.min_app_version
-    )
     updated_flag = AndroidFeatureFlagConfig(
         current_flag.state,
         (

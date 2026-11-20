@@ -45,6 +45,7 @@
         "core.android_feature_flag_list_test",
         "core.domain.android_feature_flag_registry_test",
         "core.domain.android_feature_flag_services_test",
+        "core.controllers.android_feature_flag_test",
         "core.controllers.skill_mastery_test",
         "core.controllers.improvements_test",
         "core.controllers.topics_and_skills_dashboard_test",
