@@ -20,7 +20,7 @@ import {Page} from '@playwright/test';
 import {showMessage} from '../common/show-message';
 import {Contributor} from './contributor';
 
-const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
+const submitQuestionTab = '.e2e-test-submitQuestionTab';
 const suggestQuestionButton = 'button.e2e-test-opportunity-list-item-button';
 const confirmSkillDifficultyButton =
   'button.e2e-test-confirm-skill-difficulty-button';
