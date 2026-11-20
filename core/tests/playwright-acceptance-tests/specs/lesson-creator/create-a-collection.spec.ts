@@ -19,31 +19,37 @@
  * LC.12. Visit Creator Dashboard
  */
 
-import testConstants from '../../utilities/common/test-constants';
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
-const DEFAULT_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+test.describe.configure({mode: 'serial'});
 
-describe('LC.12 Visit Creator Dashboard', function () {
+test.describe('Lesson Creator', function () {
   let lessonCreator: ExplorationEditor & LoggedInUser;
   let learner: LoggedInUser & LoggedOutUser;
 
   let positiveNumbersExplorationId: string;
   let negativeNumbersExplorationId: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     lessonCreator = await UserFactory.createNewUser(
       'lessonCreator',
-      'lessoncreator@example.com'
+      'lessoncreator@example.com',
+      browser
     );
 
-    learner = await UserFactory.createNewUser('learner', 'learner@example.com');
-  }, DEFAULT_TIMEOUT);
+    learner = await UserFactory.createNewUser(
+      'learner',
+      'learner@example.com',
+      browser
+    );
+  });
 
-  it('should view contribution stats', async function () {
+  test('should view contribution stats', async function () {
+    test.setTimeout(600000);
     await lessonCreator.navigateToCreatorDashboardUsingProfileDropdown();
     await lessonCreator.expectCreatorDashboardMessageToBe(
       "It looks like you haven't created any explorations yet. Let's get started!"
@@ -78,7 +84,7 @@ describe('LC.12 Visit Creator Dashboard', function () {
 
     await learner.navigateToCommunityLibraryPage();
 
-    await learner.playExploration(negativeNumbersExplorationId);
+    await learner.playExplorationAsLoggedInUser(negativeNumbersExplorationId);
 
     await learner.waitForPageToFullyLoad();
 
@@ -86,7 +92,7 @@ describe('LC.12 Visit Creator Dashboard', function () {
 
     await learner.returnToLibraryFromExplorationCompletion();
 
-    await learner.playExploration(positiveNumbersExplorationId);
+    await learner.playExplorationAsLoggedInUser(positiveNumbersExplorationId);
 
     await learner.waitForPageToFullyLoad();
 
@@ -94,9 +100,9 @@ describe('LC.12 Visit Creator Dashboard', function () {
 
     await learner.openLessonInfoModal();
 
-    await learner.visitCreatorProfileFromLessonInfoModal();
+    await learner.clickOnProfileIconInLessonInfoModel();
 
-    await learner.subscribeToCreator('lessonCreator');
+    await learner.subscribeToCreator();
 
     await lessonCreator.reloadPage();
 
@@ -109,57 +115,45 @@ describe('LC.12 Visit Creator Dashboard', function () {
     await lessonCreator.expectOpenFeedbacksToBe(1);
 
     await lessonCreator.expectNumberOfSubscribersToBe(1);
-  }, 600000);
+  });
 
-  it(
-    'should view explorations in grid view',
-    async function () {
-      await lessonCreator.reloadPage();
+  test('should view explorations in grid view', async function () {
+    await lessonCreator.reloadPage();
 
-      await lessonCreator.waitForPageToFullyLoad();
+    await lessonCreator.waitForPageToFullyLoad();
 
-      await lessonCreator.expectExplorationsInGridInOrder([
-        'Negative Numbers',
-        'Positive Numbers',
-      ]);
+    await lessonCreator.expectExplorationsInGridInOrder([
+      'Negative Numbers',
+      'Positive Numbers',
+    ]);
 
-      await lessonCreator.expectGridCardDetailsToBe(0, '5.0', '1', '1');
+    await lessonCreator.expectGridCardDetailsToBe(0, '5.0', '1', '1');
 
-      await lessonCreator.expectGridCardDetailsToBe(1, '3.0', '0', '1');
+    await lessonCreator.expectGridCardDetailsToBe(1, '3.0', '0', '1');
 
-      await lessonCreator.expectScreenshotToMatch(
-        'creatorDashboardGridView',
-        __dirname
-      );
-    },
-    DEFAULT_TIMEOUT
-  );
+    await lessonCreator.expectScreenshotToMatch('creatorDashboardGridView');
+  });
 
-  it(
-    'should view explorations in list view',
-    async function () {
-      if (!lessonCreator.isViewportAtMobileWidth()) {
-        await lessonCreator.switchToListView();
+  test('should view explorations in list view', async function () {
+    test.skip(
+      lessonCreator.isViewportAtMobileWidth(),
+      'List view is desktop-only.'
+    );
+    await lessonCreator.switchToListView();
 
-        await lessonCreator.expectExplorationsInListInOrder([
-          'Negative Numbers',
-          'Positive Numbers',
-        ]);
+    await lessonCreator.expectExplorationsInListInOrder([
+      'Negative Numbers',
+      'Positive Numbers',
+    ]);
 
-        await lessonCreator.expectListDetailsToBe(0, '5.0', '1', '1');
+    await lessonCreator.expectListDetailsToBe(0, '5.0', '1', '1');
 
-        await lessonCreator.expectListDetailsToBe(1, '3.0', '0', '1');
+    await lessonCreator.expectListDetailsToBe(1, '3.0', '0', '1');
 
-        await lessonCreator.expectScreenshotToMatch(
-          'creatorDashboardListView',
-          __dirname
-        );
-      }
-    },
-    DEFAULT_TIMEOUT
-  );
+    await lessonCreator.expectScreenshotToMatch('creatorDashboardListView');
+  });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
