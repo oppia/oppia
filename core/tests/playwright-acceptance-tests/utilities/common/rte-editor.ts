@@ -29,6 +29,20 @@ const textInputField = '.e2e-test-text-input';
 const uploadImageButton = '.e2e-test-upload-image';
 const useTheUploadImageButton = '.e2e-test-use-image';
 
+export const HINDI_RTE_BUTTON_TITLES = {
+  BOLD: 'बोल्ड',
+  ITALIC: 'इटैलिक',
+  NUMBERED_LIST: 'अंकीय सूची',
+  BULLETED_LIST: 'बुलॅट सूची',
+  PRE: 'Pre',
+  BLOCK_QUOTE: 'ब्लॉक-कोट',
+  INCREASE_INDENT: 'इन्डॅन्ट बढ़ायें',
+  DECREASE_INDENT: 'इन्डॅन्ट कम करें',
+  IMAGE: 'image',
+  MATH_FORMULA: 'mathematical formula',
+  CONCEPT_CARD: 'Concept Card',
+} as const;
+
 interface RTETabContent {
   title: string;
   content: string;
