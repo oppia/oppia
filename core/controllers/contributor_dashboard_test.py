@@ -4080,3 +4080,17 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '/opportunitiescounthandler/skill', expected_status_int=404
         )
+
+
+class ContributorDashboardStatsHandlerTest(test_utils.GenericTestBase):
+    """Test for the ContributorDashboardStatsHandler."""
+
+    def test_get_contributor_dashboard_stats(self) -> None:
+        response = self.get_json(feconf.CONTRIBUTOR_DASHBOARD_STATS_DATA_URL)
+        self.assertIn('topic_stats', response)
+        self.assertIn('language_stats', response)
+        self.assertIn('summary_stats', response)
+        self.assertIn('supported_languages', response)
+        self.assertIn('topic_names', response)
+        self.assertIsInstance(response['topic_stats'], list)
+        self.assertIsInstance(response['language_stats'], list)

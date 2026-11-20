@@ -446,6 +446,10 @@ URLS = [
         contributor_dashboard.ContributorStatsSummariesHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_STATS_DATA_URL,
+        contributor_dashboard.ContributorDashboardStatsHandler,
+    ),
+    get_redirect_route(
         r'%s/<username>' % feconf.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL,
         contributor_dashboard.ContributorAllStatsSummariesHandler,
     ),

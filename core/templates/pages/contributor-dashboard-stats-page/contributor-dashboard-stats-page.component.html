@@ -1,0 +1,370 @@
+<div class="oppia-stats-page-container">
+  <!-- Hero / Header Section -->
+  <div class="stats-hero-banner">
+    <div class="banner-content">
+      <h1 class="stats-page-title">Contributor Community Progress</h1>
+      <p class="stats-page-subtitle">
+        Track real-time translation completions and practice question coverage across topics and languages.
+      </p>
+    </div>
+  </div>
+
+  <div class="stats-content-body" *ngIf="!isLoading">
+    <!-- Top-level KPI Summary Cards -->
+    <div class="kpi-cards-grid" *ngIf="summaryStats">
+      <div class="kpi-card">
+        <div class="kpi-icon total-topics-icon">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-value">{{ summaryStats.total_topics_count }}</span>
+          <span class="kpi-label">Active Topics</span>
+        </div>
+      </div>
+
+      <div class="kpi-card" *ngIf="activeTab === 'translations'">
+        <div class="kpi-icon lessons-icon">
+          <i class="fas fa-layer-group"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-value">{{ summaryStats.total_chapters_count }}</span>
+          <span class="kpi-label">Total Lessons</span>
+        </div>
+      </div>
+
+      <div class="kpi-card" *ngIf="activeTab === 'questions'">
+        <div class="kpi-icon skills-icon">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-value">{{ summaryStats.total_skills_count }}</span>
+          <span class="kpi-label">Target Skills</span>
+        </div>
+      </div>
+
+      <div class="kpi-card near-complete-card">
+        <div class="kpi-icon near-complete-icon">
+          <i class="fas fa-fire"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-value">{{ summaryStats.near_completion_topics_count }}</span>
+          <span class="kpi-label">Near Completion (&gt;70%)</span>
+        </div>
+      </div>
+
+      <div class="kpi-card review-needed-card">
+        <div class="kpi-icon review-icon">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-value">{{ summaryStats.needs_review_count }}</span>
+          <span class="kpi-label">Needs Reviewers</span>
+        </div>
+      </div>
+
+      <div class="kpi-card completed-card">
+        <div class="kpi-icon complete-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-value">{{ summaryStats.fully_translated_topics_count }}</span>
+          <span class="kpi-label">Completed Topics</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Tabs -->
+    <div class="stats-tabs-row">
+      <div class="tab-button" [class.active]="activeTab === 'translations'" (click)="setActiveTab('translations')">
+        <i class="fas fa-language tab-icon"></i>
+        <span>Translations</span>
+      </div>
+      <div class="tab-button" [class.active]="activeTab === 'questions'" (click)="setActiveTab('questions')">
+        <i class="fas fa-question-circle tab-icon"></i>
+        <span>Practice Questions</span>
+      </div>
+    </div>
+
+    <!-- Filters & Search Controls Bar -->
+    <div class="controls-filter-bar">
+      <!-- Language Selector (Translations Tab only) -->
+      <div class="language-selector-wrapper" *ngIf="activeTab === 'translations'">
+        <label for="lang-select" class="control-label">Language:</label>
+        <div class="custom-select-container">
+          <select id="lang-select" class="form-control select-dropdown" [(ngModel)]="selectedLanguageCode">
+            <option *ngFor="let lang of supportedLanguages" [value]="lang.language_code">
+              {{ lang.language_name }} ({{ lang.language_code }})
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Topic Search Input -->
+      <div class="search-input-wrapper">
+        <label for="topic-search" class="control-label">Search Topics:</label>
+        <div class="search-field">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            id="topic-search"
+            type="text"
+            class="form-control topic-search-box"
+            placeholder="Search topic by name..."
+            [(ngModel)]="searchQuery"
+          />
+          <button *ngIf="searchQuery" class="clear-search-btn" (click)="searchQuery = ''">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Filter Chips -->
+      <div class="filter-chips-wrapper">
+        <span class="filter-label">Filter:</span>
+        <div class="chips-group">
+          <button class="chip-btn" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+            All Actionable
+          </button>
+          <button class="chip-btn" [class.active]="activeFilter === 'near-complete'" (click)="setFilter('near-complete')">
+            Near Complete (&gt;70%)
+          </button>
+          <button class="chip-btn" [class.active]="activeFilter === 'needs-review'" (click)="setFilter('needs-review')">
+            Needs Reviewers
+          </button>
+          <button class="chip-btn" [class.active]="activeFilter === 'needs-contributor'" (click)="setFilter('needs-contributor')">
+            Needs Contributors
+          </button>
+          <button class="chip-btn" [class.active]="activeFilter === 'completed'" (click)="setFilter('completed')">
+            Completed
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Topics Cards List (Actionable / In-Progress) -->
+    <div class="topics-container">
+      <div class="section-header-row">
+        <h2 class="section-title">
+          <span *ngIf="activeTab === 'translations'">Translation Topics in {{ getSelectedLanguageName() }}</span>
+          <span *ngIf="activeTab === 'questions'">Practice Question Topics</span>
+        </h2>
+        <span class="topic-count-pill">{{ getActionableTopics().length }} Topics In Progress</span>
+      </div>
+
+      <!-- Topic Card Item -->
+      <div class="topic-progress-card" *ngFor="let topic of getActionableTopics()">
+        <div class="topic-card-main-header">
+          <div class="topic-identity">
+            <h3 class="topic-title">{{ topic.topic_name }}</h3>
+            <div class="topic-badges-row">
+              <span class="meta-badge lessons-badge" *ngIf="activeTab === 'translations'">
+                <i class="fas fa-book-open"></i> {{ topic.total_chapters_count }} Lessons ({{ topic.total_cards_count }} Cards)
+              </span>
+              <span class="meta-badge skills-badge" *ngIf="activeTab === 'questions'">
+                <i class="fas fa-lightbulb"></i> {{ topic.question_stats.total_skills_count }} Skills ({{ topic.question_stats.target_questions_count }} Target Questions)
+              </span>
+              <span class="meta-badge activity-badge" [class.stalled]="topic.is_stalled" [class.active]="!topic.is_stalled">
+                <i class="fas fa-circle status-dot"></i>
+                {{ topic.is_stalled ? 'Stalled' : 'Active' }} (Last: {{ topic.last_progress_date }})
+              </span>
+            </div>
+          </div>
+
+          <div class="topic-actions">
+            <button class="details-toggle-btn" (click)="toggleTopicDetails(topic.topic_id)">
+              <span>{{ isTopicExpanded(topic.topic_id) ? 'Hide Breakdown' : 'View Breakdown' }}</span>
+              <i class="fas" [class.fa-chevron-up]="isTopicExpanded(topic.topic_id)" [class.fa-chevron-down]="!isTopicExpanded(topic.topic_id)"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dual Progress Bars Section (Translations) -->
+        <div class="dual-progress-section" *ngIf="activeTab === 'translations' && getTranslationStatsForTopic(topic) as tStats">
+          <!-- Submission Progress Bar -->
+          <div class="progress-bar-row">
+            <div class="progress-bar-header">
+              <span class="bar-title submission-title">
+                <i class="fas fa-pencil-alt"></i> Translation Submissions
+              </span>
+              <span class="bar-percentage">{{ tStats.submission_progress_percentage }}% ({{ tStats.submitted_cards_count }}/{{ tStats.total_cards_count }} cards)</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill submission-fill" [style.width.%]="tStats.submission_progress_percentage"></div>
+            </div>
+          </div>
+
+          <!-- Review Progress Bar -->
+          <div class="progress-bar-row">
+            <div class="progress-bar-header">
+              <span class="bar-title review-title">
+                <i class="fas fa-check-double"></i> Verified &amp; Accepted Reviews
+              </span>
+              <span class="bar-percentage">{{ tStats.progress_percentage }}% ({{ tStats.translated_cards_count }}/{{ tStats.total_cards_count }} cards)</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill review-fill" [style.width.%]="tStats.progress_percentage"></div>
+            </div>
+          </div>
+
+          <!-- Lesson Breakdown Pills -->
+          <div class="lesson-breakdown-bar">
+            <span class="breakdown-tag completed-tag">
+              <i class="fas fa-check-circle"></i> {{ tStats.completed_chapters_count }} Completed Lessons
+            </span>
+            <span class="breakdown-tag in-progress-tag">
+              <i class="fas fa-spinner"></i> {{ tStats.in_progress_chapters_count }} In-Progress Lessons
+            </span>
+            <span class="breakdown-tag unstarted-tag">
+              <i class="fas fa-clock"></i> {{ tStats.unstarted_chapters_count }} Unstarted Lessons
+            </span>
+          </div>
+
+          <!-- Expandable Chapters Drill-Down Table -->
+          <div class="drilldown-table-wrapper" *ngIf="isTopicExpanded(topic.topic_id)">
+            <table class="drilldown-table">
+              <thead>
+                <tr>
+                  <th>Chapter / Lesson</th>
+                  <th>Total Cards</th>
+                  <th>Submitted</th>
+                  <th>Reviewed</th>
+                  <th>Status</th>
+                  <th>Last Activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let chapter of tStats.chapters">
+                  <td class="chapter-name-cell">
+                    <strong>{{ chapter.chapter_title }}</strong>
+                  </td>
+                  <td>{{ chapter.content_count }}</td>
+                  <td>{{ chapter.submitted_count }} ({{ chapter.submission_percentage }}%)</td>
+                  <td>{{ chapter.reviewed_count }} ({{ chapter.review_percentage }}%)</td>
+                  <td>
+                    <span class="status-pill" [ngClass]="chapter.status.toLowerCase().replace(' ', '-')">
+                      {{ chapter.status }}
+                    </span>
+                  </td>
+                  <td class="date-cell">{{ chapter.last_activity_date }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Dual Progress Bars Section (Practice Questions) -->
+        <div class="dual-progress-section" *ngIf="activeTab === 'questions'">
+          <!-- Question Submission Progress Bar -->
+          <div class="progress-bar-row">
+            <div class="progress-bar-header">
+              <span class="bar-title submission-title">
+                <i class="fas fa-pencil-alt"></i> Questions Submitted
+              </span>
+              <span class="bar-percentage">{{ topic.question_stats.submission_progress_percentage }}% ({{ topic.question_stats.total_questions_submitted }}/{{ topic.question_stats.target_questions_count }})</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill submission-fill" [style.width.%]="topic.question_stats.submission_progress_percentage"></div>
+            </div>
+          </div>
+
+          <!-- Question Review Progress Bar -->
+          <div class="progress-bar-row">
+            <div class="progress-bar-header">
+              <span class="bar-title review-title">
+                <i class="fas fa-check-double"></i> Questions Accepted (Publish Goal: 10/skill)
+              </span>
+              <span class="bar-percentage">{{ topic.question_stats.progress_percentage }}% ({{ topic.question_stats.total_questions_reviewed }}/{{ topic.question_stats.target_questions_count }})</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill review-fill" [style.width.%]="topic.question_stats.progress_percentage"></div>
+            </div>
+          </div>
+
+          <!-- Skill Breakdown Pills -->
+          <div class="lesson-breakdown-bar">
+            <span class="breakdown-tag completed-tag">
+              <i class="fas fa-check-circle"></i> {{ topic.question_stats.completed_skills_count }} Ready Skills (10+ Qs)
+            </span>
+            <span class="breakdown-tag in-progress-tag">
+              <i class="fas fa-spinner"></i> {{ topic.question_stats.in_progress_skills_count }} In-Progress Skills
+            </span>
+            <span class="breakdown-tag unstarted-tag">
+              <i class="fas fa-clock"></i> {{ topic.question_stats.unstarted_skills_count }} Unstarted Skills
+            </span>
+          </div>
+
+          <!-- Expandable Skills Drill-Down Table -->
+          <div class="drilldown-table-wrapper" *ngIf="isTopicExpanded(topic.topic_id)">
+            <table class="drilldown-table">
+              <thead>
+                <tr>
+                  <th>Skill Description</th>
+                  <th>Submitted</th>
+                  <th>Reviewed</th>
+                  <th>Target</th>
+                  <th>Status</th>
+                  <th>Last Activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let skill of topic.question_stats.skills">
+                  <td class="chapter-name-cell">
+                    <strong>{{ skill.skill_description }}</strong>
+                  </td>
+                  <td>{{ skill.submitted_questions_count }} ({{ skill.submission_percentage }}%)</td>
+                  <td>{{ skill.reviewed_questions_count }} ({{ skill.review_percentage }}%)</td>
+                  <td>{{ skill.target_questions_count }} Qs</td>
+                  <td>
+                    <span class="status-pill" [ngClass]="skill.status.toLowerCase().replace(' ', '-')">
+                      {{ skill.status }}
+                    </span>
+                  </td>
+                  <td class="date-cell">{{ skill.last_activity_date }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Actionable Topics Empty State -->
+      <div class="empty-state-box" *ngIf="getActionableTopics().length === 0">
+        <i class="fas fa-clipboard-check empty-state-icon"></i>
+        <h3>No matching actionable topics found</h3>
+        <p>Try adjusting your search query, selecting another language, or changing the status filter.</p>
+      </div>
+
+      <!-- Collapsible Completed Topics Accordion -->
+      <div class="completed-accordion-container" *ngIf="getCompletedTopics().length > 0">
+        <div class="completed-accordion-header" (click)="toggleCompletedAccordion()">
+          <div class="accordion-title-row">
+            <i class="fas fa-check-circle completed-icon"></i>
+            <span class="completed-accordion-title">Completed Topics ({{ getCompletedTopics().length }})</span>
+          </div>
+          <button class="accordion-toggle-btn">
+            <span>{{ showCompletedAccordion ? 'Hide Completed' : 'Show Completed' }}</span>
+            <i class="fas" [class.fa-chevron-up]="showCompletedAccordion" [class.fa-chevron-down]="!showCompletedAccordion"></i>
+          </button>
+        </div>
+
+        <div class="completed-topics-list" *ngIf="showCompletedAccordion">
+          <div class="topic-progress-card completed-topic-card" *ngFor="let topic of getCompletedTopics()">
+            <div class="topic-card-main-header">
+              <div class="topic-identity">
+                <h3 class="topic-title">{{ topic.topic_name }}</h3>
+                <span class="completed-success-badge">
+                  <i class="fas fa-badge-check"></i> 100% Fully Verified &amp; Launched
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="stats-loading-box" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="loading-text">Loading contributor dashboard statistics...</p>
+  </div>
+</div>
