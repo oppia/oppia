@@ -778,6 +778,9 @@ export class TranslationModalComponent {
       })
     );
 
+    // Reading innerHTML is safe here: it only serializes the detached
+    // document parsed above back to a string and never writes to the page.
+    // eslint-disable-next-line oppia/no-inner-html
     return doc.body.innerHTML;
   }
 

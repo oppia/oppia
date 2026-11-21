@@ -1935,7 +1935,10 @@ describe('Translation Modal Component', () => {
 
   describe('getRteComponentConfigId', () => {
     it('should allow worked examples when translating a skill', () => {
-      component.opportunity.entityType = AppConstants.ENTITY_TYPE.SKILL;
+      component.opportunity = {
+        ...opportunity,
+        entityType: AppConstants.ENTITY_TYPE.SKILL,
+      };
 
       expect(component.getRteComponentConfigId()).toBe(
         'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS'
@@ -1943,7 +1946,10 @@ describe('Translation Modal Component', () => {
     });
 
     it('should use the lesson components for other entities', () => {
-      component.opportunity.entityType = AppConstants.ENTITY_TYPE.EXPLORATION;
+      component.opportunity = {
+        ...opportunity,
+        entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+      };
 
       expect(component.getRteComponentConfigId()).toBe(
         'CURATED_LESSON_COMPONENTS'
@@ -1951,7 +1957,10 @@ describe('Translation Modal Component', () => {
     });
 
     it('should use the lesson components when modifying a translation', () => {
-      component.opportunity.entityType = AppConstants.ENTITY_TYPE.SKILL;
+      component.opportunity = {
+        ...opportunity,
+        entityType: AppConstants.ENTITY_TYPE.SKILL,
+      };
       component.modifyTranslationOpportunity = {
         id: 'skillId',
         contentId: 'content_0',

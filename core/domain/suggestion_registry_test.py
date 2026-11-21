@@ -2169,7 +2169,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     ) -> None:
         exp = self.save_new_default_exploration('exp1', self.author_id)
 
-        # Modify the change command to simulate an auto-generated suggestion
+        # Modify the change command to simulate an auto-generated suggestion.
         expected_suggestion_dict = self.suggestion_dict.copy()
         change_cmd = dict(expected_suggestion_dict['change_cmd'])
         change_cmd['was_auto_generated'] = True

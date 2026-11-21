@@ -695,7 +695,7 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
     def test_auto_generated_translated_content_to_dict(self) -> None:
         translated_content = translation_domain.TranslatedContent(
             'In Hindi',
-            feconf.TranslatableContentFormat.HTML,
+            translation_domain.TranslatableContentFormat.HTML,
             False,
             data_source='auto',
         )
@@ -703,7 +703,7 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
             translated_content.to_dict(),
             {
                 'content_value': 'In Hindi',
-                'content_format': feconf.TranslatableContentFormat.HTML.value,
+                'content_format': translation_domain.TranslatableContentFormat.HTML.value,
                 'needs_update': False,
                 'data_source': 'auto',
             },
@@ -712,7 +712,7 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
     def test_from_dict_without_data_source_defaults_to_manual(self) -> None:
         translated_content_dict: feconf.TranslatedContentDict = {
             'content_value': 'In Hindi',
-            'content_format': feconf.TranslatableContentFormat.HTML.value,
+            'content_format': translation_domain.TranslatableContentFormat.HTML.value,
             'needs_update': False,
         }
 
@@ -723,7 +723,7 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translated_content.content_value, 'In Hindi')
         self.assertEqual(
             translated_content.content_format,
-            feconf.TranslatableContentFormat.HTML,
+            translation_domain.TranslatableContentFormat.HTML,
         )
         self.assertEqual(translated_content.needs_update, False)
         self.assertEqual(translated_content.data_source, 'manual')
