@@ -278,6 +278,20 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['user_bio'], 'My new editor bio')
         self.assertEqual(response['subject_interests'], ['editor', 'editing'])
 
+    def test_profile_data_handler_when_user_has_no_contributions(self) -> None:
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        with self.swap_to_always_return(
+            user_services, 'get_user_contributions', None
+        ):
+            response = self.get_json(
+                '/profilehandler/data/%s' % self.OWNER_USERNAME
+            )
+            self.assertEqual(
+                response['username_of_viewed_profile'], self.OWNER_USERNAME
+            )
+            self.assertEqual(response['created_exp_summary_dicts'], [])
+            self.assertEqual(response['edited_exp_summary_dicts'], [])
+
     def test_preferences_page(self) -> None:
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
@@ -1486,6 +1500,37 @@ class SignupTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_signup_when_user_has_ever_registered_reagreeing_to_terms(
+        self,
+    ) -> None:
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_settings = user_services.get_user_settings(editor_id)
+        user_settings.last_agreed_to_terms = (
+            feconf.TERMS_PAGE_LAST_UPDATED_UTC - datetime.timedelta(days=1)
+        )
+        user_services.save_user_settings(user_settings)
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {
+                'username': self.EDITOR_USERNAME,
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': (
+                    feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                ),
+            },
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(
+            response,
+            {'bulk_email_signup_message_should_be_shown': False},
+        )
+        self.logout()
+
 
 class DeleteAccountPageTests(test_utils.GenericTestBase):
 
@@ -2133,6 +2178,17 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
             {'user_has_viewed_lesson_info_modal_once': True},
             csrf_token=csrf_token,
         )
+
+    def test_set_user_has_viewed_lesson_info_modal_once_to_false(self) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/userinfohandler/data',
+            {'user_has_viewed_lesson_info_modal_once': False},
+            csrf_token=csrf_token,
+        )
+        self.logout()
 
 
 class UrlHandlerTests(test_utils.GenericTestBase):

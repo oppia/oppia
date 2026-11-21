@@ -195,7 +195,8 @@ class BulkEmailWebhookEndpoint(
                 ),
                 bulk_email_db_already_updated=True,
             )
-        elif self.normalized_request['type'] == 'unsubscribe':
+        else:
+            assert self.normalized_request['type'] == 'unsubscribe'
             user_services.update_email_preferences(
                 user_id,
                 False,
@@ -740,9 +741,10 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     zfile.writestr(
                         'images/' + image.image_export_path, decoded_png
                     )
-                elif image.b64_image_data.startswith(
-                    utils.DATA_URL_FORMAT_PREFIX % 'webp'
-                ):
+                else:
+                    assert image.b64_image_data.startswith(
+                        utils.DATA_URL_FORMAT_PREFIX % 'webp'
+                    )
                     decoded_webp = utils.convert_data_url_to_binary(
                         image.b64_image_data, 'webp'
                     )
