@@ -794,6 +794,7 @@
 /.github/stale.yml @oppia/dev-workflow-reviewers
 /.github/workflows/ @oppia/dev-workflow-reviewers @oppia/dev-workflow-reviewers
 # Files needed by the Android team.
+/core/android_feature_flag_list*.py @oppia/web-android-compatibility-reviewers
 /core/controllers/android*.py @oppia/web-android-compatibility-reviewers
 /core/domain/android*.py @oppia/web-android-compatibility-reviewers
 /core/android_validation_constants*.py @oppia/web-android-compatibility-reviewers
