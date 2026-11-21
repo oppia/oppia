@@ -6193,6 +6193,7 @@ export default {
     "interaction_ids": [
       "FractionInput",
       "GraphInput",
+      "NumberLineInput",
       "NumericInput",
       "SetInput",
       "NumericExpressionInput",

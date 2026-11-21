@@ -191,6 +191,11 @@
       "description": "is within {{tol|Real}} of {{x|Real}}"
     }
   },
+  "NumberLineInput": {
+    "Equals": {
+      "description": "is equal to {{x|Real}}"
+    }
+  },
   "PencilCodeEditor": {
     "CodeEquals": {
       "description": "has code equal to {{x|CodeString}}"

@@ -293,6 +293,23 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         expected = interaction_registry.Registry.get_all_specs()
         self.assertEqual(result, expected)
 
+    def test_legacy_specs_include_new_interactions_when_requested(self) -> None:
+        legacy_specs = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            52
+        )
+        self.assertNotIn('NumberLineInput', legacy_specs)
+
+        specs_with_fallback = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            52, can_fetch_latest_specs=True
+        )
+        self.assertEqual(
+            specs_with_fallback['NumberLineInput'],
+            interaction_registry.Registry.get_all_specs()['NumberLineInput'],
+        )
+        self.assertEqual(
+            specs_with_fallback['NumericInput'], legacy_specs['NumericInput']
+        )
+
     def test_get_all_specs_for_state_schema_version_loads_from_file(
         self,
     ) -> None:

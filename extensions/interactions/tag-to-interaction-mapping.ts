@@ -63,6 +63,9 @@ import {ShortResponseNumericExpressionInput} from './NumericExpressionInput/dire
 import {InteractiveNumericInput} from './NumericInput/directives/oppia-interactive-numeric-input.component';
 import {ResponseNumericInput} from './NumericInput/directives/oppia-response-numeric-input.component';
 import {ShortResponseNumericInput} from './NumericInput/directives/oppia-short-response-numeric-input.component';
+import {InteractiveNumberLineInput} from './NumberLineInput/directives/oppia-interactive-number-line-input.component';
+import {ResponseNumberLineInput} from './NumberLineInput/directives/oppia-response-number-line-input.component';
+import {ShortResponseNumberLineInput} from './NumberLineInput/directives/oppia-short-response-number-line-input.component';
 import {PencilCodeEditor} from './PencilCodeEditor/directives/oppia-interactive-pencil-code-editor.component';
 import {ResponePencilCodeEditor} from './PencilCodeEditor/directives/oppia-response-pencil-code-editor.component';
 import {ShortResponePencilCodeEditor} from './PencilCodeEditor/directives/oppia-short-response-pencil-code-editor.component';
@@ -98,6 +101,7 @@ export const TAG_TO_INTERACTION_MAPPING = {
   'OPPIA-INTERACTIVE-NUMERIC-EXPRESSION-INPUT':
     InteractiveNumericExpressionInput,
   'OPPIA-INTERACTIVE-NUMERIC-INPUT': InteractiveNumericInput,
+  'OPPIA-INTERACTIVE-NUMBER-LINE-INPUT': InteractiveNumberLineInput,
   'OPPIA-INTERACTIVE-PENCIL-CODE-EDITOR': PencilCodeEditor,
   'OPPIA-INTERACTIVE-RATIO-EXPRESSION-INPUT':
     InteractiveRatioExpressionInputComponent,
@@ -120,6 +124,7 @@ export const TAG_TO_INTERACTION_MAPPING = {
   'OPPIA-RESPONSE-NUMBER-WITH-UNITS': ResponseNumberWithUnitsComponent,
   'OPPIA-RESPONSE-NUMERIC-EXPRESSION-INPUT': ResponseNumericExpressionInput,
   'OPPIA-RESPONSE-NUMERIC-INPUT': ResponseNumericInput,
+  'OPPIA-RESPONSE-NUMBER-LINE-INPUT': ResponseNumberLineInput,
   'OPPIA-RESPONSE-PENCIL-CODE-EDITOR': ResponePencilCodeEditor,
   'OPPIA-RESPONSE-RATIO-EXPRESSION-INPUT':
     ResponseRatioExpressionInputComponent,
@@ -147,6 +152,7 @@ export const TAG_TO_INTERACTION_MAPPING = {
   'OPPIA-SHORT-RESPONSE-NUMERIC-EXPRESSION-INPUT':
     ShortResponseNumericExpressionInput,
   'OPPIA-SHORT-RESPONSE-NUMERIC-INPUT': ShortResponseNumericInput,
+  'OPPIA-SHORT-RESPONSE-NUMBER-LINE-INPUT': ShortResponseNumberLineInput,
   'OPPIA-SHORT-RESPONSE-PENCIL-CODE-EDITOR': ShortResponePencilCodeEditor,
   'OPPIA-SHORT-RESPONSE-RATIO-EXPRESSION-INPUT':
     ShortResponseRatioExpressionInputComponent,

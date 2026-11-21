@@ -1,0 +1,27 @@
+<div class="oppia-number-line-input">
+  <p>{{'I18N_INTERACTIONS_NUMBER_LINE_SELECT_POINT' | translate}}</p>
+  <div *ngIf="points.length > 0"
+       class="oppia-number-line-track"
+       dir="ltr"
+       role="radiogroup"
+       [attr.aria-label]="'I18N_INTERACTIONS_NUMBER_LINE_SELECT_POINT' | translate"
+       (pointerdown)="onPointerDown($event)"
+       (pointermove)="onPointerMove($event)"
+       (pointerup)="onPointerUp()"
+       (pointercancel)="onPointerUp()">
+    <button *ngFor="let point of points; let index = index"
+            #pointButton
+            type="button"
+            class="oppia-number-line-point"
+            [class.oppia-number-line-point-selected]="selectedIndex === index"
+            [style.left.%]="index * 100 / (points.length - 1)"
+            [attr.aria-label]="point"
+            [attr.aria-checked]="selectedIndex === index"
+            role="radio"
+            (click)="selectPoint(index)"
+            (keydown)="onKeydown($event)">
+      <span class="oppia-number-line-tick" aria-hidden="true"></span>
+      <span class="oppia-number-line-label" aria-hidden="true">{{point}}</span>
+    </button>
+  </div>
+</div>

@@ -1179,7 +1179,7 @@ states:
     interaction:
       answer_groups:
       - outcome:
-          dest: Fraction Input
+          dest: Number Line Input
           feedback:
             content_id: feedback_1
             html: <p>That number has more than one digit. Right!</p>
@@ -1206,6 +1206,61 @@ states:
         refresher_exploration_id: null
       hints: []
       id: NumericInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Number Line Input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Select 2 on the number line.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Fraction Input
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct! The selected point is 2.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        endValue:
+          value: 6
+        interval:
+          value: 2.0
+        startValue:
+          value: -2
+      default_outcome:
+        dest: Number Line Input
+        feedback:
+          content_id: default_outcome
+          html: <p>Try selecting the mark labeled 2.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumberLineInput
       solution: null
     next_content_id_index: 2
     param_changes: []

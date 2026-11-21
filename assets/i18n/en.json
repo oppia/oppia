@@ -839,6 +839,7 @@
   "I18N_INTERACTIONS_MUSIC_NARROW_INSTRUCTION": "Show music staff",
   "I18N_INTERACTIONS_MUSIC_PLAY": "Play",
   "I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Play Target Sequence",
+  "I18N_INTERACTIONS_NUMBER_LINE_SELECT_POINT": "Select a point on the number line.",
   "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY": "Please enter a valid currency (e.g., $5 or Rs 5)",
   "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY_FORMAT": "Please write currency units at the beginning",
   "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS": "Please ensure that the unit only contains numbers, alphabets, (, ), *, ^, /, -",

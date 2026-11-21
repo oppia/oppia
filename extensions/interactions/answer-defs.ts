@@ -93,6 +93,8 @@ export type NumericExpressionAnswer = string;
 
 export type NumericInputAnswer = number;
 
+export type NumberLineInputAnswer = number;
+
 export interface PencilCodeEditorAnswer {
   code: string;
   output: string;
@@ -121,6 +123,7 @@ export type InteractionAnswer =
   | NumericExpressionAnswer
   | NumberWithUnitsAnswer
   | NumericInputAnswer
+  | NumberLineInputAnswer
   | PencilCodeEditorAnswer
   | RatioInputAnswer
   | SetInputAnswer

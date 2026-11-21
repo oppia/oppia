@@ -52,6 +52,7 @@ import {
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
+import {NumberLineInputRulesService} from 'interactions/NumberLineInput/directives/number-line-input-rules.service';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
   RatioExpressionInputRulesService,
@@ -90,6 +91,7 @@ export class InteractionRulesRegistryService {
     private numberWithUnitsRulesService: NumberWithUnitsRulesService,
     private numericExpressionInputRulesService: NumericExpressionInputRulesService,
     private numericInputRulesService: NumericInputRulesService,
+    private numberLineInputRulesService: NumberLineInputRulesService,
     private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
     private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
     private setInputRulesService: SetInputRulesService,
@@ -115,6 +117,7 @@ export class InteractionRulesRegistryService {
         NumericExpressionInputRulesService:
           this.numericExpressionInputRulesService,
         NumericInputRulesService: this.numericInputRulesService,
+        NumberLineInputRulesService: this.numberLineInputRulesService,
         PencilCodeEditorRulesService: this.pencilCodeEditorRulesService,
         RatioExpressionInputRulesService: this.ratioExpressionInputRulesService,
         SetInputRulesService: this.setInputRulesService,

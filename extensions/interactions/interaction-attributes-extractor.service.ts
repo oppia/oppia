@@ -51,6 +51,7 @@ export class InteractionAttributesExtractorService {
     'NumberWithUnits',
     'NumericExpressionInput',
     'NumericInput',
+    'NumberLineInput',
     'PencilCodeEditor',
     'RatioExpressionInput',
     'SetInput',
