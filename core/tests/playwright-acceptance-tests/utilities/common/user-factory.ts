@@ -34,6 +34,7 @@ import {
   CurriculumAdmin,
   CurriculumAdminFactory,
 } from '../user/curriculum-admin';
+import {ModeratorFactory} from '../user/moderator';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
 import {BlogPostEditorFactory} from '../user/blog-post-editor';
@@ -52,6 +53,7 @@ const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptanc
 const USER_ROLE_MAPPING = {
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
+  [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
