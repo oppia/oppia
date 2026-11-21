@@ -72,6 +72,31 @@ describe('ErrorPageComponent', () => {
     );
   });
 
+  it('should set the classrooms page url', () => {
+    expect(component.classroomsPageUrl).toBe('/learn');
+  });
+
+  it('should show the classrooms link when the status code is 404', () => {
+    component.statusCode = '404';
+
+    fixture.detectChanges();
+
+    const classroomsLink = fixture.nativeElement.querySelector(
+      '.oppia-error-classrooms-link'
+    );
+    expect(classroomsLink.getAttribute('href')).toBe('/learn');
+  });
+
+  it('should not show the classrooms link when the status code is 500', () => {
+    component.statusCode = '500';
+
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.oppia-error-classrooms-link')
+    ).toBeNull();
+  });
+
   it('should extract custom error message from sessionStorage', fakeAsync(() => {
     component.statusCode = '401';
     windowRef.nativeWindow.sessionStorage.setItem(

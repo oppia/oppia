@@ -111,6 +111,18 @@ describe('Error page', () => {
     );
   });
 
+  it('should set the classrooms page url', () => {
+    expect(component.classroomsPageUrl).toBe('/learn');
+  });
+
+  it('should show the classrooms link', () => {
+    const classroomsLink = fixture.nativeElement.querySelector(
+      '.oppia-error-classrooms-link'
+    );
+
+    expect(classroomsLink.getAttribute('href')).toBe('/learn');
+  });
+
   it('should unsubscribe on component destruction', () => {
     component.directiveSubscriptions.add(
       translateService.onLangChange.subscribe(() => {
