@@ -4366,8 +4366,7 @@ def to_exploration_dict_for_android(
         )
 
         for content_id in content_ids:
-            if content_id not in voiceovers_mapping:
-                voiceovers_mapping[content_id] = {}
+            voiceovers_mapping[content_id] = {}
 
             for (
                 language_code,
