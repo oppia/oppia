@@ -5,8 +5,9 @@
   </div>
 </div>
 <div *ngIf="!canShowExploreVersionHistoryButton()" class="explore-version-history-container">
-  <span *ngIf="!validationErrorIsShown" tabindex="0">No changes have been made after the initial commit to this state.</span>
-  <span *ngIf="validationErrorIsShown" class="error-message" tabindex="0">
+  <span *ngIf="stateIsNotSavedYet" tabindex="0">This card hasn't been saved yet. Its version history will appear after you save your changes.</span>
+  <span *ngIf="!stateIsNotSavedYet && !validationErrorIsShown" tabindex="0">No changes have been made after the initial commit to this state.</span>
+  <span *ngIf="!stateIsNotSavedYet && validationErrorIsShown" class="error-message" tabindex="0">
     Unable to display the version history due to an error loading the exploration data.
   </span>
 </div>

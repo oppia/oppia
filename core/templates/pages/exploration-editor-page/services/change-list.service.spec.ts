@@ -523,6 +523,64 @@ describe('Change List Service when changes are mergable', () => {
     expect(changeListService.explorationChangeList.length).toEqual(1);
   }));
 
+  it('should map a state back to its name in the saved version', () => {
+    const addState = (stateName: string) => ({
+      cmd: 'add_state' as const,
+      state_name: stateName,
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1',
+    });
+    const renameState = (oldStateName: string, newStateName: string) => ({
+      cmd: 'rename_state' as const,
+      old_state_name: oldStateName,
+      new_state_name: newStateName,
+    });
+    const deleteState = (stateName: string) => ({
+      cmd: 'delete_state' as const,
+      state_name: stateName,
+    });
+
+    // With no unsaved changes, every state keeps its name.
+    changeListService.explorationChangeList = [];
+    expect(changeListService.getSavedStateName('Introduction')).toEqual(
+      'Introduction'
+    );
+
+    // A renamed saved state, renamed more than once, and a new state that
+    // was renamed after it was added.
+    changeListService.explorationChangeList = [
+      renameState('A', 'B'),
+      addState('New'),
+      renameState('B', 'C'),
+      renameState('New', 'Newer'),
+    ];
+    expect(changeListService.getSavedStateName('C')).toEqual('A');
+    expect(changeListService.getSavedStateName('Newer')).toBeNull();
+    expect(changeListService.getSavedStateName('Unchanged')).toEqual(
+      'Unchanged'
+    );
+
+    // A saved name that is reused for a new state in the same session.
+    changeListService.explorationChangeList = [
+      renameState('A', 'B'),
+      addState('A'),
+    ];
+    expect(changeListService.getSavedStateName('A')).toBeNull();
+    expect(changeListService.getSavedStateName('B')).toEqual('A');
+
+    // A saved state that is deleted and replaced by a new state of the same
+    // name.
+    changeListService.explorationChangeList = [deleteState('A'), addState('A')];
+    expect(changeListService.getSavedStateName('A')).toBeNull();
+
+    // A saved state renamed to the name of a deleted saved state.
+    changeListService.explorationChangeList = [
+      deleteState('A'),
+      renameState('B', 'A'),
+    ];
+    expect(changeListService.getSavedStateName('A')).toEqual('B');
+  });
+
   it(
     'should save changes after renaming a state ' +
       "when calling 'renameState'",

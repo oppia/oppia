@@ -4098,6 +4098,31 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_raises_error_when_state_does_not_exist_in_version(
+        self,
+    ) -> None:
+        self.login(self.OWNER_EMAIL)
+
+        # The state was renamed to 'a' in version 2, so the old name is not
+        # in version 2, and 'a' is not in version 1.
+        for state_name, version in (
+            (feconf.DEFAULT_INIT_STATE_NAME, 2),
+            ('a', 1),
+            ('unsaved_card', 2),
+        ):
+            self.get_json(
+                '%s/%s/%s/%s'
+                % (
+                    feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                    self.EXP_ID,
+                    state_name,
+                    version,
+                ),
+                expected_status_int=404,
+            )
+
+        self.logout()
+
     def test_version_history_for_a_state_is_fetched_correctly(self) -> None:
         self.login(self.OWNER_EMAIL)
         exploration_v1 = exp_fetchers.get_exploration_by_id(
