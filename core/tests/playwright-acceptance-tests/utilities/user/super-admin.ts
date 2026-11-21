@@ -143,7 +143,7 @@ export class SuperAdmin extends LoggedInUser {
       throw new Error('Select element not found');
     }
 
-    await this.expectElementToBeVisible('.e2e-test-select-topic option');
+    await this.expectElementToBeAttachedInDOM('.e2e-test-select-topic option');
     const optionElements = await selectElement.$$('option');
     if (!optionElements.length) {
       throw new Error('No options found in the select element');

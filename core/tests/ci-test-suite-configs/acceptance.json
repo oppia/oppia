@@ -332,8 +332,8 @@
     },
     {
       "name": "topic-manager/cannot-do-curriculum-admin-actions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "topic-manager/edit-and-republish-story-with-mobile-supported-explorations",
