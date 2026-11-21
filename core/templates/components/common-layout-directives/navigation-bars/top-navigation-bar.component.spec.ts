@@ -303,14 +303,22 @@ describe('TopNavigationBarComponent', () => {
     expect(closeIcon.nativeElement.textContent.trim()).toBe('✕');
     expect(closeIcon.nativeElement.getAttribute('aria-hidden')).toBe('true');
 
-    const spaceEvent = new KeyboardEvent('keydown', {
+    const spaceKeydownEvent = new KeyboardEvent('keydown', {
       key: ' ',
       cancelable: true,
     });
-    menuControl.triggerEventHandler('keydown.space', spaceEvent);
+    menuControl.triggerEventHandler('keydown.space', spaceKeydownEvent);
     fixture.detectChanges();
 
-    expect(spaceEvent.defaultPrevented).toBeTrue();
+    expect(spaceKeydownEvent.defaultPrevented).toBeTrue();
+    expect(component.isSidebarShown()).toBeTrue();
+
+    menuControl.triggerEventHandler(
+      'keyup.space',
+      new KeyboardEvent('keyup', {key: ' '})
+    );
+    fixture.detectChanges();
+
     expect(component.isSidebarShown()).toBeFalse();
     expect(menuControl.nativeElement.getAttribute('aria-label')).toBe(
       'I18N_TOPNAV_OPEN_MENU'
