@@ -27,6 +27,7 @@ import random
 import time
 
 from core import feconf
+from core.domain import role_domain
 from core.platform import models
 
 from typing import Dict, List, Optional
@@ -331,20 +332,31 @@ def log_role_query(
     role: Optional[str] = None,
     username: Optional[str] = None,
 ) -> None:
-    """Stores the query to role structure in RoleQueryAuditModel."""
+    """Validates and records a query to the role structure."""
+    audit = role_domain.RoleQueryAudit(user_id, intent, role, username)
+    audit.validate()
+    _save_role_query_audit(audit)
+
+
+def _save_role_query_audit(audit: role_domain.RoleQueryAudit) -> None:
+    """Converts a validated role-query audit payload to a stored record.
+
+    Args:
+        audit: RoleQueryAudit. The validated caller-provided audit payload.
+    """
     model_id = '%s.%s.%s.%s' % (
-        user_id,
+        audit.user_id,
         int(math.floor(time.time())),
-        intent,
+        audit.intent,
         random.randint(0, 1000),
     )
 
     model = audit_models.RoleQueryAuditModel(
         id=model_id,
-        user_id=user_id,
-        intent=intent,
-        role=role,
-        username=username,
+        user_id=audit.user_id,
+        intent=audit.intent,
+        role=audit.role,
+        username=audit.username,
     )
     model.update_timestamps()
     model.put()
