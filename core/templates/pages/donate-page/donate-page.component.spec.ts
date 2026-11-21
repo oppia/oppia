@@ -16,14 +16,13 @@
  * @fileoverview Unit tests for donate page.
  */
 
-import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
-
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbModal, NgbModule, NgbSlideEvent} from '@ng-bootstrap/ng-bootstrap';
 import {DonatePageComponent} from './donate-page.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -61,6 +60,7 @@ describe('Donate page', () => {
   beforeEach(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
+      imports: [NgbModule],
       declarations: [DonatePageComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
@@ -118,6 +118,48 @@ describe('Donate page', () => {
       size: 'xl',
       windowClass: 'donation-box-modal',
     });
+  });
+
+  it('should set the learner carousel interval to 5 seconds', () => {
+    fixture.detectChanges();
+
+    expect(component.learnerCarousel.interval).toBe(5000);
+  });
+
+  it('should render one indicator dot per learner with the first active', () => {
+    fixture.detectChanges();
+
+    const dots = fixture.nativeElement.querySelectorAll(
+      '.donate-learner-carousel-indicator'
+    );
+    expect(dots.length).toBe(component.learners.length);
+    expect(dots[0].classList).toContain('active');
+  });
+
+  it('should go to the matching slide when an indicator dot is clicked', () => {
+    fixture.detectChanges();
+    spyOn(component.learnerCarousel, 'select');
+
+    component.selectLearnerSlide(2);
+
+    expect(component.learnerCarousel.select).toHaveBeenCalledWith('2');
+  });
+
+  it('should update the active indicator when the slide changes', () => {
+    component.onLearnerSlideChange({current: '3'} as NgbSlideEvent);
+
+    expect(component.activeLearnerSlideIndex).toBe(3);
+  });
+  it('should render all quotes in a slide with only its own quote visible', () => {
+    fixture.detectChanges();
+
+    const slide = fixture.nativeElement.querySelector('.carousel-item.active');
+    const quotes = slide.querySelectorAll('.donate-learners-quote');
+    const hiddenQuotes = slide.querySelectorAll(
+      '.donate-learners-quote-hidden'
+    );
+    expect(quotes.length).toBe(component.learners.length);
+    expect(hiddenQuotes.length).toBe(component.learners.length - 1);
   });
 
   it('should move the correct testimonials carousel to the previous slide', () => {

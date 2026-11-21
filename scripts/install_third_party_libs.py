@@ -38,8 +38,8 @@ import tarfile
 
 from scripts import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
+    install_python_prod_dependencies,
 )
-from scripts import install_python_prod_dependencies
 
 from typing import Final
 
@@ -454,8 +454,10 @@ def main() -> None:
     install_python_dev_dependencies.main(['--assert_compiled'])
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.
-    from . import pre_commit_hook  # pylint: disable=wrong-import-position
-    from . import pre_push_hook  # pylint: disable=wrong-import-position
+    from . import (
+        pre_commit_hook,  # pylint: disable=wrong-import-position
+        pre_push_hook,  # pylint: disable=wrong-import-position
+    )
 
     if common.is_windows_os():
         raise Exception(
