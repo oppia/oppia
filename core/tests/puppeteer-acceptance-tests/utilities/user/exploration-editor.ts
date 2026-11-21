@@ -75,6 +75,7 @@ const createExplorationFromModalSelector = '.e2e-test-create-exploration';
 const rolesHeaderSelector = '.e2e-test-roles-header';
 const rolesContentSelector = '.e2e-test-roles-content';
 const usernameSelector = '.e2e-test-role-username';
+const rolesWarningMessageSelector = '.e2e-test-title-warning';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -3814,6 +3815,57 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as playtester.`);
+  }
+
+  /**
+   * Enters a username in the roles form and blurs the input field to trigger validation.
+   * @param {string} username - The username to enter.
+   */
+  async enterUsernameAndBlurInRolesForm(username: string): Promise<void> {
+    await this.expectElementToBeVisible(usernameSelector);
+    await this.expectElementToBeClickable(addUsernameInputBox);
+    await this.clickOnElementWithSelector(addUsernameInputBox);
+    await this.typeInInputField(addUsernameInputBox, username);
+    await this.page.keyboard.press('Tab');
+  }
+
+  /**
+   * Checks if the Save role button is enabled or disabled.
+   * @param {boolean} disabled - Whether the button should be disabled.
+   */
+  async expectSaveRoleButtonToBeDisabled(
+    disabled: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(saveRoleButton);
+    await this.page.waitForFunction(
+      (selector: string, disabled: boolean) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLButtonElement)?.disabled === disabled;
+      },
+      {},
+      saveRoleButton,
+      disabled
+    );
+  }
+
+  /**
+   * Verifies that the warning message in the roles form matches the expected text.
+   * @param {string} expectedMessage - The expected error/warning text.
+   */
+  async expectRolesWarningMessageToBe(expectedMessage: string): Promise<void> {
+    await this.expectElementToBeVisible(rolesWarningMessageSelector);
+    await this.expectTextContentToBe(
+      rolesWarningMessageSelector,
+      expectedMessage
+    );
+  }
+
+  /**
+   * Closes the roles form by clicking the Cancel button.
+   */
+  async closeRolesForm(): Promise<void> {
+    await this.clickOnElementWithText('Cancel');
+    await this.expectElementToBeVisible(saveRoleButton, false);
   }
 
   /**
