@@ -31,6 +31,7 @@ from core.domain import (
     exp_services,
     html_validation_service,
     interaction_registry,
+    question_domain,
     rules_registry,
     state_domain,
     translation_domain,
@@ -1015,6 +1016,37 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             init_state.get_content_html('hint_1'), '<p>Changed hint one</p>'
         )
+
+    def test_solution_from_dict_can_skip_explanation_validation(self) -> None:
+        solution_dict: state_domain.SolutionDict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'hello world',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>A sample explanation.</p>',
+            },
+        }
+        validated_explanations: List[state_domain.SubtitledHtml] = []
+
+        def record_validation(explanation: state_domain.SubtitledHtml) -> None:
+            validated_explanations.append(explanation)
+
+        with self.swap(
+            state_domain.SubtitledHtml, 'validate', record_validation
+        ):
+            solution = state_domain.Solution.from_dict(
+                'TextInput', solution_dict, validate=False
+            )
+            self.assertEqual(validated_explanations, [])
+            self.assertEqual(solution.to_dict(), solution_dict)
+
+            validated_solution = state_domain.Solution.from_dict(
+                'TextInput', solution_dict
+            )
+            self.assertEqual(
+                validated_explanations, [validated_solution.explanation]
+            )
+            self.assertEqual(validated_solution.to_dict(), solution_dict)
 
     def test_rte_content_validation_for_android(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -3040,6 +3072,336 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.init_state.validate({}, True)
 
+    def test_nonredundant_drag_and_drop_rules_validate_and_can_be_removed(
+        self,
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id'
+        )
+        state = exploration.init_state
+        self.set_interaction_for_state(
+            state,
+            'DragAndDropSortInput',
+            translation_domain.ContentIdGenerator(),
+        )
+        state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('choice_%s' % i, '<p>%s</p>' % i)
+            for i in range(3)
+        ]
+        state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'
+        ].value = True
+        assert state.interaction.default_outcome is not None
+        state.interaction.answer_groups = [
+            state_domain.AnswerGroup(
+                copy.deepcopy(state.interaction.default_outcome),
+                [
+                    state_domain.RuleSpec(
+                        'HasElementXAtPositionY',
+                        {
+                            'x': 'choice_0',
+                            'y': 1,
+                        },
+                    ),
+                    state_domain.RuleSpec(
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                        {'x': [['choice_0'], ['choice_1'], ['choice_2']]},
+                    ),
+                    state_domain.RuleSpec(
+                        'IsEqualToOrdering',
+                        {
+                            'x': [['choice_1'], ['choice_2'], ['choice_0']],
+                        },
+                    ),
+                ],
+                [],
+                None,
+            )
+        ]
+
+        state.interaction.validate({}, strict=True)
+        self.assertEqual(len(state.interaction.answer_groups[0].rule_specs), 3)
+        state.update_interaction_id('TextInput')
+        self.assertEqual(state.interaction.id, 'TextInput')
+        self.assertEqual(state.interaction.answer_groups, [])
+
+    def test_generate_content_id_mapping_includes_text_rule_inputs(
+        self,
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id'
+        )
+        state = exploration.init_state
+        self.set_interaction_for_state(
+            state, 'TextInput', translation_domain.ContentIdGenerator()
+        )
+        assert state.interaction.default_outcome is not None
+        state.interaction.answer_groups = [
+            state_domain.AnswerGroup(
+                copy.deepcopy(state.interaction.default_outcome),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': {
+                                'contentId': 'old_rule_input',
+                                'normalizedStrSet': ['hello', 'world'],
+                            }
+                        },
+                    )
+                ],
+                [],
+                None,
+            )
+        ]
+        state.interaction.answer_groups[0].outcome.feedback.content_id = (
+            'old_feedback'
+        )
+        state_dict = state.to_dict()
+        original_state = copy.deepcopy(state_dict)
+
+        mappings, next_index = (
+            state_domain.State.generate_old_content_id_to_new_content_id_in_v54_states(
+                {'Introduction': state_dict}
+            )
+        )
+
+        self.assertEqual(
+            mappings['Introduction']['old_rule_input'], 'rule_input_3'
+        )
+        self.assertEqual(mappings['Introduction']['old_feedback'], 'feedback_2')
+        self.assertEqual(next_index, len(mappings['Introduction']))
+        self.assertEqual(state_dict, original_state)
+
+    def test_text_rules_with_disjoint_strings_are_not_redundant(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id'
+        )
+        state = exploration.init_state
+        self.set_interaction_for_state(
+            state, 'TextInput', translation_domain.ContentIdGenerator()
+        )
+        assert state.interaction.default_outcome is not None
+        rule_specs = [
+            state_domain.RuleSpec(
+                rule_type,
+                {
+                    'x': {
+                        'contentId': 'rule_input_%s' % index,
+                        'normalizedStrSet': strings,
+                    }
+                },
+            )
+            for index, (rule_type, strings) in enumerate(
+                [
+                    ('Contains', ['apple', 'banana']),
+                    ('Contains', ['cherry', 'date']),
+                    ('StartsWith', ['egg', 'fig']),
+                    ('StartsWith', ['grape', 'honey']),
+                    ('Equals', ['ice', 'jam']),
+                ]
+            )
+        ]
+        state.interaction.answer_groups = [
+            state_domain.AnswerGroup(
+                copy.deepcopy(state.interaction.default_outcome),
+                rule_specs,
+                [],
+                None,
+            )
+        ]
+
+        state.interaction.validate({}, strict=True)
+        rule_specs[-1].inputs['x']['normalizedStrSet'] = ['apple pie']
+        with self.assertRaisesRegex(utils.ValidationError, 'redundant'):
+            state.interaction.validate({}, strict=True)
+
+    def test_legacy_html_conversion_preserves_music_note_rule_inputs(
+        self,
+    ) -> None:
+        # MusicNotesInput and ItemSelectionInput both use Equals, but only
+        # the legacy ItemSelectionInput rule contains HTML strings.
+        rule_dict: state_domain.RuleSpecDict = {
+            'rule_type': 'Equals',
+            'inputs': {
+                'x': [
+                    {
+                        'readableNoteName': 'D4',
+                        'noteDuration': {'num': 1, 'den': 1},
+                    }
+                ]
+            },
+        }
+        original_rule = copy.deepcopy(rule_dict)
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            'MusicNotesInput'
+        )
+        state_domain.RuleSpec.from_dict(rule_dict).validate(
+            interaction.get_rule_param_list('Equals'), {}
+        )
+        converted_html: List[str] = []
+
+        def convert_html(html: str) -> str:
+            converted_html.append(html)
+            return '<p>converted</p>'
+
+        converted_rule = state_domain.RuleSpec.convert_html_in_rule_spec(
+            rule_dict,
+            convert_html,
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41
+            ),
+        )
+
+        self.assertEqual(converted_rule, original_rule)
+        self.assertEqual(converted_html, [])
+
+    def test_html_conversion_preserves_stored_item_selection_solution_answer(
+        self,
+    ) -> None:
+        # Stored solutions are accepted by Solution.from_dict even when the
+        # interaction does not offer solution authoring.
+        solution_dict: state_domain.SolutionDict = {
+            'answer_is_exclusive': True,
+            'correct_answer': ['choice_0', 'choice_1'],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>Original explanation</p>',
+            },
+        }
+        solution = state_domain.Solution.from_dict(
+            'ItemSelectionInput', solution_dict
+        )
+        solution.validate('ItemSelectionInput')
+        interaction_spec = interaction_registry.Registry.get_all_specs()[
+            'ItemSelectionInput'
+        ]
+        self.assertFalse(interaction_spec['can_have_solution'])
+
+        converted = state_domain.Solution.convert_html_in_solution(
+            'ItemSelectionInput',
+            solution.to_dict(),
+            lambda html: html.replace('Original', 'Converted'),
+            rules_registry.Registry.get_html_field_types_to_rule_specs(),
+            interaction_spec,
+        )
+
+        self.assertEqual(converted['correct_answer'], ['choice_0', 'choice_1'])
+        self.assertEqual(
+            converted['explanation'],
+            {
+                'content_id': 'solution',
+                'html': '<p>Converted explanation</p>',
+            },
+        )
+
+    def test_solution_html_conversion_preserves_empty_set_answer(self) -> None:
+        solution = state_domain.Solution(
+            'SetInput',
+            True,
+            [],
+            state_domain.SubtitledHtml('solution', '<p>Original</p>'),
+        )
+        solution.validate('SetInput')
+        converted = state_domain.Solution.convert_html_in_solution(
+            'SetInput',
+            solution.to_dict(),
+            lambda html: html.replace('Original', 'Converted'),
+            rules_registry.Registry.get_html_field_types_to_rule_specs(),
+            interaction_registry.Registry.get_all_specs()['SetInput'],
+        )
+        self.assertEqual(converted['correct_answer'], [])
+        self.assertEqual(converted['explanation']['html'], '<p>Converted</p>')
+
+    def test_sparse_legacy_choices_survive_html_migration_until_population(
+        self,
+    ) -> None:
+        state = exp_domain.Exploration.create_default_exploration(
+            'exp_id'
+        ).init_state.to_dict()
+        state['interaction']['id'] = 'MultipleChoiceInput'
+        state['interaction']['customization_args'] = {}
+        # Here we use MyPy ignore because written_translations is part of
+        # the historical schema, not the current StateDict.
+        state['written_translations'] = {  # type: ignore[typeddict-item]
+            'translations_mapping': {}
+        }
+        # Here we use MyPy ignore because recorded_voiceovers is part of
+        # the historical schema, not the current StateDict.
+        state['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+            'voiceovers_mapping': {}
+        }
+        versioned_state: question_domain.VersionedQuestionStateDict = {
+            'state': state,
+            'state_schema_version': 33,
+        }
+        for version in [33, 34]:
+            question_domain.Question.update_state_from_model(
+                versioned_state, version
+            )
+            self.assertEqual(state['interaction']['customization_args'], {})
+        question_domain.Question.update_state_from_model(versioned_state, 35)
+        self.assertEqual(versioned_state['state_schema_version'], 36)
+        self.assertEqual(
+            state['interaction']['customization_args']['choices'],
+            {'value': [{'content_id': 'ca_choices_0', 'html': ''}]},
+        )
+
+    def test_convert_state_dict_to_yaml_preserves_state(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id'
+        )
+        state_dict = exploration.init_state.to_dict()
+
+        state_yaml = state_domain.State.convert_state_dict_to_yaml(
+            state_dict, 80
+        )
+
+        self.assertEqual(utils.dict_from_yaml(state_yaml), state_dict)
+
+    def test_generate_content_id_mapping_for_empty_states(self) -> None:
+        self.assertEqual(
+            state_domain.State.generate_old_content_id_to_new_content_id_in_v54_states(
+                {}
+            ),
+            ({}, 0),
+        )
+
+    def test_generate_content_id_mapping_sorts_states_without_mutating_them(
+        self,
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id'
+        )
+        exploration.add_states(['Zebra', 'Apple'])
+        states = {
+            name: exploration.states[name].to_dict()
+            for name in ['Zebra', 'Apple']
+        }
+        original_states = copy.deepcopy(states)
+
+        mappings, next_index = (
+            state_domain.State.generate_old_content_id_to_new_content_id_in_v54_states(
+                states
+            )
+        )
+
+        self.assertEqual(list(mappings), ['Apple', 'Zebra'])
+        for index, name in enumerate(['Apple', 'Zebra']):
+            outcome = states[name]['interaction']['default_outcome']
+            assert outcome is not None
+            self.assertEqual(
+                mappings[name],
+                {
+                    states[name]['content']['content_id']: 'content_%s'
+                    % (2 * index),
+                    outcome['feedback']['content_id']: 'default_outcome_%s'
+                    % (2 * index + 1),
+                },
+            )
+        self.assertEqual(next_index, 4)
+        self.assertEqual(states, original_states)
+
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(
         self,
     ) -> None:
@@ -3447,6 +3809,32 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
 
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on recorded voiceovers."""
+
+    def test_validates_empty_voiceover_mapping(self) -> None:
+        recorded_voiceovers = state_domain.RecordedVoiceovers({})
+        recorded_voiceovers.validate([])
+        self.assertEqual(
+            recorded_voiceovers.to_dict(), {'voiceovers_mapping': {}}
+        )
+
+    def test_validates_nested_voiceovers_for_known_languages(self) -> None:
+        voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
+        recorded_voiceovers = state_domain.RecordedVoiceovers(
+            {
+                'content': {'en': voiceover},
+                'feedback': {},
+            }
+        )
+        recorded_voiceovers.validate(['content', 'feedback'])
+        self.assertEqual(
+            recorded_voiceovers.to_dict()['voiceovers_mapping']['content'][
+                'en'
+            ],
+            voiceover.to_dict(),
+        )
+        voiceover.duration_secs = -1.0
+        with self.assertRaisesRegex(utils.ValidationError, 'duration'):
+            recorded_voiceovers.validate(['content', 'feedback'])
 
     def test_from_and_to_dict_wroks_correctly(self) -> None:
         recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
