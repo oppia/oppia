@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the feature tab in release coordinator page.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA, ElementRef, QueryList} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
@@ -44,9 +42,18 @@ import {
 import {UserGroup} from 'domain/release_coordinator/user-group.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {FeatureStage} from 'domain/platform-parameter/platform-parameter.model';
-import {FeatureFlag} from 'domain/feature-flag/feature-flag.model';
+import {
+  FeatureFlag,
+  FeatureFlagBackendDict,
+} from 'domain/feature-flag/feature-flag.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {HttpErrorResponse} from '@angular/common/http';
+
+const createFeatureFlagViewModel = (backendDict: FeatureFlagBackendDict) => ({
+  ...FeatureFlag.createFromBackendDict(backendDict),
+  searchQuery: '',
+  filteredUserGroups: [],
+});
 
 let dummyFeatureStatus = false;
 const mockDummyFeatureFlagForE2ETestsStatus = (status: boolean) => {
@@ -186,7 +193,7 @@ describe('Release coordinator page feature tab', function () {
     let featureFlagVM = component.featureFlagViewModels[0];
     component.resetUserGroupSearch(featureFlagVM);
 
-    expect(component.userGroupInputs._results[0].nativeElement.value).toEqual(
+    expect(component.userGroupInputs.first.nativeElement.value).toEqual(
       'UserGroup1'
     );
     expect(featureFlagVM.filteredUserGroups).toEqual(component.allUserGroups);
@@ -439,19 +446,19 @@ describe('Release coordinator page feature tab', function () {
       featureFlag.forceEnableForAllUsers = true;
       component.clearChanges(featureFlag);
 
-      expect(featureFlag.forceEnableForAllUsers).toBeFalse();
+      expect(featureFlag.forceEnableForAllUsers).toBe(false);
     });
 
     it("should not proceed if the user doesn't confirm", () => {
       mockConfirmResult(false);
       const featureFlag = component.featureFlagViewModels[0];
 
-      expect(featureFlag.forceEnableForAllUsers).toBeFalse();
+      expect(featureFlag.forceEnableForAllUsers).toBe(false);
 
       featureFlag.forceEnableForAllUsers = true;
       component.clearChanges(featureFlag);
 
-      expect(featureFlag.forceEnableForAllUsers).toBeTrue();
+      expect(featureFlag.forceEnableForAllUsers).toBe(true);
     });
   });
 
@@ -487,7 +494,7 @@ describe('Release coordinator page feature tab', function () {
       'should return the human readable last updated string from date-time ' +
         'object string',
       () => {
-        let featureFlag = FeatureFlag.createFromBackendDict({
+        let featureFlag = createFeatureFlagViewModel({
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.PROD,
           name: 'dummy_feature_flag_for_e2e_tests',
@@ -512,7 +519,7 @@ describe('Release coordinator page feature tab', function () {
     });
 
     it('should return text for test feature stage', () => {
-      let featureFlagTestStage = FeatureFlag.createFromBackendDict({
+      let featureFlagTestStage = createFeatureFlagViewModel({
         description: 'This is a dummy feature flag.',
         feature_stage: FeatureStage.TEST,
         name: 'dummy_feature_flag_for_e2e_tests',
@@ -527,7 +534,7 @@ describe('Release coordinator page feature tab', function () {
     });
 
     it('should return text for prod feature stage', () => {
-      let featureFlagProdStage = FeatureFlag.createFromBackendDict({
+      let featureFlagProdStage = createFeatureFlagViewModel({
         description: 'This is a dummy feature flag.',
         feature_stage: FeatureStage.PROD,
         name: 'dummy_feature_flag_for_e2e_tests',
@@ -543,7 +550,7 @@ describe('Release coordinator page feature tab', function () {
   });
 
   describe('.getFeatureValidOnCurrentServer', () => {
-    let featureFlagDevStage = FeatureFlag.createFromBackendDict({
+    let featureFlagDevStage = createFeatureFlagViewModel({
       description: 'This is a dummy feature flag.',
       feature_stage: FeatureStage.DEV,
       name: 'dummy_feature_flag_for_e2e_tests',
@@ -553,7 +560,7 @@ describe('Release coordinator page feature tab', function () {
       last_updated: null,
     });
 
-    let featureFlagProdStage = FeatureFlag.createFromBackendDict({
+    let featureFlagProdStage = createFeatureFlagViewModel({
       description: 'This is a dummy feature flag.',
       feature_stage: FeatureStage.PROD,
       name: 'dummy_feature_flag_for_e2e_tests',
@@ -789,7 +796,7 @@ describe('Release coordinator page feature tab', function () {
     it('should return false if the feature is the same as the backup instance', () => {
       const featureFlag = component.featureFlagViewModels[0];
 
-      expect(component.isFeatureFlagViewModelChanged(featureFlag)).toBeFalse();
+      expect(component.isFeatureFlagViewModelChanged(featureFlag)).toBe(false);
     });
 
     it('should return true if the feature is different from the backup instance', () => {
@@ -797,11 +804,11 @@ describe('Release coordinator page feature tab', function () {
 
       featureFlag.userGroupIds = ['user_group_1'];
 
-      expect(component.isFeatureFlagViewModelChanged(featureFlag)).toBeTrue();
+      expect(component.isFeatureFlagViewModelChanged(featureFlag)).toBe(true);
     });
 
     it('should throw error if the feature name is not found', () => {
-      const featureFlag = FeatureFlag.createFromBackendDict({
+      const featureFlag = createFeatureFlagViewModel({
         description: 'This is a dummy feature flag.',
         feature_stage: FeatureStage.DEV,
         name: 'invalid',
@@ -820,7 +827,7 @@ describe('Release coordinator page feature tab', function () {
   describe('.validateFeatureFlagViewModel', () => {
     it('should return empty array if no issue', () => {
       const issues = component.validateFeatureFlagViewModel(
-        FeatureFlag.createFromBackendDict({
+        createFeatureFlagViewModel({
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           name: 'dummy_feature_flag_for_e2e_tests',
@@ -836,7 +843,7 @@ describe('Release coordinator page feature tab', function () {
 
     it('should return issues if rollout percentage is not between 10 and 100', () => {
       const issues = component.validateFeatureFlagViewModel(
-        FeatureFlag.createFromBackendDict({
+        createFeatureFlagViewModel({
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           name: 'dummy_feature_flag_for_e2e_tests',
@@ -856,12 +863,12 @@ describe('Release coordinator page feature tab', function () {
   describe('.dummyFeatureFlagForE2eTestsIsEnabled', () => {
     it('should return true when dummy feature is enabled', () => {
       mockDummyFeatureFlagForE2ETestsStatus(true);
-      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeTrue();
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBe(true);
     });
 
     it('should return false when dummy feature is disabled', () => {
       mockDummyFeatureFlagForE2ETestsStatus(false);
-      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeFalse();
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBe(false);
     });
   });
 

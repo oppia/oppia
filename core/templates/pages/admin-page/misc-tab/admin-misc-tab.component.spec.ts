@@ -16,8 +16,6 @@
  * @fileoverview UnitTests for Admin misc tab component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -51,18 +49,13 @@ class MockWindowRef {
   };
 }
 
-class MockReaderObject {
-  result = null;
-  onload: {(arg0: {target: {result: string}}): void; (): string};
-  constructor() {
-    this.onload = () => {
-      return 'Fake onload executed';
-    };
+class MockReaderObject extends FileReader {
+  get result(): string {
+    return 'result';
   }
 
-  readAsText() {
-    this.onload({target: {result: 'result'}});
-    return 'The file is loaded';
+  readAsText(): void {
+    this.dispatchEvent(new ProgressEvent('load'));
   }
 }
 
@@ -108,10 +101,6 @@ describe('Admin misc tab component ', () => {
     spyOn(adminTaskManagerService, 'startTask').and.returnValue();
     spyOn(adminTaskManagerService, 'finishTask').and.returnValue();
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
-    // This throws "Argument of type 'mockReaderObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". We need to suppress this
-    // error because 'HTMLImageElement' has around 250 more properties.
-    // We have only defined the properties we need in 'mockReaderObject'.
     spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
   });
 
@@ -307,17 +296,9 @@ describe('Admin misc tab component ', () => {
     });
 
     it('should throw error if no files are uploaded', () => {
-      // This throws "Argument of type '() => { files: { size: number;
-      // name: string; }[]; }' is not assignable to parameter of type
-      // '(elementId: string) => HTMLElement'.". This is because the
-      // actual 'getElementById' returns more properties than just "files".
-      // We need to suppress this error because we need only "files"
-      // property for testing.
-      spyOn(document, 'getElementById').and.callFake(() => {
-        return {
-          files: null,
-        };
-      });
+      spyOn(document, 'getElementById').and.returnValue(
+        document.createElement('input')
+      );
       expect(() => {
         component.uploadTopicSimilaritiesFile();
       }).toThrowError('No files found.');

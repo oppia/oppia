@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for UploadActivityModalComponent.
  */
 
-// @ts-nocheck
-
 import {AlertsService} from 'services/alerts.service';
 import {
   ComponentFixture,
@@ -78,23 +76,14 @@ describe('Upload Activity Modal Component', () => {
   it('should close modal when saving activity', fakeAsync(() => {
     const dismissSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
 
-    let file = {
-      size: 100,
-      name: 'file.mp3',
-    };
+    let file = new File(['content'], 'file.mp3');
     // TODO(#10113): Refactor the code to not use the DOM methods.
-
-    // This throws "Argument of type '() => { files: { size: number;
-    // name: string; }[]; }' is not assignable to parameter of type
-    // '(elementId: string) => HTMLElement'.". This is because the
-    // actual 'getElementById' returns more properties than just "files".
-    // We need to suppress this error because we need only "files"
-    // property for testing.
-    spyOn(document, 'getElementById').and.callFake(() => {
-      return {
-        files: [file],
-      };
-    });
+    let dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    let fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.files = dataTransfer.files;
+    spyOn(document, 'getElementById').and.returnValue(fileInput);
     component.save();
     expect(dismissSpy).toHaveBeenCalledWith({
       yamlFile: file,
@@ -105,18 +94,9 @@ describe('Upload Activity Modal Component', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     spyOn(alertsService, 'addWarning').and.callThrough();
     // TODO(#10113): Refactor the code to not use the DOM methods.
-
-    // This throws "Argument of type '() => { files: { size: number;
-    // name: string; }[]; }' is not assignable to parameter of type
-    // '(elementId: string) => HTMLElement'.". This is because the
-    // actual 'getElementById' returns more properties than just "files".
-    // We need to suppress this error because we need only "files"
-    // property for testing.
-    spyOn(document, 'getElementById').and.callFake(() => {
-      return {
-        files: [],
-      };
-    });
+    let fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    spyOn(document, 'getElementById').and.returnValue(fileInput);
     component.save();
     flushMicrotasks();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
@@ -142,17 +122,9 @@ describe('Upload Activity Modal Component', () => {
 
   it('should throw error if no files are uploaded', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-    // This throws "Argument of type '() => { files: { size: number;
-    // name: string; }[]; }' is not assignable to parameter of type
-    // '(elementId: string) => HTMLElement'.". This is because the
-    // actual 'getElementById' returns more properties than just "files".
-    // We need to suppress this error because we need only "files"
-    // property for testing.
-    spyOn(document, 'getElementById').and.callFake(() => {
-      return {
-        files: null,
-      };
-    });
+    spyOn(document, 'getElementById').and.returnValue(
+      document.createElement('input')
+    );
     expect(() => {
       component.save();
     }).toThrowError('No files found.');
