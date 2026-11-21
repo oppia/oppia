@@ -359,7 +359,6 @@ describe('Exploration Editor', function () {
     ]);
     await explorationEditor.expectResponseFeedbackToBe('Try Again!');
     // View Hint.
-    await explorationEditor.removeFeedbackResponseInPreviewTab();
     // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {

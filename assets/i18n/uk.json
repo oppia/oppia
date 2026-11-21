@@ -201,7 +201,6 @@
   "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION": "Введіть тут вираз.",
   "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION": "Введіть код в редакторі",
   "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "Перейдіть до редактора коду",
-  "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION": "Перетягуйте елементи",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "Введіть дріб у формі «x/y» або змішане число у формі «A x/y».",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "Введіть дріб у вигляді x/y.",
   "I18N_INTERACTIONS_GRAPH_ADD_EDGE": "Додати край",

@@ -12,8 +12,8 @@
        and drop interactions on mobile (see issue #5607), while also maintaining
        vertical touch movements and zoom touch actions.
     */
-  height: 540px;
   margin: 16px;
+  max-height: 540px;
   overflow-y: auto;
   padding: 10px 10px 10px 10px;
   touch-action: manipulation;

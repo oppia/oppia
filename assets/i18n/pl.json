@@ -115,7 +115,6 @@
   "I18N_HEADING_VOLUNTEER": "Wolontariat",
   "I18N_HINT_TITLE": "Wskazówka",
   "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "Przejdź do edytora kodu",
-  "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION": "Przeciągnij i upuść elementy",
   "I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO": "Proszę nie umieszczać 0 w mianowniku",
   "I18N_INTERACTIONS_FRACTIONS_INVALID_CHARS_LENGTH": "\nŻadna z liczb w ułamku nie powinna mieć więcej niż 7 cyfr",
   "I18N_INTERACTIONS_FRACTIONS_NON_MIXED": "Proszę wpisać swoją odpowiedź jako ułamek (przykład, 5/3 zamiast 1 2/3).",

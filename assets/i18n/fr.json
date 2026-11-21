@@ -699,7 +699,6 @@
   "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION": "Taper une expression ici.",
   "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION": "Taper le code dans l’éditeur",
   "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "Aller à l’éditeur de code",
-  "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION": "Tirer et lâcher des éléments",
   "I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO": "Ne pas mettre à 0 le dénominateur",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "Entrer une fraction au format « x/y » ou un nombre mixte sous la forme « A x/y ».",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "Entrer une fraction sous la forme « x/y ».",

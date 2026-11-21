@@ -350,7 +350,6 @@
   "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION": "Kirjoita yhtälö tähän.",
   "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION": "Kirjoita ohjelmakoodia editoriin",
   "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "Mene koodimuokkaimeen",
-  "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION": "Raahaa ja pudota kohteita",
   "I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO": "Älä laita lukua 0 nimittäjään",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "Anna murtoluku muodossa \"x/y\", tai sekaluku muodossa \"A x/y\".",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "Anna murtoluku muodossa x/y.",
