@@ -879,9 +879,15 @@ export class ConversationFlowService {
       .then(response => {
         states = response.exploration.states;
 
-        let mostRecentlyReachedCheckpoint =
-          this.checkpointProgressService.getMostRecentlyReachedCheckpoint() ||
-          response.most_recently_reached_checkpoint_state_name;
+        let mostRecentlyReachedCheckpoint: string | null = null;
+        try {
+          mostRecentlyReachedCheckpoint =
+            this.checkpointProgressService.getMostRecentlyReachedCheckpoint();
+        } catch (e) {}
+        mostRecentlyReachedCheckpoint =
+          mostRecentlyReachedCheckpoint ||
+          response.most_recently_reached_checkpoint_state_name ||
+          response.exploration.init_state_name;
 
         this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
           mostRecentlyReachedCheckpoint

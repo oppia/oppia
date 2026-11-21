@@ -264,3 +264,20 @@
     width: 64px;
   }
 }
+
+@media (max-width: 768px) {
+  .answer-wrapper {
+    padding-right: 20px;
+  }
+
+  .feedback-wrapper .conversation-skin-oppia-avatar,
+  .feedback-wrapper .left-side-curve,
+  .answer-wrapper .right-side-curve,
+  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+    display: none;
+  }
+
+  .conversation-skin-learner-answer-container {
+    border-radius: 0;
+  }
+}
