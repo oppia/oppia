@@ -1,0 +1,31 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    Open Feedback Available
+  </h4>
+</div>
+
+<div class="modal-body">
+  <p>
+    Your exploration has
+    <strong>{{ openThreadsCount }}</strong>
+    open feedback
+    <span *ngIf="openThreadsCount === 1">thread</span>
+    <span *ngIf="openThreadsCount !== 1">threads</span>.
+  </p>
+  <p>
+    Would you like to review the feedback now, or continue editing?
+  </p>
+</div>
+
+<div class="modal-footer">
+  <button type="button"
+          class="btn btn-secondary e2e-test-stay-in-editor-button"
+          (click)="cancel()">
+    Stay in editor
+  </button>
+  <button type="button"
+          class="btn btn-success e2e-test-go-to-feedback-button"
+          (click)="confirm()">
+    Go to feedback
+  </button>
+</div>

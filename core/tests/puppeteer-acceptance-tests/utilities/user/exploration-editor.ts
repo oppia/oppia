@@ -245,6 +245,8 @@ const tagsField = '.e2e-test-chip-list-tags';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const stayInEditorButtonSelector = '.e2e-test-stay-in-editor-button';
+const goToFeedbackButtonSelector = '.e2e-test-go-to-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
 const feedbackSelector = '.e2e-test-exploration-feedback';
@@ -2920,7 +2922,11 @@ export class ExplorationEditor extends BaseUser {
    * Navigate to feedback tab.
    */
   async navigateToFeedbackTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
+    const goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
+    if (goToFeedbackButton) {
+      await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
+      await this.waitForNetworkIdle();
+    } else if (this.isViewportAtMobileWidth()) {
       const mobileNavbarElement = await this.getElementInParent(
         mobileNavbarOptions
       ).catch(() => null);
@@ -2985,6 +2991,37 @@ export class ExplorationEditor extends BaseUser {
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
     await this.dismissWelcomeModal(false);
+  }
+
+  /**
+   * Function to dismiss the feedback prompt modal if it is present.
+   */
+  async dismissFeedbackPromptModalIfPresent(): Promise<void> {
+    try {
+      await this.page.waitForSelector(stayInEditorButtonSelector, {
+        visible: true,
+        timeout: 2500,
+      });
+      await this.clickOnElementWithSelector(stayInEditorButtonSelector);
+      await this.expectElementToBeVisible(stayInEditorButtonSelector, false);
+    } catch {
+      // Modal is not present, continue.
+    }
+  }
+  /**
+   * Function to accept the feedback prompt modal if it is present.
+   */
+  async acceptFeedbackPromptModalIfPresent(): Promise<void> {
+    try {
+      await this.page.waitForSelector(goToFeedbackButtonSelector, {
+        visible: true,
+        timeout: 2500,
+      });
+      await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
+      await this.expectElementToBeVisible(goToFeedbackButtonSelector, false);
+    } catch {
+      // Modal is not present, continue.
+    }
   }
 
   /**
