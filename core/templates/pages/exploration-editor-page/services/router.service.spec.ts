@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for RouterService.
  */
 
-// @ts-nocheck
-
 import {RouterService} from './router.service';
 import {Subscription} from 'rxjs';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -327,7 +325,7 @@ describe('Router Service', () => {
       location: {
         hash: '#/settings',
       },
-    });
+    } as Window);
 
     expect(routerService.isLocationSetToNonStateEditorTab()).toBe(true);
 
@@ -339,9 +337,9 @@ describe('Router Service', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
         hash: '#/gui/Introduction',
-      },
+      } as Location,
       scrollTo: () => {},
-    });
+    } as Window);
 
     routerService.savePendingChanges();
     expect(routerService.getCurrentStateFromLocationPath()).toBe(

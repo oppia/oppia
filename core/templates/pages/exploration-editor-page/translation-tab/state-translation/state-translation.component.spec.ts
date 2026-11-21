@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for stateTranslation.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   EventEmitter,
@@ -421,7 +419,7 @@ describe('State translation component', () => {
         component.onContentClick(mockEvent);
 
         expect(ckEditorCopyContentService.broadcastCopy).toHaveBeenCalledWith(
-          mockEvent.target
+          mockEvent.target as HTMLElement
         );
       });
 
@@ -680,7 +678,7 @@ describe('State translation component', () => {
             Outcome.createNew('unused', '1', 'Feedback Text', []),
             'Continue',
             0,
-            'true'
+            true
           )
         ).toBe('[] Feedback Text');
       });
@@ -694,7 +692,7 @@ describe('State translation component', () => {
               Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               1,
-              'true'
+              true
             )
           ).toBe('[] Feedback Text');
         }
@@ -709,7 +707,7 @@ describe('State translation component', () => {
               Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               0,
-              'true'
+              true
             )
           ).toBe('[] Feedback Text');
         }
@@ -717,7 +715,7 @@ describe('State translation component', () => {
 
       it('should get an empty summary when default outcome is a falsy value', () => {
         expect(
-          component.summarizeDefaultOutcome(null, 'Continue', 0, 'true')
+          component.summarizeDefaultOutcome(null, 'Continue', 0, true)
         ).toBe('');
       });
 
@@ -2343,7 +2341,7 @@ describe('State translation component', () => {
         spyOn(
           translationTabActiveContentIdService,
           'getActiveContentId'
-        ).and.returnValue(undefined);
+        ).and.returnValue(null);
 
         expect(() => {
           component.updateTranslatedContent();
@@ -2358,12 +2356,7 @@ describe('State translation component', () => {
           },
         } as Outcome;
 
-        const result = component.summarizeDefaultOutcome(
-          outcome,
-          '',
-          0,
-          'short'
-        );
+        const result = component.summarizeDefaultOutcome(outcome, '', 0, true);
 
         expect(result).toBe('');
       });
