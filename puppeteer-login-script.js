@@ -162,7 +162,7 @@ const setFeatureFlag = async function (page, flagName, enabled) {
         body: new URLSearchParams({
           csrf_token: csrfToken,
           payload: JSON.stringify({
-            action: 'update_feature_flag',
+            action: 'update_web_feature_flag',
             feature_flag_name: flagName,
             force_enable_for_all_users: enabled,
             rollout_percentage: 0,

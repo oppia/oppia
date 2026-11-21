@@ -36,7 +36,7 @@ import {
   UserGroupBackendDict,
 } from 'domain/release_coordinator/user-group.model';
 
-interface MemoryCacheProfileResponse {
+interface WebMemoryCacheProfileResponse {
   peak_allocation: string;
   total_allocation: string;
   total_keys_stored: string;
@@ -68,10 +68,10 @@ export interface UserGroupsResponse {
 export class ReleaseCoordinatorBackendApiService {
   constructor(private http: HttpClient) {}
 
-  async getMemoryCacheProfileAsync(): Promise<MemoryCacheProfileResponse> {
+  async getMemoryCacheProfileAsync(): Promise<WebMemoryCacheProfileResponse> {
     return new Promise((resolve, reject) => {
       this.http
-        .get<MemoryCacheProfileResponse>('/memorycachehandler')
+        .get<WebMemoryCacheProfileResponse>('/memorycachehandler')
         .toPromise()
         .then(
           response => {

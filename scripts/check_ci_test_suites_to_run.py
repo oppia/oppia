@@ -23,7 +23,7 @@ import os
 import re
 import subprocess
 
-from core import feature_flag_list
+from core import web_feature_flag_list
 from scripts import generate_root_files_mapping
 
 from typing import Dict, Final, List, Optional, Sequence, Set, TypedDict
@@ -136,7 +136,7 @@ APP_ROUTING_MODULE_FILEPATH: Final = os.path.join(
 ASSETS_CONSTANTS_FILEPATH: Final = os.path.join('assets', 'constants.ts')
 # Maps the PascalCase FeatureNames members used in app.routing.module.ts to
 # their snake_case values, which are the identifiers the backend uses for the
-# feature flags (see core/feature_flag_list.py).
+# feature flags (see core/web_feature_flag_list.py).
 FEATURE_NAMES_MODEL_FILEPATH: Final = os.path.join(
     'core',
     'templates',
@@ -592,7 +592,7 @@ def _get_feature_names_members_to_values() -> Dict[str, str]:
     """
     with open(FEATURE_NAMES_MODEL_FILEPATH, 'r', encoding='utf-8') as f:
         content = f.read()
-    feature_names_block = content.split('export enum FeatureNames {', 1)[1]
+    feature_names_block = content.split('export enum WebFeatureNames {', 1)[1]
     feature_names_block = feature_names_block.split('}', 1)[0]
     members_to_values = dict(
         re.findall(FEATURE_NAMES_MEMBERS_REGEX, feature_names_block)
@@ -688,7 +688,7 @@ def _get_module_to_dev_feature_flags() -> Dict[str, Set[str]]:
     normalized_content = _get_normalized_routing_content()
     members_to_values = _get_feature_names_members_to_values()
     dev_feature_values = {
-        feature.value for feature in feature_flag_list.DEV_FEATURES_LIST
+        feature.value for feature in web_feature_flag_list.DEV_FEATURES_LIST
     }
     modules_to_dev_feature_flags: Dict[str, Set[str]] = {}
     for route_object in _extract_route_objects(normalized_content):

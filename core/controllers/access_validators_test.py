@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     caching_services,
@@ -1620,7 +1620,7 @@ class ViewLearnerGroupPageAccessValidationHandlerTests(
         self.logout()
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
+        [web_feature_flag_list.WebFeatureNames.LEARNER_GROUPS_ARE_ENABLED]
     )
     def test_validation_returns_false_with_user_not_being_a_learner(
         self,
@@ -1633,7 +1633,7 @@ class ViewLearnerGroupPageAccessValidationHandlerTests(
         self.logout()
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
+        [web_feature_flag_list.WebFeatureNames.LEARNER_GROUPS_ARE_ENABLED]
     )
     def test_validation_returns_true_for_valid_learner(self) -> None:
         learner_group_services.add_learner_to_learner_group(
@@ -1682,7 +1682,7 @@ class EditLearnerGroupPageAccessValidationHandlerTests(
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
+        [web_feature_flag_list.WebFeatureNames.LEARNER_GROUPS_ARE_ENABLED]
     )
     def test_validation_returns_false_with_user_not_being_a_facilitator(
         self,
@@ -1695,7 +1695,7 @@ class EditLearnerGroupPageAccessValidationHandlerTests(
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
+        [web_feature_flag_list.WebFeatureNames.LEARNER_GROUPS_ARE_ENABLED]
     )
     def test_validation_returns_true_for_valid_facilitator(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -1725,7 +1725,7 @@ class FacilitatorDashboardPageAccessValidationHandlerTests(
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
+        [web_feature_flag_list.WebFeatureNames.LEARNER_GROUPS_ARE_ENABLED]
     )
     def test_should_access_facilitator_dashboard_page_when_feature_is_enabled(
         self,
@@ -1814,7 +1814,7 @@ class CreateLearnerGroupPageAccessValidationHandlerTests(
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
+        [web_feature_flag_list.WebFeatureNames.LEARNER_GROUPS_ARE_ENABLED]
     )
     def test_validation_returns_true_for_valid_user(self) -> None:
         self.login(self.NEW_USER_EMAIL)
