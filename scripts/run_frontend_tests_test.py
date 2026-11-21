@@ -445,7 +445,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'
-            'Frontend-unit-tests-guide#how-to-handle-common-errors'
+            'Frontend-tests#how-to-handle-common-errors'
             ' for details on how to fix it.',
             self.print_arr,
         )
@@ -474,7 +474,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'
-            'Frontend-unit-tests-guide#how-to-handle-common-errors'
+            'Frontend-tests#how-to-handle-common-errors'
             ' for details on how to fix it.',
             self.print_arr,
         )
@@ -510,7 +510,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'
-            'Frontend-unit-tests-guide#how-to-handle-common-errors'
+            'Frontend-tests#how-to-handle-common-errors'
             ' for details on how to fix it.',
             self.print_arr,
         )
@@ -805,7 +805,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         angular_msg = (
             'If you run into the error "Trying to get the Angular '
             'injector", please see https://github.com/oppia/oppia/wiki/'
-            'Frontend-unit-tests-guide#how-to-handle-common-errors'
+            'Frontend-tests#how-to-handle-common-errors'
             ' for details on how to fix it.'
         )
         self.assertNotIn(angular_msg, self.print_arr)

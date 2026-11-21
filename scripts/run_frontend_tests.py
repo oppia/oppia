@@ -29,15 +29,13 @@ from . import build, check_frontend_test_coverage
 
 MAX_ATTEMPTS = 2
 
-_PARSER = argparse.ArgumentParser(
-    description="""
+_PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
     python -m scripts.run_frontend_tests
 The root folder MUST be named 'oppia'.
 Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run
 a single test or test suite.
-"""
-)
+""")
 
 _PARSER.add_argument(
     '--verbose',
@@ -284,7 +282,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             print(
                 'If you run into the error "Trying to get the Angular '
                 'injector", please see https://github.com/oppia/oppia/wiki/'
-                'Frontend-unit-tests-guide#how-to-handle-common-errors'
+                'Frontend-tests#how-to-handle-common-errors'
                 ' for details on how to fix it.'
             )
 

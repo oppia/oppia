@@ -25,11 +25,9 @@ import sys
 
 from typing import List, Optional
 
-_PARSER = argparse.ArgumentParser(
-    description="""
+_PARSER = argparse.ArgumentParser(description="""
 Checks the frontend test coverage.
-"""
-)
+""")
 
 _PARSER.add_argument(
     '--files_to_check',
@@ -238,7 +236,7 @@ def check_coverage_changes(files_to_check: Optional[List[str]] = None) -> None:
                     ' make sure you\'ve followed the unit tests rules'
                     ' correctly on:'
                     ' https://github.com/oppia/oppia/wiki/Frontend'
-                    '-unit-tests-guide#rules\n'.format(file_path)
+                    '-tests#good-practices\n'.format(file_path)
                 )
 
             remaining_denylisted_files.remove(file_path)

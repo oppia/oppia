@@ -915,8 +915,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         finally:
             sys.modules['pip'] = pip
         self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
-            'OS%29' in self.print_arr
+            'https://github.com/oppia/oppia/wiki/Installing-Oppia'
+            in self.print_arr
         )
 
     def test_pip_install_with_import_error_and_linux_os(self) -> None:
@@ -940,8 +940,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         finally:
             sys.modules['pip'] = pip
         self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
-            '%29' in self.print_arr
+            'https://github.com/oppia/oppia/wiki/Installing-Oppia'
+            in self.print_arr
         )
 
     def test_pip_install_with_import_error_and_windows_os(self) -> None:
@@ -964,8 +964,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         finally:
             sys.modules['pip'] = pip
         self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-            'Windows%29' in self.print_arr
+            'https://github.com/oppia/oppia/wiki/Installing-Oppia'
+            in self.print_arr
         )
 
     def test_normalize_python_library_name(self) -> None:

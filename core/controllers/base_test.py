@@ -1690,7 +1690,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
     )
     wiki_page_link: Final = (
-        'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args'
+        'https://github.com/oppia/oppia/wiki/Schemas#validating-controller-arguments'
     )
 
     def _get_list_of_routes_which_need_schemas(

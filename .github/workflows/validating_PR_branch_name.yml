@@ -31,11 +31,11 @@ jobs:
                 const author = context.payload.pull_request.user;
                 let comment;
                 if (branch === "develop") {
-                    comment = `Hi @${author.login}, PRs made from the \`develop\` branch are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
+                    comment = `Hi @${author.login}, PRs made from the \`develop\` branch are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Rules-for-making-PRs#step-1-create-a-new-branch-with-a-descriptive-name) (Rule 1 specifically). Thanks!`;
                 } else if (branch.startsWith("release-")) {
-                    comment = `Hi @${author.login}, PRs made from branches with names prefixed with \`release-\` are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
+                    comment = `Hi @${author.login}, PRs made from branches with names prefixed with \`release-\` are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Rules-for-making-PRs#step-1-create-a-new-branch-with-a-descriptive-name) (Rule 1 specifically). Thanks!`;
                 } else if (branch.startsWith("test-")) {
-                    comment = `Hi @${author.login}, PRs made from branches with names prefixed with \`test-\` are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
+                    comment = `Hi @${author.login}, PRs made from branches with names prefixed with \`test-\` are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Rules-for-making-PRs#step-1-create-a-new-branch-with-a-descriptive-name) (Rule 1 specifically). Thanks!`;
                 }
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
