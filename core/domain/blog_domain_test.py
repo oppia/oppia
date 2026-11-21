@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core import utils
-from core.domain import blog_domain, blog_services
+from core.domain import blog_domain, blog_domain_errors, blog_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -435,6 +435,62 @@ class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
             'blog_post_is_published': False,
         }
         self.assertEqual(self.blog_post_rights.to_dict(), expected_dict)
+
+    def test_valid_blog_post_rights_pass_validation(self) -> None:
+        self.blog_post_rights.validate()
+
+        self.blog_post_rights.editor_ids = [self.user_id_a, self.user_id_b]
+        self.blog_post_rights.blog_post_is_published = True
+        self.blog_post_rights.validate()
+
+    def test_invalid_blog_post_id_fails_validation(self) -> None:
+        self.blog_post_rights.id = 'short'
+
+        with self.assertRaisesRegex(
+            blog_domain_errors.InvalidBlogPostIdError,
+            'Blog post ID short is invalid',
+        ):
+            self.blog_post_rights.validate()
+
+    def test_invalid_editor_id_fails_validation(self) -> None:
+        self.blog_post_rights.editor_ids = [self.user_id_a, 'invalid_id']
+
+        with self.assertRaisesRegex(
+            blog_domain_errors.InvalidEditorIdError,
+            'Editor ID invalid_id is not a valid user ID',
+        ):
+            self.blog_post_rights.validate()
+
+    def test_pseudonymous_editor_id_fails_validation(self) -> None:
+        pseudonymous_id = 'pid_%s' % ('a' * 32)
+        self.blog_post_rights.editor_ids = [pseudonymous_id]
+
+        with self.assertRaisesRegex(
+            blog_domain_errors.InvalidEditorIdError,
+            'Editor ID %s is not a valid user ID' % pseudonymous_id,
+        ):
+            self.blog_post_rights.validate()
+
+    def test_duplicate_editor_ids_fail_validation(self) -> None:
+        self.blog_post_rights.editor_ids = [self.user_id_a, self.user_id_a]
+
+        with self.assertRaisesRegex(
+            blog_domain_errors.DuplicateEditorIdError,
+            'Editor ID %s appears more than once' % self.user_id_a,
+        ):
+            self.blog_post_rights.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_non_bool_published_status_fails_validation(self) -> None:
+        self.blog_post_rights.blog_post_is_published = 'yes'  # type: ignore[assignment]
+
+        with self.assertRaisesRegex(
+            blog_domain_errors.InvalidPublishedStatusError,
+            'Expected blog_post_is_published to be a bool, received yes',
+        ):
+            self.blog_post_rights.validate()
 
 
 class BlogPostSummaryUnitTests(test_utils.GenericTestBase):

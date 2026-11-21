@@ -23,7 +23,10 @@ import re
 
 from core import feconf, utils
 from core.constants import constants
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
+from core.domain import (  # pylint: disable=invalid-import-from
+    blog_domain_errors,
+    html_cleaner,  # pylint: disable=invalid-import-from
+)
 
 from typing import Final, List, Optional, TypedDict
 
@@ -693,6 +696,41 @@ class BlogPostRights:
         self.id = blog_post_id
         self.editor_ids = editor_ids
         self.blog_post_is_published = blog_post_is_published
+
+    def validate(self) -> None:
+        """Validates the blog post rights.
+
+        Raises:
+            InvalidBlogPostIdError. The blog post ID does not have the expected
+                length.
+            InvalidEditorIdError. An editor ID is not a valid user ID.
+            DuplicateEditorIdError. An editor ID appears more than once.
+            InvalidPublishedStatusError. The published status is not a bool.
+        """
+        if len(self.id) != constants.BLOG_POST_ID_LENGTH:
+            raise blog_domain_errors.InvalidBlogPostIdError(
+                'Blog post ID %s is invalid' % self.id
+            )
+
+        # Wipeout removes deleted users from editor_ids instead of
+        # pseudonymizing them, so pseudonymous and system IDs are not allowed.
+        seen_editor_ids = set()
+        for editor_id in self.editor_ids:
+            if not utils.is_user_id_valid(editor_id):
+                raise blog_domain_errors.InvalidEditorIdError(
+                    'Editor ID %s is not a valid user ID' % editor_id
+                )
+            if editor_id in seen_editor_ids:
+                raise blog_domain_errors.DuplicateEditorIdError(
+                    'Editor ID %s appears more than once' % editor_id
+                )
+            seen_editor_ids.add(editor_id)
+
+        if not isinstance(self.blog_post_is_published, bool):
+            raise blog_domain_errors.InvalidPublishedStatusError(
+                'Expected blog_post_is_published to be a bool, received %s'
+                % self.blog_post_is_published
+            )
 
     def to_dict(self) -> BlogPostRightsDict:
         """Returns a dict suitable for use by the frontend.
