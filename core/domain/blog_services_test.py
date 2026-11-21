@@ -640,21 +640,16 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
     def test_update_blog_models_author_and_published_on_date_successfully(
         self,
     ) -> None:
-        model = blog_models.BlogPostModel.get_by_id(self.blog_post_a_id)
-        model.title = 'sample title'
-        model.tags = ['news']
-        model.thumbnail_filename = 'image.png'
-        model.content = 'hello bloggers'
-        model.url_fragment = 'sample'
-        model.published_on = utils.get_current_utc_datetime()
-        model.update_timestamps()
-        model.put()
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_two
+        )
+        blog_services.publish_blog_post(self.blog_post_a_id)
 
         blog_services.update_blog_models_author_and_published_on_date(
             self.blog_post_a_id, self.user_id_b, '05/09/2000'
         )
 
-        blog_model = blog_models.BlogPostSummaryModel.get_by_id(
+        blog_model = blog_models.BlogPostModel.get_by_id(
             self.blog_post_a_id
         )
         self.assertEqual(blog_model.author_id, self.user_id_b)
@@ -673,20 +668,76 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         blog_rights_model = blog_models.BlogPostRightsModel.get_by_id(
             self.blog_post_a_id
         )
-        self.assertTrue(self.user_id_b in blog_rights_model.editor_ids)
+        self.assertEqual(blog_rights_model.editor_ids.count(self.user_id_b), 1)
+        self.assertTrue(blog_rights_model.blog_post_is_published)
+
+    def test_admin_update_does_not_duplicate_existing_author(self) -> None:
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_two
+        )
+        blog_services.publish_blog_post(self.blog_post_a_id)
+
+        for _ in range(2):
+            blog_services.update_blog_models_author_and_published_on_date(
+                self.blog_post_a_id, self.user_id_a, '05/09/2000'
+            )
+
+        rights_model = blog_models.BlogPostRightsModel.get_by_id(
+            self.blog_post_a_id
+        )
+        self.assertEqual(rights_model.editor_ids, [self.user_id_a])
+
+    def test_admin_update_adds_new_author_only_once(self) -> None:
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_two
+        )
+        blog_services.publish_blog_post(self.blog_post_a_id)
+
+        for _ in range(2):
+            blog_services.update_blog_models_author_and_published_on_date(
+                self.blog_post_a_id, self.user_id_b, '05/09/2000'
+            )
+
+        rights_model = blog_models.BlogPostRightsModel.get_by_id(
+            self.blog_post_a_id
+        )
+        self.assertEqual(rights_model.editor_ids.count(self.user_id_b), 1)
+        self.assertIn(self.user_id_a, rights_model.editor_ids)
+
+    def test_admin_update_rejects_draft_without_modifying_models(self) -> None:
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_two
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Cannot change the author or publication date of a draft blog post.',
+        ):
+            blog_services.update_blog_models_author_and_published_on_date(
+                self.blog_post_a_id, self.user_id_b, '05/09/2000'
+            )
+
+        post_model = blog_models.BlogPostModel.get_by_id(self.blog_post_a_id)
+        summary_model = blog_models.BlogPostSummaryModel.get_by_id(
+            self.blog_post_a_id
+        )
+        rights_model = blog_models.BlogPostRightsModel.get_by_id(
+            self.blog_post_a_id
+        )
+        self.assertEqual(post_model.author_id, self.user_id_a)
+        self.assertIsNone(post_model.published_on)
+        self.assertEqual(summary_model.author_id, self.user_id_a)
+        self.assertIsNone(summary_model.published_on)
+        self.assertFalse(rights_model.blog_post_is_published)
+        self.assertEqual(rights_model.editor_ids, [self.user_id_a])
 
     def test_update_blog_models_author_and_publish_date_with_invalid_date(
         self,
     ) -> None:
-        model = blog_models.BlogPostModel.get_by_id(self.blog_post_a_id)
-        model.title = 'sample title'
-        model.tags = ['news']
-        model.thumbnail_filename = 'image.png'
-        model.content = 'hello bloggers'
-        model.url_fragment = 'sample'
-        model.published_on = utils.get_current_utc_datetime()
-        model.update_timestamps()
-        model.put()
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_two
+        )
+        blog_services.publish_blog_post(self.blog_post_a_id)
 
         # Invalid month.
         with self.assertRaisesRegex(
@@ -717,6 +768,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.update_blog_models_author_and_published_on_date(
                 self.blog_post_a_id, self.user_id_b, '01/22/31126'
             )
+
 
     def test_update_blog_model_author_and_publish_on_with_invalid_blog_id(
         self,
