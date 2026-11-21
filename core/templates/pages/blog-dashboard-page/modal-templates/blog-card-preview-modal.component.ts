@@ -23,6 +23,7 @@ import {BlogDashboardPageService} from '../services/blog-dashboard-page.service'
 import {BlogPostData} from 'domain/blog/blog-post.model';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
+import dayjs from 'dayjs';
 @Component({
   selector: 'oppia-blog-card-preview-modal',
   templateUrl: './blog-card-preview-modal.component.html',
@@ -39,6 +40,7 @@ export class BlogCardPreviewModalComponent
   blogPostSummary!: BlogPostSummary;
   summaryContent!: string;
   blogHomePageLink: string = '';
+  publishedDateString: string = '';
   constructor(
     ngbActiveModal: NgbActiveModal,
     private blogDashboardPageService: BlogDashboardPageService,
@@ -53,11 +55,15 @@ export class BlogCardPreviewModalComponent
       .replace(/<strong>(.*?)<\/strong>/g, ' ')
       .replace(/<h1>(.*?)<\/h1>/g, ' ');
     this.summaryContent = this.truncatePipe.transform(rawContent, 300);
-    let dateString;
+    let dateString = '';
     if (this.blogPostData.publishedOn) {
       dateString = this.blogPostData.publishedOn;
-    } else {
+      this.publishedDateString = this.getDateStringInWords(dateString);
+    } else if (this.blogPostData.lastUpdated) {
       dateString = this.blogPostData.lastUpdated;
+      this.publishedDateString = '';
+    } else {
+      this.publishedDateString = '';
     }
 
     this.blogPostSummary = new BlogPostSummary(
@@ -77,5 +83,9 @@ export class BlogCardPreviewModalComponent
       '( link </span><span ' +
       'class="fas fa-external-link-alt oppia-open-new-tab-icon">' +
       '</span> )</a>';
+  }
+
+  getDateStringInWords(naiveDate: string): string {
+    return dayjs(naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
   }
 }

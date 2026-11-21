@@ -60,6 +60,8 @@ const editBlogBodySelector = '.e2e-test-ck-editor';
 const blogTitleHelpSelector = '.e2e-test-blog-title-help';
 const previewBlogPostButtonSelector = '.e2e-test-blog-card-preview-button';
 const closePreviewModalButtonSelector = '.e2e-test-close-preview-button';
+const blogPostFullPreviewSelector = '.e2e-test-blog-post-full-preview';
+const blogCardPreviewSelector = '.e2e-test-blog-card-preview';
 const photoUploadErrorSelector = '.e2e-test-upload-error';
 
 export class BlogPostEditor extends BaseUser {
@@ -405,6 +407,15 @@ export class BlogPostEditor extends BaseUser {
   async previewBlogPost(): Promise<void> {
     await this.expectElementToBeVisible(previewBlogPostButtonSelector);
     await this.clickOnElementWithSelector(previewBlogPostButtonSelector);
+    await this.expectElementToBeVisible(blogPostFullPreviewSelector);
+  }
+
+  /**
+   * Switches to the blog card preview tab in the preview modal.
+   */
+  async switchToBlogCardPreviewTab(): Promise<void> {
+    await this.clickOnElementWithText('Blog Card Preview');
+    await this.expectElementToBeVisible(blogCardPreviewSelector);
   }
 
   /**
