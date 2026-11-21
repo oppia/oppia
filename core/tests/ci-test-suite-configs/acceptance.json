@@ -307,8 +307,8 @@
     },
     {
       "name": "logged-out-user/sign-in-and-save-exploration-progress",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/sign-in-and-save-exploration-progress.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/sign-in-and-save-exploration-progress.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/view-blog-posts",
