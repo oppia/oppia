@@ -20,6 +20,7 @@ import logging
 
 from core import feconf
 from core.constants import constants
+from core.controllers import reader
 from core.domain import (
     collection_domain,
     collection_services,
@@ -4208,6 +4209,24 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_metadata_version_history_is_none_for_first_version(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 1)
+        )
+
+        self.assertEqual(
+            response,
+            {
+                'last_edited_version_number': None,
+                'last_edited_committer_username': self.OWNER_USERNAME,
+                'metadata_dict_in_previous_version': None,
+            },
+        )
+
+        self.logout()
+
 
 class EntityTranslationHandlerTest(test_utils.GenericTestBase):
     """Unit test for the EntityTranslationHandler."""
@@ -4237,3 +4256,154 @@ class EntityTranslationHandlerTest(test_utils.GenericTestBase):
             entity_translation_dict['translations'], translations_mapping
         )
         self.logout()
+
+
+class DoesExplorationExistTests(test_utils.GenericTestBase):
+    """Unit tests for the _does_exploration_exist helper function."""
+
+    EXP_ID: Final = 'exp_id'
+    COLLECTION_ID: Final = 'collection_id'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID
+        )
+        self.collection = (
+            collection_domain.Collection.create_default_collection(
+                self.COLLECTION_ID
+            )
+        )
+
+    def _mock_get_exploration_returning_none(
+        self,
+        unused_exploration_id: str,
+        strict: bool = True,  # pylint: disable=unused-argument
+        version: Optional[int] = None,  # pylint: disable=unused-argument
+    ) -> None:
+        """Mocks exp_fetchers.get_exploration_by_id for a missing
+        exploration.
+        """
+        return None
+
+    def _mock_get_exploration_returning_exploration(
+        self,
+        unused_exploration_id: str,
+        strict: bool = True,  # pylint: disable=unused-argument
+        version: Optional[int] = None,  # pylint: disable=unused-argument
+    ) -> exp_domain.Exploration:
+        """Mocks exp_fetchers.get_exploration_by_id for an existing
+        exploration.
+        """
+        return self.exploration
+
+    def _mock_get_collection_returning_none(
+        self,
+        unused_collection_id: str,
+        strict: bool = True,  # pylint: disable=unused-argument
+    ) -> None:
+        """Mocks collection_services.get_collection_by_id for a missing
+        collection.
+        """
+        return None
+
+    def _mock_get_collection_returning_collection(
+        self,
+        unused_collection_id: str,
+        strict: bool = True,  # pylint: disable=unused-argument
+    ) -> collection_domain.Collection:
+        """Mocks collection_services.get_collection_by_id for an existing
+        collection.
+        """
+        return self.collection
+
+    def test_returns_false_when_exploration_does_not_exist(self) -> None:
+        get_exploration_swap = self.swap_with_checks(
+            exp_fetchers,
+            'get_exploration_by_id',
+            self._mock_get_exploration_returning_none,
+            expected_args=[(self.EXP_ID,)],
+            expected_kwargs=[{'strict': False, 'version': 2}],
+        )
+        # The collection should never be fetched when the exploration is
+        # missing, since the function returns early.
+        get_collection_swap = self.swap_with_checks(
+            collection_services,
+            'get_collection_by_id',
+            self._mock_get_collection_returning_collection,
+            called=False,
+        )
+        with get_exploration_swap, get_collection_swap:
+            self.assertFalse(
+                reader._does_exploration_exist(  # pylint: disable=protected-access
+                    self.EXP_ID, 2, self.COLLECTION_ID
+                )
+            )
+
+    def test_returns_true_when_exploration_exists_without_collection(
+        self,
+    ) -> None:
+        get_exploration_swap = self.swap_with_checks(
+            exp_fetchers,
+            'get_exploration_by_id',
+            self._mock_get_exploration_returning_exploration,
+            expected_args=[(self.EXP_ID,)],
+            expected_kwargs=[{'strict': False, 'version': None}],
+        )
+        # The collection should not be fetched when no collection ID is given.
+        get_collection_swap = self.swap_with_checks(
+            collection_services,
+            'get_collection_by_id',
+            self._mock_get_collection_returning_collection,
+            called=False,
+        )
+        with get_exploration_swap, get_collection_swap:
+            self.assertTrue(
+                reader._does_exploration_exist(  # pylint: disable=protected-access
+                    self.EXP_ID, None, None
+                )
+            )
+
+    def test_returns_false_when_collection_does_not_exist(self) -> None:
+        get_exploration_swap = self.swap_with_checks(
+            exp_fetchers,
+            'get_exploration_by_id',
+            self._mock_get_exploration_returning_exploration,
+            expected_args=[(self.EXP_ID,)],
+            expected_kwargs=[{'strict': False, 'version': None}],
+        )
+        get_collection_swap = self.swap_with_checks(
+            collection_services,
+            'get_collection_by_id',
+            self._mock_get_collection_returning_none,
+            expected_args=[(self.COLLECTION_ID,)],
+            expected_kwargs=[{'strict': False}],
+        )
+        with get_exploration_swap, get_collection_swap:
+            self.assertFalse(
+                reader._does_exploration_exist(  # pylint: disable=protected-access
+                    self.EXP_ID, None, self.COLLECTION_ID
+                )
+            )
+
+    def test_returns_true_when_exploration_and_collection_exist(self) -> None:
+        get_exploration_swap = self.swap_with_checks(
+            exp_fetchers,
+            'get_exploration_by_id',
+            self._mock_get_exploration_returning_exploration,
+            expected_args=[(self.EXP_ID,)],
+            expected_kwargs=[{'strict': False, 'version': 1}],
+        )
+        get_collection_swap = self.swap_with_checks(
+            collection_services,
+            'get_collection_by_id',
+            self._mock_get_collection_returning_collection,
+            expected_args=[(self.COLLECTION_ID,)],
+            expected_kwargs=[{'strict': False}],
+        )
+        with get_exploration_swap, get_collection_swap:
+            self.assertTrue(
+                reader._does_exploration_exist(  # pylint: disable=protected-access
+                    self.EXP_ID, 1, self.COLLECTION_ID
+                )
+            )
