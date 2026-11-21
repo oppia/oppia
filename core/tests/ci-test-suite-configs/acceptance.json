@@ -727,8 +727,8 @@
     },
     {
       "name": "site-moderator/check-recent-commits",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/check-recent-commits.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/site-moderator/check-recent-commits.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "site-moderator/check-recent-feedback-messages",

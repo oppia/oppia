@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,21 +22,26 @@
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Moderator} from '../../utilities/user/moderator';
+import {test} from '@playwright/test';
 
-describe('Site Moderator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Site Moderator', function () {
   let siteModerator: Moderator;
   let explorationId: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     siteModerator = await UserFactory.createNewUser(
       'siteModerator',
       'site_moderator@example.com',
+      browser,
       [testConstants.Roles.MODERATOR]
     );
 
     const explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -67,9 +72,9 @@ describe('Site Moderator', function () {
     );
   });
 
-  it('should be able verify display of recent commits table', async function () {
+  test('should be able verify display of recent commits table', async function () {
     await siteModerator.navigateToModeratorPage();
-    await siteModerator.expectScreenshotToMatch('siteModeratorPage', __dirname);
+    await siteModerator.expectScreenshotToMatch('siteModeratorPage');
 
     await siteModerator.expectNumberOfRecentCommits(2);
     await siteModerator.expectRecentCommitsTableToHaveColumns([
@@ -90,7 +95,7 @@ describe('Site Moderator', function () {
     ]);
   });
 
-  it('should be able to verify clickable exploration links', async function () {
+  test('should be able to verify clickable exploration links', async function () {
     await siteModerator.clickOnExplorationLinkInRecentCommitsTable(2);
     await siteModerator.expectToBeInExplorationEditor(explorationId);
 
@@ -98,11 +103,11 @@ describe('Site Moderator', function () {
     await siteModerator.expectToBeInModeratorPage();
   });
 
-  it('should be able to verify order of timestamp', async function () {
+  test('should be able to verify order of timestamp', async function () {
     await siteModerator.expectTimestampToBeInDescendingOrder();
   });
 
-  it('should be able to verify community owned section', async function () {
+  test('should be able to verify community owned section', async function () {
     await siteModerator.expectCommitPropertyToBe(
       1,
       'isCommunityOwned',
@@ -110,7 +115,7 @@ describe('Site Moderator', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
