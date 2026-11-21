@@ -140,6 +140,7 @@
         "core.domain.event_services_test",
         "core.domain.user_services_test",
         "core.domain.fs_services_test",
+        "core.domain.recommendations_domain_test",
         "core.domain.recommendations_services_test",
         "scripts.run_typescript_checks_test",
         "core.storage.skill.gae_models_test",
