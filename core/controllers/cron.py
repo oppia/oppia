@@ -24,13 +24,13 @@ from core.domain import (
     beam_job_services,
     cron_services,
     email_manager,
-    platform_parameter_list,
-    platform_parameter_services,
     story_services,
     suggestion_registry,
     suggestion_services,
     taskqueue_services,
     user_services,
+    web_platform_parameter_list,
+    web_platform_parameter_services,
 )
 from core.jobs.batch_jobs import (
     cloud_task_run_migration_jobs,
@@ -126,8 +126,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         suggestions that have been waiting the longest for review, based on
         their reviewing permissions.
         """
-        if not platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+        if not web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return self.render_json({})
         reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
@@ -172,8 +172,8 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
             feconf.ROLE_ID_TRANSLATION_ADMIN
         )
 
-        if platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
+        if web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
         ):
             suggestion_types_needing_reviewers = (
                 suggestion_services.get_suggestion_types_that_need_reviewers()
@@ -185,8 +185,8 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 suggestion_types_needing_reviewers,
             )
 
-        if platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+        if web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
         ):
             info_about_suggestions_waiting_too_long_for_review = (
                 suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
@@ -218,8 +218,8 @@ class CronMailReviewerNewSuggestionsHandler(
         """Sends email notifications to reviewers about new
         suggestions on the Contributor Dashboard.
         """
-        if not platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+        if not web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return self.render_json({})
 

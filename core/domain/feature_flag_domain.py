@@ -39,7 +39,7 @@ class ServerMode(enum.Enum):
 FeatureStages = ServerMode
 
 
-def get_server_mode() -> ServerMode:
+def get_web_platform_parameter_server_mode() -> ServerMode:
     """Returns the current server mode.
 
     Returns:
@@ -347,7 +347,7 @@ class FeatureFlagConfig:
                 '0 and 100 inclusive.'
             )
 
-        server_mode = get_server_mode()
+        server_mode = get_web_platform_parameter_server_mode()
         if server_mode == ServerMode.TEST and feature_stage == ServerMode.DEV:
             raise utils.ValidationError(
                 'Feature flag in %s stage cannot be updated '

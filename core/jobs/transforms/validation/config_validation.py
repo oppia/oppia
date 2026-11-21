@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_domain as parameter_domain
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.platform import models

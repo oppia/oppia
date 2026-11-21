@@ -235,6 +235,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
             'StudyGuideCommitLogEntryModel',
             # Config models.
             'PlatformParameterSnapshotMetadataModel',
+            'WebPlatformParameterConfigSnapshotMetadataModel',
             # Certificate assessment offering models.
             'CertificateAssessmentOfferingSnapshotMetadataModel',
             'CertificateAssessmentOfferingCommitLogEntryModel',

@@ -27,7 +27,6 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     feedback_services,
-    platform_parameter_list,
     rights_manager,
     stats_domain,
     stats_services,
@@ -35,6 +34,7 @@ from core.domain import (
     user_services,
     voiceover_cloud_task_services,
     voiceover_regeneration_services,
+    web_platform_parameter_list,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -80,18 +80,18 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -196,22 +196,22 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
             (
-                platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
                 'http://localhost:8181',
             ),
         ]
@@ -267,18 +267,18 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -319,18 +319,18 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -365,18 +365,18 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -414,18 +414,18 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -454,18 +454,18 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -522,18 +522,18 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -588,18 +588,18 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1240,18 +1240,18 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]

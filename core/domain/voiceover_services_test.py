@@ -42,7 +42,7 @@ from core.domain import (
     voiceover_regeneration_services,
     voiceover_services,
 )
-from core.domain import platform_parameter_list as param_list
+from core.domain import web_platform_parameter_list as param_list
 from core.platform import models
 from core.tests import test_utils
 
