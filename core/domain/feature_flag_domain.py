@@ -24,6 +24,7 @@ import re
 
 from core import feconf, utils
 from core.constants import constants
+from core.domain import feature_flag_domain_errors
 
 from typing import Final, List, Optional, TypedDict
 
@@ -342,14 +343,14 @@ class FeatureFlagConfig:
     def validate(self, feature_stage: ServerMode) -> None:
         """Validates the FeatureFlagConfig object."""
         if self._rollout_percentage < 0 or self._rollout_percentage > 100:
-            raise utils.ValidationError(
+            raise feature_flag_domain_errors.InvalidRolloutPercentageError(
                 'Feature flag rollout-percentage should be between '
                 '0 and 100 inclusive.'
             )
 
         server_mode = get_server_mode()
         if server_mode == ServerMode.TEST and feature_stage == ServerMode.DEV:
-            raise utils.ValidationError(
+            raise feature_flag_domain_errors.IncompatibleFeatureStageError(
                 'Feature flag in %s stage cannot be updated '
                 'in %s environment.' % (feature_stage.value, server_mode.value)
             )
@@ -357,7 +358,7 @@ class FeatureFlagConfig:
             ServerMode.DEV,
             ServerMode.TEST,
         ):
-            raise utils.ValidationError(
+            raise feature_flag_domain_errors.IncompatibleFeatureStageError(
                 'Feature flag in %s stage cannot be updated '
                 'in %s environment.' % (feature_stage.value, server_mode.value)
             )
