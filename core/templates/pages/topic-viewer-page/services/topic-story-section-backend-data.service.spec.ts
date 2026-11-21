@@ -176,9 +176,6 @@ describe('TopicStorySectionBackendDataService', () => {
       'getId',
       'getStatus',
       'getAcquiredSkillIds',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue(title);
     storyNodeSpy.getDescription.and.returnValue(description);
@@ -188,11 +185,6 @@ describe('TopicStorySectionBackendDataService', () => {
     storyNodeSpy.getStatus.and.returnValue(options.status ?? null);
     storyNodeSpy.getAcquiredSkillIds.and.returnValue(
       options.acquiredSkillIds ?? []
-    );
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
     );
     return storyNodeSpy;
   };

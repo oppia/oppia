@@ -25,7 +25,6 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {SimpleChange} from '@angular/core';
-import {EventEmitter} from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
@@ -34,7 +33,6 @@ import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
 import {UrlService} from 'services/contextual/url.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -64,9 +62,7 @@ describe('TopicStorySectionComponent', () => {
   let assetsBackendApiService: jasmine.SpyObj<AssetsBackendApiService>;
   let i18nLanguageCodeService: {
     isCurrentLanguageRTL: jasmine.Spy;
-    onI18nLanguageCodeChange: EventEmitter<string>;
   };
-  let topicSessionFallbackLanguageService: jasmine.SpyObj<TopicSessionFallbackLanguageService>;
   let chapterLabelVisibilityService: jasmine.SpyObj<ChapterLabelVisibilityService>;
   let questionBackendApiService: jasmine.SpyObj<QuestionBackendApiService>;
   let localStorageService: jasmine.SpyObj<LocalStorageService>;
@@ -114,12 +110,6 @@ describe('TopicStorySectionComponent', () => {
     i18nLanguageCodeService = jasmine.createSpyObj('I18nLanguageCodeService', [
       'isCurrentLanguageRTL',
     ]);
-    i18nLanguageCodeService.onI18nLanguageCodeChange =
-      new EventEmitter<string>();
-    topicSessionFallbackLanguageService = jasmine.createSpyObj(
-      'TopicSessionFallbackLanguageService',
-      ['clearSelection']
-    );
     chapterLabelVisibilityService = jasmine.createSpyObj(
       'ChapterLabelVisibilityService',
       ['isNewChapterLabelVisible']
@@ -181,10 +171,6 @@ describe('TopicStorySectionComponent', () => {
         {provide: UrlInterpolationService, useValue: urlInterpolationService},
         {provide: AssetsBackendApiService, useValue: assetsBackendApiService},
         {provide: I18nLanguageCodeService, useValue: i18nLanguageCodeService},
-        {
-          provide: TopicSessionFallbackLanguageService,
-          useValue: topicSessionFallbackLanguageService,
-        },
         {
           provide: ChapterLabelVisibilityService,
           useValue: chapterLabelVisibilityService,
@@ -268,10 +254,6 @@ describe('TopicStorySectionComponent', () => {
     component.storySummary = createStorySummarySpy([], []);
   });
 
-  afterEach(() => {
-    component.ngOnDestroy();
-  });
-
   const createStorySummarySpy = (
     nodeTitles: string[],
     nodes: jasmine.SpyObj<StoryNode>[],
@@ -312,7 +294,6 @@ describe('TopicStorySectionComponent', () => {
     thumbnailFilename: string | null = null,
     options: {
       status?: string | null;
-      textLanguageCodes?: string[];
       acquiredSkillIds?: string[];
     } = {}
   ): jasmine.SpyObj<StoryNode> => {
@@ -324,9 +305,6 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getStatus',
       'getAcquiredSkillIds',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue(title);
     storyNodeSpy.getDescription.and.returnValue(description);
@@ -336,13 +314,6 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getStatus.and.returnValue(options.status);
     storyNodeSpy.getAcquiredSkillIds.and.returnValue(
       options.acquiredSkillIds ?? []
-    );
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(
-      options.textLanguageCodes ?? []
-    );
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
     );
     return storyNodeSpy;
   };
@@ -368,9 +339,6 @@ describe('TopicStorySectionComponent', () => {
     isComingSoon: false,
     isPublished: true,
     isNewLabelVisible: false,
-    availableTextLanguageCodes: [],
-    availableVoiceoverLanguageCodes: [],
-    availableVoiceoverLanguageAccentDescriptions: {},
   });
 
   const createModuleGroup = (
@@ -475,10 +443,7 @@ describe('TopicStorySectionComponent', () => {
       'Node description 1',
       'exp_1',
       'node_1',
-      'thumb.png',
-      {
-        textLanguageCodes: ['en'],
-      }
+      'thumb.png'
     );
 
     component.storySummary = createStorySummarySpy(
@@ -505,10 +470,7 @@ describe('TopicStorySectionComponent', () => {
       'Node description 1',
       'exp_1',
       'node_1',
-      'thumb.png',
-      {
-        textLanguageCodes: ['en'],
-      }
+      'thumb.png'
     );
 
     const storySummary = createStorySummarySpy(
@@ -536,10 +498,7 @@ describe('TopicStorySectionComponent', () => {
       'Node description 1',
       'exp_1',
       'node_1',
-      'thumb.png',
-      {
-        textLanguageCodes: ['en'],
-      }
+      'thumb.png'
     );
 
     const storySummary = createStorySummarySpy(
@@ -564,10 +523,7 @@ describe('TopicStorySectionComponent', () => {
       'Node description 1',
       'exp_1',
       'node_1',
-      'thumb.png',
-      {
-        textLanguageCodes: ['en'],
-      }
+      'thumb.png'
     );
 
     component.storySummary = createStorySummarySpy(
@@ -641,10 +597,7 @@ describe('TopicStorySectionComponent', () => {
       'Node description 1',
       'exp_1',
       'node_1',
-      null,
-      {
-        textLanguageCodes: ['en'],
-      }
+      null
     );
 
     const storySummary = createStorySummarySpy(
@@ -671,10 +624,7 @@ describe('TopicStorySectionComponent', () => {
       'Node description 1',
       null,
       'node_1',
-      'thumb.png',
-      {
-        textLanguageCodes: ['en'],
-      }
+      'thumb.png'
     );
 
     const storySummary = createStorySummarySpy(
@@ -711,33 +661,13 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isLanguageRTL()).toBe(true);
   });
 
-  it('should clear fallback selection when language changes', () => {
-    component.ngOnInit();
-    topicSessionFallbackLanguageService.clearSelection.calls.reset();
-
-    i18nLanguageCodeService.onI18nLanguageCodeChange.emit('es');
-
-    expect(
-      topicSessionFallbackLanguageService.clearSelection
-    ).toHaveBeenCalledTimes(1);
-
-    component.ngOnDestroy();
-    i18nLanguageCodeService.onI18nLanguageCodeChange.emit('fr');
-    expect(
-      topicSessionFallbackLanguageService.clearSelection
-    ).toHaveBeenCalledTimes(1);
-  });
-
   it('should construct practice card url when arcs and fragments are present', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node title 1',
       'Node description 1',
       'exp_1',
       'node_1',
-      'thumb.png',
-      {
-        textLanguageCodes: ['en'],
-      }
+      'thumb.png'
     );
 
     const storySummary = createStorySummarySpy(
@@ -772,10 +702,7 @@ describe('TopicStorySectionComponent', () => {
       'Node description 1',
       'exp_1',
       'node_1',
-      'thumb.png',
-      {
-        textLanguageCodes: ['en'],
-      }
+      'thumb.png'
     );
 
     const storySummary = createStorySummarySpy(
@@ -1010,10 +937,7 @@ describe('TopicStorySectionComponent', () => {
       'Node description 1',
       null,
       'node_1',
-      null,
-      {
-        textLanguageCodes: ['en'],
-      }
+      null
     );
 
     const storySummary = createStorySummarySpy(
@@ -1137,10 +1061,7 @@ describe('TopicStorySectionComponent', () => {
       'Node description 1',
       'exp_1',
       'node_1',
-      'thumb.png',
-      {
-        textLanguageCodes: ['en'],
-      }
+      'thumb.png'
     );
 
     component.storySummary = createStorySummarySpy(
@@ -1824,9 +1745,6 @@ describe('TopicStorySectionComponent', () => {
         'getId',
         'getStatus',
         'getAcquiredSkillIds',
-        'getAvailableTextLanguageCodes',
-        'getAvailableVoiceoverLanguageCodes',
-        'getAvailableVoiceoverLanguageAccentDescriptions',
       ]);
       spy.getTitle.and.returnValue(`Node ${i}`);
       spy.getDescription.and.returnValue(`Desc ${i}`);
@@ -1835,9 +1753,6 @@ describe('TopicStorySectionComponent', () => {
       spy.getId.and.returnValue(`node_${i}`);
       spy.getStatus.and.returnValue(null);
       spy.getAcquiredSkillIds.and.returnValue([]);
-      spy.getAvailableTextLanguageCodes.and.returnValue([]);
-      spy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-      spy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue({});
       storyNodeSpies.push(spy);
       nodeIds.push(`node_${i}`);
     }
@@ -1899,9 +1814,6 @@ describe('TopicStorySectionComponent', () => {
       isComingSoon: false,
       isPublished: true,
       isNewLabelVisible: false,
-      availableTextLanguageCodes: [],
-      availableVoiceoverLanguageCodes: [],
-      availableVoiceoverLanguageAccentDescriptions: {},
     };
 
     component.availableLessonCards = [
@@ -1943,9 +1855,6 @@ describe('TopicStorySectionComponent', () => {
       isComingSoon: false,
       isPublished: true,
       isNewLabelVisible: false,
-      availableTextLanguageCodes: [],
-      availableVoiceoverLanguageCodes: [],
-      availableVoiceoverLanguageAccentDescriptions: {},
     };
 
     component.visibleModuleGroups = [
@@ -2591,9 +2500,6 @@ describe('TopicStorySectionComponent', () => {
         'getId',
         'getStatus',
         'getAcquiredSkillIds',
-        'getAvailableTextLanguageCodes',
-        'getAvailableVoiceoverLanguageCodes',
-        'getAvailableVoiceoverLanguageAccentDescriptions',
       ]);
       storyNodeSpy.getTitle.and.returnValue(title);
       storyNodeSpy.getDescription.and.returnValue('Desc');
@@ -2602,11 +2508,6 @@ describe('TopicStorySectionComponent', () => {
       storyNodeSpy.getId.and.returnValue(nodeId);
       storyNodeSpy.getStatus.and.returnValue('Published');
       storyNodeSpy.getAcquiredSkillIds.and.returnValue([]);
-      storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-      storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-      storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-        {}
-      );
       return storyNodeSpy;
     };
 
@@ -2675,9 +2576,6 @@ describe('TopicStorySectionComponent', () => {
         'getId',
         'getStatus',
         'getAcquiredSkillIds',
-        'getAvailableTextLanguageCodes',
-        'getAvailableVoiceoverLanguageCodes',
-        'getAvailableVoiceoverLanguageAccentDescriptions',
       ]);
       storyNodeSpy.getTitle.and.returnValue(title);
       storyNodeSpy.getDescription.and.returnValue('Desc');
@@ -2686,11 +2584,6 @@ describe('TopicStorySectionComponent', () => {
       storyNodeSpy.getId.and.returnValue(nodeId);
       storyNodeSpy.getStatus.and.returnValue('Published');
       storyNodeSpy.getAcquiredSkillIds.and.returnValue([]);
-      storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-      storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-      storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-        {}
-      );
       return storyNodeSpy;
     };
 
@@ -3256,9 +3149,6 @@ describe('TopicStorySectionComponent', () => {
         'getId',
         'getStatus',
         'getAcquiredSkillIds',
-        'getAvailableTextLanguageCodes',
-        'getAvailableVoiceoverLanguageCodes',
-        'getAvailableVoiceoverLanguageAccentDescriptions',
       ]);
       storyNodeSpy.getTitle.and.returnValue(title);
       storyNodeSpy.getDescription.and.returnValue('Desc');
@@ -3267,11 +3157,6 @@ describe('TopicStorySectionComponent', () => {
       storyNodeSpy.getId.and.returnValue(nodeId);
       storyNodeSpy.getStatus.and.returnValue('Published');
       storyNodeSpy.getAcquiredSkillIds.and.returnValue([]);
-      storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-      storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-      storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-        {}
-      );
       return storyNodeSpy;
     };
 

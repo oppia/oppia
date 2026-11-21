@@ -55,9 +55,6 @@ export interface LessonCardData {
   isComingSoon: boolean;
   isPublished: boolean;
   isNewLabelVisible: boolean;
-  availableTextLanguageCodes: string[];
-  availableVoiceoverLanguageCodes: string[];
-  availableVoiceoverLanguageAccentDescriptions: {[accentCode: string]: string};
 }
 
 export interface ModuleGroupData {
@@ -134,11 +131,6 @@ export class TopicStorySectionBackendDataService {
         isComingSoon: lessonProgressStatus === 'coming_soon',
         isPublished: this.isChapterPublished(node),
         isNewLabelVisible: this.isNewChapterLabelVisible(node, storySummary),
-        availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
-        availableVoiceoverLanguageCodes:
-          node.getAvailableVoiceoverLanguageCodes(),
-        availableVoiceoverLanguageAccentDescriptions:
-          node.getAvailableVoiceoverLanguageAccentDescriptions(),
       };
     });
   }
