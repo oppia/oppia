@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for TranslationSuggestionReviewModalComponent.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -654,7 +652,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           suggestionId: string,
           translationHtml: string,
           successCallback: () => void,
-          errorCallback: () => void
+          errorCallback: (error: Error) => void
         ) => {
           isSubmittingInServiceCall = component.isSubmitting;
           return Promise.resolve(successCallback());
@@ -1086,6 +1084,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           errorCallback
         ) => {
           errorCallback('Error');
+          return Promise.resolve();
         }
       );
       spyOn(alertsService, 'addWarning');
@@ -1117,6 +1116,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           errorCallback
         ) => {
           errorCallback('Error');
+          return Promise.resolve();
         }
       );
       spyOn(alertsService, 'addWarning');
@@ -1489,7 +1489,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           successCallback,
           errorCallback
         ) => {
-          successCallback();
+          successCallback(suggestionId);
           return Promise.resolve();
         }
       );
@@ -1731,7 +1731,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           suggestionId: string,
           translationHtml: string,
           successCallback: () => void,
-          errorCallback: () => void
+          errorCallback: (error: Error) => void
         ) => {
           isSubmittingInServiceCall = component.isSubmitting;
           return Promise.resolve(successCallback());

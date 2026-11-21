@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for contributionsAndReview.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   fakeAsync,
@@ -67,6 +65,7 @@ import {
   MatSnackBar,
   MatSnackBarRef,
   MAT_SNACK_BAR_DATA,
+  TextOnlySnackBar,
 } from '@angular/material/snack-bar';
 import {of, Subject} from 'rxjs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -90,13 +89,6 @@ class MockNgbModal {
       result: Promise.resolve(),
     };
   }
-}
-
-class MockNgbModalRef {
-  componentInstance: Record<string, unknown> = {};
-  result: Promise<unknown> = Promise.resolve();
-  close(): void {}
-  dismiss(): void {}
 }
 
 class MockWindowRef {
@@ -312,6 +304,7 @@ describe('Contributions and review component', () => {
                 content_html: 'Translation',
                 translation_html: 'Tradução',
                 skill_id: 'skill_id',
+                content_id: 'content_id',
               },
               status: 'review',
             },
@@ -343,6 +336,7 @@ describe('Contributions and review component', () => {
                 new_value: null,
                 old_value: null,
                 skill_id: 'skill1',
+                content_id: 'content_id',
                 question_dict: {
                   id: '1',
                   question_state_data: {
@@ -406,7 +400,7 @@ describe('Contributions and review component', () => {
                           content_id: 'content_4',
                         },
                       },
-                      id: 'TextInput',
+                      id: 'TextInput' as const,
                     },
                     param_changes: [],
                     recorded_voiceovers: {
@@ -445,6 +439,7 @@ describe('Contributions and review component', () => {
                 new_value: null,
                 old_value: null,
                 skill_id: 'skill1',
+                content_id: 'content_id',
                 question_dict: {
                   id: '1',
                   question_state_data: {
@@ -508,7 +503,7 @@ describe('Contributions and review component', () => {
                           content_id: 'content_4',
                         },
                       },
-                      id: 'TextInput',
+                      id: 'TextInput' as const,
                     },
                     param_changes: [],
                     recorded_voiceovers: {
@@ -592,6 +587,8 @@ describe('Contributions and review component', () => {
                 old_value: null,
                 content_html: 'Translation',
                 translation_html: 'Tradução',
+                skill_id: 'skill_id',
+                content_id: 'content_id',
               },
               status: 'review',
             },
@@ -1316,7 +1313,7 @@ describe('Contributions and review component', () => {
                         content_id: 'content_4',
                       },
                     },
-                    id: 'TextInput',
+                    id: 'TextInput' as const,
                   },
                   param_changes: [],
                   recorded_voiceovers: {
@@ -1365,21 +1362,22 @@ describe('Contributions and review component', () => {
     }));
 
     it('should handle dismiss when question suggestion modal is closed', fakeAsync(() => {
-      const mockModalRef = new MockNgbModalRef();
-      mockModalRef.componentInstance = {
-        authorName: null,
-        contentHtml: null,
-        reviewable: null,
-        question: null,
-        questionHeader: null,
-        suggestion: null,
-        skillRubrics: null,
-        suggestionId: null,
-        skillDifficulty: null,
-        misconceptionsBySkill: null,
-        editSuggestionEmitter: new EventEmitter(),
-      };
-      mockModalRef.result = Promise.reject();
+      const mockModalRef = {
+        componentInstance: {
+          authorName: null,
+          contentHtml: null,
+          reviewable: null,
+          question: null,
+          questionHeader: null,
+          suggestion: null,
+          skillRubrics: null,
+          suggestionId: null,
+          skillDifficulty: null,
+          misconceptionsBySkill: null,
+          editSuggestionEmitter: new EventEmitter(),
+        },
+        result: Promise.reject(),
+      } as NgbModalRef;
       spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
       let question = Question.createFromBackendDict({
@@ -1574,12 +1572,12 @@ describe('Contributions and review component', () => {
           component.activeTabType = component.TAB_TYPE_REVIEWS;
           component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE;
 
-          const loadPromise = component.loadContributions(null);
+          const loadPromise = component.loadContributions(false);
 
           // Simulate the user switching tabs before the response resolves.
           component.activeTabSubtype = component.SUGGESTION_TYPE_QUESTION;
 
-          let result: GetOpportunitiesResponse;
+          let result!: GetOpportunitiesResponse;
           loadPromise.then(response => {
             result = response;
           });
@@ -1587,7 +1585,7 @@ describe('Contributions and review component', () => {
 
           // The stale response should be ignored and an empty result returned.
           expect(result.opportunitiesDicts).toEqual([]);
-          expect(result.more).toBeFalse();
+          expect(result.more).toBe(false);
         })
       );
 
@@ -1652,19 +1650,22 @@ describe('Contributions and review component', () => {
       });
 
       it('should show only selected type when switching tabs', fakeAsync(() => {
-        const suggestion1 = {
+        const suggestion1: Record<string, ActiveContributionDict> = {
           suggestion_1: {
             suggestion: {
               target_type: 'state',
               author_name: 'rod newt',
-              last_updated_msecs: '66778',
+              last_updated_msecs: 66778,
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
+              language_code: 'en',
               change_cmd: {
+                cmd: 'add_translation',
+                content_id: 'content_id',
+                data_format: 'html',
+                language_code: 'en',
                 state_name: 'state',
-                new_value: 'new',
-                old_value: 'old',
                 content_html: 'Translation',
                 translation_html: 'Tradução',
               },
@@ -1725,7 +1726,7 @@ describe('Contributions and review component', () => {
         const suggestion2 = {
           target_type: 'state',
           author_name: 'eddie name',
-          last_updated_msecs: '345435',
+          last_updated_msecs: 345435,
           suggestion_id: 'suggestion_2',
           target_id: '1',
           suggestion_type: 'add_question',
@@ -1734,9 +1735,17 @@ describe('Contributions and review component', () => {
             new_value: 'new',
             old_value: 'old',
             skill_id: 'skill1',
+            content_html: '',
+            translation_html: '',
+            skill_difficulty: [],
             question_dict: {
               id: '1',
               question_state_data: {
+                classifier_model_id: null,
+                card_is_checkpoint: false,
+                linked_skill_id: null,
+                solicit_answer_details: false,
+                inapplicable_skill_misconception_ids: [],
                 content: {
                   html: 'Question 2',
                   content_id: 'content_2',
@@ -1754,8 +1763,11 @@ describe('Contributions and review component', () => {
                         labelled_as_correct: true,
                         param_changes: [],
                         refresher_exploration_id: null,
+                        missing_prerequisite_skill_id: null,
                       },
                       rule_specs: [],
+                      training_data: [],
+                      tagged_skill_misconception_id: null,
                     },
                   ],
                   confirmed_unclassified_answers: [],
@@ -1780,6 +1792,8 @@ describe('Contributions and review component', () => {
                     },
                     param_changes: [],
                     labelled_as_correct: true,
+                    refresher_exploration_id: null,
+                    missing_prerequisite_skill_id: null,
                   },
                   hints: [
                     {
@@ -1797,16 +1811,23 @@ describe('Contributions and review component', () => {
                       content_id: 'content_4',
                     },
                   },
-                  id: 'TextInput',
+                  id: 'TextInput' as const,
                 },
                 param_changes: [],
                 recorded_voiceovers: {
                   voiceovers_mapping: {},
                 },
               },
+              question_state_data_schema_version: 1,
+              language_code: 'en',
+              version: 1,
+              linked_skill_ids: [],
+              inapplicable_skill_misconception_ids: [],
+              next_content_id_index: 0,
             },
           },
           status: 'accepted',
+          entity_content_html: null,
         };
         getUserCreatedQuestionSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve({
@@ -1897,7 +1918,7 @@ describe('Contributions and review component', () => {
 
           let response = null;
           component
-            .loadContributions(null)
+            .loadContributions(false)
             .then(({opportunitiesDicts, more}) => {
               response = {opportunitiesDicts, more};
             });
@@ -1921,7 +1942,7 @@ describe('Contributions and review component', () => {
           );
 
           let rejectionStatus = null;
-          component.loadContributions(null).then(
+          component.loadContributions(false).then(
             () => {},
             error => {
               rejectionStatus = error.status;
@@ -1974,7 +1995,7 @@ describe('Contributions and review component', () => {
                       },
                       hints: [],
                       solution: null,
-                      id: 'TextInput',
+                      id: 'TextInput' as const,
                     },
                     param_changes: [],
                     solicit_answer_details: false,
@@ -2221,7 +2242,7 @@ describe('Contributions and review component', () => {
         const pinReviewableTranslationOpportunityAsyncSpy = spyOn(
           contributionOpportunitiesService,
           'pinReviewableTranslationOpportunityAsync'
-        ).and.returnValue(Promise.resolve({}));
+        ).and.returnValue(Promise.resolve());
 
         const dict = {
           topic_name: 'Topic 3',
@@ -2280,7 +2301,7 @@ describe('Contributions and review component', () => {
       const unpinReviewableTranslationOpportunityAsyncSpy = spyOn(
         contributionOpportunitiesService,
         'unpinReviewableTranslationOpportunityAsync'
-      ).and.returnValue(Promise.resolve({}));
+      ).and.returnValue(Promise.resolve());
 
       component.languageCode = 'en';
 
@@ -2296,6 +2317,9 @@ describe('Contributions and review component', () => {
     }));
 
     it('should open snackbar and handle action', fakeAsync(() => {
+      const mockSnackBarRef = jasmine.createSpyObj<
+        MatSnackBarRef<TextOnlySnackBar>
+      >('MatSnackBarRef', ['dismiss', 'onAction']);
       spyOn(snackBar, 'open').and.callFake(
         (
           message: string,
@@ -2304,10 +2328,8 @@ describe('Contributions and review component', () => {
         ) => {
           const data = TestBed.inject(MAT_SNACK_BAR_DATA);
           data.onAction = of(null);
-          return {
-            onAction: () => data.onAction,
-            dismiss: () => {},
-          };
+          mockSnackBarRef.onAction.and.returnValue(data.onAction);
+          return mockSnackBarRef;
         }
       );
       spyOn(
@@ -3090,11 +3112,7 @@ describe('Contributions and review component', () => {
     });
 
     it('should close dropdown when a click is made outside', () => {
-      const element = {
-        contains: () => {
-          return true;
-        },
-      };
+      const element = document.createElement('div');
       const clickEvent = {
         target: document.createElement('div'),
       };
@@ -3111,12 +3129,6 @@ describe('Contributions and review component', () => {
       expect(elementContainsSpy).not.toHaveBeenCalled();
       expect(component.dropdownShown).toBe(true);
 
-      // This throws "Argument of type '{ contains: () => boolean; }' is not
-      // assignable to parameter of type 'Element'. Type '{ contains:
-      // () => boolean; }' is missing the following properties from type
-      // 'Element': attributes, classList, className, clientHeight, and 159
-      // more.". We need to suppress this error because only the properties
-      // provided in the element object are required for testing.
       querySelectorSpy.and.returnValue(element);
 
       component.closeDropdownWhenClickedOutside(clickEvent);
@@ -3221,15 +3233,16 @@ describe('Contributions and review component', () => {
     }));
 
     it('should handle dismiss when translation suggestion modal is closed', fakeAsync(() => {
-      const mockModalRef = new MockNgbModalRef();
-      mockModalRef.componentInstance = {
-        suggestionIdToContribution: {},
-        initialSuggestionId: 'suggestion_1',
-        subheading: 'Sub heading',
-        queuedSuggestionSummaryEmit: new EventEmitter(),
-        queuedSuggestionEmit: new EventEmitter(),
-      };
-      mockModalRef.result = Promise.reject();
+      const mockModalRef = {
+        componentInstance: {
+          suggestionIdToContribution: {},
+          initialSuggestionId: 'suggestion_1',
+          subheading: 'Sub heading',
+          queuedSuggestionSummaryEmit: new EventEmitter(),
+          queuedSuggestionEmit: new EventEmitter(),
+        },
+        result: Promise.reject(),
+      } as NgbModalRef;
       spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
       component.contributions = {
@@ -3856,6 +3869,7 @@ describe('Contributions and review component', () => {
         _errorCb: (err: string) => void
       ) => {
         successCb('');
+        return Promise.resolve();
       }
     );
     component.commitQueuedSuggestion();
