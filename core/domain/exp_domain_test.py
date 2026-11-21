@@ -1332,6 +1332,13 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         d_state.update_card_is_checkpoint(True)
         self.exploration.validate()
 
+        # Strict validation also accepts the exploration, because no checkpoint
+        # can be bypassed.
+        self.exploration.title = 'A title'
+        self.exploration.category = 'A category'
+        self.exploration.objective = 'An objective'
+        self.exploration.validate(strict=True)
+
         # Modifying the graph to add another EndExploration state.
         #                ┌────────────────┐
         #                │ Introduction*  │
@@ -5346,6 +5353,16 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             self.exp_summary.is_solely_owned_by_user(self.owner_id)
         )
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
+
+    def test_to_metadata_dict(self) -> None:
+        self.assertEqual(
+            self.exp_summary.to_metadata_dict(),
+            {
+                'id': 'eid',
+                'title': self.exp_summary.title,
+                'objective': self.exp_summary.objective,
+            },
+        )
 
     def test_does_user_have_any_role(self) -> None:
         self.assertTrue(self.exp_summary.does_user_have_any_role(self.owner_id))
