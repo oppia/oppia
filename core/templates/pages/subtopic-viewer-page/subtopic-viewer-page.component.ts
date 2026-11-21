@@ -247,13 +247,14 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     if (this.sections === null || this.sections.length === 0) {
       return;
     }
-    const sectionNumber = Number(this.urlService.getUrlParams().section);
+    // The raw value is checked first, since Number() also converts values like
+    // '0x2', '2e0' or ' 2 ', and only plain section numbers should be accepted.
+    const sectionParam = this.urlService.getUrlParams().section;
     if (
-      Number.isInteger(sectionNumber) &&
-      sectionNumber >= 1 &&
-      sectionNumber <= this.sections.length
+      /^[1-9]\d*$/.test(sectionParam) &&
+      Number(sectionParam) <= this.sections.length
     ) {
-      this.highlightedSectionIndex = sectionNumber - 1;
+      this.highlightedSectionIndex = Number(sectionParam) - 1;
       this.expandedSectionIndices.add(this.highlightedSectionIndex);
     } else {
       this.expandedSectionIndices.add(0);

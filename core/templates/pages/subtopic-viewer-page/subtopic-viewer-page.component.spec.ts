@@ -575,7 +575,19 @@ describe('Subtopic viewer page', function () {
       expect(getDisplayedSectionContents()).toEqual(['Heading 3']);
     }));
 
-    for (const invalidSection of ['0', '4', '-1', '1.5', 'abc', '']) {
+    for (const invalidSection of [
+      '0',
+      '4',
+      '-1',
+      '1.5',
+      'abc',
+      '',
+      '0x2',
+      '2e0',
+      ' 2 ',
+      '+2',
+      '02',
+    ]) {
       it(
         'should fall back to the default state when the section in the ' +
           `URL is invalid: '${invalidSection}'`,
