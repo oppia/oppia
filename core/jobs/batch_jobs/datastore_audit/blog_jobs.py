@@ -33,11 +33,18 @@ from typing import Callable, Iterator, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models, blog_models, user_models
+    from mypy_imports import (
+        base_models,
+        blog_models,
+        datastore_services,
+        user_models,
+    )
 
 (base_models, blog_models, user_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.BLOG, models.Names.USER]
 )
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class BlogPostRightsModelValidationJob(base_validation_jobs.BaseValidationJob):
@@ -83,10 +90,15 @@ class BlogPostRightsModelValidationJob(base_validation_jobs.BaseValidationJob):
             blog_models.BlogPostRightsModel,
             blog_models.BlogPostRightsModel.id,
         )
-        blog_post_model = blog_models.BlogPostModel.get(model.id, strict=False)
-        blog_post_summary_model = blog_models.BlogPostSummaryModel.get(
-            model.id, strict=False
-        )
+        # Beam runs this outside the request's NDB context, so the reads need
+        # their own.
+        with datastore_services.get_ndb_context():
+            blog_post_model = blog_models.BlogPostModel.get(
+                model.id, strict=False
+            )
+            blog_post_summary_model = blog_models.BlogPostSummaryModel.get(
+                model.id, strict=False
+            )
 
         for target_kind, target_model in (
             ('BlogPostModel', blog_post_model),
@@ -132,9 +144,10 @@ class BlogPostRightsModelValidationJob(base_validation_jobs.BaseValidationJob):
         if not isinstance(model, blog_models.BlogPostRightsModel):
             return
 
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            model.editor_ids
-        )
+        with datastore_services.get_ndb_context():
+            user_settings_models = user_models.UserSettingsModel.get_multi(
+                model.editor_ids
+            )
         for editor_id, user_settings_model in zip(
             model.editor_ids, user_settings_models
         ):

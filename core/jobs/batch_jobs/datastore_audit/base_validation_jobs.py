@@ -25,7 +25,7 @@ from core.jobs.types import base_validation_errors, job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Callable, Dict, Iterator, List
+from typing import Callable, Iterable, Iterator, List, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -63,17 +63,40 @@ This class must implement the following methods:
 """
 
 
+def _to_job_run_result(
+    group: Tuple[str, Iterable[job_run_result.JobRunResult]],
+) -> job_run_result.JobRunResult:
+    """Combines the errors of one type into a single job run result.
+
+    The job runner stores the job's output with JobRunResult.accumulate, so
+    every element of the output must be a JobRunResult.
+
+    Args:
+        group: tuple(str, iterable(JobRunResult)). The error type and the
+            errors of that type.
+
+    Returns:
+        JobRunResult. A result whose stderr is the error type followed by the
+        first ERROR_TRUNCATION_LIMIT error messages, sorted, one per line.
+    """
+    error_type, errors = group
+    messages = sorted(error.stderr for error in errors)[:ERROR_TRUNCATION_LIMIT]
+    return job_run_result.JobRunResult.as_stderr(
+        '%s: %s' % (error_type, '\n'.join(messages))
+    )
+
+
 # TODO(oppia-web-developer-docs#464): Create wiki page for pointers on writing
 # validation jobs.
 class BaseValidationJob(base_jobs.JobBase):
     """Base class for all validation jobs."""
 
-    def run(self) -> beam.PCollection[Dict[str, List[str]]]:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the validation job.
 
         Returns:
-            PCollection. A PCollection of dictionaries, where keys are error
-            types and values are lists of truncated model IDs.
+            PCollection. One JobRunResult per error type, whose stderr names
+            the error type followed by its (truncated) error messages.
         """
         all_models = self.pipeline | 'Get all models' >> (
             ndb_io.GetModels(datastore_services.query_everything())
@@ -105,14 +128,7 @@ class BaseValidationJob(base_jobs.JobBase):
             results
             | 'Group Errors by Type'
             >> beam.GroupBy(lambda error: type(error).__name__)
-            | 'Extract Error Messages'
-            >> beam.Map(
-                lambda group: {
-                    group[0]: sorted([error.stderr for error in group[1]])[
-                        :ERROR_TRUNCATION_LIMIT
-                    ]
-                }
-            )
+            | 'Extract Error Messages' >> beam.Map(_to_job_run_result)
         )
 
     def get_validation_fns(

@@ -25,6 +25,7 @@ from core.jobs.batch_jobs.datastore_audit import blog_jobs
 from core.jobs.types import (
     base_validation_errors,
     blog_validation_errors,
+    job_run_result,
     model_property,
 )
 from core.platform import models
@@ -43,6 +44,23 @@ BLOG_POST_ID = 'blogpostid01'
 AUTHOR_ID = 'uid_%s' % ('a' * 32)
 EDITOR_ID = 'uid_%s' % ('b' * 32)
 PSEUDONYMOUS_AUTHOR_ID = 'pid_%s' % ('c' * 32)
+
+
+def grouped_errors(
+    error_type: str, messages: List[str]
+) -> job_run_result.JobRunResult:
+    """Returns the job output expected for the given errors of one type.
+
+    Args:
+        error_type: str. The name of the error class.
+        messages: list(str). The stderr of each error.
+
+    Returns:
+        JobRunResult. The expected job output for these errors.
+    """
+    return job_run_result.JobRunResult.as_stderr(
+        '%s: %s' % (error_type, '\n'.join(sorted(messages)))
+    )
 
 
 class BlogPostRightsModelValidationJobTests(job_test_utils.JobTestBase):
@@ -210,7 +228,7 @@ class BlogPostRightsModelValidationJobTests(job_test_utils.JobTestBase):
         ]
 
         self.assert_job_output_is(
-            [{'ModelRelationshipError': sorted(expected_errors)}]
+            [grouped_errors('ModelRelationshipError', expected_errors)]
         )
 
     def test_missing_user_settings_produce_relationship_error(self) -> None:
@@ -235,7 +253,7 @@ class BlogPostRightsModelValidationJobTests(job_test_utils.JobTestBase):
         )
 
         self.assert_job_output_is(
-            [{'ModelRelationshipError': [expected_error.stderr]}]
+            [grouped_errors('ModelRelationshipError', [expected_error.stderr])]
         )
 
     def test_published_rights_for_draft_post_produce_errors(self) -> None:
@@ -257,20 +275,16 @@ class BlogPostRightsModelValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                {
-                    'InconsistentBlogPostPublishedStatusError': sorted(
-                        expected_errors
-                    )
-                }
+                grouped_errors(
+                    'InconsistentBlogPostPublishedStatusError', expected_errors
+                )
             ]
         )
 
     def test_unpublished_rights_for_published_summary_produce_error(
         self,
     ) -> None:
-        model = self.create_blog_post_rights_model(
-            blog_post_is_published=False
-        )
+        model = self.create_blog_post_rights_model(blog_post_is_published=False)
         self.put_multi(
             [
                 model,
@@ -289,11 +303,10 @@ class BlogPostRightsModelValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                {
-                    'InconsistentBlogPostPublishedStatusError': [
-                        expected_error.stderr
-                    ]
-                }
+                grouped_errors(
+                    'InconsistentBlogPostPublishedStatusError',
+                    [expected_error.stderr],
+                )
             ]
         )
 
@@ -311,7 +324,11 @@ class BlogPostRightsModelValidationJobTests(job_test_utils.JobTestBase):
         )
 
         self.assert_job_output_is(
-            [{'BlogPostAuthorNotEditorError': [expected_error.stderr]}]
+            [
+                grouped_errors(
+                    'BlogPostAuthorNotEditorError', [expected_error.stderr]
+                )
+            ]
         )
 
     def test_pseudonymized_author_missing_from_editors_produces_no_errors(
@@ -350,7 +367,11 @@ class BlogPostRightsModelValidationJobTests(job_test_utils.JobTestBase):
         )
 
         self.assert_job_output_is(
-            [{'ModelDomainObjectValidateError': [expected_error.stderr]}]
+            [
+                grouped_errors(
+                    'ModelDomainObjectValidateError', [expected_error.stderr]
+                )
+            ]
         )
 
     def test_inconsistent_timestamps_produce_error(self) -> None:
@@ -368,12 +389,13 @@ class BlogPostRightsModelValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                {
-                    'InconsistentTimestampsError': [
+                grouped_errors(
+                    'InconsistentTimestampsError',
+                    [
                         base_validation_errors.InconsistentTimestampsError(
                             model
                         ).stderr
-                    ]
-                }
+                    ],
+                )
             ]
         )

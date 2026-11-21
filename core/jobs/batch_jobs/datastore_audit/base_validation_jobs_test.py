@@ -34,6 +34,23 @@ if MYPY:  # pragma: no cover
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
+def grouped_errors(
+    error_type: str, messages: List[str]
+) -> job_run_result.JobRunResult:
+    """Returns the job output expected for the given errors of one type.
+
+    Args:
+        error_type: str. The name of the error class.
+        messages: list(str). The stderr of each error, in sorted order.
+
+    Returns:
+        JobRunResult. The expected job output for these errors.
+    """
+    return job_run_result.JobRunResult.as_stderr(
+        '%s: %s' % (error_type, '\n'.join(messages))
+    )
+
+
 class MissingGetValidationFnsJob(base_validation_jobs.BaseValidationJob):
     """Child validation job with missing get_validation_fns."""
 
@@ -160,13 +177,14 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                {
-                    'InconsistentTimestampsError': [
+                grouped_errors(
+                    'InconsistentTimestampsError',
+                    [
                         base_validation_errors.InconsistentTimestampsError(
                             model
                         ).stderr
                     ],
-                }
+                )
             ]
         )
 
@@ -179,13 +197,14 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                {
-                    'BaseValidationError': [
+                grouped_errors(
+                    'BaseValidationError',
+                    [
                         base_validation_errors.BaseValidationError(
                             'Mock validation error message', model
                         ).stderr
-                    ]
-                }
+                    ],
+                )
             ]
         )
 
@@ -212,16 +231,17 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
         with self.swap(base_validation_jobs, 'ERROR_TRUNCATION_LIMIT', 2):
             self.assert_job_output_is(
                 [
-                    {
-                        'BaseValidationError': [
+                    grouped_errors(
+                        'BaseValidationError',
+                        [
                             base_validation_errors.BaseValidationError(
                                 'Mock validation error message', model1
                             ).stderr,
                             base_validation_errors.BaseValidationError(
                                 'Mock validation error message', model2
                             ).stderr,
-                        ]
-                    }
+                        ],
+                    )
                 ]
             )
 
