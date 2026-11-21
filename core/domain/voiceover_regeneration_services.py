@@ -558,6 +558,12 @@ def regenerate_voiceover_for_exploration_content(
         Note: This field only contains the audio offset for automated
         voiceovers that are synthesized from using cloud service.
     """
+    if voiceover_services.is_rule_input_content_id(content_id):
+        raise ValueError(
+            'Rule input content IDs are not eligible for automatic voiceover '
+            'generation.'
+        )
+
     content_html = get_content_html_in_requested_language(
         exploration_id,
         exploration_version,
@@ -654,6 +660,9 @@ def regenerate_voiceovers_of_exploration(
     """
     errors_while_voiceover_regeneration = []
     for content_id, content_html in content_id_to_content_html.items():
+        if voiceover_services.is_rule_input_content_id(content_id):
+            continue
+
         voiceover_filename = generate_new_voiceover_filename(
             content_id, language_accent_code
         )
