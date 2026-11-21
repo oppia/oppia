@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oppia.org/schemas/android/feature_flags_response.json",
+  "title": "AndroidFeatureFlagsResponse",
+  "description": "Schema for GET /android_feature_flags response.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "enum": [
+          "android_enable_fast_language_switching_in_lesson"
+        ]
+      },
+      "enabled": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name",
+      "enabled"
+    ],
+    "additionalProperties": false
+  }
+}

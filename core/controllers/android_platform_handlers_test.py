@@ -17,7 +17,11 @@
 
 from __future__ import annotations
 
+import copy
+
+from core.tests import android_test_utils
 from core.tests import test_utils
+import jsonschema
 
 
 class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
@@ -34,6 +38,9 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
 
     def test_platform_parameters_defaults(self) -> None:
         response = self.get_json('/android_platform_parameters')
+        android_test_utils.validate_android_response(
+            response, android_test_utils.PLATFORM_PARAMETERS_SCHEMA
+        )
 
         mapping = {item['name']: item['value'] for item in response}
 
@@ -42,6 +49,9 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
     def test_platform_parameters_override(self) -> None:
         response = self.get_json(
             '/android_platform_parameters?android_min_supported_api_level=40'
+        )
+        android_test_utils.validate_android_response(
+            response, android_test_utils.PLATFORM_PARAMETERS_SCHEMA
         )
 
         mapping = {item['name']: item['value'] for item in response}
@@ -61,6 +71,9 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
             '?android_min_supported_api_level=33'
             '&android_min_supported_version_code=120'
         )
+        android_test_utils.validate_android_response(
+            response, android_test_utils.PLATFORM_PARAMETERS_SCHEMA
+        )
 
         mapping = {item['name']: item['value'] for item in response}
 
@@ -79,8 +92,76 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
             expected_status_int=400,
         )
 
+    def test_platform_parameters_schema_validation_negative_cases(self) -> None:
+        """Verifies that corrupted /android_platform_parameters responses fail validation."""
+        response = self.get_json('/android_platform_parameters')
+        android_test_utils.validate_android_response(
+            response, android_test_utils.PLATFORM_PARAMETERS_SCHEMA
+        )
+
+        # 1. Missing required field ('value').
+        corrupted_missing_field = copy.deepcopy(response)
+        del corrupted_missing_field[0]['value']
+        with self.assertRaisesRegex(
+            jsonschema.exceptions.ValidationError,
+            '\'value\' is a required property',
+        ):
+            android_test_utils.validate_android_response(
+                corrupted_missing_field,
+                android_test_utils.PLATFORM_PARAMETERS_SCHEMA,
+            )
+
+        # 2. Incorrect data type ('value' as string).
+        corrupted_invalid_type = copy.deepcopy(response)
+        corrupted_invalid_type[0]['value'] = 'not-an-integer'
+        with self.assertRaisesRegex(
+            jsonschema.exceptions.ValidationError,
+            'is not of type \'integer\'',
+        ):
+            android_test_utils.validate_android_response(
+                corrupted_invalid_type,
+                android_test_utils.PLATFORM_PARAMETERS_SCHEMA,
+            )
+
+        # 3. Invalid parameter name (not in enum).
+        corrupted_invalid_name = copy.deepcopy(response)
+        corrupted_invalid_name[0]['name'] = 'unrecognized_parameter_name'
+        with self.assertRaisesRegex(
+            jsonschema.exceptions.ValidationError, 'is not one of'
+        ):
+            android_test_utils.validate_android_response(
+                corrupted_invalid_name,
+                android_test_utils.PLATFORM_PARAMETERS_SCHEMA,
+            )
+
+        # 4. Unexpected additional property.
+        corrupted_extra_property = copy.deepcopy(response)
+        corrupted_extra_property[0]['unexpected_web_field'] = True
+        with self.assertRaisesRegex(
+            jsonschema.exceptions.ValidationError,
+            'Additional properties are not allowed',
+        ):
+            android_test_utils.validate_android_response(
+                corrupted_extra_property,
+                android_test_utils.PLATFORM_PARAMETERS_SCHEMA,
+            )
+
+        # 5. Non-array top level.
+        corrupted_non_array = {'name': 'test', 'value': 1}
+        with self.assertRaisesRegex(
+            jsonschema.exceptions.ValidationError,
+            'is not of type \'array\'',
+        ):
+            android_test_utils.validate_android_response(
+                corrupted_non_array,
+                android_test_utils.PLATFORM_PARAMETERS_SCHEMA,
+            )
+
     def test_feature_flags_defaults(self) -> None:
         response = self.get_json('/android_feature_flags')
+        android_test_utils.validate_android_response(
+            response, android_test_utils.FEATURE_FLAGS_SCHEMA
+        )
         mapping = {item['name']: item['enabled'] for item in response}
 
         self.assertEqual(
@@ -90,6 +171,9 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
     def test_feature_flags_override(self) -> None:
         response = self.get_json(
             '/android_feature_flags?android_enable_fast_language_switching_in_lesson=true'
+        )
+        android_test_utils.validate_android_response(
+            response, android_test_utils.FEATURE_FLAGS_SCHEMA
         )
         mapping = {item['name']: item['enabled'] for item in response}
 
@@ -102,3 +186,57 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
             '/android_feature_flags?android_enable_fast_language_switching_in_lesson=notabool',
             expected_status_int=400,
         )
+
+    def test_feature_flags_schema_validation_negative_cases(self) -> None:
+        """Verifies that corrupted /android_feature_flags responses fail validation."""
+        response = self.get_json('/android_feature_flags')
+        android_test_utils.validate_android_response(
+            response, android_test_utils.FEATURE_FLAGS_SCHEMA
+        )
+
+        # 1. Missing required field ('enabled').
+        corrupted_missing_field = copy.deepcopy(response)
+        del corrupted_missing_field[0]['enabled']
+        with self.assertRaisesRegex(
+            jsonschema.exceptions.ValidationError,
+            '\'enabled\' is a required property',
+        ):
+            android_test_utils.validate_android_response(
+                corrupted_missing_field,
+                android_test_utils.FEATURE_FLAGS_SCHEMA,
+            )
+
+        # 2. Incorrect data type ('enabled' as string).
+        corrupted_invalid_type = copy.deepcopy(response)
+        corrupted_invalid_type[0]['enabled'] = 'true'
+        with self.assertRaisesRegex(
+            jsonschema.exceptions.ValidationError,
+            'is not of type \'boolean\'',
+        ):
+            android_test_utils.validate_android_response(
+                corrupted_invalid_type,
+                android_test_utils.FEATURE_FLAGS_SCHEMA,
+            )
+
+        # 3. Invalid flag name (not in enum).
+        corrupted_invalid_name = copy.deepcopy(response)
+        corrupted_invalid_name[0]['name'] = 'unregistered_flag'
+        with self.assertRaisesRegex(
+            jsonschema.exceptions.ValidationError, 'is not one of'
+        ):
+            android_test_utils.validate_android_response(
+                corrupted_invalid_name,
+                android_test_utils.FEATURE_FLAGS_SCHEMA,
+            )
+
+        # 4. Unexpected additional property.
+        corrupted_extra_property = copy.deepcopy(response)
+        corrupted_extra_property[0]['extra_flag_property'] = 'disallowed'
+        with self.assertRaisesRegex(
+            jsonschema.exceptions.ValidationError,
+            'Additional properties are not allowed',
+        ):
+            android_test_utils.validate_android_response(
+                corrupted_extra_property,
+                android_test_utils.FEATURE_FLAGS_SCHEMA,
+            )

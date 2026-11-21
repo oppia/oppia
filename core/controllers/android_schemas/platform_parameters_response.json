@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oppia.org/schemas/android/platform_parameters_response.json",
+  "title": "AndroidPlatformParametersResponse",
+  "description": "Schema for GET /android_platform_parameters response.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "enum": [
+          "android_min_version_code_for_recommending_app_update",
+          "android_min_supported_version_code",
+          "android_min_supported_api_level"
+        ]
+      },
+      "value": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "name",
+      "value"
+    ],
+    "additionalProperties": false
+  }
+}
