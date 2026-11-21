@@ -49,18 +49,18 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         feature_name_enums = [FeatureNames.FEATURE_A, FeatureNames.FEATURE_B]
 
         self.swapped_value = {
-            FeatureNames.FEATURE_A.value: (
+            FeatureNames.FEATURE_A.value: feature_flag_domain.FeatureFlagSpec(
                 'a feature in dev stage',
                 FeatureStages.DEV,
             ),
-            FeatureNames.FEATURE_B.value: (
+            FeatureNames.FEATURE_B.value: feature_flag_domain.FeatureFlagSpec(
                 'a feature in prod stage',
                 FeatureStages.PROD,
             ),
         }
-        self.swap_name_to_description_feature_stage_registry_dict = self.swap(
+        self.swap_name_to_spec_registry_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             self.swapped_value,
         )
 
@@ -78,7 +78,7 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
             ),
             feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
         )
-        with self.swap_name_to_description_feature_stage_registry_dict:
+        with self.swap_name_to_spec_registry_dict:
             registry.Registry.update_feature_flag(
                 self.prod_feature_flag.name, True, 0, []
             )
@@ -99,19 +99,19 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
 
     def test_feature_flag_evaluation_is_correct(self) -> None:
-        swap_name_to_description_feature_stage_dict = self.swap(
+        swap_name_to_spec_dict = self.swap(
             feature_services,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             self.swapped_value,
         )
-        swap_name_to_description_feature_stage_registry_dict = self.swap(
+        swap_name_to_spec_registry_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             self.swapped_value,
         )
 
-        with swap_name_to_description_feature_stage_dict:
-            with swap_name_to_description_feature_stage_registry_dict:
+        with swap_name_to_spec_dict:
+            with swap_name_to_spec_registry_dict:
                 result = self.get_json('/feature_flags_evaluation_handler')
         self.assertEqual(
             result,
