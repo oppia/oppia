@@ -87,6 +87,7 @@ export interface ActiveSuggestionDict {
   suggestion_type: string;
   target_id: string;
   target_type: string;
+  new_image_filenames?: string[];
 }
 
 // Details are null if suggestion's corresponding opportunity is deleted.
@@ -294,6 +295,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.pageContextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id
+    );
+    this.pageContextService.setImageContextNewImageFilenames(
+      this.activeSuggestion.new_image_filenames || []
+    );
+    this.pageContextService.setImageContextTargetEntityType(
+      this.activeSuggestion.target_type
     );
     if (
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
