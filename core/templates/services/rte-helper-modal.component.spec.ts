@@ -295,6 +295,49 @@ describe('RteHelperModalComponent', () => {
       });
     }));
 
+    it('should not re-upload math SVG if raw_latex is unchanged and svg_filename exists', fakeAsync(() => {
+      component.attrsCustomizationArgsDict = {
+        math_content: {
+          raw_latex: 'x^2',
+          svg_filename: 'mathImage_existing.svg',
+        },
+      } as unknown as CustomizationArgsForRteType;
+      spyOn(assetsBackendApiService, 'saveMathExpressionImage');
+      component.ngOnInit();
+      flush();
+
+      component.customizationArgsForm.value[0] = {
+        raw_latex: 'x^2',
+        svgFile: 'Svg Data',
+        svg_filename: 'mathImage_existing.svg',
+        mathExpressionSvgIsBeingProcessed: false,
+      };
+
+      component.save();
+      flush();
+
+      expect(
+        assetsBackendApiService.saveMathExpressionImage
+      ).not.toHaveBeenCalled();
+      expect(activeModal.close).toHaveBeenCalledWith({
+        math_content: {
+          raw_latex: 'x^2',
+          svg_filename: 'mathImage_existing.svg',
+        },
+      });
+    }));
+
+    it('should ignore subsequent save calls while saving is in progress', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.isSaving = true;
+      spyOn(mockExternalRteSaveEventEmitter, 'emit');
+
+      component.save();
+
+      expect(mockExternalRteSaveEventEmitter.emit).not.toHaveBeenCalled();
+    }));
+
     it('should handle being unable to communicate to server and show error while saving', fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
@@ -1531,6 +1574,50 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.save();
     flush();
     expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should not re-upload math SVG if raw_latex is unchanged in bottom sheet mode', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {
+        raw_latex: 'x^2',
+        svg_filename: 'mathImage_existing.svg',
+      },
+    } as unknown as CustomizationArgsForRteType;
+    component.customizationArgSpecs = [
+      {
+        name: 'math_content',
+        default_value: {raw_latex: '', svg_filename: ''},
+      },
+    ] as unknown as CustomizationArgsSpecsType;
+    spyOn(assetsBackendApiService, 'saveMathExpressionImage');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage_existing.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+
+    component.save();
+    flush();
+
+    expect(
+      assetsBackendApiService.saveMathExpressionImage
+    ).not.toHaveBeenCalled();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith({
+      math_content: {
+        raw_latex: 'x^2',
+        svg_filename: 'mathImage_existing.svg',
+      },
+    });
   }));
 
   describe('when a math save cancel path is hit', () => {

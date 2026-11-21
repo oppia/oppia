@@ -4316,6 +4316,54 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
         self.logout()
 
+    def test_upload_math_svg_succeeds_when_image_already_exists(self) -> None:
+        """Test that re-uploading an existing math SVG succeeds idempotently."""
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = (
+            'mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_'
+            'vertical_1d306.svg'
+        )
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id,
+        )
+
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb',
+            encoding=None,
+        ) as f:
+            raw_image = f.read()
+
+        get_image_exists_swap = self.swap_to_always_return(
+            fs_services.GcsFileSystem, 'isfile', value=True
+        )
+
+        with get_image_exists_swap:
+            response = self.post_json(
+                publish_url,
+                {
+                    'image': 'img',
+                    'filename': filename,
+                    'filename_prefix': filename_prefix,
+                },
+                csrf_token=csrf_token,
+                expected_status_int=200,
+                upload_files=[('image', 'unused_filename', raw_image)],
+            )
+
+        self.assertEqual(response['filename'], filename)
+        self.logout()
+
     def test_upload_successful_when_image_uploaded(self) -> None:
         """Test that no error is returned when valid image is uploaded."""
 
