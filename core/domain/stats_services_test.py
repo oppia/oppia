@@ -1474,9 +1474,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         Returns:
             str. The ID of the new playthrough.
         """
-        issue_customization_args: (
-            stats_domain.IssuesCustomizationArgsDictType
-        ) = {'state_names': {'value': state_names}}
+        issue_customization_args: stats_domain.IssuesCustomizationArgsDictType = {
+            'state_names': {'value': state_names}
+        }
         actions: List[stats_domain.LearnerActionDict] = [
             {
                 'action_type': 'ExplorationStart',
@@ -1530,9 +1530,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         Returns:
             str. The ID of the new playthrough.
         """
-        issue_customization_args: (
-            stats_domain.IssuesCustomizationArgsDictType
-        ) = {
+        issue_customization_args: stats_domain.IssuesCustomizationArgsDictType = {
             'state_name': {'value': state_name},
             'time_spent_in_exp_in_msecs': {'value': 200},
         }
@@ -1575,9 +1573,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         Returns:
             str. The ID of the new playthrough.
         """
-        issue_customization_args: (
-            stats_domain.IssuesCustomizationArgsDictType
-        ) = {
+        issue_customization_args: stats_domain.IssuesCustomizationArgsDictType = {
             'state_name': {'value': state_name},
             'num_times_answered_incorrectly': {
                 'value': num_times_answered_incorrectly

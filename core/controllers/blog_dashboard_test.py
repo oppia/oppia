@@ -35,7 +35,6 @@ if MYPY:  # pragma: no cover
 
 
 class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
-
     username = 'user'
     user_email = 'user@example.com'
 
@@ -254,7 +253,6 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
 
 
 class BlogPostHandlerTests(test_utils.GenericTestBase):
-
     username = 'user'
     user_email = 'user@example.com'
 

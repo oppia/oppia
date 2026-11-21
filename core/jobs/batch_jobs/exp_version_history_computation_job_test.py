@@ -1124,9 +1124,7 @@ class DeleteExplorationVersionHistoryModelsJobTest(
 ):
     """Unit tests for DeleteExplorationVersionHistoryModelsJob."""
 
-    JOB_CLASS = (
-        exp_version_history_computation_job.DeleteExplorationVersionHistoryModelsJob
-    )
+    JOB_CLASS = exp_version_history_computation_job.DeleteExplorationVersionHistoryModelsJob
 
     USER_1_EMAIL = 'user1@example.com'
     USER_1_USERNAME = 'user1'

@@ -77,9 +77,7 @@ ASSETS_CONSTANTS_FILEPATH: Final = os.path.join(
     os.getcwd(), 'assets', 'constants.ts'
 )
 
-ROUTE_KEY_REGEX: Final = (
-    r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
-)
+ROUTE_KEY_REGEX: Final = r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
 
 # Matches each PAGES_REGISTERED_WITH_FRONTEND entry and captures its key and
 # ROUTE path. Non-brace characters are allowed between the entry's opening brace

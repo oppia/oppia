@@ -63,9 +63,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'Path not found.',
                 )
 
-        def mock_popen(
-            cmd_tokens: list[str], **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(cmd_tokens: list[str], **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
 
@@ -89,9 +87,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'',
                 )
 
-        def mock_popen(
-            cmd_tokens: list[str], **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(cmd_tokens: list[str], **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
 
@@ -115,9 +111,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'',
                 )
 
-        def mock_popen(
-            cmd_tokens: list[str], **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(cmd_tokens: list[str], **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
 
@@ -141,9 +135,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'',
                 )
 
-        def mock_popen(
-            cmd_tokens: list[str], **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(cmd_tokens: list[str], **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
 

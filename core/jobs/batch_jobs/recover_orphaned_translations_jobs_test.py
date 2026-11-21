@@ -42,7 +42,6 @@ datastore_services = models.Registry.import_datastore_services()
 class RecoverOrphanedTranslationsJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
     JOB_CLASS = (
         recover_orphaned_translations_jobs.RecoverOrphanedTranslationsJob
     )
@@ -451,7 +450,6 @@ class RecoverOrphanedTranslationsJobTests(
 class AuditRecoverOrphanedTranslationsJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
     JOB_CLASS = (
         recover_orphaned_translations_jobs.AuditRecoverOrphanedTranslationsJob
     )

@@ -36,7 +36,6 @@ datastore_services = models.Registry.import_datastore_services()
 class InvalidEntityTypeErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         model = feedback_models.GeneralFeedbackThreadModel(
             id='123',

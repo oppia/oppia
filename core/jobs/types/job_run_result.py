@@ -176,8 +176,7 @@ class JobRunResult:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         return (
-            (self.stdout, self.stderr)
-            == (other.stdout, other.stderr)  # pylint: disable=protected-access
+            (self.stdout, self.stderr) == (other.stdout, other.stderr)  # pylint: disable=protected-access
             if self.__class__ is other.__class__
             else NotImplemented
         )

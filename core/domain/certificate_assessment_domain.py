@@ -459,8 +459,7 @@ class CertificateAssessmentAttempt:
             or self.version_data['certificate_version'] < 1
         ):
             raise utils.ValidationError(
-                'version_data.certificate_version must be a positive '
-                'integer.'
+                'version_data.certificate_version must be a positive integer.'
             )
         if not isinstance(self.version_data['topic_versions'], dict):
             raise utils.ValidationError(
@@ -484,8 +483,7 @@ class CertificateAssessmentAttempt:
         if self.finished_at is not None:
             if not isinstance(self.finished_at, datetime.datetime):
                 raise utils.ValidationError(
-                    'finished_at must be a datetime.datetime instance '
-                    'or None.'
+                    'finished_at must be a datetime.datetime instance or None.'
                 )
             if self.finished_at < self.started_at:
                 raise utils.ValidationError(

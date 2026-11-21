@@ -146,15 +146,11 @@ def get_topic_from_model(
         'schema_version': topic_model.subtopic_schema_version,
         'subtopics': copy.deepcopy(topic_model.subtopics),
     }
-    versioned_canonical_story_references: (
-        topic_domain.VersionedStoryReferencesDict
-    ) = {
+    versioned_canonical_story_references: topic_domain.VersionedStoryReferencesDict = {
         'schema_version': topic_model.story_reference_schema_version,
         'story_references': topic_model.canonical_story_references,
     }
-    versioned_additional_story_references: (
-        topic_domain.VersionedStoryReferencesDict
-    ) = {
+    versioned_additional_story_references: topic_domain.VersionedStoryReferencesDict = {
         'schema_version': topic_model.story_reference_schema_version,
         'story_references': topic_model.additional_story_references,
     }

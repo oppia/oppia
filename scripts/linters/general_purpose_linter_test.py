@@ -287,7 +287,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             [
-                'Use of "fmt: off" is prohibited. All code must be formatted by Black.'
+                'Use of "fmt: off" is prohibited. All code must be formatted by Ruff.'
             ],
             lint_task_report.trimmed_messages,
         )
@@ -301,7 +301,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             [
-                'Use of "fmt: skip" is prohibited. All code must be formatted by Black.'
+                'Use of "fmt: skip" is prohibited. All code must be formatted by Ruff.'
             ],
             lint_task_report.trimmed_messages,
         )
@@ -591,7 +591,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         )
 
         # We use a temporary file here instead of a real one because
-        # the Black formatter auto-fixes newlines at the end of files.
+        # the Ruff formatter auto-fixes newlines at the end of files.
         temp_file.write(INVALID_NO_NEWLINE_FILE_CONTENT)
         temp_file.close()
         linter = general_purpose_linter.GeneralPurposeLinter(

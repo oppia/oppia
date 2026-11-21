@@ -34,7 +34,6 @@ if MYPY:  # pragma: no cover
 
 
 class MachineTranslationFetchersTests(test_utils.GenericTestBase):
-
     def test_get_translation_from_model(self) -> None:
         model_id = translation_models.MachineTranslationModel.create(
             'en', 'es', 'hello world', 'hola mundo'
@@ -78,7 +77,6 @@ class MachineTranslationFetchersTests(test_utils.GenericTestBase):
 
 
 class EntityTranslationFetchersTests(test_utils.GenericTestBase):
-
     def test_get_all_entity_translation_objects_for_entity_returns_correclty(
         self,
     ) -> None:

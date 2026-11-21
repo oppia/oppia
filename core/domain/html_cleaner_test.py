@@ -248,7 +248,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
                     'start-with-value': 0,
                     'end-with-value': 0,
                     'video_id-with-value': (
-                        'https://www.youtube.com/watch?' 'v=Ntcw0H0hwPU'
+                        'https://www.youtube.com/watch?v=Ntcw0H0hwPU'
                     ),
                     'autoplay-with-value': False,
                 },
@@ -452,7 +452,7 @@ class IsHtmlEmptyTests(test_utils.GenericTestBase):
 
     def test_double_quotes_only_is_empty(self) -> None:
         """Test that \"\" is considered empty."""
-        self.assertTrue(html_cleaner.is_html_empty('\"\"'))
+        self.assertTrue(html_cleaner.is_html_empty('""'))
 
     def test_single_quotes_only_is_empty(self) -> None:
         """Test that '' is considered empty."""

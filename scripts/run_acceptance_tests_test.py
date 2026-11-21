@@ -478,12 +478,15 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         self.exit_stack.enter_context(self.managed_portserver_swap)
 
-        with self.compile_test_ts_files_swap, self.assertRaisesRegex(
-            SystemExit,
-            """
+        with (
+            self.compile_test_ts_files_swap,
+            self.assertRaisesRegex(
+                SystemExit,
+                """
             Oppia server is already running. Try shutting all the servers down
             before running the script.
         """,
+            ),
         ):
             run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
@@ -535,8 +538,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-                json_load_swap
+            with (
+                self.compile_test_ts_files_swap,
+                self.install_playwright_dependencies_swap,
+                json_load_swap,
             ):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
@@ -588,8 +593,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-                json_load_swap
+            with (
+                self.compile_test_ts_files_swap,
+                self.install_playwright_dependencies_swap,
+                json_load_swap,
             ):
                 run_acceptance_tests.main(
                     args=['--suite', 'testSuite', '--update_snapshots']
@@ -609,9 +616,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         def mock_managed_acceptance_tests_server(
             **unused_kwargs: str,
-        ) -> ContextManager[
-            scripts_test_utils.PopenStub
-        ]:  # pylint: disable=unused-argument, line-too-long
+        ) -> ContextManager[scripts_test_utils.PopenStub]:  # pylint: disable=unused-argument, line-too-long
             return contextlib.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
                     stdout='sample\n✓\noutput\n'.encode(encoding='utf-8'),
@@ -653,8 +658,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-                json_load_swap
+            with (
+                self.compile_test_ts_files_swap,
+                self.install_playwright_dependencies_swap,
+                json_load_swap,
             ):
                 lines, _ = run_acceptance_tests.run_tests(args)
 
@@ -721,8 +728,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             )
         )
 
-        with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-            json_load_swap
+        with (
+            self.compile_test_ts_files_swap,
+            self.install_playwright_dependencies_swap,
+            json_load_swap,
         ):
             run_acceptance_tests.main(
                 args=['--suite', 'testSuite', '--skip_build']
@@ -776,8 +785,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-                json_load_swap
+            with (
+                self.compile_test_ts_files_swap,
+                self.install_playwright_dependencies_swap,
+                json_load_swap,
             ):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
@@ -829,7 +840,9 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-                json_load_swap
+            with (
+                self.compile_test_ts_files_swap,
+                self.install_playwright_dependencies_swap,
+                json_load_swap,
             ):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])

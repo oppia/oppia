@@ -171,7 +171,6 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
 
 
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.exp_id = 'exp'
@@ -179,9 +178,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         self.thread_id = 'exp.thread'
 
     def test_to_dict(self) -> None:
-        expected_feedback_message_reference: (
-            feedback_domain.FeedbackMessageReferenceDict
-        ) = {
+        expected_feedback_message_reference: feedback_domain.FeedbackMessageReferenceDict = {
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.exp_id,
             'thread_id': self.thread_id,

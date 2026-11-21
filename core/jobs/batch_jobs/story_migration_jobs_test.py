@@ -41,7 +41,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class MigrateStoryJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[story_migration_jobs.MigrateStoryJob] = (
         story_migration_jobs.MigrateStoryJob
     )
@@ -263,7 +262,6 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
 
 
 class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[story_migration_jobs.AuditStoryMigrationJob] = (
         story_migration_jobs.AuditStoryMigrationJob
     )

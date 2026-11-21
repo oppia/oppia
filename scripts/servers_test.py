@@ -59,7 +59,6 @@ def mock_context_manager() -> MockCompilerContextManager:
 
 
 class ManagedProcessTests(test_utils.TestBase):
-
     # Helper class for improving the readability of tests.
     POPEN_CALL = collections.namedtuple(
         'POPEN_CALL', ['program_args', 'kwargs']
@@ -152,8 +151,8 @@ class ManagedProcessTests(test_utils.TestBase):
         old_rmtree = shutil.rmtree
         old_makedirs = os.makedirs
 
-        is_data_dir: Callable[[str], bool] = (
-            lambda p: p == common.CLOUD_DATASTORE_EMULATOR_DATA_DIR
+        is_data_dir: Callable[[str], bool] = lambda p: (
+            p == common.CLOUD_DATASTORE_EMULATOR_DATA_DIR
         )
 
         new_exists = lambda p: (
@@ -1132,7 +1131,6 @@ class ManagedProcessTests(test_utils.TestBase):
 
 
 class GetChromedriverVersionTests(test_utils.TestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.print_arr: list[str] = []

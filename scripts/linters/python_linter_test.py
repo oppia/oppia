@@ -185,7 +185,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         """Returns a ThirdPartyPythonLintChecksManager for a temporary Python file.
         This helper method writes the provided string `file` into a temporary
         `.py` file and uses it to initialize a ThirdPartyPythonLintChecksManager.
-        A temporary file is used because Black automatically modifies newline
+        A temporary file is used because Ruff automatically modifies newline
         formatting at the end of real files, which can interfere with testing.
 
         Args:
@@ -216,7 +216,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_pycodestyle_with_error_message(self) -> None:
         # We use a temporary file here instead of a real one because
-        # the Black formatter auto-fixes newlines at the end of files.
+        # the Ruff formatter auto-fixes newlines at the end of files.
         lint_task_report = self.get_third_party_python_lint_checks_manager_obj(
             INVALID_PYCODESTYLE_CONTENT
         ).lint_py_files()

@@ -247,12 +247,15 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             registry.Registry, 'get_platform_parameter', parameter
         )
 
-        with swap_get_platform_parameter, self.assertRaisesRegex(
-            Exception,
-            (
-                'The param_name platform parameter has a data type of unknown '
-                'which is not valid. Please use one of these data types instead: '
-                'typing.Union\\[str, int, bool, float].'
+        with (
+            swap_get_platform_parameter,
+            self.assertRaisesRegex(
+                Exception,
+                (
+                    'The param_name platform parameter has a data type of unknown '
+                    'which is not valid. Please use one of these data types instead: '
+                    'typing.Union\\[str, int, bool, float].'
+                ),
             ),
         ):
             parameter_services.get_platform_parameter_schema(parameter.name)

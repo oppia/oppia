@@ -169,9 +169,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
                 1  # type: ignore[index]
             ] = self.entity_voiceovers_instance.voiceovers_mapping[
                 'content_id_0'
-            ][
-                'manual'
-            ]
+            ]['manual']
             self.entity_voiceovers_instance.validate()
 
     def test_validate_language_accent_code(self) -> None:
@@ -205,11 +203,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         ):
             del self.entity_voiceovers_instance.automated_voiceovers_audio_offsets_msecs[
                 'content_id_0'
-            ][
-                0
-            ][
-                'token'
-            ]
+            ][0]['token']
             self.entity_voiceovers_instance.validate()
 
     def test_validate_missing_offset_key_in_audio_offset(self) -> None:
@@ -219,11 +213,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         ):
             del self.entity_voiceovers_instance.automated_voiceovers_audio_offsets_msecs[
                 'content_id_0'
-            ][
-                0
-            ][
-                'audio_offset_msecs'
-            ]
+            ][0]['audio_offset_msecs']
             self.entity_voiceovers_instance.validate()
 
     def test_validate_token_data_type(self) -> None:
@@ -233,11 +223,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             (
                 self.entity_voiceovers_instance.automated_voiceovers_audio_offsets_msecs[
                     'content_id_0'
-                ][
-                    0
-                ][
-                    'token'
-                ]
+                ][0]['token']
             ) = 1
             self.entity_voiceovers_instance.validate()
 
@@ -248,18 +234,13 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             (
                 self.entity_voiceovers_instance.automated_voiceovers_audio_offsets_msecs[
                     'content_id_0'
-                ][
-                    0
-                ][
-                    'audio_offset_msecs'
-                ]
+                ][0]['audio_offset_msecs']
             ) = 'dummy'
             self.entity_voiceovers_instance.validate()
 
     def test_validate_language_accent_code_pattern(self) -> None:
         expected_error_msg = (
-            'language_accent_code must be formatted as '
-            '{{language}}-{{accent}}'
+            'language_accent_code must be formatted as {{language}}-{{accent}}'
         )
 
         with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):

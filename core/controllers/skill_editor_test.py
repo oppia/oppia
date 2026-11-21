@@ -41,7 +41,6 @@ if MYPY:  # pragma: no cover
 
 
 class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()

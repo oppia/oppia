@@ -180,7 +180,6 @@ STATE_DICT_IN_V52 = {
 class EntityTranslationsModelGenerationOneOffJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
     JOB_CLASS = (
         translation_migration_jobs.EntityTranslationsModelGenerationOneOffJob
     )
@@ -306,10 +305,7 @@ class EntityTranslationsModelGenerationOneOffJobTests(
 class AuditEntityTranslationsModelGenerationOneOffJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
-    JOB_CLASS = (
-        translation_migration_jobs.AuditEntityTranslationsModelGenerationOneOffJob
-    )
+    JOB_CLASS = translation_migration_jobs.AuditEntityTranslationsModelGenerationOneOffJob
 
     AUTHOR_EMAIL: Final = 'author@example.com'
 

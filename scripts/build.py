@@ -470,9 +470,9 @@ def build_using_ng() -> None:
     )
     with managed_ng_build_process as p:
         p.wait()
-    assert (
-        get_file_count('build') > 0
-    ), 'angular generated bundle should be non-empty'
+    assert get_file_count('build') > 0, (
+        'angular generated bundle should be non-empty'
+    )
 
 
 def sync_angular_css_hashes() -> None:

@@ -1337,9 +1337,9 @@ def delete_certificate_assessment_offering(certificate_id: str) -> None:
     )
 
 
-def get_certificate_assessment_offerings() -> (
-    List[certificate_assessment_domain.CertificateAssessmentOffering]
-):
+def get_certificate_assessment_offerings() -> List[
+    certificate_assessment_domain.CertificateAssessmentOffering
+]:
     """Returns all certificate assessment offerings from datastore.
 
     Returns:

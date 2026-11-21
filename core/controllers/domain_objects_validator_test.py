@@ -66,9 +66,7 @@ VALID_SESSION_INFO: Dict[str, object] = {
 
 VALID_SCREENSHOT_FILE: str = 'aGVsbG8='
 
-VALID_LESSON_REPORT_PAYLOAD: (
-    general_feedback_domain.PlatformFeedbackSubmitPayloadDict
-) = {
+VALID_LESSON_REPORT_PAYLOAD: general_feedback_domain.PlatformFeedbackSubmitPayloadDict = {
     'source': 'lesson',
     'report_message': 'The image in step 3 is broken.',
     'category': 'broken_layout_or_image',
@@ -80,9 +78,7 @@ VALID_LESSON_REPORT_PAYLOAD: (
     'page_url': 'https://oppia.org/explore/exp0',
 }
 
-VALID_SITE_REPORT_PAYLOAD: (
-    general_feedback_domain.PlatformFeedbackSubmitPayloadDict
-) = {
+VALID_SITE_REPORT_PAYLOAD: general_feedback_domain.PlatformFeedbackSubmitPayloadDict = {
     'source': 'app',
     'report_message': 'The site crashes on the home page.',
     'category': None,
@@ -219,8 +215,7 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
         }
         with self.assertRaisesRegex(
             Exception,
-            'Platform parameter name should be a string, received'
-            ': %s' % 1234,
+            'Platform parameter name should be a string, received: %s' % 1234,
         ):
             (
                 # TODO(#13059): Here we use MyPy ignore because after we fully
@@ -349,8 +344,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             Exception,
-            'Expected each tag in \'tags\' to be a string,'
-            ' received: \'123\'',
+            'Expected each tag in \'tags\' to be a string, received: \'123\'',
         ):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change

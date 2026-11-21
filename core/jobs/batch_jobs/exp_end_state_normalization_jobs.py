@@ -66,9 +66,9 @@ class ExplorationEndStateNormalizationJob(base_jobs.JobBase):
                     state.get('content', {}).get('html')
                     == self.DEFAULT_TERMINAL_STATE_CONTENT_WITHOUT_P_TAG
                 ):
-                    state['content'][
-                        'html'
-                    ] = f'<p>{self.DEFAULT_TERMINAL_STATE_CONTENT_WITHOUT_P_TAG}</p>'
+                    state['content']['html'] = (
+                        f'<p>{self.DEFAULT_TERMINAL_STATE_CONTENT_WITHOUT_P_TAG}</p>'
+                    )
                     is_exploration_updated = True
 
             if is_exploration_updated:

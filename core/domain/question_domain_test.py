@@ -392,7 +392,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Checks the tagged skill misconception id's format."""
         state = self.question.question_state_data
         state.update_interaction_answer_groups([self.state_answer_group])
-        state.interaction.answer_groups[0].tagged_skill_misconception_id = (
+        state.interaction.answer_groups[
+            0
+        ].tagged_skill_misconception_id = (
             'invalid_tagged_skill_misconception_id'
         )
         with self.assertRaisesRegex(
@@ -406,9 +408,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because we want to add a test which would
         # check the tagged_skill_misconception_id's format as well as the
         # regex.
-        state.interaction.answer_groups[
-            0
-        ].tagged_skill_misconception_id = 1  # type: ignore[assignment]
+        state.interaction.answer_groups[0].tagged_skill_misconception_id = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected tagged skill misconception id to be a str, received 1',
@@ -852,7 +852,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers'], test_data  # type: ignore[typeddict-item]
+            test_value['state']['recorded_voiceovers'],  # type: ignore[typeddict-item]
+            test_data,
         )
 
     def test_question_state_dict_conversion_from_v28_to_v29(self) -> None:
@@ -936,9 +937,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'duration_secs',
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'][  # type: ignore[typeddict-item]
                 'content'
-            ][
-                'audio_metadata'
-            ],
+            ]['audio_metadata'],
         )
 
         question_domain.Question.update_state_from_model(
@@ -952,20 +951,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'duration_secs',
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'][  # type: ignore[typeddict-item]
                 'content'
-            ][
-                'audio_metadata'
-            ],
+            ]['audio_metadata'],
         )
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'][  # type: ignore[typeddict-item]
                 'content'
-            ][
-                'audio_metadata'
-            ][
-                'duration_secs'
-            ],
+            ]['audio_metadata']['duration_secs'],
             0.0,
         )
 
@@ -1977,9 +1970,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         # Testing with interaction id 'DragAndDropSortInput'.
         test_value['state']['interaction']['id'] = 'DragAndDropSortInput'
-        test_value['state']['interaction'][
-            'solution'
-        ] = drag_and_drop_test_solution_dict
+        test_value['state']['interaction']['solution'] = (
+            drag_and_drop_test_solution_dict
+        )
         ca_choices_dicts = [
             {'html': 'correct_value', 'content_id': 'content_id_1'},
             {'html': 'value_2', 'content_id': 'content_id_2'},
@@ -2207,9 +2200,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v49_to_v50(self) -> None:
-        self.question_state_dict['interaction'][
-            'id'
-        ] = 'AlgebraicExpressionInput'
+        self.question_state_dict['interaction']['id'] = (
+            'AlgebraicExpressionInput'
+        )
         self.question_state_dict['interaction']['customization_args'] = {
             'customOskLetters': {'value': ['a', 'b', 'c']}
         }
@@ -2478,8 +2471,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         self.observed_object.misconception_ids = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected misconception ids to be a list of strings, '
-            'received 123',
+            'Expected misconception ids to be a list of strings, received 123',
         ):
             self.observed_object.validate()
 

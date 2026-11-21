@@ -192,9 +192,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_update_written_translations(self) -> None:
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'en': {
@@ -278,14 +276,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
 class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
-        self.subtopic_page_contents = (
-            subtopic_page_domain.SubtopicPageContents.create_default_subtopic_page_contents()
-        )
+        self.subtopic_page_contents = subtopic_page_domain.SubtopicPageContents.create_default_subtopic_page_contents()
 
     def test_create_default_subtopic_page(self) -> None:
-        subtopic_page_contents = (
-            subtopic_page_domain.SubtopicPageContents.create_default_subtopic_page_contents()
-        )
+        subtopic_page_contents = subtopic_page_domain.SubtopicPageContents.create_default_subtopic_page_contents()
         expected_subtopic_page_contents_dict = {
             'subtitled_html': {'html': '', 'content_id': 'content'},
             'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
@@ -297,9 +291,7 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_to_and_from_dict(self) -> None:
-        subtopic_page_contents_dict: (
-            subtopic_page_domain.SubtopicPageContentsDict
-        ) = {
+        subtopic_page_contents_dict: subtopic_page_domain.SubtopicPageContentsDict = {
             'subtitled_html': {'html': '<p>test</p>', 'content_id': 'content'},
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -336,7 +328,6 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
 
 
 class SubtopicPageChangeTests(test_utils.GenericTestBase):
-
     def test_subtopic_page_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'
@@ -453,7 +444,6 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
 
 
 class SubtopicPageSummaryTests(test_utils.GenericTestBase):
-
     SUBTOPIC_ID = 1
     SUBTOPIC_TITLE = 'subtopic_title'
     TOPIC_ID = 'topic_id'

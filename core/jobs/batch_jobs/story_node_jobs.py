@@ -206,8 +206,7 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
         topic_story_pairs = (
             (fetched_topic_models, fetched_story_models)
             | 'Merge topic and story models' >> beam.CoGroupByKey()
-            | 'Get rid of topic ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of topic ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         updated_story_models_results = (

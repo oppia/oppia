@@ -45,7 +45,9 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
     """Plan the copy operation. This is a helper PTransform for
     CopyMissingTranslationImagesJob."""
 
-    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
         beam.PCollection[Tuple[str, beam.PCollection[str]]],
         beam.PCollection[
             Tuple[str, Dict[str, beam.PCollection[Union[str, bool]]]]
@@ -68,8 +70,10 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
             )
             | 'Keep only translation suggestions'
             >> beam.Filter(
-                lambda model: model.suggestion_type
-                == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                lambda model: (
+                    model.suggestion_type
+                    == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                )
             )
         )
 
@@ -126,8 +130,7 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
             'src_exist': src_path_exist_by_src_path,
             'dst_exist': dst_path_exist_by_src_path,
         } | (
-            'Group as {src: {dst: [str], src_exist: [bool], '
-            'dst_exist: [bool]}}'
+            'Group as {src: {dst: [str], src_exist: [bool], dst_exist: [bool]}}'
         ) >> beam.CoGroupByKey()
 
         copy_info_to_copy_by_src_path = (

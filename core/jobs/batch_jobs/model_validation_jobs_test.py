@@ -37,7 +37,6 @@ if MYPY:  # pragma: no cover
 
 
 class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[model_validation_jobs.AuditAllStorageModelsJob] = (
         model_validation_jobs.AuditAllStorageModelsJob
     )

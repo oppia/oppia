@@ -148,7 +148,9 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
         }
 
     @classmethod
-    def export_data(cls, user_id: str) -> Dict[
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[
         str,
         Dict[
             str,

@@ -207,9 +207,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
 
     def test_get_all_translatable_content_returns_correct_items(self) -> None:
         expected_contents = ['My name is jhon.', 'My name is jack.']
-        translatable_contents = (
-            self.translatable_object1.get_translatable_contents_collection().content_id_to_translatable_content.values()
-        )
+        translatable_contents = self.translatable_object1.get_translatable_contents_collection().content_id_to_translatable_content.values()
 
         self.assertItemsEqual(
             expected_contents,
@@ -762,9 +760,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_from_and_to_dict_works_correctly(self) -> None:
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content1': {
                     'en': {
@@ -831,9 +827,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     def test_add_content_id_for_translation_with_existing_content_id_raise_error(
         self,
     ) -> None:
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'feedback_1': {
                     'en': {
@@ -859,9 +853,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_content_id_for_translations_deletes_content_id(
         self,
     ) -> None:
-        old_written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        old_written_translations_dict: translation_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'en': {
@@ -889,9 +881,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(  # pylint: disable=line-too-long
         self,
     ) -> None:
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {'translations_mapping': {'content': {}}}
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
+            'translations_mapping': {'content': {}}
+        }
         written_translations = translation_domain.WrittenTranslations.from_dict(
             written_translations_dict
         )
@@ -924,9 +916,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
             'translations_mapping': {123: {}}  # type: ignore[dict-item]
         }
 
@@ -964,9 +954,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     def test_validation_with_invalid_type_language_code_raise_error(
         self,
     ) -> None:
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     123: {  # type: ignore[dict-item]
@@ -988,9 +976,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.validate(['content'])
 
     def test_validation_with_unknown_language_code_raise_error(self) -> None:
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'ed': {
@@ -1010,9 +996,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.validate(['content'])
 
     def test_validation_with_invalid_content_id_list(self) -> None:
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'en': {

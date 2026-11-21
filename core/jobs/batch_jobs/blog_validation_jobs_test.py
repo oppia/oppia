@@ -33,7 +33,6 @@ if MYPY:  # pragma: no cover
 
 
 class FindDuplicateBlogPostTitlesJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[blog_validation_jobs.FindDuplicateBlogPostTitlesJob] = (
         blog_validation_jobs.FindDuplicateBlogPostTitlesJob
     )
@@ -85,7 +84,6 @@ class FindDuplicateBlogPostTitlesJobTests(job_test_utils.JobTestBase):
 
 
 class FindDuplicateBlogPostSummaryTitlesJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob
     ] = blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob
@@ -137,7 +135,6 @@ class FindDuplicateBlogPostSummaryTitlesJobTests(job_test_utils.JobTestBase):
 
 
 class FindDuplicateBlogPostUrlsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[blog_validation_jobs.FindDuplicateBlogPostUrlsJob] = (
         blog_validation_jobs.FindDuplicateBlogPostUrlsJob
     )
@@ -185,7 +182,6 @@ class FindDuplicateBlogPostUrlsJobTests(job_test_utils.JobTestBase):
 
 
 class FindDuplicateBlogPostSummaryUrlsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob
     ] = blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob
@@ -239,7 +235,6 @@ class FindDuplicateBlogPostSummaryUrlsJobTests(job_test_utils.JobTestBase):
 class FindDuplicateBlogAuthorDetailsModelForAuthorJobTests(
     job_test_utils.JobTestBase
 ):
-
     JOB_CLASS: Type[
         blog_validation_jobs.FindDuplicateBlogAuthorDetailsModelForAuthorJob
     ] = blog_validation_jobs.FindDuplicateBlogAuthorDetailsModelForAuthorJob

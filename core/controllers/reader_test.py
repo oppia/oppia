@@ -1596,7 +1596,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # If the exploration is played in context of an invalid story, raise
         # an error.
         def _mock_none_function(
-            _: str, strict: bool = True  # pylint: disable=unused-argument
+            _: str,
+            strict: bool = True,  # pylint: disable=unused-argument
         ) -> None:
             """Mocks None."""
             return None
@@ -2557,7 +2558,6 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
 
 
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -2667,7 +2667,6 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
 
 class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -2741,7 +2740,6 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
 
 class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -2754,9 +2752,7 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         exp_services.load_demo(exp_id)
         exp_version = 1
 
-        all_models = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
-        )
+        all_models = stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 0)
 
         self.post_json(
@@ -2770,9 +2766,7 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
             },
         )
 
-        all_models = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
-        )
+        all_models = stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
         exp_event_log_model: Optional[
@@ -2792,7 +2786,6 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
 
 class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -2971,7 +2964,6 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
 
 class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -3047,7 +3039,6 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
 
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -3981,8 +3972,7 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/sync_logged_out_and_logged_in_progress/%s'
-            % exp_id,  # pylint: disable=line-too-long
+            '/sync_logged_out_and_logged_in_progress/%s' % exp_id,  # pylint: disable=line-too-long
             {
                 'unique_progress_url_id': pid,
             },

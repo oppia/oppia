@@ -41,9 +41,7 @@ class AuditBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
         blog_author_details_migration_jobs.AuditBlogAuthorDetailsForDeletedUsersJob
-    ] = (
-        blog_author_details_migration_jobs.AuditBlogAuthorDetailsForDeletedUsersJob
-    )
+    ] = blog_author_details_migration_jobs.AuditBlogAuthorDetailsForDeletedUsersJob
 
     # Active user with a UserSettingsModel.
     AUTHOR_ID_1: Final = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -300,9 +298,7 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
 
     JOB_CLASS: Type[
         blog_author_details_migration_jobs.MigrateBlogAuthorDetailsForDeletedUsersJob
-    ] = (
-        blog_author_details_migration_jobs.MigrateBlogAuthorDetailsForDeletedUsersJob
-    )
+    ] = blog_author_details_migration_jobs.MigrateBlogAuthorDetailsForDeletedUsersJob
 
     # Active user with a UserSettingsModel.
     AUTHOR_ID_1: Final = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'

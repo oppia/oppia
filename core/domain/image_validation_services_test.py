@@ -26,7 +26,6 @@ from typing import Union
 
 
 class ImageValidationServiceTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         with open(

@@ -69,7 +69,6 @@ opportunity_models, suggestion_models = models.Registry.import_models(
 
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
-
     ASSET_HANDLER_URL_PREFIX: Final = '/assetsdevhandler'
     TOPIC_ID = 'topic'
     STORY_ID = 'story'
@@ -2585,7 +2584,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
 
 class QuestionSuggestionTests(test_utils.GenericTestBase):
-
     AUTHOR_EMAIL: Final = 'author@example.com'
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
 
@@ -3184,7 +3182,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
 
 class SkillSuggestionTests(test_utils.GenericTestBase):
-
     AUTHOR_EMAIL: Final = 'author@example.com'
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
 
@@ -4141,9 +4138,9 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         # - story_node is None (swap get_node_with_corresponding_exp_id to return None)
         topic_summaries = topic_fetchers.get_all_topic_summaries()
 
-        def mock_get_all_topic_summaries() -> (
-            List[Optional[topic_domain.TopicSummary]]
-        ):
+        def mock_get_all_topic_summaries() -> List[
+            Optional[topic_domain.TopicSummary]
+        ]:
             return [None] + topic_summaries
 
         orig_get_opps = (
@@ -4161,18 +4158,22 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 opps['exp_no_opp'] = None
             return opps
 
-        with self.swap(
-            topic_fetchers,
-            'get_all_topic_summaries',
-            mock_get_all_topic_summaries,
-        ), self.swap(
-            opportunity_services,
-            'get_translation_opportunities_by_entity_ids',
-            mock_get_translation_opportunities_by_entity_ids,
-        ), self.swap(
-            story_domain.StoryContents,
-            'get_node_with_corresponding_exp_id',
-            lambda *args, **kwargs: None,
+        with (
+            self.swap(
+                topic_fetchers,
+                'get_all_topic_summaries',
+                mock_get_all_topic_summaries,
+            ),
+            self.swap(
+                opportunity_services,
+                'get_translation_opportunities_by_entity_ids',
+                mock_get_translation_opportunities_by_entity_ids,
+            ),
+            self.swap(
+                story_domain.StoryContents,
+                'get_node_with_corresponding_exp_id',
+                lambda *args, **kwargs: None,
+            ),
         ):
             response = self.get_json(
                 '/getsubmittedsuggestions/exploration/translate_content',
@@ -4186,9 +4187,9 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['suggestions']), 3)
 
         # 5. Swap get_all_topic_summaries to empty list to cover story_ids is empty branch.
-        def mock_get_all_topic_summaries_empty() -> (
-            List[topic_domain.TopicSummary]
-        ):
+        def mock_get_all_topic_summaries_empty() -> List[
+            topic_domain.TopicSummary
+        ]:
             return []
 
         with self.swap(

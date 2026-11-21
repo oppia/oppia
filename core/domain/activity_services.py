@@ -34,9 +34,9 @@ if MYPY:  # pragma: no cover
 (activity_models,) = models.Registry.import_models([models.Names.ACTIVITY])
 
 
-def get_featured_activity_references() -> (
-    List[activity_domain.ActivityReference]
-):
+def get_featured_activity_references() -> List[
+    activity_domain.ActivityReference
+]:
     """Gets a list of ActivityReference domain models.
 
     Returns:

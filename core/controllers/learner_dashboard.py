@@ -299,9 +299,7 @@ class LearnerDashboardExplorationsProgressHandler(
                 self.user_id, exploration_ids_for_progress
             )
         )
-        default_progress_data: (
-            learner_progress_services.ExplorationCheckpointProgressDict
-        ) = {
+        default_progress_data: learner_progress_services.ExplorationCheckpointProgressDict = {
             'visited_checkpoints_count': 0,
             'total_checkpoints_count': 0,
         }

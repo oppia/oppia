@@ -2880,9 +2880,7 @@ def can_access_certificate_assessment_attempt_result(
             attempt = certificate_assessment_services.get_certificate_attempt(
                 attempt_id
             )
-        except (
-            certificate_assessment_services.CertificateAssessmentAttemptNotFoundException
-        ) as e:
+        except certificate_assessment_services.CertificateAssessmentAttemptNotFoundException as e:
             raise self.NotFoundException(str(e)) from e
 
         if attempt.learner_id != self.user_id:
@@ -4702,15 +4700,15 @@ def can_edit_entity(
             feconf.ENTITY_TYPE_EXPLORATION: lambda entity_id: (
                 can_edit_exploration(reduced_handler)(self, entity_id, **kwargs)
             ),
-            feconf.ENTITY_TYPE_QUESTION: lambda entity_id: (
-                can_edit_question(reduced_handler)(self, entity_id, **kwargs)
-            ),
-            feconf.ENTITY_TYPE_TOPIC: lambda entity_id: (
-                can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
-            ),
-            feconf.ENTITY_TYPE_SKILL: lambda entity_id: (
-                can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
-            ),
+            feconf.ENTITY_TYPE_QUESTION: lambda entity_id: can_edit_question(
+                reduced_handler
+            )(self, entity_id, **kwargs),
+            feconf.ENTITY_TYPE_TOPIC: lambda entity_id: can_edit_topic(
+                reduced_handler
+            )(self, entity_id, **kwargs),
+            feconf.ENTITY_TYPE_SKILL: lambda entity_id: can_edit_skill(
+                reduced_handler
+            )(self, entity_id, **kwargs),
             feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS: lambda entity_id: (
                 can_submit_images_to_questions(reduced_handler)(
                     self, entity_id, **kwargs
@@ -4721,12 +4719,12 @@ def can_edit_entity(
                     self, entity_id, **kwargs
                 )
             ),
-            feconf.ENTITY_TYPE_STORY: lambda entity_id: (
-                can_edit_story(reduced_handler)(self, entity_id, **kwargs)
-            ),
-            feconf.ENTITY_TYPE_BLOG_POST: lambda entity_id: (
-                can_edit_blog_post(reduced_handler)(self, entity_id, **kwargs)
-            ),
+            feconf.ENTITY_TYPE_STORY: lambda entity_id: can_edit_story(
+                reduced_handler
+            )(self, entity_id, **kwargs),
+            feconf.ENTITY_TYPE_BLOG_POST: lambda entity_id: can_edit_blog_post(
+                reduced_handler
+            )(self, entity_id, **kwargs),
         }
         if entity_type not in dict.keys(functions):
             raise self.NotFoundException
@@ -5308,7 +5306,6 @@ def can_access_platform_feedback_reports(
         """
 
         if dashboard == feconf.DESTINATION_CURRICULUM:
-
             # Here we use type Any because the decorated handler may receive
             # handler-specific keyword arguments.
             def wrapped_handler(

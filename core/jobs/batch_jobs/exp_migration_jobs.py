@@ -126,7 +126,9 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
             )
             yield (exp_id, exp_change)
 
-    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
         beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult],
     ]:
@@ -173,8 +175,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         all_migrated_exp_results = (
             (unmigrated_exploration_models, exp_publication_status)
             | 'Merge model and staus' >> beam.CoGroupByKey()
-            | 'Get rid of exp ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of exp ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Transform and migrate model'
             >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
                 lambda exploration_models, status: self._migrate_exploration(
@@ -211,8 +212,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
                 'exp_changes': exp_changes,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         transformed_exp_objects_list = (
@@ -448,8 +448,9 @@ class RegenerateMissingExplorationStatsModelsJob(base_jobs.JobBase):
             # are fixed and it is possible to migrate them.
             | 'Remove broken exploration'
             >> beam.Filter(
-                lambda id_and_exp: id_and_exp[0]
-                not in ('umPkwp0L1M0-', '670bU6d9JGBh')
+                lambda id_and_exp: (
+                    id_and_exp[0] not in ('umPkwp0L1M0-', '670bU6d9JGBh')
+                )
             )
         )
 

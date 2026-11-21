@@ -270,9 +270,7 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
 
     def _get_sample_version_data(
         self,
-    ) -> (
-        certificate_assessment_domain.CertificateAssessmentAttemptVersionDataDict
-    ):
+    ) -> certificate_assessment_domain.CertificateAssessmentAttemptVersionDataDict:
         """Returns sample version_data for use in tests."""
         return {
             'certificate_id': 'cert_abc123',
@@ -549,10 +547,7 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             Exception,
-            (
-                'total_correct_questions cannot exceed '
-                'total_related_questions'
-            ),
+            ('total_correct_questions cannot exceed total_related_questions'),
         ):
             attempt.validate()
 

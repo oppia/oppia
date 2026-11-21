@@ -36,7 +36,6 @@ if MYPY:  # pragma: no cover
 
 
 class TopicSnapshotContentModelTests(test_utils.GenericTestBase):
-
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             topic_models.TopicSnapshotContentModel.get_deletion_policy(),
@@ -185,7 +184,6 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
 
 
 class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):
-
     TOPIC_ID_1: Final = '1'
     USER_ID_1: Final = 'id_1'
     USER_ID_2: Final = 'id_2'

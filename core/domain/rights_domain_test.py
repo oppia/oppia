@@ -28,7 +28,6 @@ from typing import Sequence
 
 
 class ActivityRightsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -340,7 +339,6 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
 
 class ExplorationRightsChangeTests(test_utils.GenericTestBase):
-
     def test_exploration_rights_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'
@@ -389,10 +387,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
     def test_exploration_rights_change_object_with_invalid_role(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
-            (
-                'Value for new_role in cmd change_role: '
-                'invalid is not allowed'
-            ),
+            ('Value for new_role in cmd change_role: invalid is not allowed'),
         ):
             rights_domain.ExplorationRightsChange(
                 {
@@ -552,7 +547,6 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
 
 
 class CollectionRightsChangeTests(test_utils.GenericTestBase):
-
     def test_collection_rights_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'
@@ -601,10 +595,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
     def test_collection_rights_change_object_with_invalid_role(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
-            (
-                'Value for new_role in cmd change_role: '
-                'invalid is not allowed'
-            ),
+            ('Value for new_role in cmd change_role: invalid is not allowed'),
         ):
             rights_domain.CollectionRightsChange(
                 {

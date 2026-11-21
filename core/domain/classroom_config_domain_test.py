@@ -31,7 +31,6 @@ from core.tests import test_utils
 
 
 class ClassroomDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.dummy_thumbnail_data = classroom_config_domain.ImageData(
@@ -366,8 +365,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_invalid_index_should_raise_exception(self) -> None:
         self.classroom.index = 'index'  # type: ignore[assignment]
         error_msg = (
-            'Expected index of the classroom to be a boolean, '
-            'received: index.'
+            'Expected index of the classroom to be a boolean, received: index.'
         )
         with self.assertRaisesRegex(utils.ValidationError, error_msg):
             self.classroom.validate(strict=True)
@@ -457,8 +455,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_invalid_banner_data_should_raise_exception(self) -> None:
         self.classroom.banner_data = 1  # type: ignore[assignment]
         error_msg = (
-            'Expected banner_data of the classroom to be a string, '
-            'received: 1.'
+            'Expected banner_data of the classroom to be a string, received: 1.'
         )
         with self.assertRaisesRegex(utils.ValidationError, error_msg):
             self.classroom.validate(strict=True)
@@ -523,7 +520,6 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
 
 
 class ImageDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         self.filename = 'test_image.png'
         self.bg_color = '#FFFFFF'

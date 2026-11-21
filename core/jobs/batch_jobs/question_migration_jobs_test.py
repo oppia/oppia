@@ -35,7 +35,6 @@ if MYPY:
 
 
 class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         question_migration_jobs.PopulateQuestionSummaryVersionOneOffJob
     ] = question_migration_jobs.PopulateQuestionSummaryVersionOneOffJob
@@ -214,7 +213,7 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
-                    stderr='QUESTION SUMMARY PROCESSED ERROR: \"(\'question_1_id\''
+                    stderr='QUESTION SUMMARY PROCESSED ERROR: "(\'question_1_id\''
                     ', ValidationError(\'Expected version to be non-negative, '
                     'received -4\'))": 1'
                 ),
@@ -225,7 +224,6 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
 class AuditPopulateQuestionSummaryVersionOneOffJobTests(
     job_test_utils.JobTestBase
 ):
-
     JOB_CLASS: Type[
         question_migration_jobs.AuditPopulateQuestionSummaryVersionOneOffJob
     ] = question_migration_jobs.AuditPopulateQuestionSummaryVersionOneOffJob
@@ -388,7 +386,7 @@ class AuditPopulateQuestionSummaryVersionOneOffJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
-                    stderr='QUESTION SUMMARY PROCESSED ERROR: \"(\'question_1_id\''
+                    stderr='QUESTION SUMMARY PROCESSED ERROR: "(\'question_1_id\''
                     ', ValidationError(\'Expected version to be non-negative, '
                     'received -4\'))": 1'
                 ),
@@ -397,7 +395,6 @@ class AuditPopulateQuestionSummaryVersionOneOffJobTests(
 
 
 class MigrateQuestionJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[question_migration_jobs.MigrateQuestionJob] = (
         question_migration_jobs.MigrateQuestionJob
     )
@@ -690,8 +687,8 @@ class MigrateQuestionJobTests(job_test_utils.JobTestBase):
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'QUESTION PROCESSED ERROR: \"(\'question_1_id\', '
-                        'ValidationError(\'Invalid language code: abc\'))\": 1'
+                        'QUESTION PROCESSED ERROR: "(\'question_1_id\', '
+                        'ValidationError(\'Invalid language code: abc\'))": 1'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -746,7 +743,6 @@ class MigrateQuestionJobTests(job_test_utils.JobTestBase):
 
 
 class AuditQuestionMigrationJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[question_migration_jobs.AuditQuestionMigrationJob] = (
         question_migration_jobs.AuditQuestionMigrationJob
     )
@@ -972,8 +968,8 @@ class AuditQuestionMigrationJobTests(job_test_utils.JobTestBase):
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'QUESTION PROCESSED ERROR: \"(\'question_1_id\', '
-                        'ValidationError(\'Invalid language code: abc\'))\": 1'
+                        'QUESTION PROCESSED ERROR: "(\'question_1_id\', '
+                        'ValidationError(\'Invalid language code: abc\'))": 1'
                     )
                 ),
                 job_run_result.JobRunResult(

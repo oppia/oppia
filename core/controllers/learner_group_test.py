@@ -38,7 +38,6 @@ from typing import Final
 
 
 class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
-
     USER1_EMAIL: Final = 'user1@example.com'
     USER1_USERNAME: Final = 'user1'
     USER2_EMAIL: Final = 'user2@example.com'
@@ -89,7 +88,6 @@ class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
 
 
 class LearnerGroupHandlerTests(test_utils.GenericTestBase):
-
     USER1_EMAIL: Final = 'user1@example.com'
     USER1_USERNAME: Final = 'user1'
     USER2_EMAIL: Final = 'user2@example.com'
@@ -221,7 +219,6 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
 
 
 class FacilitatorDashboardHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -260,7 +257,6 @@ class FacilitatorDashboardHandlerTests(test_utils.GenericTestBase):
 
 
 class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
-
     learner_group_id = None
     LEARNER_ID: Final = 'learner_user_1'
     TOPIC_ID_0: Final = 'topic_id_0'
@@ -397,7 +393,6 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
 
 
 class ViewLearnerGroupInfoHandlerTests(test_utils.GenericTestBase):
-
     USER1_EMAIL: Final = 'user1@example.com'
     USER1_USERNAME: Final = 'user1'
     USER2_EMAIL: Final = 'user2@example.com'
@@ -463,7 +458,6 @@ class ViewLearnerGroupInfoHandlerTests(test_utils.GenericTestBase):
 
 
 class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
-
     LEARNER_1_EMAIL: Final = 'user1@example.com'
     LEARNER_1_USERNAME: Final = 'user1'
     LEARNER_2_EMAIL: Final = 'user2@example.com'

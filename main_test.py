@@ -163,7 +163,6 @@ class MainModuleDevModeTests(test_utils.GenericTestBase):
             with mock.patch(
                 'core.platform.auth.firebase_auth_services.establish_firebase_connection'
             ) as mock_connection:
-
                 importlib.reload(main)
 
                 mock_connection.assert_not_called()

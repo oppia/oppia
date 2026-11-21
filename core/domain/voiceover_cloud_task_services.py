@@ -255,7 +255,6 @@ def resolve_multiple_cloud_task_runs_for_exploration(
             ) in earlier_language_accent_to_content_status_map_clone[
                 language_accent
             ].items():
-
                 if (
                     content_id
                     not in later_language_accent_to_content_status_map[
@@ -483,7 +482,6 @@ def create_voiceover_regeneration_task_batch_models(
     for (
         voiceover_regeneration_task_batch
     ) in voiceover_regeneration_task_batch_instances:
-
         model_id = '%s:%s' % (
             voiceover_regeneration_task_batch.parent_cloud_task_run_id,
             voiceover_regeneration_task_batch.child_cloud_task_run_id,

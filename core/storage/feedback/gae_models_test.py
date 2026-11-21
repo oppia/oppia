@@ -347,8 +347,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         )
 
         test_data = {
-            thread_id
-            + '.0': {
+            thread_id + '.0': {
                 'thread_id': thread_id,
                 'message_id': 0,
                 'updated_status': test_export_updated_status,
@@ -356,8 +355,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
                 'text': test_export_text,
                 'received_via_email': test_export_received_via_email,
             },
-            thread_id
-            + '.1': {
+            thread_id + '.1': {
                 'thread_id': thread_id,
                 'message_id': 1,
                 'updated_status': test_export_updated_status,

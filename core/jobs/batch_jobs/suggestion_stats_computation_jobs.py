@@ -199,8 +199,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 'opportunity': exp_opportunities,
             }
             | 'Merge models' >> beam.CoGroupByKey()
-            | 'Get rid of key submitted objects'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of key submitted objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
         exp_opportunity_to_reviewed_suggestions = (
             {
@@ -210,8 +209,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 'opportunity': exp_opportunities,
             }
             | 'Merge reviewed models' >> beam.CoGroupByKey()
-            | 'Get rid of key of reviewed objects'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of key of reviewed objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
         skill_opportunity_to_submitted_suggestions = (
             {
@@ -219,8 +217,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 'opportunity': skill_opportunities_by_id,
             }
             | 'Merge submitted question models' >> beam.CoGroupByKey()
-            | 'Get rid of key of submitted question objects'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of key of submitted question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
         skill_opportunity_to_reviewed_suggestions = (
             {
@@ -228,8 +225,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 'opportunity': skill_opportunities_by_id,
             }
             | 'Merge reviewed question models' >> beam.CoGroupByKey()
-            | 'Get rid of key of reviewed question objects'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of key of reviewed question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         translation_contribution_stats_keys_and_results = (
@@ -368,8 +364,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             >> beam.Filter(lambda key_and_result: key_and_result[1].is_err())
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
-            | 'Remove contribution keys'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove contribution keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Transform contribution result to job run result'
             >> (job_result_transforms.ResultsToJobRunResults())
         )
@@ -379,8 +374,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             >> beam.Filter(lambda key_and_result: key_and_result[1].is_err())
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
-            | 'Remove review keys'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove review keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Transform review result to job run result'
             >> (job_result_transforms.ResultsToJobRunResults())
         )
@@ -390,8 +384,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             >> beam.Filter(lambda key_and_result: key_and_result[1].is_err())
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
-            | 'Remove question contribution keys'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove question contribution keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Transform question contribution result to job run result'
             >> (job_result_transforms.ResultsToJobRunResults())
         )
@@ -401,8 +394,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             >> beam.Filter(lambda key_and_result: key_and_result[1].is_err())
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
-            | 'Remove question review keys'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove question review keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Transform question review result to job run result'
             >> (job_result_transforms.ResultsToJobRunResults())
         )

@@ -32,7 +32,6 @@ from core.platform import models
 
 
 class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS = translation_audit_jobs.ValidateExplorationOpportunityCountsJob
 
     def test_empty_storage(self) -> None:

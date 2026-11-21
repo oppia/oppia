@@ -35,7 +35,6 @@ if MYPY:  # pragma: no cover
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-
     def test_blog_post_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
@@ -88,7 +87,6 @@ class RelationshipsOfTests(test_utils.TestBase):
 
 
 class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
-
     def test_reports_model_created_on_timestamp_relationship_error(
         self,
     ) -> None:
@@ -232,7 +230,6 @@ class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 class ValidateBlogPostModelDomainObjectsInstancesTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_validation_type_for_domain_object_strict(self) -> None:
         blog_model = blog_models.BlogPostModel(
             id='validblogid2',
@@ -285,7 +282,6 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
 class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_validation_type_for_domain_object_strict(self) -> None:
         blog_summary_model = blog_models.BlogPostSummaryModel(
             id='validblogid4',

@@ -93,8 +93,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         stats_model_class = blog_stats_models.BlogPostViewedEventLogEntryModel
         with self.assertRaisesRegex(
             Exception,
-            'The id generator for the model is producing too many'
-            ' collisions.',
+            'The id generator for the model is producing too many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
@@ -240,8 +239,7 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         stats_model_class = blog_stats_models.BlogPostReadEventLogEntryModel
         with self.assertRaisesRegex(
             Exception,
-            'The id generator for the model is producing too many'
-            ' collisions.',
+            'The id generator for the model is producing too many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
@@ -385,8 +383,7 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         stats_model_class = blog_stats_models.BlogPostExitedEventLogEntryModel
         with self.assertRaisesRegex(
             Exception,
-            'The id generator for the model is producing too many'
-            ' collisions.',
+            'The id generator for the model is producing too many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(

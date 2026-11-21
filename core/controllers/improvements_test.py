@@ -149,7 +149,6 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
 
 
 class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -645,7 +644,6 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
 
 class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -783,7 +781,6 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
 
 
 class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
-
     EXP_ID: Final = 'eid'
 
     def setUp(self) -> None:

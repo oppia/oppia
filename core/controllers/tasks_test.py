@@ -49,7 +49,6 @@ if MYPY:  # pragma: no cover
 
 
 class TasksTests(test_utils.EmailTestBase):
-
     USER_A_EMAIL: Final = 'a@example.com'
     USER_B_EMAIL: Final = 'b@example.com'
     EMAIL_FOOTER: Final = (
@@ -307,12 +306,17 @@ class TasksTests(test_utils.EmailTestBase):
                 )
             )
             mock_pop = mock.Mock()
-            with self.swap(
-                email_manager, 'send_feedback_message_email', mock_send_email
-            ), self.swap(
-                feedback_services,
-                'pop_feedback_message_references_transactional',
-                mock_pop,
+            with (
+                self.swap(
+                    email_manager,
+                    'send_feedback_message_email',
+                    mock_send_email,
+                ),
+                self.swap(
+                    feedback_services,
+                    'pop_feedback_message_references_transactional',
+                    mock_pop,
+                ),
             ):
                 self.process_and_flush_pending_tasks()
             mock_pop.assert_called_once()
@@ -617,7 +621,6 @@ class TasksTests(test_utils.EmailTestBase):
 
         with self.can_send_feedback_email_ctx:
             with get_moderator_id_as_list:
-
                 # Create thread.
                 feedback_services.create_thread(
                     feconf.ENTITY_TYPE_EXPLORATION,

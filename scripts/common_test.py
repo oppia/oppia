@@ -193,8 +193,11 @@ class CommonTests(test_utils.GenericTestBase):
             return 'invalid'
 
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        with getcwd_swap, self.assertRaisesRegex(
-            Exception, 'Please run this script from the oppia/ directory.'
+        with (
+            getcwd_swap,
+            self.assertRaisesRegex(
+                Exception, 'Please run this script from the oppia/ directory.'
+            ),
         ):
             common.require_cwd_to_be_oppia()
 
@@ -387,9 +390,12 @@ class CommonTests(test_utils.GenericTestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output
         )
-        with check_output_swap, self.assertRaisesRegex(
-            Exception,
-            'ERROR: There is no existing remote alias for the url3, url4 repo.',
+        with (
+            check_output_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'ERROR: There is no existing remote alias for the url3, url4 repo.',
+            ),
         ):
             common.get_remote_alias(['url3', 'url4'])
 
@@ -407,8 +413,12 @@ class CommonTests(test_utils.GenericTestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output
         )
-        with check_output_swap, self.assertRaisesRegex(
-            Exception, 'ERROR: This script should be run from a clean branch.'
+        with (
+            check_output_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'ERROR: This script should be run from a clean branch.',
+            ),
         ):
             common.verify_local_repo_is_clean()
 
@@ -579,9 +589,12 @@ class CommonTests(test_utils.GenericTestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output
         )
-        with check_output_swap, self.assertRaisesRegex(
-            Exception,
-            'ERROR: This script can only be run from the "test" branch.',
+        with (
+            check_output_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'ERROR: This script can only be run from the "test" branch.',
+            ),
         ):
             common.verify_current_branch_name('test')
 
@@ -689,7 +702,8 @@ class CommonTests(test_utils.GenericTestBase):
             status = 200
 
         def mock_urlopen(
-            unused_url: str, timeout: int  # pylint: disable=unused-argument
+            unused_url: str,
+            timeout: int,  # pylint: disable=unused-argument
         ) -> MockResponse:
             return MockResponse()
 
@@ -708,7 +722,8 @@ class CommonTests(test_utils.GenericTestBase):
             status = 200
 
         def mock_urlopen(
-            unused_url: str, timeout: int  # pylint: disable=unused-argument
+            unused_url: str,
+            timeout: int,  # pylint: disable=unused-argument
         ) -> MockResponse:
             nonlocal attempt_count
             attempt_count += 1
@@ -729,7 +744,8 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_wait_for_firebase_emulator_to_be_ready_timeout(self) -> None:
         def mock_urlopen(
-            unused_url: str, timeout: int  # pylint: disable=unused-argument
+            unused_url: str,
+            timeout: int,  # pylint: disable=unused-argument
         ) -> NoReturn:
             raise urlerror.URLError('Connection refused')
 
@@ -895,11 +911,14 @@ class CommonTests(test_utils.GenericTestBase):
             return None
 
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        with getpass_swap, self.assertRaisesRegex(
-            Exception,
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script',
+        with (
+            getpass_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'No personal access token provided, please set up a personal '
+                'access token at https://github.com/settings/tokens and re-run '
+                'the script',
+            ),
         ):
             common.get_personal_access_token()
 
@@ -988,9 +1007,12 @@ class CommonTests(test_utils.GenericTestBase):
             raise ValueError('Exception raised from compile()')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaisesRegex(
-            ValueError, re.escape('Exception raised from compile()')
-        ), compile_swap:
+        with (
+            self.assertRaisesRegex(
+                ValueError, re.escape('Exception raised from compile()')
+            ),
+            compile_swap,
+        ):
             common.inplace_replace_file(
                 origin_filepath, '"DEV_MODE": .*', '"DEV_MODE": true,'
             )
@@ -1145,10 +1167,12 @@ class CommonTests(test_utils.GenericTestBase):
         isfile_swap = self.swap(
             os.path,
             'isfile',
-            lambda path: path
-            == (
-                '/mnt/c/Program Files (x86)/Google/'
-                'Chrome/Application/chrome.exe'
+            lambda path: (
+                path
+                == (
+                    '/mnt/c/Program Files (x86)/Google/'
+                    'Chrome/Application/chrome.exe'
+                )
             ),
         )
         with isfile_swap:
@@ -1167,8 +1191,10 @@ class CommonTests(test_utils.GenericTestBase):
         isfile_swap = self.swap(os.path, 'isfile', lambda _: False)
         print_swap = self.swap(builtins, 'print', mock_print)
 
-        with print_swap, isfile_swap, self.assertRaisesRegex(
-            Exception, 'Chrome not found.'
+        with (
+            print_swap,
+            isfile_swap,
+            self.assertRaisesRegex(Exception, 'Chrome not found.'),
         ):
             common.setup_chrome_bin_env_variable()
         self.assertIn('Chrome is not found, stopping...', print_arr)
@@ -1324,9 +1350,7 @@ class CommonTests(test_utils.GenericTestBase):
                 self.swap_with_checks(
                     common,
                     'is_port_in_use',
-                    lambda port: (
-                        port == common.GAE_PORT_FOR_ACCEPTANCE_TESTING
-                    ),
+                    lambda port: port == common.GAE_PORT_FOR_ACCEPTANCE_TESTING,
                 )
             )
 
@@ -1556,9 +1580,7 @@ class UrlRetrieveTests(CommonTests):
         ) -> NoReturn:
             raise AssertionError('open() should not be called')
 
-        def mock_urlopen(
-            url: str, context: ssl.SSLContext
-        ) -> NoReturn:  # pylint: disable=unused-argument
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:  # pylint: disable=unused-argument
             raise AssertionError('urlopen() should not be called')
 
         open_swap = self.swap(builtins, 'open', mock_open)

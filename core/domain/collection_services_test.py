@@ -92,7 +92,6 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
 
 
 class MockCollectionModel(collection_models.CollectionModel):
-
     nodes = datastore_services.JsonProperty(repeated=True)
 
 
@@ -386,10 +385,13 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             collection_services, 'apply_change_list', lambda _, __: collection
         )
 
-        with apply_change_list_swap, self.assertRaisesRegex(
-            Exception,
-            'Unexpected error: received an invalid change list when trying to '
-            'save collection',
+        with (
+            apply_change_list_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'Unexpected error: received an invalid change list when trying to '
+                'save collection',
+            ),
         ):
             # Here we use MyPy ignore because the argument `change_list`
             # of update_collection method can only accept values of type
@@ -397,7 +399,10 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             # None which causes MyPy to throw incompatible argument type
             # error. Thus to avoid the error, we used ignore here.
             collection_services.update_collection(
-                self.owner_id, 'collection_id', None, 'commit message'  # type: ignore[arg-type]
+                self.owner_id,
+                'collection_id',
+                None,  # type: ignore[arg-type]
+                'commit message',
             )
 
     def test_save_collection_with_mismatch_of_versions_raises_error(
@@ -598,9 +603,12 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
 
         self.save_new_valid_collection('collection_id', self.owner_id)
 
-        with self.assertRaisesRegex(
-            Exception, 'Command invalid command is not allowed'
-        ), logging_swap:
+        with (
+            self.assertRaisesRegex(
+                Exception, 'Command invalid command is not allowed'
+            ),
+            logging_swap,
+        ):
             collection_services.update_collection(
                 self.owner_id,
                 'collection_id',
@@ -1475,7 +1483,6 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
 
 class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
-
     def test_loading_demo_reuses_existing_explorations(self) -> None:
         collection_id = next(iter(feconf.DEMO_COLLECTIONS))
         collection_services.load_demo(collection_id)
@@ -1623,8 +1630,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertTrue(rights_manager.is_exploration_private(private_exp_id))
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Cannot reference a private exploration within a public '
-            'collection',
+            'Cannot reference a private exploration within a public collection',
         ):
             collection_services.update_collection(
                 self.owner_id,
@@ -2497,7 +2503,6 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
 
 
 class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):
-
     def test_get_collection_and_collection_rights_object(self) -> None:
         collection_id = self.COLLECTION_0_ID
         self.save_new_valid_collection(

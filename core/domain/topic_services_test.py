@@ -473,13 +473,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         story = story_fetchers.get_story_by_id(self.story_id_1)
 
-        with self.swap_to_always_return(
-            feature_flag_services, 'is_feature_flag_enabled', True
-        ), self.swap_with_checks(
-            topic_services,
-            'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(self.TOPIC_ID,)],
+        with (
+            self.swap_to_always_return(
+                feature_flag_services, 'is_feature_flag_enabled', True
+            ),
+            self.swap_with_checks(
+                topic_services,
+                'generate_topic_summary',
+                topic_services.generate_topic_summary,
+                expected_args=[(self.TOPIC_ID,)],
+            ),
         ):
             topic_services.update_story_and_topic_summary(
                 self.user_id_admin,
@@ -1856,9 +1859,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                     'property_name': (
-                        (
-                            subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
-                        )
+                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
                     ),
                     'old_value': '<p>New Value</p>',
                     'subtopic_id': 1,
@@ -4688,9 +4689,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_summary = topic_fetchers.get_topic_summary_by_id(
                     self.TOPIC_ID
                 ).to_dict()
-                frontend_topic_summary: (
-                    topic_domain.FrontendTopicSummaryDict
-                ) = {
+                frontend_topic_summary: topic_domain.FrontendTopicSummaryDict = {
                     'id': topic_summary['id'],
                     'name': topic_summary['name'],
                     'url_fragment': topic_summary['url_fragment'],
@@ -4910,7 +4909,6 @@ class MockTopicObject(topic_domain.Topic):
 
 
 class SubtopicMigrationTests(test_utils.GenericTestBase):
-
     def test_migrate_subtopic_to_latest_schema(self) -> None:
         topic_services.create_new_topic_rights('topic_id', 'user_id_admin')
         commit_cmd = topic_domain.TopicChange(
@@ -4961,7 +4959,6 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
 
 
 class StoryReferenceMigrationTests(test_utils.GenericTestBase):
-
     def test_migrate_story_reference_to_latest_schema(self) -> None:
         topic_services.create_new_topic_rights('topic_id', 'user_id_admin')
         commit_cmd = topic_domain.TopicChange(

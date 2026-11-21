@@ -107,12 +107,16 @@ class FixThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
             )
         )
 
-        invalid_thread_logs = invalid_threads | 'Log invalid threads' >> beam.Map(
-            lambda model: job_run_result.JobRunResult.as_stdout(
-                (
-                    'GeneralFeedbackThreadModel marked as has_suggestion=True '
-                    'but no GeneralSuggestionModel exists: '
-                    f'id={model.id}'
+        invalid_thread_logs = (
+            invalid_threads
+            | 'Log invalid threads'
+            >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stdout(
+                    (
+                        'GeneralFeedbackThreadModel marked as has_suggestion=True '
+                        'but no GeneralSuggestionModel exists: '
+                        f'id={model.id}'
+                    )
                 )
             )
         )

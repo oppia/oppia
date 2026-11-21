@@ -196,9 +196,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             async_status='Available',
         )
 
-        offerings = (
-            certificate_assessment_services.get_certificate_assessment_offerings()
-        )
+        offerings = certificate_assessment_services.get_certificate_assessment_offerings()
 
         self.assertEqual(len(offerings), 1)
         self.assertEqual(
@@ -509,30 +507,35 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             'skill_unclassified': skill_unclassified_links,
         }
 
-        with mock.patch.object(
-            topic_fetchers,
-            'get_topics_by_ids',
-            return_value=[topic],
-        ), mock.patch.object(
-            skill_models.SkillModel,
-            'get_multi',
-            return_value=[
-                None,
-                skill_1,
-                skill_2,
-                skill_3,
-                skill_unclassified,
-            ],
-        ), mock.patch.object(
-            skill_fetchers,
-            'get_skill_from_model',
-            side_effect=lambda skill_model: skill_model,
-        ), mock.patch.object(
-            question_services,
-            'get_question_skill_links_of_skill',
-            side_effect=lambda skill_id, description: links_by_skill_id[
-                skill_id
-            ],
+        with (
+            mock.patch.object(
+                topic_fetchers,
+                'get_topics_by_ids',
+                return_value=[topic],
+            ),
+            mock.patch.object(
+                skill_models.SkillModel,
+                'get_multi',
+                return_value=[
+                    None,
+                    skill_1,
+                    skill_2,
+                    skill_3,
+                    skill_unclassified,
+                ],
+            ),
+            mock.patch.object(
+                skill_fetchers,
+                'get_skill_from_model',
+                side_effect=lambda skill_model: skill_model,
+            ),
+            mock.patch.object(
+                question_services,
+                'get_question_skill_links_of_skill',
+                side_effect=lambda skill_id, description: links_by_skill_id[
+                    skill_id
+                ],
+            ),
         ):
             result = getattr(
                 certificate_assessment_services,
@@ -554,14 +557,17 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
     ) -> None:
         topic = mock.Mock(version=3)
         question = mock.Mock(version=7)
-        with mock.patch.object(
-            topic_fetchers,
-            'get_topics_by_ids',
-            return_value=[topic],
-        ), mock.patch.object(
-            question_fetchers,
-            'get_questions_by_ids',
-            return_value=[question],
+        with (
+            mock.patch.object(
+                topic_fetchers,
+                'get_topics_by_ids',
+                return_value=[topic],
+            ),
+            mock.patch.object(
+                question_fetchers,
+                'get_questions_by_ids',
+                return_value=[question],
+            ),
         ):
             result = getattr(
                 certificate_assessment_services, '_build_version_data'
@@ -783,16 +789,19 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             is_submitted=False,
         )
 
-        with mock.patch.object(
-            certificate_assessment_services,
-            'validate_certificate_assessment_offering',
-            return_value={'is_valid': True},
-        ), self.assertRaisesRegex(
-            certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
-            # The remaining wait is about 5 minutes and 30 seconds, so it
-            # must be reported rounded up to 6 minutes.
-            r'Assessment attempt blocked by cooldown; 6 minute\(s\) remaining\.',
-        ) as context:
+        with (
+            mock.patch.object(
+                certificate_assessment_services,
+                'validate_certificate_assessment_offering',
+                return_value={'is_valid': True},
+            ),
+            self.assertRaisesRegex(
+                certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
+                # The remaining wait is about 5 minutes and 30 seconds, so it
+                # must be reported rounded up to 6 minutes.
+                r'Assessment attempt blocked by cooldown; 6 minute\(s\) remaining\.',
+            ) as context,
+        ):
             certificate_assessment_services.start_certificate_assessment_attempt(
                 created_offering.certificate_id,
                 owner_id,
@@ -863,14 +872,17 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             is_submitted=False,
         )
 
-        with mock.patch.object(
-            certificate_assessment_services,
-            'validate_certificate_assessment_offering',
-            return_value={'is_valid': True},
-        ), self.assertRaisesRegex(
-            certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
-            r'Assessment attempt blocked by cooldown; 1 minute\(s\) remaining\.',
-        ) as context:
+        with (
+            mock.patch.object(
+                certificate_assessment_services,
+                'validate_certificate_assessment_offering',
+                return_value={'is_valid': True},
+            ),
+            self.assertRaisesRegex(
+                certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
+                r'Assessment attempt blocked by cooldown; 1 minute\(s\) remaining\.',
+            ) as context,
+        ):
             certificate_assessment_services.start_certificate_assessment_attempt(
                 created_offering.certificate_id,
                 owner_id,
@@ -965,13 +977,16 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             async_status='Available',
         )
 
-        with mock.patch.object(
-            certificate_assessment_services,
-            'validate_certificate_assessment_offering',
-            return_value={'is_valid': False},
-        ), self.assertRaisesRegex(
-            certificate_assessment_services.CertificateAssessmentAttemptNotReadyException,
-            'Sorry, this assessment isn\'t ready anymore!',
+        with (
+            mock.patch.object(
+                certificate_assessment_services,
+                'validate_certificate_assessment_offering',
+                return_value={'is_valid': False},
+            ),
+            self.assertRaisesRegex(
+                certificate_assessment_services.CertificateAssessmentAttemptNotReadyException,
+                'Sorry, this assessment isn\'t ready anymore!',
+            ),
         ):
             certificate_assessment_services.start_certificate_assessment_attempt(
                 created_offering.certificate_id,
@@ -1340,13 +1355,16 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 '%s not found' % attempt_id
             )
 
-        with mock.patch.object(
-            gae_models.CertificateAssessmentAttemptModel,
-            'get',
-            side_effect=_get_returns_missing,
-        ), self.assertRaisesRegex(
-            utils.ValidationError,
-            'Attempt does not exist.',
+        with (
+            mock.patch.object(
+                gae_models.CertificateAssessmentAttemptModel,
+                'get',
+                side_effect=_get_returns_missing,
+            ),
+            self.assertRaisesRegex(
+                utils.ValidationError,
+                'Attempt does not exist.',
+            ),
         ):
             certificate_assessment_services.submit_certificate_assessment_attempt(
                 'attempt_1',
@@ -1363,13 +1381,16 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 return valid_model
             return submitted_model
 
-        with mock.patch.object(
-            gae_models.CertificateAssessmentAttemptModel,
-            'get',
-            side_effect=_get_returns_submitted,
-        ), self.assertRaisesRegex(
-            utils.ValidationError,
-            'This assessment has already been submitted.',
+        with (
+            mock.patch.object(
+                gae_models.CertificateAssessmentAttemptModel,
+                'get',
+                side_effect=_get_returns_submitted,
+            ),
+            self.assertRaisesRegex(
+                utils.ValidationError,
+                'This assessment has already been submitted.',
+            ),
         ):
             certificate_assessment_services.submit_certificate_assessment_attempt(
                 'attempt_1',
@@ -1833,9 +1854,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         topic_skill_to_question_ids: dict[str, dict[str, list[str]]],
         topic_ids: list[str],
         total_questions: int,
-    ) -> (
-        certificate_assessment_services.CertificateAssessmentOfferingValidationResultDict
-    ):
+    ) -> certificate_assessment_services.CertificateAssessmentOfferingValidationResultDict:
         """Builds a mocked validation scenario from topic and skill mappings."""
         topic_objects: dict[str, mock.Mock] = {}
         skill_objects: dict[str, mock.Mock] = {}
@@ -1879,22 +1898,27 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             )
             return question_link_map[skill_id]
 
-        with mock.patch.object(
-            topic_fetchers,
-            'get_topics_by_ids',
-            side_effect=_get_topics,
-        ), mock.patch.object(
-            skill_models.SkillModel,
-            'get_multi',
-            side_effect=_get_skill_models,
-        ), mock.patch.object(
-            skill_fetchers,
-            'get_skill_from_model',
-            side_effect=lambda skill_model: skill_model,
-        ), mock.patch.object(
-            question_services,
-            'get_question_skill_links_of_skill',
-            side_effect=_get_links,
+        with (
+            mock.patch.object(
+                topic_fetchers,
+                'get_topics_by_ids',
+                side_effect=_get_topics,
+            ),
+            mock.patch.object(
+                skill_models.SkillModel,
+                'get_multi',
+                side_effect=_get_skill_models,
+            ),
+            mock.patch.object(
+                skill_fetchers,
+                'get_skill_from_model',
+                side_effect=lambda skill_model: skill_model,
+            ),
+            mock.patch.object(
+                question_services,
+                'get_question_skill_links_of_skill',
+                side_effect=_get_links,
+            ),
         ):
             return certificate_assessment_services.validate_certificate_assessment_offering(
                 topic_ids=topic_ids,
@@ -1964,22 +1988,27 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         skill.description = 'Skill description'
         question_link = mock.Mock(question_id='question_1')
 
-        with mock.patch.object(
-            topic_fetchers,
-            'get_topics_by_ids',
-            side_effect=Exception('topic lookup failed'),
-        ), mock.patch.object(
-            topic_fetchers,
-            'get_topic_by_id',
-            return_value=topic,
-        ), mock.patch.object(
-            skill_fetchers,
-            'get_skill_by_id',
-            return_value=skill,
-        ), mock.patch.object(
-            question_services,
-            'get_question_skill_links_of_skill',
-            return_value=[question_link],
+        with (
+            mock.patch.object(
+                topic_fetchers,
+                'get_topics_by_ids',
+                side_effect=Exception('topic lookup failed'),
+            ),
+            mock.patch.object(
+                topic_fetchers,
+                'get_topic_by_id',
+                return_value=topic,
+            ),
+            mock.patch.object(
+                skill_fetchers,
+                'get_skill_by_id',
+                return_value=skill,
+            ),
+            mock.patch.object(
+                question_services,
+                'get_question_skill_links_of_skill',
+                return_value=[question_link],
+            ),
         ):
             with self.assertRaisesRegex(
                 utils.ValidationError,
@@ -2000,26 +2029,32 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         skill.description = 'Skill description'
         question_link = mock.Mock(question_id='question_1')
 
-        with mock.patch.object(
-            topic_fetchers,
-            'get_topics_by_ids',
-            return_value=[topic],
-        ), mock.patch.object(
-            topic_fetchers,
-            'get_topic_by_id',
-            side_effect=AssertionError('unused'),
-        ), mock.patch.object(
-            skill_models.SkillModel,
-            'get_multi',
-            return_value=[mock.Mock(), None],
-        ), mock.patch.object(
-            skill_fetchers,
-            'get_skill_from_model',
-            return_value=skill,
-        ), mock.patch.object(
-            question_services,
-            'get_question_skill_links_of_skill',
-            return_value=[question_link],
+        with (
+            mock.patch.object(
+                topic_fetchers,
+                'get_topics_by_ids',
+                return_value=[topic],
+            ),
+            mock.patch.object(
+                topic_fetchers,
+                'get_topic_by_id',
+                side_effect=AssertionError('unused'),
+            ),
+            mock.patch.object(
+                skill_models.SkillModel,
+                'get_multi',
+                return_value=[mock.Mock(), None],
+            ),
+            mock.patch.object(
+                skill_fetchers,
+                'get_skill_from_model',
+                return_value=skill,
+            ),
+            mock.patch.object(
+                question_services,
+                'get_question_skill_links_of_skill',
+                return_value=[question_link],
+            ),
         ):
             result = getattr(
                 certificate_assessment_services,
@@ -2139,15 +2174,20 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             },
         }
 
-        with mock.patch.object(
-            certificate_assessment_services,
-            '_get_topic_question_ids_by_difficulty',
-            return_value=topic_id_to_question_ids_by_difficulty,
-        ), mock.patch.object(
-            secrets,
-            'SystemRandom',
-            return_value=mock.Mock(
-                sample=mock.Mock(side_effect=lambda items, count: items[:count])
+        with (
+            mock.patch.object(
+                certificate_assessment_services,
+                '_get_topic_question_ids_by_difficulty',
+                return_value=topic_id_to_question_ids_by_difficulty,
+            ),
+            mock.patch.object(
+                secrets,
+                'SystemRandom',
+                return_value=mock.Mock(
+                    sample=mock.Mock(
+                        side_effect=lambda items, count: items[:count]
+                    )
+                ),
             ),
         ):
             selected_question_ids = pick_questions(['topic_1', 'topic_2'], 5)
@@ -2500,23 +2540,28 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         skill_model_2 = mock.Mock()
         skill_model_2.id = 'skill_2'
 
-        with mock.patch.object(
-            topic_fetchers,
-            'get_topics_by_ids',
-            return_value=[topic],
-        ) as get_topics_by_ids, mock.patch.object(
-            skill_models.SkillModel,
-            'get_multi',
-            return_value=[skill_model_1, skill_model_2],
-        ) as get_multi_mock, mock.patch.object(
-            skill_fetchers,
-            'get_skill_from_model',
-            return_value=skill,
-        ), mock.patch.object(
-            question_services,
-            'get_question_skill_links_of_skill',
-            return_value=[mock.Mock(question_id='question_1')],
-        ) as get_links:
+        with (
+            mock.patch.object(
+                topic_fetchers,
+                'get_topics_by_ids',
+                return_value=[topic],
+            ) as get_topics_by_ids,
+            mock.patch.object(
+                skill_models.SkillModel,
+                'get_multi',
+                return_value=[skill_model_1, skill_model_2],
+            ) as get_multi_mock,
+            mock.patch.object(
+                skill_fetchers,
+                'get_skill_from_model',
+                return_value=skill,
+            ),
+            mock.patch.object(
+                question_services,
+                'get_question_skill_links_of_skill',
+                return_value=[mock.Mock(question_id='question_1')],
+            ) as get_links,
+        ):
             result = certificate_assessment_services.validate_certificate_assessment_offering(
                 topic_ids=['topic_1'],
                 total_questions=3,
@@ -2547,25 +2592,30 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         skill = mock.Mock()
         skill.description = 'Skill description'
 
-        with mock.patch.object(
-            topic_fetchers,
-            'get_topics_by_ids',
-            return_value=[topic],
-        ) as get_topics_by_ids, mock.patch.object(
-            skill_models.SkillModel,
-            'get_multi',
-            return_value=[None, mock.Mock()],
-        ) as get_multi_mock, mock.patch.object(
-            skill_fetchers,
-            'get_skill_from_model',
-            return_value=skill,
-        ), mock.patch.object(
-            question_services,
-            'get_question_skill_links_of_skill',
-            return_value=[
-                mock.Mock(question_id='question_1', skill_difficulty=0.6)
-            ],
-        ) as get_links:
+        with (
+            mock.patch.object(
+                topic_fetchers,
+                'get_topics_by_ids',
+                return_value=[topic],
+            ) as get_topics_by_ids,
+            mock.patch.object(
+                skill_models.SkillModel,
+                'get_multi',
+                return_value=[None, mock.Mock()],
+            ) as get_multi_mock,
+            mock.patch.object(
+                skill_fetchers,
+                'get_skill_from_model',
+                return_value=skill,
+            ),
+            mock.patch.object(
+                question_services,
+                'get_question_skill_links_of_skill',
+                return_value=[
+                    mock.Mock(question_id='question_1', skill_difficulty=0.6)
+                ],
+            ) as get_links,
+        ):
             result = certificate_assessment_services.validate_certificate_assessment_offering(
                 topic_ids=['topic_1'],
                 total_questions=3,
@@ -2686,22 +2736,27 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             mock.Mock(question_id='hard_1', skill_difficulty=0.9),
         ]
 
-        with mock.patch.object(
-            topic_fetchers,
-            'get_topics_by_ids',
-            return_value=[topic],
-        ) as get_topics_by_ids, mock.patch.object(
-            skill_models.SkillModel,
-            'get_multi',
-            return_value=[mock.Mock()],
-        ), mock.patch.object(
-            skill_fetchers,
-            'get_skill_from_model',
-            return_value=skill,
-        ), mock.patch.object(
-            question_services,
-            'get_question_skill_links_of_skill',
-            return_value=question_links,
+        with (
+            mock.patch.object(
+                topic_fetchers,
+                'get_topics_by_ids',
+                return_value=[topic],
+            ) as get_topics_by_ids,
+            mock.patch.object(
+                skill_models.SkillModel,
+                'get_multi',
+                return_value=[mock.Mock()],
+            ),
+            mock.patch.object(
+                skill_fetchers,
+                'get_skill_from_model',
+                return_value=skill,
+            ),
+            mock.patch.object(
+                question_services,
+                'get_question_skill_links_of_skill',
+                return_value=question_links,
+            ),
         ):
             result = certificate_assessment_services.validate_certificate_assessment_offering(
                 topic_ids=[self.topic_id],

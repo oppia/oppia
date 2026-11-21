@@ -288,7 +288,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             logging.error(
-                'Could not find a story corresponding to ' '%s id.' % story_id
+                'Could not find a story corresponding to %s id.' % story_id
             )
             self.render_json({})
             return

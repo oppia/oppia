@@ -35,7 +35,6 @@ if MYPY:  # pragma: no cover
 
 
 class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
-
     def test_assert_pcoll_empty_raises_immediately(self) -> None:
         # NOTE: Arbitrary operations that produce a non-empty PCollection.
         output = self.pipeline | beam.Create([123]) | beam.Map(lambda x: x)
@@ -83,7 +82,6 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 
 
 class JobTestBaseTests(job_test_utils.JobTestBase):
-
     JOB_CLASS = mock.Mock()
 
     def tearDown(self) -> None:
@@ -119,9 +117,7 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         # replaced with some more standard method, we can remove this todo.
         self.job.run.return_value = (  # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce a non-empty PCollection.
-            self.pipeline
-            | beam.Create([123])
-            | beam.Map(lambda x: x)
+            self.pipeline | beam.Create([123]) | beam.Map(lambda x: x)
         )
 
         self.assert_job_output_is([123])
@@ -134,16 +130,13 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         # replaced with some more standard method, we can remove this todo.
         self.job.run.return_value = (  # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce an empty PCollection.
-            self.pipeline
-            | beam.Create([])
-            | beam.Map(lambda x: x)
+            self.pipeline | beam.Create([]) | beam.Map(lambda x: x)
         )
 
         self.assert_job_output_is_empty()
 
 
 class DecorateBeamErrorsTests(test_utils.TestBase):
-
     def assert_error_is_decorated(
         self, actual_msg: str, decorated_msg: str
     ) -> None:

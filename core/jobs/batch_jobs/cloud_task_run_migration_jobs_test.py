@@ -581,9 +581,7 @@ class MarkStaleCloudTaskRunModelsAsFailedAuditJobTests(
 
     JOB_CLASS: Type[
         cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedAuditJob
-    ] = (
-        cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedAuditJob
-    )
+    ] = cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedAuditJob
 
     def test_audit_job_does_not_update_models(self) -> None:
         """Test that the audit job does not update any models and only logs the IDs of stale models."""
@@ -640,9 +638,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
 
     JOB_CLASS: Type[
         cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedJob
-    ] = (
-        cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedJob
-    )
+    ] = cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedJob
 
     def test_empty_storage(self) -> None:
         """Test that the job runs successfully with empty storage."""
@@ -932,9 +928,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJobTests(
 
     JOB_CLASS: Type[
         cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJob
-    ] = (
-        cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJob
-    )
+    ] = cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJob
 
     def test_empty_storage(self) -> None:
         """Test that the audit job runs successfully with empty storage."""
