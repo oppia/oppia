@@ -35,6 +35,7 @@ import {
 } from './answer-classification.service';
 import {AlertsService} from '../../../services/alerts.service';
 import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
+import {DiagnosticTestPlayerStatusService} from '../../../pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 
 describe('Diagnostic test engine service', () => {
   let diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService;
@@ -1301,4 +1302,207 @@ describe('Diagnostic test engine service', () => {
       diagnosticTestPlayerEngineService.computeProgressPercentage()
     ).toEqual(20);
   }));
+
+  describe('when a topic has no questions left', () => {
+    // A topic can come back with no questions: e.g. its diagnostic test
+    // skills are shared with a topic that was already tested, and all their
+    // questions were shown there, so they are excluded (#22176).
+    let diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService;
+
+    beforeEach(() => {
+      diagnosticTestPlayerStatusService = TestBed.inject(
+        DiagnosticTestPlayerStatusService
+      );
+      spyOn(
+        diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted,
+        'emit'
+      );
+    });
+
+    it('should skip that topic on initialization and test the next one', fakeAsync(() => {
+      const initSuccessCb = jasmine.createSpy('success');
+      const diagnosticTestTopicTrackerModel =
+        new DiagnosticTestTopicTrackerModel({topicId1: [], topicId2: []});
+      const fetchSpy = spyOn(
+        questionBackendApiService,
+        'fetchDiagnosticTestQuestionsAsync'
+      ).and.returnValues(
+        Promise.resolve({}),
+        Promise.resolve({
+          skillId1: new DiagnosticTestQuestionsModel(question1, question2),
+        })
+      );
+
+      diagnosticTestPlayerEngineService.init(
+        diagnosticTestTopicTrackerModel,
+        initSuccessCb
+      );
+      tick();
+
+      expect(fetchSpy.calls.allArgs().map(args => args[0])).toEqual([
+        'topicId1',
+        'topicId2',
+      ]);
+      expect(initSuccessCb).toHaveBeenCalledTimes(1);
+      expect(diagnosticTestPlayerEngineService.getCurrentTopicId()).toEqual(
+        'topicId2'
+      );
+      expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+        question1
+      );
+      // The skipped topic is neither failed nor left pending.
+      expect(diagnosticTestPlayerEngineService.getFailedTopicIds()).toEqual([]);
+      expect(
+        diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest()
+      ).toEqual(['topicId2']);
+      expect(
+        diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted.emit
+      ).not.toHaveBeenCalled();
+    }));
+
+    it('should finish the test without a question if no topic has questions', fakeAsync(() => {
+      const initSuccessCb = jasmine.createSpy('success');
+      const diagnosticTestTopicTrackerModel =
+        new DiagnosticTestTopicTrackerModel({
+          topicId1: [],
+          topicId2: ['topicId1'],
+        });
+      const fetchSpy = spyOn(
+        questionBackendApiService,
+        'fetchDiagnosticTestQuestionsAsync'
+      ).and.returnValue(Promise.resolve({}));
+
+      diagnosticTestPlayerEngineService.init(
+        diagnosticTestTopicTrackerModel,
+        initSuccessCb
+      );
+      tick();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+      expect(initSuccessCb).not.toHaveBeenCalled();
+      expect(
+        diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted.emit
+      ).toHaveBeenCalledOnceWith([]);
+    }));
+
+    it('should skip that topic when moving on to the next topic', fakeAsync(() => {
+      const diagnosticTestTopicTrackerModel =
+        new DiagnosticTestTopicTrackerModel({
+          topicId1: [],
+          topicId2: [],
+          topicId3: [],
+        });
+      const fetchSpy = spyOn(
+        questionBackendApiService,
+        'fetchDiagnosticTestQuestionsAsync'
+      ).and.returnValues(
+        Promise.resolve({
+          skillId1: new DiagnosticTestQuestionsModel(question1, question2),
+        }),
+        Promise.resolve({}),
+        Promise.resolve({
+          skillId2: new DiagnosticTestQuestionsModel(question3, question4),
+        })
+      );
+      const skipSuccessCb = jasmine.createSpy('success');
+
+      diagnosticTestPlayerEngineService.init(
+        diagnosticTestTopicTrackerModel,
+        () => {}
+      );
+      tick();
+      // Skipping twice uses up the lifeline, so topicId1 is failed.
+      diagnosticTestPlayerEngineService.skipCurrentQuestion(skipSuccessCb);
+      tick();
+      diagnosticTestPlayerEngineService.skipCurrentQuestion(skipSuccessCb);
+      tick();
+
+      expect(fetchSpy.calls.allArgs().map(args => args[0])).toEqual([
+        'topicId1',
+        'topicId2',
+        'topicId3',
+      ]);
+      expect(skipSuccessCb).toHaveBeenCalledTimes(2);
+      expect(diagnosticTestPlayerEngineService.getCurrentTopicId()).toEqual(
+        'topicId3'
+      );
+      expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+        question3
+      );
+      expect(diagnosticTestPlayerEngineService.getFailedTopicIds()).toEqual([
+        'topicId1',
+      ]);
+      expect(
+        diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted.emit
+      ).not.toHaveBeenCalled();
+    }));
+
+    it('should finish the test if the last pending topic has no questions', fakeAsync(() => {
+      const diagnosticTestTopicTrackerModel =
+        new DiagnosticTestTopicTrackerModel({topicId1: [], topicId2: []});
+      const fetchSpy = spyOn(
+        questionBackendApiService,
+        'fetchDiagnosticTestQuestionsAsync'
+      ).and.returnValues(
+        Promise.resolve({
+          skillId1: new DiagnosticTestQuestionsModel(question1, question2),
+        }),
+        Promise.resolve({})
+      );
+      const skipSuccessCb = jasmine.createSpy('success');
+
+      diagnosticTestPlayerEngineService.init(
+        diagnosticTestTopicTrackerModel,
+        () => {}
+      );
+      tick();
+      diagnosticTestPlayerEngineService.skipCurrentQuestion(skipSuccessCb);
+      tick();
+      diagnosticTestPlayerEngineService.skipCurrentQuestion(skipSuccessCb);
+      tick();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+      // Only the first skip moved to a new question.
+      expect(skipSuccessCb).toHaveBeenCalledTimes(1);
+      expect(
+        diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted.emit
+      ).toHaveBeenCalledOnceWith(['topicId1']);
+    }));
+
+    it('should not fetch another topic once the test is finished', fakeAsync(() => {
+      const diagnosticTestTopicTrackerModel =
+        new DiagnosticTestTopicTrackerModel({topicId1: []});
+      const fetchSpy = spyOn(
+        questionBackendApiService,
+        'fetchDiagnosticTestQuestionsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          skillId1: new DiagnosticTestQuestionsModel(question1, question2),
+        })
+      );
+
+      const selectSpy = spyOn(
+        diagnosticTestTopicTrackerModel,
+        'selectNextTopicIdToTest'
+      ).and.callThrough();
+
+      diagnosticTestPlayerEngineService.init(
+        diagnosticTestTopicTrackerModel,
+        () => {}
+      );
+      tick();
+      diagnosticTestPlayerEngineService.skipCurrentQuestion(() => {});
+      tick();
+      diagnosticTestPlayerEngineService.skipCurrentQuestion(() => {});
+      tick();
+
+      // Failing the only topic finishes the test, so no further topic is
+      // selected (there is none to select) or fetched.
+      expect(selectSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(
+        diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted.emit
+      ).toHaveBeenCalledOnceWith(['topicId1']);
+    }));
+  });
 });

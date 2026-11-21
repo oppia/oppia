@@ -208,6 +208,60 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
                 expected_skill_id_to_question_ids[skill_id],
             )
 
+    def test_returns_no_skills_once_shared_skill_questions_are_shown(
+        self,
+    ) -> None:
+        # A second topic shares skill_id_1, which has exactly 2 questions,
+        # i.e. one main and one backup question. Once the learner has seen
+        # both while testing the first topic, they are excluded for the
+        # second topic, so the handler returns no skills for it. The
+        # diagnostic test player skips such a topic (#22176).
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_1, 'skill_id_1', 0.5
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_2, 'skill_id_1', 0.5
+        )
+        second_topic_id = topic_fetchers.get_new_topic_id()
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 2', 'url-frag-two'
+        )
+        subtopic.skill_ids = ['skill_id_1']
+        subtopic.url_fragment = 'sub-two-frag'
+        self.save_new_topic(
+            second_topic_id,
+            self.admin_id,
+            name='Second topic',
+            url_fragment='second-topic',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+
+        first_topic_response = self.get_json(
+            '%s/%s?excluded_question_ids=%s'
+            % (feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL, self.topic_id, '')
+        )
+        self.assertEqual(
+            list(first_topic_response['skill_id_to_questions_dict'].keys()),
+            ['skill_id_1'],
+        )
+
+        second_topic_response = self.get_json(
+            '%s/%s?excluded_question_ids=%s'
+            % (
+                feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
+                second_topic_id,
+                ','.join([self.question_id_1, self.question_id_2]),
+            )
+        )
+        self.assertEqual(
+            second_topic_response['skill_id_to_questions_dict'], {}
+        )
+
     def test_raise_error_for_non_existent_topic_id(self) -> None:
         non_existent_topic_id = topic_fetchers.get_new_topic_id()
 
