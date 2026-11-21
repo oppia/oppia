@@ -752,8 +752,8 @@
     },
     {
       "name": "exploration-editor/delete-lesson-creators-user-profile",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/delete-lesson-creators-user-profile.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/delete-lesson-creators-user-profile.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "contributor-dashboard-admin/manage-auto-translation-configuration",
