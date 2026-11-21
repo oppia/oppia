@@ -624,12 +624,11 @@ class NewSkillHandler(
         image_filenames = skill_services.get_image_filenames_from_skill(skill)
 
         skill_services.save_new_skill(self.user_id, skill)
-        if linked_topic_ids is not None:
-            for topic in topics:
-                assert topic is not None
-                topic_services.add_uncategorized_skill(
-                    self.user_id, topic.id, new_skill_id
-                )
+        for topic in topics:
+            assert topic is not None
+            topic_services.add_uncategorized_skill(
+                self.user_id, topic.id, new_skill_id
+            )
 
         for filename in image_filenames:
             base64_image = files[filename]
