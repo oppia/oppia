@@ -161,7 +161,6 @@ class TranslatedContent:
         content_value: feconf.ContentValueType,
         content_format: TranslatableContentFormat,
         needs_update: bool,
-        data_source: str = 'manual',
     ) -> None:
         """Constructor for the TranslatedContent object.
 
@@ -171,14 +170,10 @@ class TranslatedContent:
             content_format: TranslatableContentFormat. The format of the
                 content.
             needs_update: bool. Whether the translated content needs an update.
-            data_source: str. Whether the translation was produced
-                automatically ('auto') or by a human contributor ('manual').
-                Defaults to 'manual'.
         """
         self.content_value = content_value
         self.content_format = content_format
         self.needs_update = needs_update
-        self.data_source = data_source
 
     def to_dict(self) -> feconf.TranslatedContentDict:
         """Returns the dict representation of TranslatedContent object.
@@ -192,7 +187,6 @@ class TranslatedContent:
             'content_value': self.content_value,
             'content_format': self.content_format.value,
             'needs_update': self.needs_update,
-            'data_source': self.data_source,
         }
 
     @classmethod
@@ -206,9 +200,6 @@ class TranslatedContent:
                 translated_content_dict['content_format']
             ),
             translated_content_dict['needs_update'],
-            # Absent in rows written before this field was introduced;
-            # default to 'manual' for backward compatibility.
-            translated_content_dict.get('data_source', 'manual'),
         )
 
 
@@ -696,7 +687,6 @@ class EntityTranslation:
         content_value: feconf.ContentValueType,
         content_format: TranslatableContentFormat,
         needs_update: bool,
-        data_source: str = 'manual',
     ) -> None:
         """Adds new TranslatedContent in the object.
 
@@ -706,12 +696,9 @@ class EntityTranslation:
             content_format: TranslatableContentFormat. The format of the
                 content.
             needs_update: bool. Whether the translation needs update.
-            data_source: str. Whether the translation was produced
-                automatically ('auto') or by a human contributor ('manual').
-                Defaults to 'manual'.
         """
         self.translations[content_id] = TranslatedContent(
-            content_value, content_format, needs_update, data_source
+            content_value, content_format, needs_update
         )
 
     def remove_translations(self, content_ids: List[str]) -> None:

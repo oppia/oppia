@@ -4233,17 +4233,7 @@ class EntityTranslationHandlerTest(test_utils.GenericTestBase):
         url = '/entity_translations_handler/exploration/exp1/5/hi'
         entity_translation_dict = self.get_json(url)
 
-        # Translations stored without a data source are read back as manual
-        # ones.
-        expected_translations: Dict[str, feconf.TranslatedContentDict] = {
-            'content_0': {
-                'content_value': 'Translated content',
-                'content_format': 'html',
-                'needs_update': False,
-                'data_source': 'manual',
-            }
-        }
         self.assertEqual(
-            entity_translation_dict['translations'], expected_translations
+            entity_translation_dict['translations'], translations_mapping
         )
         self.logout()

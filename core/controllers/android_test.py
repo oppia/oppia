@@ -570,9 +570,6 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                                 'content_value': 'Hello world!',
                                 'needs_update': False,
                                 'content_format': 'html',
-                                # Translations stored without a data source
-                                # are read back as manual ones.
-                                'data_source': 'manual',
                             }
                         },
                     }
