@@ -1,5 +1,44 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .oppia-contributor-dashboard-admin-page-tabs-container {
   margin: auto;
-  max-width: 800px;
+  max-width: 960px;
   padding-top: 16px;
+  width: 100%;
+}
+
+/* On the old contributor-dashboard-admin page all cards are capped at 800px;
+   match that width so the translation config card doesn't stick out wider. */
+.oppia-legacy-admin-spacing.oppia-contributor-dashboard-admin-page-tabs-container {
+  max-width: 800px;
+}
+
+.translation-provider-settings {
+  border: 0;
+  margin: 1.5rem 0 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.e2e-test-provider-mapping-table td,
+.e2e-test-provider-mapping-table th {
+  vertical-align: middle;
+}
+
+.e2e-test-translation-config-container .oppia-page-card {
+  margin-top: 0;
+}
+
+.oppia-legacy-admin-spacing {
+  padding-top: 80px;
+}
+
+.e2e-test-remove-mapping-btn {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  vertical-align: middle;
 }

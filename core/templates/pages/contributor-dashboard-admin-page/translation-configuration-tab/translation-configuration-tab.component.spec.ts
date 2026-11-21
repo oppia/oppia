@@ -177,6 +177,23 @@ describe('TranslationConfigurationTabComponent', () => {
     ).not.toHaveBeenCalled();
   }));
 
+  it('should not change mappings while automatic translation is off', fakeAsync(() => {
+    fixture.detectChanges();
+    tick();
+    component.isAutomaticTranslationEnabled = false;
+
+    component.selectedLanguage = 'es';
+    component.selectedProvider = 'azure';
+    component.addMapping();
+    component.removeMapping('hi');
+    tick();
+
+    expect(component.providerMapping).toEqual({hi: 'azure'});
+    expect(
+      mockApiService.updateTranslationConfigurationAsync
+    ).not.toHaveBeenCalled();
+  }));
+
   it('should not add mapping if provider not selected', fakeAsync(() => {
     fixture.detectChanges();
     tick();
@@ -334,6 +351,20 @@ describe('TranslationConfigurationTabComponent', () => {
     tick();
 
     // 'hi' is already mapped, so only 'es' (Spanish) should appear.
+    expect(component.unmappedLanguageOptions).toEqual([
+      {code: 'es', name: 'Spanish'},
+    ]);
+  }));
+
+  it('should not offer English as a language to translate into', fakeAsync(() => {
+    mockLanguageUtilService.getAllVoiceoverLanguageCodes.and.returnValue([
+      'en',
+      'hi',
+      'es',
+    ]);
+    fixture.detectChanges();
+    tick();
+
     expect(component.unmappedLanguageOptions).toEqual([
       {code: 'es', name: 'Spanish'},
     ]);

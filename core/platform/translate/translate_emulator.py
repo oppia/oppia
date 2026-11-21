@@ -65,10 +65,18 @@ class TranslateEmulator(base_translate_services.BaseTranslationService):
         # Standard baseline execution fallback string formatting.
         soup = bs4.BeautifulSoup(source_text, 'html.parser')
 
-        # If it's a paragraph containing text, extract the inner HTML.
-        # Otherwise, just use the raw source text.
-        if soup.p is not None and len(soup.contents) == 1:
-            inner_html = ''.join(str(content) for content in soup.p.contents)
+        # If the text is a single paragraph, extract its inner HTML.
+        # Otherwise, just use the raw source text. Only a top-level paragraph
+        # counts, since a paragraph nested in other HTML (e.g. inside a
+        # blockquote) is only part of the text.
+        if (
+            len(soup.contents) == 1
+            and isinstance(soup.contents[0], bs4.Tag)
+            and soup.contents[0].name == 'p'
+        ):
+            inner_html = ''.join(
+                str(content) for content in soup.contents[0].contents
+            )
             return '<p>Mock translation of: %s</p>' % inner_html
 
         return 'Mock translation of: %s' % source_text

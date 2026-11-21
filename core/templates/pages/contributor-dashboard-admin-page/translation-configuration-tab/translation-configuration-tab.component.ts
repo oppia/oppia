@@ -18,11 +18,12 @@
  * translation providers and toggle the master automatic translation flag.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationProviderOption} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {AlertsService} from 'services/alerts.service';
+import {AppConstants} from 'app.constants';
 import AUTO_TRANSLATION_PROVIDER_MAPPING from 'assets/auto_translation_provider_mapping.json';
 
 import './translation-configuration-tab.component.css';
@@ -38,6 +39,8 @@ interface LanguageOption {
   styleUrls: ['./translation-configuration-tab.component.css'],
 })
 export class TranslationConfigurationTabComponent implements OnInit {
+  @Input() useLegacyAdminSpacing: boolean = false;
+
   providerMapping: Record<string, string> = {};
   isAutomaticTranslationEnabled: boolean = false;
 
@@ -93,8 +96,14 @@ export class TranslationConfigurationTabComponent implements OnInit {
     const allOppiaLanguages =
       this.languageUtilService.getAllVoiceoverLanguageCodes();
 
+    // Lessons are written in English, so English is never a target language
+    // for automatic translation.
     this.unmappedLanguageOptions = allOppiaLanguages
-      .filter(code => !(code in this.providerMapping))
+      .filter(
+        code =>
+          code !== AppConstants.DEFAULT_LANGUAGE_CODE &&
+          !(code in this.providerMapping)
+      )
       .map(code => ({
         code,
         name: this.getLanguageName(code),
@@ -112,7 +121,11 @@ export class TranslationConfigurationTabComponent implements OnInit {
   }
 
   async addMapping(): Promise<void> {
-    if (!this.selectedLanguage || !this.selectedProvider) {
+    if (
+      !this.isAutomaticTranslationEnabled ||
+      !this.selectedLanguage ||
+      !this.selectedProvider
+    ) {
       return;
     }
     this.providerMapping = {
@@ -127,6 +140,10 @@ export class TranslationConfigurationTabComponent implements OnInit {
   }
 
   async removeMapping(languageCode: string): Promise<void> {
+    if (!this.isAutomaticTranslationEnabled) {
+      return;
+    }
+
     const updated = {...this.providerMapping};
     delete updated[languageCode];
     this.providerMapping = updated;

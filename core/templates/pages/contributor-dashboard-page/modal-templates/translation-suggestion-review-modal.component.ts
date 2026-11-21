@@ -291,6 +291,19 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
     this.activeSuggestion = this.activeContribution.suggestion;
+    // The editor removes any RTE component that is not in its set when HTML
+    // is loaded into it. Skill content can contain worked examples, so a
+    // skill translation needs the same set as the skill editor. Otherwise
+    // editing the translation would silently drop its worked examples.
+    this.HTML_SCHEMA = {
+      type: 'html',
+      ui_config: {
+        rte_component_config_id:
+          this.activeSuggestion.target_type === AppConstants.ENTITY_TYPE.SKILL
+            ? 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS'
+            : 'CURATED_LESSON_COMPONENTS',
+      },
+    };
     this.pageContextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id

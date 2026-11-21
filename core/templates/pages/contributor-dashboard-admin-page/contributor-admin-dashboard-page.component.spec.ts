@@ -28,7 +28,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import {ContributorAdminDashboardPageComponent} from './contributor-admin-dashboard-page.component';
 import {UserService} from 'services/user.service';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {ContributorDashboardAdminBackendApiService} from './services/contributor-dashboard-admin-backend-api.service';
 import {
   CommunityContributionStatsBackendDict,
@@ -931,6 +931,108 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.CONTRIBUTION_TYPES).toContain(
         component.TAB_NAME_QUESTION_COORDINATOR
       );
+    }));
+
+    it('should add the translation configuration tab when it is enabled', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+
+      component.showTranslationConfigurationTab = true;
+      component.ngOnChanges({
+        showTranslationConfigurationTab: new SimpleChange(false, true, false),
+      });
+
+      expect(component.CONTRIBUTION_TYPES).toContain(
+        component.TAB_NAME_TRANSLATION_CONFIGURATION
+      );
+      // The tab that was already selected stays selected.
+      expect(component.activeTab).toBe(
+        component.TAB_NAME_TRANSLATION_SUBMITTER
+      );
+    }));
+
+    it('should not change the tabs for other input changes', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      const contributionTypes = [...component.CONTRIBUTION_TYPES];
+
+      component.showTranslationConfigurationTab = true;
+      component.ngOnChanges({});
+
+      expect(component.CONTRIBUTION_TYPES).toEqual(contributionTypes);
+    }));
+
+    it('should remove the translation configuration tab when it is disabled', fakeAsync(() => {
+      component.showTranslationConfigurationTab = true;
+      component.ngOnInit();
+      tick();
+      component.updateSelectedContributionType(
+        component.TAB_NAME_TRANSLATION_CONFIGURATION
+      );
+
+      component.showTranslationConfigurationTab = false;
+      component.ngOnChanges({
+        showTranslationConfigurationTab: new SimpleChange(true, false, false),
+      });
+
+      expect(component.CONTRIBUTION_TYPES).not.toContain(
+        component.TAB_NAME_TRANSLATION_CONFIGURATION
+      );
+      expect(component.activeTab).toBe(component.CONTRIBUTION_TYPES[0]);
+    }));
+
+    it('should keep the selected tab when the configuration tab is removed', fakeAsync(() => {
+      component.showTranslationConfigurationTab = true;
+      component.ngOnInit();
+      tick();
+      component.updateSelectedContributionType(
+        component.TAB_NAME_QUESTION_SUBMITTER
+      );
+
+      component.showTranslationConfigurationTab = false;
+      component.ngOnChanges({
+        showTranslationConfigurationTab: new SimpleChange(true, false, false),
+      });
+
+      expect(component.activeTab).toBe(component.TAB_NAME_QUESTION_SUBMITTER);
+    }));
+
+    it('should open the configuration tab if it is the only tab', () => {
+      component.CONTRIBUTION_TYPES = [];
+      component.selectedContributionType = '';
+
+      component.showTranslationConfigurationTab = true;
+      component.ngOnChanges({
+        showTranslationConfigurationTab: new SimpleChange(false, true, true),
+      });
+      expect(component.activeTab).toBe(
+        component.TAB_NAME_TRANSLATION_CONFIGURATION
+      );
+
+      component.showTranslationConfigurationTab = false;
+      component.ngOnChanges({
+        showTranslationConfigurationTab: new SimpleChange(true, false, false),
+      });
+      expect(component.CONTRIBUTION_TYPES).toEqual([]);
+      expect(component.activeTab).toBe('');
+    });
+
+    it('should keep the tab bar visible on the configuration tab', fakeAsync(() => {
+      component.showTranslationConfigurationTab = true;
+      component.ngOnInit();
+      tick();
+      component.setActiveTab(component.TAB_NAME_TRANSLATION_CONFIGURATION);
+      fixture.detectChanges();
+
+      const element: HTMLElement = fixture.nativeElement;
+      expect(element.querySelector('.dashboard-tabs')).not.toBeNull();
+      expect(
+        element.querySelector('.e2e-test-translation-configuration-tab')
+      ).not.toBeNull();
+      expect(
+        element.querySelector('oppia-translation-configuration-tab')
+      ).not.toBeNull();
+      expect(element.querySelector('contributor-admin-stats-table')).toBeNull();
     }));
 
     it('should identify coordinator tabs', () => {

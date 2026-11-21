@@ -30,6 +30,14 @@
     </div>
   </div>
   <div class="dashboard-content">
+    <!-- The translation configuration is shown below the tab bar (or the
+         dropdown on mobile), in place of the filters and the stats table, so
+         that the other tabs stay reachable. -->
+    <ng-template #translationConfigurationContent>
+      <div class="translation-configuration-content e2e-test-translation-configuration-content">
+        <oppia-translation-configuration-tab></oppia-translation-configuration-tab>
+      </div>
+    </ng-template>
     <div class="dashboard-content-primary" *ngIf="!checkMobileView()">
       <div>
         <ul class="dashboard-tabs">
@@ -63,59 +71,68 @@
               Question<br>Coordinators
             </a>
           </li>
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_CONFIGURATION}"
+              *ngIf="showTranslationConfigurationTab">
+            <a class="dashboard-tabs-text e2e-test-translation-configuration-tab"
+               (click)="setActiveTab(TAB_NAME_TRANSLATION_CONFIGURATION)">
+              Translation<br>Configuration
+            </a>
+          </li>
         </ul>
       </div>
-      <div class="filter-container">
-        <div class="filter-rights-sub-container">
-          <div class="add-rights-button-container">
-            <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) && !isCoordinatorTab()">
-              + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
-            </button>
-          </div>
-          <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
-            <div #languageDropdown class="oppia-filter-selector-container e2e-test-language-selector"
-                 (click)="toggleLanguageDropdown()">
-              <div class="oppia-filter-selector-inner-container e2e-test-language-selector-selected">
-                <b>Language: </b>{{selectedLanguage.language}}
-                <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                  [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
-                </span>
-              </div>
-              <div *ngIf="languageDropdownShown"
-                   class="oppia-filter-selector-dropdown-container e2e-test-language-selector-dropdown">
-                <div class="oppia-filter-selector-dropdown-option e2e-test-language-selector-option"
-                     *ngFor="let option of languageChoices"
-                     (click)="selectLanguage(option.language)"
-                     [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option.language === selectedLanguage.language}">
-                  {{option.language}}
+      <ng-container *ngIf="activeTab !== TAB_NAME_TRANSLATION_CONFIGURATION; else translationConfigurationContent">
+        <div class="filter-container">
+          <div class="filter-rights-sub-container">
+            <div class="add-rights-button-container">
+              <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) && !isCoordinatorTab()">
+                + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
+              </button>
+            </div>
+            <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
+              <div #languageDropdown class="oppia-filter-selector-container e2e-test-language-selector"
+                   (click)="toggleLanguageDropdown()">
+                <div class="oppia-filter-selector-inner-container e2e-test-language-selector-selected">
+                  <b>Language: </b>{{selectedLanguage.language}}
+                  <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
+                    [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
+                  </span>
+                </div>
+                <div *ngIf="languageDropdownShown"
+                     class="oppia-filter-selector-dropdown-container e2e-test-language-selector-dropdown">
+                  <div class="oppia-filter-selector-dropdown-option e2e-test-language-selector-option"
+                       *ngFor="let option of languageChoices"
+                       (click)="selectLanguage(option.language)"
+                       [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option.language === selectedLanguage.language}">
+                    {{option.language}}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="filter-sub-container">
-          <div class="date-selector-container">
-            <div class="date-selector-inner-container">
-              <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
-              <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
-              <mat-form-field>
-                <input matInput class="e2e-test-last-date-picker-input" [matDatepicker]="lastDatePicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
-                <mat-datepicker-toggle matSuffix class="e2e-test-last-date-picker-toggle" [for]="lastDatePicker"></mat-datepicker-toggle>
-                <mat-datepicker #lastDatePicker></mat-datepicker>
-              </mat-form-field>
+          <div class="filter-sub-container">
+            <div class="date-selector-container">
+              <div class="date-selector-inner-container">
+                <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
+                <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
+                <mat-form-field>
+                  <input matInput class="e2e-test-last-date-picker-input" [matDatepicker]="lastDatePicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
+                  <mat-datepicker-toggle matSuffix class="e2e-test-last-date-picker-toggle" [for]="lastDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #lastDatePicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="topic-selector-container">
+              <oppia-topic-filter
+                *ngIf="topicsAreFetched === 'true' && (activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
+                [(defaultTopicNames)]="allTopicNames"
+                [(selectedTopicNames)]="selectedTopicNames"
+                (selectionsChange)="applyTopicFilter()">
+              </oppia-topic-filter>
             </div>
           </div>
-          <div class="topic-selector-container">
-            <oppia-topic-filter
-              *ngIf="topicsAreFetched === 'true' && (activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
-              [(defaultTopicNames)]="allTopicNames"
-              [(selectedTopicNames)]="selectedTopicNames"
-              (selectionsChange)="applyTopicFilter()">
-            </oppia-topic-filter>
-          </div>
         </div>
-      </div>
-      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
+        <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
+      </ng-container>
     </div>
     <div class="dashboard-content-mobile" *ngIf="checkMobileView()">
       <div class="dropdown">
@@ -130,55 +147,57 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div class="filter-container">
-        <div class="add-rights-button-container">
-          <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) && !isCoordinatorTab()">
-            + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
-          </button>
-        </div>
-        <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
-          <div class="oppia-filter-selector-container e2e-test-topic-selector e2e-test-language-selector" (click)="toggleLanguageDropdown()">
-            <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
-              <b class="required">Language: </b>
-              <div class="selector-icon-div e2e-test-language-selector-selected">
-                {{selectedLanguage.language}}
-                <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                  [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
-                </span>
+      <ng-container *ngIf="activeTab !== TAB_NAME_TRANSLATION_CONFIGURATION; else translationConfigurationContent">
+        <div class="filter-container">
+          <div class="add-rights-button-container">
+            <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) && !isCoordinatorTab()">
+              + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
+            </button>
+          </div>
+          <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
+            <div class="oppia-filter-selector-container e2e-test-topic-selector e2e-test-language-selector" (click)="toggleLanguageDropdown()">
+              <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
+                <b class="required">Language: </b>
+                <div class="selector-icon-div e2e-test-language-selector-selected">
+                  {{selectedLanguage.language}}
+                  <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
+                    [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
+                  </span>
+                </div>
               </div>
-            </div>
-            <div *ngIf="languageDropdownShown"
-                 class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
-              <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option e2e-test-language-selector-option"
-                   *ngFor="let option of languageChoices"
-                   (click)="selectLanguage(option.language)"
-                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option.language === selectedLanguage.language}">
-                {{option.language}}
+              <div *ngIf="languageDropdownShown"
+                   class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
+                <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option e2e-test-language-selector-option"
+                     *ngFor="let option of languageChoices"
+                     (click)="selectLanguage(option.language)"
+                     [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option.language === selectedLanguage.language}">
+                  {{option.language}}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="date-selector-container">
-          <div class="date-selector-inner-container">
-            <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
-            <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
-            <mat-form-field>
-              <input matInput class="e2e-test-mobile-last-date-picker-input" [matDatepicker]="lastDatePicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
-              <mat-datepicker-toggle matSuffix class="e2e-test-mobile-last-date-picker-toggle" [for]="lastDatePicker"></mat-datepicker-toggle>
-              <mat-datepicker #lastDatePicker></mat-datepicker>
-            </mat-form-field>
+          <div class="date-selector-container">
+            <div class="date-selector-inner-container">
+              <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
+              <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
+              <mat-form-field>
+                <input matInput class="e2e-test-mobile-last-date-picker-input" [matDatepicker]="lastDatePicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
+                <mat-datepicker-toggle matSuffix class="e2e-test-mobile-last-date-picker-toggle" [for]="lastDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #lastDatePicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="topic-selector-container">
+            <oppia-topic-filter
+              *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
+              [(defaultTopicNames)]="allTopicNames"
+              [(selectedTopicNames)]="selectedTopicNames"
+              (selectionsChange)="applyTopicFilter()">
+            </oppia-topic-filter>
           </div>
         </div>
-        <div class="topic-selector-container">
-          <oppia-topic-filter
-            *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
-            [(defaultTopicNames)]="allTopicNames"
-            [(selectedTopicNames)]="selectedTopicNames"
-            (selectionsChange)="applyTopicFilter()">
-          </oppia-topic-filter>
-        </div>
-      </div>
-      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
+        <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
+      </ng-container>
     </div>
   </div>
 </div>
