@@ -301,6 +301,12 @@ const ourNetworkSectionSelector = '.e2e-test-dp-our-network-section';
 const thanksForDonatingDismissButton =
   'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingModalOpen = '.modal-open';
+const watchAVideoButtonInDonationModal =
+  'a.e2e-test-thanks-for-donating-page-watch-a-video-button';
+const readOurBlogButtonInDonationModal =
+  'a.e2e-test-thanks-for-donating-page-read-our-blog-button';
+const donateThanksWatchAVideoUrl =
+  testConstants.URLs.DonatePageThanksModalWatchAVideoUrl;
 
 // Navbar and sidebar selectors for Donate.
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
@@ -3927,6 +3933,40 @@ export class LoggedOutUser extends BaseUser {
       'The dismiss button closes the Donation thanks modal on Donate page ' +
         'and shows the Donate page.'
     );
+  }
+
+  /**
+   * Checks that the "Watch a video" button in the donation thanks modal has
+   * the correct text and links to the Oppia video page.
+   */
+  async expectWatchAVideoButtonInDonationThanksModalToHaveCorrectLink(): Promise<void> {
+    await this.expectElementToBeVisible(watchAVideoButtonInDonationModal);
+    await this.expectTextContentToBe(
+      watchAVideoButtonInDonationModal,
+      'Watch a video'
+    );
+    await this.expectLinkToHaveHref(
+      watchAVideoButtonInDonationModal,
+      donateThanksWatchAVideoUrl
+    );
+    showMessage('The Watch A Video button has the right link.');
+  }
+
+  /**
+   * Clicks the "Read our blog" button in the donation thanks modal and verifies
+   * that it navigates to the blog page.
+   */
+  async clickReadOurBlogButtonInDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.expectElementToBeVisible(readOurBlogButtonInDonationModal);
+    await this.expectTextContentToBe(
+      readOurBlogButtonInDonationModal,
+      'Read our blog'
+    );
+    await this.clickButtonToNavigateToNewPage(
+      readOurBlogButtonInDonationModal,
+      blogUrl
+    );
+    showMessage('The Read Our Blog button opens the blog page.');
   }
 
   /**
