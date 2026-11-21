@@ -756,10 +756,19 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   isTitlePresent(): boolean {
-    return (this.explorationTitleService.savedMemento as string).length > 0;
+    return (
+      Boolean(this.explorationTitleService.savedMemento) &&
+      (this.explorationTitleService.savedMemento as string).length > 0
+    );
   }
 
   onRolesFormUsernameBlur(): void {
+    if (!this.isTitlePresent()) {
+      this.rolesSaveButtonEnabled = false;
+      this.errorMessage = 'Please provide a title before inviting.';
+      return;
+    }
+
     this.rolesSaveButtonEnabled = true;
     this.errorMessage = '';
 
