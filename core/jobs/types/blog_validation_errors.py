@@ -137,3 +137,35 @@ class DuplicateBlogAuthorModelError(base_validation_errors.BaseValidationError):
     def __init__(self, model: blog_models.BlogAuthorDetailsModel) -> None:
         message = 'author id=%s is not unique' % utils.quoted(model.author_id)
         super().__init__(message, model)
+
+
+class InconsistentBlogPostPublishedStatusError(
+    base_validation_errors.BaseValidationError
+):
+    """Error class for blog post rights whose published status disagrees with
+    the blog post or blog post summary that has the same ID.
+    """
+
+    def __init__(
+        self, model: blog_models.BlogPostRightsModel, target_kind: str
+    ) -> None:
+        message = '%s.published_on is %s, but blog_post_is_published=%r' % (
+            target_kind,
+            'not set' if model.blog_post_is_published else 'set',
+            model.blog_post_is_published,
+        )
+        super().__init__(message, model)
+
+
+class BlogPostAuthorNotEditorError(base_validation_errors.BaseValidationError):
+    """Error class for blog post rights that don't list the author of the
+    blog post as an editor.
+    """
+
+    def __init__(
+        self, model: blog_models.BlogPostRightsModel, author_id: str
+    ) -> None:
+        message = 'author_id=%s of the blog post is not in editor_ids' % (
+            utils.quoted(author_id)
+        )
+        super().__init__(message, model)
