@@ -1010,20 +1010,16 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
             ['en']
         )
         self.exp_opportunity_summary_model_1 = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                topic_name='topic name',
-                story_id=self.STORY_1_ID,
-                story_title='story title',
-                chapter_title='node title',
+            opportunity_models.TranslationOpportunityModel(
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=2,
                 incomplete_translation_language_codes=sorted(
                     list(incomplete_translation_language_codes)
                 ),
                 translation_counts={'hi': 1},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[],
             )
         )
         self.exp_opportunity_summary_model_1.update_timestamps()
@@ -1080,7 +1076,7 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
         )
 
         updated_exp_opportunity_summary_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get(
+            opportunity_models.TranslationOpportunityModel.get(
                 self.exp_opportunity_summary_model_1.id
             )
         )
@@ -1162,20 +1158,16 @@ class AuditDeleteTranslationsForInvalidContentIDsJobTests(
             ['en']
         )
         self.exp_opportunity_summary_model_1 = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                topic_name='topic name',
-                story_id=self.STORY_1_ID,
-                story_title='story title',
-                chapter_title='node title',
+            opportunity_models.TranslationOpportunityModel(
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=2,
                 incomplete_translation_language_codes=sorted(
                     list(incomplete_translation_language_codes)
                 ),
                 translation_counts={'hi': 1},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[],
             )
         )
         self.exp_opportunity_summary_model_1.update_timestamps()
@@ -1235,7 +1227,7 @@ class AuditDeleteTranslationsForInvalidContentIDsJobTests(
         )
 
         updated_exp_opportunity_summary_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get(
+            opportunity_models.TranslationOpportunityModel.get(
                 self.exp_opportunity_summary_model_1.id
             )
         )

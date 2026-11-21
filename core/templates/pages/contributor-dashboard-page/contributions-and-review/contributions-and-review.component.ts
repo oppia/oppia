@@ -297,18 +297,17 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
       } else {
         if (suggestion.target_type === AppConstants.ENTITY_TYPE.SKILL) {
           subheading = details.skill_description || '';
-        } else if (
-          this.featureService.status.EnableTranslationOppsWithNewOppModels
-            .isEnabled
-        ) {
+        } else if (details.entity_description) {
           subheading = details.topic_name + ' / ' + details.entity_description;
-        } else {
+        } else if (details.story_title && details.chapter_title) {
           subheading =
             details.topic_name +
             ' / ' +
             details.story_title +
             ' / ' +
             details.chapter_title;
+        } else {
+          subheading = details.topic_name || '';
         }
       }
 
@@ -483,17 +482,17 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
       // A skill's opportunity carries its description rather than the topic
       // and chapter that an exploration's opportunity does.
       subheading = details.skill_description || '';
-    } else if (
-      this.featureService.status.EnableTranslationOppsWithNewOppModels.isEnabled
-    ) {
+    } else if (details.entity_description) {
       subheading = details.topic_name + ' / ' + details.entity_description;
-    } else {
+    } else if (details.story_title && details.chapter_title) {
       subheading =
         details.topic_name +
         ' / ' +
         details.story_title +
         ' / ' +
         details.chapter_title;
+    } else {
+      subheading = details.topic_name || '';
     }
     const modalRef: NgbModalRef = this.ngbModal.open(
       TranslationSuggestionReviewModalComponent,

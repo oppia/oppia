@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feature_flag_list, feconf
+from core import feconf
 from core.constants import constants
 from core.domain import (
     opportunity_services,
@@ -1040,12 +1040,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(skill.rubrics[1].explanations, ['<p>Explanation</p>'])
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_update_skill_updates_v2_translation_opportunity(self) -> None:
+    def test_update_skill_updates_translation_opportunity(self) -> None:
         self.save_new_topic(
             'topic_1',
             self.user_id_admin,
@@ -1172,12 +1167,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             None,
         )
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_delete_skill_deletes_v2_translation_opportunity(self) -> None:
+    def test_delete_skill_deletes_translation_opportunity(self) -> None:
         opportunity_services.create_translation_opportunity(
             {feconf.ENTITY_TYPE_SKILL: [self.SKILL_ID]}, topic_ids=['topic_id']
         )
@@ -1194,12 +1184,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_update_skill_with_topic_updates_v2_translation_opportunity(
+    def test_update_skill_with_topic_updates_translation_opportunity(
         self,
     ) -> None:
         topic = topic_domain.Topic.create_default_topic(

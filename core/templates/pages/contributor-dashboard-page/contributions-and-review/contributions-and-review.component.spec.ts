@@ -110,9 +110,6 @@ class MockPlatformFeatureService {
     ContributorDashboardAccomplishments: {
       isEnabled: false,
     },
-    EnableTranslationOppsWithNewOppModels: {
-      isEnabled: false,
-    },
     EnableDropdownPagination: {
       isEnabled: false,
     },
@@ -902,9 +899,7 @@ describe('Contributions and review component', () => {
       ).not.toHaveBeenCalled();
     });
 
-    it('should format subheading using topic_name and entity_description when V2 flag is enabled', () => {
-      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-        true;
+    it('should format subheading using topic_name and entity_description', () => {
       const suggestionsDict: Record<string, SuggestionDetails> = {
         sug_1: {
           suggestion: {
@@ -933,9 +928,6 @@ describe('Contributions and review component', () => {
         component.getTranslationContributionsSummary(suggestionsDict);
 
       expect(summaries[0].subheading).toBe('Math / Chapter 1');
-
-      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-        false;
     });
 
     it('should be able to change language', fakeAsync(() => {
@@ -3631,9 +3623,7 @@ describe('Contributions and review component', () => {
       expect(summaryList[3].labelText).toBe('Obsolete');
     }));
 
-    it('should get translation contributions summary correctly when EnableTranslationOppsWithNewOppModels is enabled', fakeAsync(() => {
-      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-        true;
+    it('should get translation contributions summary correctly with topic_name and entity_description', fakeAsync(() => {
       const suggestionIdToSuggestions = {
         suggestion_1: {
           suggestion: {
@@ -3658,9 +3648,6 @@ describe('Contributions and review component', () => {
 
       expect(summaryList[0].id).toBe('suggestion_1');
       expect(summaryList[0].subheading).toBe('Topic / Entity Description');
-
-      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-        false;
     }));
 
     it('should use the skill description as the subheading for skill translation suggestions', fakeAsync(() => {
@@ -3705,9 +3692,7 @@ describe('Contributions and review component', () => {
       expect(summaryList[1].subheading).toBe('');
     }));
 
-    it('should open translation suggestion modal with correct subheading when EnableTranslationOppsWithNewOppModels is enabled', fakeAsync(() => {
-      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-        true;
+    it('should open translation suggestion modal with correct subheading', fakeAsync(() => {
       const modalRef = {
         componentInstance: {
           suggestionIdToContribution: null,
@@ -3762,13 +3747,9 @@ describe('Contributions and review component', () => {
       expect(modalRef.componentInstance.subheading).toBe(
         'Topic / Entity Description'
       );
-      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-        false;
     }));
 
     it('should open translation suggestion modal with the skill description as its subheading', fakeAsync(() => {
-      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-        true;
       const modalRef = {
         componentInstance: {
           suggestionIdToContribution: null,
@@ -3811,8 +3792,6 @@ describe('Contributions and review component', () => {
       );
 
       expect(modalRef.componentInstance.subheading).toBe('Skill description');
-      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
-        false;
     }));
 
     it(

@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -95,8 +95,10 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'The Picnic Problem'
+      'Exploration - Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
       'Save and translate another'
@@ -114,13 +116,18 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 3');
     await translationSubmitter.clickOnElementWithText('Save and close');
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
-      'The Picnic Problem'
+      'Exploration - Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
       'Save and translate another'
@@ -128,6 +135,9 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOnElementWithText('Save and close');
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
   }, 900000);
 
   it('should be able to view all pending reviews', async function () {
@@ -142,11 +152,11 @@ describe('Translation Reviewer', function () {
   it('should be able to move between review cards', async function () {
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
     await translationReviewer.startTranslationReview(
       'सामग्री 0',
-      'Fractions / The Picnic'
+      'Fractions / Cutting the Pies'
     );
     await translationReviewer.expectPaginationButtonToBeDisabled('previous');
 

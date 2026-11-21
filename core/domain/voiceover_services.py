@@ -1616,20 +1616,20 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
     exploration_version = exploration.version
 
     try:
-        exp_opportuinity_summary_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                exploration_id
-            )
+        opp_model = opportunity_models.TranslationOpportunityModel.get(
+            f'{feconf.ENTITY_TYPE_EXPLORATION}.{exploration_id}', strict=False
         )
-        topic_id = exp_opportuinity_summary_model.topic_id
-        topic = topic_fetchers.get_topic_by_id(topic_id)
-        topic_name = topic.name
-        exploration_title = exploration.title
+        if opp_model is not None and opp_model.topic_ids:
+            topic = topic_fetchers.get_topic_by_id(opp_model.topic_ids[0])
+            topic_name = topic.name
+            exploration_title = exploration.title
 
-        additional_contextual_information = {
-            'exploration_title': exploration_title,
-            'topic_name': topic_name,
-        }
+            additional_contextual_information = {
+                'exploration_title': exploration_title,
+                'topic_name': topic_name,
+            }
+        else:
+            additional_contextual_information = {}
     except Exception as _:
         additional_contextual_information = {}
 

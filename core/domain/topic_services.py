@@ -1530,11 +1530,6 @@ def update_topic_and_subtopic_pages(
             )
     generate_topic_summary(topic_id)
 
-    if old_topic.name != updated_topic.name:
-        opportunity_services.update_opportunities_with_new_topic_name(
-            updated_topic.id, updated_topic.name
-        )
-
 
 def delete_uncategorized_skill(
     user_id: str, topic_id: str, uncategorized_skill_id: str
@@ -1561,13 +1556,9 @@ def delete_uncategorized_skill(
         change_list,
         'Removed %s from uncategorized skill ids' % uncategorized_skill_id,
     )
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-        None,
-    ):
-        opportunity_services.remove_topic_from_translation_opportunities(
-            topic_id, {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]}
-        )
+    opportunity_services.remove_topic_from_translation_opportunities(
+        topic_id, {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]}
+    )
 
 
 def add_uncategorized_skill(
@@ -1595,14 +1586,10 @@ def add_uncategorized_skill(
         change_list,
         'Added %s to uncategorized skill ids' % uncategorized_skill_id,
     )
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-        None,
-    ):
-        opportunity_services.create_translation_opportunity(
-            {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]},
-            topic_ids=[topic_id],
-        )
+    opportunity_services.create_translation_opportunity(
+        {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]},
+        topic_ids=[topic_id],
+    )
 
 
 def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
@@ -2007,16 +1994,12 @@ def delete_topic(
             topic_id
         )
     )
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-        None,
-    ):
-        if topic is not None:
-            topic_skills = topic.get_all_skill_ids()
-            if topic_skills:
-                opportunity_services.remove_topic_from_translation_opportunities(
-                    topic_id, {feconf.ENTITY_TYPE_SKILL: topic_skills}
-                )
+    if topic is not None:
+        topic_skills = topic.get_all_skill_ids()
+        if topic_skills:
+            opportunity_services.remove_topic_from_translation_opportunities(
+                topic_id, {feconf.ENTITY_TYPE_SKILL: topic_skills}
+            )
 
 
 def delete_topic_summary(topic_id: str) -> None:

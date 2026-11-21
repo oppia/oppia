@@ -94,17 +94,14 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         exp_opportunities = (
             self.pipeline
-            | 'Get all non-deleted exp opportunity models'
+            | 'Get all non-deleted translation opportunity models'
             >> ndb_io.GetModels(
-                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                opportunity_models.TranslationOpportunityModel.get_all(
                     include_deleted=False
                 )
             )
-            | 'Transform to exp opportunity domain object'
-            >> beam.Map(
-                opportunity_services.get_exploration_opportunity_summary_from_model
-            )
-            | 'Group exp opportunity by ID' >> beam.GroupBy(lambda m: m.id)
+            | 'Group translation opportunity by entity ID'
+            >> beam.GroupBy(lambda m: m.entity_id)
         )
 
         exp_opportunity_to_submitted_suggestions = (
@@ -1162,11 +1159,12 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                         'problem: no_exp_context_model},\n],\n'
                     )
 
-                    # Check if xploration opportunity model exists.
-                    opportunity_model_exists = opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                        s.target_id
-                    ) is not (
-                        None
+                    # Check if translation opportunity model exists.
+                    opportunity_model_exists = (
+                        opportunity_models.TranslationOpportunityModel.get_by_id(
+                            f'{s.target_type}.{s.target_id}'
+                        )
+                        is not None
                     )
                     debug_logs += (
                         'exp_opportunity_model_exists: '
@@ -1195,11 +1193,12 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                             'problem: no_story_model},\n],\n'
                         )
 
-                        # Check if xploration opportunity model exists.
-                        opportunity_model_exists = opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                            s.target_id
-                        ) is not (
-                            None
+                        # Check if translation opportunity model exists.
+                        opportunity_model_exists = (
+                            opportunity_models.TranslationOpportunityModel.get_by_id(
+                                f'{s.target_type}.{s.target_id}'
+                            )
+                            is not None
                         )
                         debug_logs += (
                             'exp_opportunity_model_exists: '
@@ -1228,11 +1227,12 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                                 'problem: no_stats_model},\n],\n'
                             )
 
-                            # Check if xploration opportunity model exists.
-                            opportunity_model_exists = opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                                s.target_id
-                            ) is not (
-                                None
+                            # Check if translation opportunity model exists.
+                            opportunity_model_exists = (
+                                opportunity_models.TranslationOpportunityModel.get_by_id(
+                                    f'{s.target_type}.{s.target_id}'
+                                )
+                                is not None
                             )
                             debug_logs += (
                                 'exp_opportunity_model_exists: '
@@ -1392,17 +1392,14 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
 
         exp_opportunities = (
             self.pipeline
-            | 'Get all non-deleted exp opportunity models'
+            | 'Get all non-deleted translation opportunity models'
             >> ndb_io.GetModels(
-                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                opportunity_models.TranslationOpportunityModel.get_all(
                     include_deleted=False
                 )
             )
-            | 'Transform to exp opportunity domain object'
-            >> beam.Map(
-                opportunity_services.get_exploration_opportunity_summary_from_model
-            )
-            | 'Group exp opportunity by ID' >> beam.GroupBy(lambda m: m.id)
+            | 'Group translation opportunity by entity ID'
+            >> beam.GroupBy(lambda m: m.entity_id)
         )
 
         exp_opportunity_to_translation_suggestions = (

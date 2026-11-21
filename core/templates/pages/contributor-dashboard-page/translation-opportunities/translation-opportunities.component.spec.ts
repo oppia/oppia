@@ -72,7 +72,7 @@ class MockUserService {
 
 class MockPlatformFeatureService {
   status = {
-    EnableTranslationOppsWithNewOppModels: {
+    EnableAutomaticTranslationSuggestions: {
       isEnabled: false,
     },
   };
