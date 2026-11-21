@@ -781,6 +781,18 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                     False,
                 ),
             )
+            translation_services.add_new_translation(
+                feconf.TranslatableEntityType.EXPLORATION,
+                self.EXP_ID,
+                5,
+                lang_code,
+                feconf.EXPLORATION_TITLE_CONTENT_ID,
+                translation_domain.TranslatedContent(
+                    'Translations in %s!' % lang_code,
+                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                    False,
+                ),
+            )
         translation_services.add_new_translation(
             feconf.TranslatableEntityType.EXPLORATION,
             self.EXP_ID,
