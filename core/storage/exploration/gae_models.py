@@ -1100,13 +1100,13 @@ class ExpSummaryModel(base_models.BaseModel):
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the
     # exploration *summary* model was last updated).
-    exploration_model_last_updated = datastore_services.DateTimeProperty(
+    exploration_model_last_updated = datastore_services.AwareDateTimeProperty(
         indexed=True
     )
     # Time when the exploration model was created (not to be confused
     # with created_on, which is the time when the exploration *summary*
     # model was created).
-    exploration_model_created_on = datastore_services.DateTimeProperty(
+    exploration_model_created_on = datastore_services.AwareDateTimeProperty(
         indexed=True
     )
     # Time when the exploration was first published.

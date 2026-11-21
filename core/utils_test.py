@@ -319,7 +319,7 @@ class UtilsTests(test_utils.GenericTestBase):
         """Tests to make sure converting a naive datetime object to a string and
         back doesn't alter the naive datetime object data.
         """
-        now = utils.get_current_utc_datetime()
+        now = utils.get_current_utc_datetime().replace(tzinfo=None)
         self.assertEqual(
             utils.convert_string_to_naive_datetime_object(
                 utils.convert_naive_datetime_to_string(now)
@@ -838,33 +838,33 @@ class UtilsTests(test_utils.GenericTestBase):
         utils.require_valid_image_filename(filename)
 
     def test_get_time_in_millisecs(self) -> None:
-        dt = datetime.datetime(2020, 6, 15)
+        dt = datetime.datetime(2020, 6, 15, tzinfo=datetime.timezone.utc)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
-            dt,
-            datetime.datetime.fromtimestamp(
-                msecs / 1000.0, datetime.timezone.utc
-            ).replace(tzinfo=None),
+            dt, utils.convert_millisecs_time_to_datetime_object(msecs)
         )
 
     def test_get_time_in_millisecs_with_complicated_time(self) -> None:
-        dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
+        dt = datetime.datetime(
+            2020,
+            6,
+            15,
+            5,
+            18,
+            23,
+            microsecond=123456,
+            tzinfo=datetime.timezone.utc,
+        )
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
-            dt,
-            datetime.datetime.fromtimestamp(
-                msecs / 1000.0, datetime.timezone.utc
-            ).replace(tzinfo=None),
+            dt, utils.convert_millisecs_time_to_datetime_object(msecs)
         )
 
     def test_get_time_in_millisecs_with_utc_aware_datetime(self) -> None:
         dt = datetime.datetime(2020, 6, 15, tzinfo=datetime.timezone.utc)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
-            dt,
-            datetime.datetime.fromtimestamp(
-                msecs / 1000.0, datetime.timezone.utc
-            ),
+            dt, utils.convert_millisecs_time_to_datetime_object(msecs)
         )
 
     def test_get_time_in_millisecs_with_non_utc_aware_datetime(self) -> None:
@@ -877,10 +877,7 @@ class UtilsTests(test_utils.GenericTestBase):
         )
         msecs = utils.get_time_in_millisecs(dt_ist)
         self.assertEqual(
-            dt_utc,
-            datetime.datetime.fromtimestamp(
-                msecs / 1000.0, datetime.timezone.utc
-            ),
+            dt_utc, utils.convert_millisecs_time_to_datetime_object(msecs)
         )
 
     def test_convert_millisecs_time_to_datetime_object(self) -> None:
@@ -1139,11 +1136,10 @@ class UtilsTests(test_utils.GenericTestBase):
             ),
         )
 
-    def test_get_current_utc_datetime_returns_naive_utc_datetime(self) -> None:
-        # TODO(#26624): This will be updated to assertIsNotNone after
-        # AwareDateTimeProperty is implemented in PR 3.
+    def test_get_current_utc_datetime_returns_aware_utc_datetime(self) -> None:
         current_time = utils.get_current_utc_datetime()
-        self.assertIsNone(current_time.tzinfo)
+        self.assertIsNotNone(current_time.tzinfo)
+        self.assertEqual(current_time.utcoffset(), datetime.timedelta(0))
 
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()

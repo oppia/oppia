@@ -357,7 +357,8 @@ class AppFeedbackReport:
         )
 
         report_datetime = datetime.datetime.fromtimestamp(
-            report_dict['report_submission_timestamp_sec']
+            report_dict['report_submission_timestamp_sec'],
+            datetime.timezone.utc,
         )
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(

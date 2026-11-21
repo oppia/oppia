@@ -123,7 +123,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(report_model.platform, 'android')
         self.assertEqual(
             report_model.submitted_on,
-            datetime.datetime.fromtimestamp(1615519337),
+            datetime.datetime.fromtimestamp(1615519337, datetime.timezone.utc),
         )
 
     def test_incoming_report_with_invalid_headers_raises_exception(

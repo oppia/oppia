@@ -102,7 +102,7 @@ class ExplorationStatsTaskEntryModel(base_models.BaseModel):
         default=None, required=False, indexed=True
     )
     # The date and time at which a task was closed or deprecated.
-    resolved_on = datastore_services.DateTimeProperty(
+    resolved_on = datastore_services.AwareDateTimeProperty(
         default=None, required=False, indexed=True
     )
 

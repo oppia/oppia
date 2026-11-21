@@ -22,7 +22,7 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feconf
+from core import feconf, utils
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
@@ -76,9 +76,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJob(base_jobs.JobBase):
             cloud_task_run_model.exception_messages_for_failed_runs.append(
                 exception_message
             )
-            cloud_task_run_model.last_updated = datetime.datetime.now(
-                datetime.timezone.utc
-            ).replace(tzinfo=None)
+            cloud_task_run_model.last_updated = utils.get_current_utc_datetime()
 
         logging.info(
             'Marking the state of CloudTaskRunModel with id %s as PERMANENTLY_FAILED.'
@@ -99,6 +97,11 @@ class MarkStaleCloudTaskRunModelsAsFailedJob(base_jobs.JobBase):
         """
         # Stale CloudTaskRunModels are those that have been in the
         # RUNNING or PENDING state for more than three days.
+        stale_threshold_datetime = (
+            utils.get_current_utc_datetime()
+            - datetime.timedelta(days=STALE_TASK_THRESHOLD_DAYS)
+        )
+
         stale_cloud_task_run_models = (
             self.pipeline
             | 'Get CloudTaskRunModels from the datastore'
@@ -111,13 +114,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJob(base_jobs.JobBase):
                         cloud_task_models.CloudTaskState.PENDING.value,
                         cloud_task_models.CloudTaskState.RUNNING.value,
                     ]
-                    and (
-                        datetime.datetime.now(datetime.timezone.utc).replace(
-                            tzinfo=None
-                        )
-                        >= model.last_updated
-                        + datetime.timedelta(days=STALE_TASK_THRESHOLD_DAYS)
-                    )
+                    and model.last_updated <= stale_threshold_datetime
                 )
             )
         )
@@ -217,9 +214,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
                         counter += 1
 
             voiceover_regeneration_task_mapping_model.last_updated = (
-                datetime.datetime.now(datetime.timezone.utc).replace(
-                    tzinfo=None
-                )
+                utils.get_current_utc_datetime()
             )
 
         logging.info(
@@ -241,6 +236,11 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
         """
         # Stale VoiceoverRegenerationJobModels are those that have been in the
         # GENERATING state for more than three days.
+        stale_threshold_datetime = (
+            utils.get_current_utc_datetime()
+            - datetime.timedelta(days=STALE_TASK_THRESHOLD_DAYS)
+        )
+
         stale_voiceover_regeneration_task_mapping_models = (
             self.pipeline
             | 'Get VoiceoverRegenerationJobModels from the datastore'
@@ -249,13 +249,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
             )
             | 'Filter VoiceoverRegenerationJobModels which was last updated more than three days ago'
             >> beam.Filter(
-                lambda model: (
-                    datetime.datetime.now(datetime.timezone.utc).replace(
-                        tzinfo=None
-                    )
-                    >= model.last_updated
-                    + datetime.timedelta(days=STALE_TASK_THRESHOLD_DAYS)
-                )
+                lambda model: model.last_updated <= stale_threshold_datetime
             )
         )
 

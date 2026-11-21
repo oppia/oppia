@@ -166,12 +166,12 @@ class BaseModel(datastore_services.Model):
 
     # When this entity was first created. This value should only be modified by
     # the update_timestamps method.
-    created_on = datastore_services.DateTimeProperty(
+    created_on = datastore_services.AwareDateTimeProperty(
         indexed=True, required=True
     )
     # When this entity was last updated. This value should only be modified by
     # the update_timestamps method.
-    last_updated = datastore_services.DateTimeProperty(
+    last_updated = datastore_services.AwareDateTimeProperty(
         indexed=True, required=True
     )
     # Whether the current version of the model instance is deleted.
@@ -602,7 +602,7 @@ class BaseHumanMaintainedModel(BaseModel):
     """
 
     # When this entity was last updated on behalf of a human.
-    last_updated_by_human = datastore_services.DateTimeProperty(
+    last_updated_by_human = datastore_services.AwareDateTimeProperty(
         indexed=True, required=True
     )
 
