@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for ShareLessonModalComponent.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   TestBed,
@@ -39,16 +37,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
-interface MockLocation {
-  href: string;
-  origin: string;
-  pathname: string;
-  protocol: string;
-  host: string;
-}
-
 interface MockWindow {
-  location: MockLocation;
+  location: Location;
 }
 
 @Pipe({name: 'translate'})
@@ -69,7 +59,7 @@ describe('ShareLessonModalComponent', () => {
   let pageContextService: jasmine.SpyObj<PageContextService>;
   let windowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
   let mockWindow: MockWindow;
-  let mockLocation: MockLocation;
+  let mockLocation: Location;
 
   beforeEach(waitForAsync(() => {
     const ngbActiveModalSpy = jasmine.createSpyObj('NgbActiveModal', [
@@ -101,6 +91,15 @@ describe('ShareLessonModalComponent', () => {
       pathname: '/explore/test-exploration',
       protocol: 'https:',
       host: 'oppia.org',
+      hostname: 'oppia.org',
+      hash: '',
+      port: '',
+      search: '',
+      ancestorOrigins: window.location.ancestorOrigins,
+      assign: () => {},
+      reload: () => {},
+      replace: () => {},
+      toString: () => 'https://oppia.org/explore/test-exploration',
     };
 
     mockWindow = {
@@ -408,7 +407,9 @@ describe('ShareLessonModalComponent', () => {
     component.showAttributionModal();
 
     expect(component.backBtnIsVisible).toBe(true);
-    expect(component.showModal).toHaveBeenCalledWith('attribution');
+    expect(component.showModal).toHaveBeenCalledWith(
+      component.modalStates.ATTRIBUTION
+    );
   });
 
   it('should show embed modal and set back button visible', () => {
@@ -417,7 +418,9 @@ describe('ShareLessonModalComponent', () => {
     component.showEmbedModal();
 
     expect(component.backBtnIsVisible).toBe(true);
-    expect(component.showModal).toHaveBeenCalledWith('embed');
+    expect(component.showModal).toHaveBeenCalledWith(
+      component.modalStates.EMBED
+    );
   });
 
   it('should go back to copy modal and hide back button', () => {
@@ -426,7 +429,9 @@ describe('ShareLessonModalComponent', () => {
     component.goBackToCopyModal();
 
     expect(component.backBtnIsVisible).toBe(false);
-    expect(component.showModal).toHaveBeenCalledWith('copy');
+    expect(component.showModal).toHaveBeenCalledWith(
+      component.modalStates.COPY
+    );
   });
 
   it('should generate facebook share URL', () => {

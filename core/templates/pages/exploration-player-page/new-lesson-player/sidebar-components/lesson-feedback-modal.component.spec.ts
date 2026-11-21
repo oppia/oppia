@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for LessonFeedbackModalComponent.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
@@ -30,6 +28,7 @@ import {PlayerPositionService} from '../../../../pages/exploration-player-page/s
 import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
 import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {UserInfo} from 'domain/user/user-info.model';
 
 @Directive({
   selector: '[oppiaFocusOn]',
@@ -49,13 +48,20 @@ describe('LessonFeedbackModalComponent', () => {
     let feedbackPopupBackendApiService: jasmine.SpyObj<FeedbackPopupBackendApiService>;
     let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
 
-    const mockUserInfo = {
-      isLoggedIn: () => true,
-    };
+    const mockUserInfo = new UserInfo(
+      [],
+      false,
+      false,
+      false,
+      false,
+      false,
+      'en',
+      'user',
+      'user@example.com',
+      true
+    );
 
-    const mockUserInfoLoggedOut = {
-      isLoggedIn: () => false,
-    };
+    const mockUserInfoLoggedOut = UserInfo.createDefault();
 
     beforeEach(waitForAsync(() => {
       const bottomSheetRefSpy = jasmine.createSpyObj('MatBottomSheetRef', [
@@ -157,7 +163,7 @@ describe('LessonFeedbackModalComponent', () => {
       component.isLoggedIn = true;
       component.isSubmitterAnonymized = false;
       feedbackPopupBackendApiService.submitFeedbackAsync.and.returnValue(
-        Promise.resolve()
+        Promise.resolve({})
       );
 
       component.saveFeedback();
@@ -180,7 +186,7 @@ describe('LessonFeedbackModalComponent', () => {
       component.isLoggedIn = true;
       component.isSubmitterAnonymized = true;
       feedbackPopupBackendApiService.submitFeedbackAsync.and.returnValue(
-        Promise.resolve()
+        Promise.resolve({})
       );
 
       component.saveFeedback();
@@ -203,7 +209,7 @@ describe('LessonFeedbackModalComponent', () => {
       component.isLoggedIn = false;
       component.isSubmitterAnonymized = false;
       feedbackPopupBackendApiService.submitFeedbackAsync.and.returnValue(
-        Promise.resolve()
+        Promise.resolve({})
       );
 
       component.saveFeedback();
@@ -235,8 +241,8 @@ describe('LessonFeedbackModalComponent', () => {
     it('should show thank you modal without saving when feedback text is null', () => {
       component.ngOnInit();
 
-      const nullValue: string = null as unknown as string;
-      component.feedbackText = nullValue;
+      // Exercise the runtime null guard despite the field's string type.
+      Object.assign(component, {feedbackText: null});
 
       component.saveFeedback();
 
@@ -258,9 +264,18 @@ describe('LessonFeedbackModalComponent', () => {
     let userService: jasmine.SpyObj<UserService>;
     let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
 
-    const mockUserInfo = {
-      isLoggedIn: () => true,
-    };
+    const mockUserInfo = new UserInfo(
+      [],
+      false,
+      false,
+      false,
+      false,
+      false,
+      'en',
+      'user',
+      'user@example.com',
+      true
+    );
 
     beforeEach(waitForAsync(() => {
       const ngbActiveModalSpy = jasmine.createSpyObj('NgbActiveModal', [
@@ -334,9 +349,18 @@ describe('LessonFeedbackModalComponent', () => {
     let userService: jasmine.SpyObj<UserService>;
     let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
 
-    const mockUserInfo = {
-      isLoggedIn: () => true,
-    };
+    const mockUserInfo = new UserInfo(
+      [],
+      false,
+      false,
+      false,
+      false,
+      false,
+      'en',
+      'user',
+      'user@example.com',
+      true
+    );
 
     beforeEach(waitForAsync(() => {
       const focusManagerSpy = jasmine.createSpyObj('FocusManagerService', [

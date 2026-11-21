@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for HintSolutionAndConceptCardDisplayComponent
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ChangeDetectorRef, EventEmitter} from '@angular/core';
 import {
@@ -28,6 +26,11 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
+import {Observable} from 'rxjs';
+import {State} from 'domain/state/state.model';
+import {DisplayNewHintModalComponent} from './display-new-hint-modal.component';
+import {DisplayNewSolutionInterstititalModalComponent} from './display-new-solution-interstitial-modal.component';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {
@@ -48,6 +51,9 @@ import {ConceptCardManagerService} from '../../../../../pages/exploration-player
 import {ExplorationEngineService} from '../../../../../pages/exploration-player-page/services/exploration-engine.service';
 import {PageContextService} from '../../../../../services/page-context.service';
 import {UrlService} from '../../../../../services/contextual/url.service';
+
+type SolutionInterstitialModalRef =
+  MatBottomSheetRef<DisplayNewSolutionInterstititalModalComponent>;
 
 describe('HintSolutionAndConceptCardDisplayComponent', () => {
   let component: HintSolutionAndConceptCardDisplayComponent;
@@ -450,9 +456,8 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   });
 
   it('should show concept card when showConceptCard is called', () => {
-    const mockState = {
-      linkedSkillId: 'skill123',
-    };
+    const mockState = State.createDefaultState('State', 'content', 'feedback');
+    mockState.linkedSkillId = 'skill123';
     spyOn(explorationEngineService, 'getState').and.returnValue(mockState);
     spyOn(conceptCardManagerService, 'openConceptCardModal');
 
@@ -464,9 +469,8 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   });
 
   it('should not open concept card modal when linkedSkillId is null', () => {
-    const mockState = {
-      linkedSkillId: null,
-    };
+    const mockState = State.createDefaultState('State', 'content', 'feedback');
+    mockState.linkedSkillId = null;
     spyOn(explorationEngineService, 'getState').and.returnValue(mockState);
     spyOn(conceptCardManagerService, 'openConceptCardModal');
 
@@ -508,7 +512,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       result: Promise.resolve('success'),
     } as NgbModalRef);
 
-    expect(component.activeHintIndex).toBe(undefined);
+    expect(component.activeHintIndex).toBeUndefined();
     component.displayHintModal(0);
 
     expect(component.activeHintIndex).toBe(0);
@@ -524,7 +528,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
         } as NgbModalRef
       );
 
-      expect(component.activeHintIndex).toBe(undefined);
+      expect(component.activeHintIndex).toBeUndefined();
 
       component.displayHintModal(0);
       tick();
@@ -534,7 +538,9 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   );
 
   it('should handle hint modal without result property', () => {
-    const mockModalRef = {};
+    const mockModalRef = jasmine.createSpyObj<
+      MatBottomSheetRef<DisplayNewHintModalComponent>
+    >('MatBottomSheetRef', ['dismiss']);
     spyOn(hintAndSolutionModalService, 'displayNewHintModal').and.returnValue(
       mockModalRef
     );
@@ -699,14 +705,15 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       false
     );
-    const mockAfterDismissed = jasmine.createSpy().and.returnValue({
-      subscribe: (callback: (result: string) => void) => {
-        setTimeout(() => callback('confirm'), 0);
-      },
-    });
-    const mockModalRef = {
-      afterDismissed: mockAfterDismissed,
-    };
+    const mockModalRef = jasmine.createSpyObj<SolutionInterstitialModalRef>(
+      'MatBottomSheetRef',
+      ['afterDismissed']
+    ) as jasmine.SpyObj<SolutionInterstitialModalRef>;
+    mockModalRef.afterDismissed.and.returnValue(
+      new Observable<string>(subscriber => {
+        setTimeout(() => subscriber.next('confirm'), 0);
+      })
+    );
     spyOn(
       hintAndSolutionModalService,
       'displayNewSolutionInterstitialModal'
@@ -723,14 +730,15 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       false
     );
-    const mockAfterDismissed = jasmine.createSpy().and.returnValue({
-      subscribe: (callback: (result: string) => void) => {
-        setTimeout(() => callback('cancel'), 0);
-      },
-    });
-    const mockModalRef = {
-      afterDismissed: mockAfterDismissed,
-    };
+    const mockModalRef = jasmine.createSpyObj<SolutionInterstitialModalRef>(
+      'MatBottomSheetRef',
+      ['afterDismissed']
+    ) as jasmine.SpyObj<SolutionInterstitialModalRef>;
+    mockModalRef.afterDismissed.and.returnValue(
+      new Observable<string>(subscriber => {
+        setTimeout(() => subscriber.next('cancel'), 0);
+      })
+    );
     spyOn(
       hintAndSolutionModalService,
       'displayNewSolutionInterstitialModal'

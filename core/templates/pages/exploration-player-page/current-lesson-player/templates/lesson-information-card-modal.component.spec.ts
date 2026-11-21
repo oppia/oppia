@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for lesson information card modal component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {EventEmitter} from '@angular/core';

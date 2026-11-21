@@ -16,8 +16,6 @@
  * @fileoverview Tests for ExplorationPlayerPageAuthGuard.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {
@@ -32,6 +30,17 @@ import {AppConstants} from '../../../app.constants';
 import {AccessValidationBackendApiService} from '../../../pages/oppia-root/routing/access-validation-backend-api.service';
 import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.guard';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {
+  FeatureNames,
+  FeatureStatusChecker,
+  FeatureStatusSummary,
+} from 'domain/feature-flag/feature-status-summary.model';
+
+const createFeatureStatus = (isEnabled: boolean): FeatureStatusChecker => {
+  const summary = FeatureStatusSummary.createDefault();
+  summary.featureNameToFlag.set(FeatureNames.NewLessonPlayer, isEnabled);
+  return summary.toStatusChecker();
+};
 
 class MockRouter {
   navigate(commands: string[]): Promise<boolean> {
@@ -47,9 +56,7 @@ class MockRouter {
 
 class MockPlatformFeatureService {
   get status() {
-    return {
-      NewLessonPlayer: {isEnabled: false},
-    };
+    return createFeatureStatus(false);
   }
 }
 
@@ -107,9 +114,9 @@ describe('ExplorationPlayerPageAuthGuard', () => {
       'validateAccessToExplorationPlayerPage'
     ).and.returnValue(Promise.resolve());
 
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      NewLessonPlayer: {isEnabled: false},
-    });
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+      createFeatureStatus(false)
+    );
 
     const route = {
       paramMap: convertToParamMap({exploration_id: 'exp123'}),
@@ -133,9 +140,9 @@ describe('ExplorationPlayerPageAuthGuard', () => {
       'validateAccessToExplorationPlayerPage'
     ).and.returnValue(Promise.resolve());
 
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      NewLessonPlayer: {isEnabled: true},
-    });
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+      createFeatureStatus(true)
+    );
 
     const route = createMockRoute('exp123');
 
@@ -156,9 +163,9 @@ describe('ExplorationPlayerPageAuthGuard', () => {
       'validateAccessToExplorationPlayerPage'
     ).and.returnValue(Promise.resolve());
 
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      NewLessonPlayer: {isEnabled: true},
-    });
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+      createFeatureStatus(true)
+    );
 
     const route = createMockRoute('exp123');
     const routerNavigateSpy = spyOn(router, 'navigate');

@@ -16,14 +16,13 @@
  * @fileoverview Unit tests for ratings and recommendations component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   EventEmitter,
   NO_ERRORS_SCHEMA,
   Pipe,
   PipeTransform,
+  Type,
 } from '@angular/core';
 import {
   ComponentFixture,
@@ -33,7 +32,11 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {
+  MatBottomSheet,
+  MatBottomSheetConfig,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {AlertsService} from 'services/alerts.service';
@@ -61,6 +64,14 @@ import {CustomizableThankYouModalComponent} from '../../sidebar-components/custo
 import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
 import {of} from 'rxjs';
 
+// These tests exercise the component overload rather than the template overload.
+interface ComponentBottomSheet {
+  open: (
+    component: Type<object>,
+    config?: MatBottomSheetConfig
+  ) => MatBottomSheetRef<object>;
+}
+
 @Pipe({name: 'limitTo'})
 export class MockLimitToPipe implements PipeTransform {
   transform(value: string): string {
@@ -85,7 +96,7 @@ describe('New Ratings and recommendations component', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let windowDimensionsService: WindowDimensionsService;
   let ngbModal: NgbModal;
-  let bottomSheet: MatBottomSheet;
+  let bottomSheet: jasmine.SpyObj<ComponentBottomSheet>;
   let windowRef: WindowRef;
 
   class MockWindowRef {
@@ -119,6 +130,9 @@ describe('New Ratings and recommendations component', () => {
   }
 
   beforeEach(waitForAsync(() => {
+    bottomSheet = jasmine.createSpyObj<ComponentBottomSheet>('MatBottomSheet', [
+      'open',
+    ]) as jasmine.SpyObj<ComponentBottomSheet>;
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
@@ -155,7 +169,7 @@ describe('New Ratings and recommendations component', () => {
         },
         {
           provide: MatBottomSheet,
-          useValue: jasmine.createSpyObj('MatBottomSheet', ['open']),
+          useValue: bottomSheet,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -179,7 +193,6 @@ describe('New Ratings and recommendations component', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
-    bottomSheet = TestBed.inject(MatBottomSheet);
     windowRef = TestBed.inject(WindowRef);
   });
 
@@ -227,8 +240,8 @@ describe('New Ratings and recommendations component', () => {
         'published'
       );
 
-      expect(componentInstance.inStoryMode).toBe(undefined);
-      expect(componentInstance.storyViewerUrl).toBe(undefined);
+      expect(componentInstance.inStoryMode).toBeUndefined();
+      expect(componentInstance.storyViewerUrl).toBeUndefined();
       expect(componentInstance.practiceQuestionsAreEnabled).toBe(false);
 
       spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
@@ -383,8 +396,8 @@ describe('New Ratings and recommendations component', () => {
     'should not generate story page url and determine the next story node' +
       'if not in story mode',
     fakeAsync(() => {
-      expect(componentInstance.inStoryMode).toBe(undefined);
-      expect(componentInstance.storyViewerUrl).toBe(undefined);
+      expect(componentInstance.inStoryMode).toBeUndefined();
+      expect(componentInstance.storyViewerUrl).toBeUndefined();
 
       spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
         false
@@ -399,7 +412,7 @@ describe('New Ratings and recommendations component', () => {
       expect(explorationModeService.isInStoryChapterMode).toHaveBeenCalled();
       expect(componentInstance.inStoryMode).toBe(false);
       expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
-      expect(componentInstance.storyViewerUrl).toBe(undefined);
+      expect(componentInstance.storyViewerUrl).toBeUndefined();
     })
   );
 
@@ -535,7 +548,9 @@ describe('New Ratings and recommendations component', () => {
     expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalledWith(
       '.sign-in-button'
     );
-    expect(windowRef.nativeWindow.location).toBe('login_url');
+    expect(
+      (windowRef.nativeWindow as {location: string | Location}).location
+    ).toBe('login_url');
   }));
 
   it(
