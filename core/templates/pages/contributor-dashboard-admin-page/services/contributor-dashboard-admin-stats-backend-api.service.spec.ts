@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for contributor admin dashboard backend service
  */
 
-// @ts-nocheck
-
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {
   HttpClientTestingModule,
@@ -604,6 +602,20 @@ describe('Contribution Admin dashboard stats service', () => {
         courseDetails: '',
         topicListIntro: '',
         topicIdToPrerequisiteTopicIds: {},
+        feedbackRecipientEmail: '',
+        teaserText: '',
+        isPublished: true,
+        diagnosticTestIsEnabled: false,
+        thumbnailData: {
+          filename: 'thumbnail.svg',
+          size_in_bytes: 100,
+          bg_color: 'transparent',
+        },
+        bannerData: {
+          filename: 'banner.png',
+          size_in_bytes: 100,
+          bg_color: 'transparent',
+        },
       },
     };
     let classroomId = '0';

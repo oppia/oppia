@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for QuestionSuggestionEditorModalComponent.
  */
 
-// @ts-nocheck
-
 import {fakeAsync, tick} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -479,14 +477,14 @@ describe('Question Suggestion Editor Modal Component', () => {
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: MockNgbModalRef,
         result: Promise.resolve({
-          skillDifficulty: '0.6',
+          skillDifficulty: 0.6,
         }),
       } as NgbModalRef);
 
       component.onClickChangeDifficulty();
       tick();
 
-      expect(component.skillDifficulty).toBe('0.6');
+      expect(component.skillDifficulty).toBe(0.6);
     })
   );
 

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for contribution and review service
  */
 
-// @ts-nocheck
-
 import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AppConstants} from 'app.constants';
@@ -485,7 +483,7 @@ describe('Contribution and review service', () => {
           Promise.resolve({
             suggestionIdToDetails: {
               skill_id_1: {
-                suggestions: suggestion1,
+                suggestion: suggestion1,
                 details: opportunityDict1,
               },
             },
@@ -497,7 +495,7 @@ describe('Contribution and review service', () => {
           .getReviewableTranslationSuggestionsAsync(true, 'skill_id_1', '1')
           .then(response => {
             expect(response.suggestionIdToDetails.skill_id_1).toEqual({
-              suggestions: suggestion1,
+              suggestion: suggestion1,
               details: opportunityDict1,
             });
             expect(fetchTranslationSuggestionsAsyncSpy).toHaveBeenCalled();
@@ -711,6 +709,9 @@ describe('Contribution and review service', () => {
             author_name: 'author',
             change_cmd: {
               state_name: 'End State',
+              new_value: {html: ''},
+              old_value: {html: ''},
+              skill_id: '',
               content_id: 'hints_1',
             },
             last_updated_msecs: 0,
@@ -731,6 +732,9 @@ describe('Contribution and review service', () => {
                   author_name: 'author',
                   change_cmd: {
                     state_name: 'End State',
+                    new_value: {html: ''},
+                    old_value: {html: ''},
+                    skill_id: '',
                     content_id: 'hints_1',
                   },
                   last_updated_msecs: 0,
@@ -752,6 +756,10 @@ describe('Contribution and review service', () => {
       'should fetch translation suggestions for a skill without ' +
         'loading an exploration',
       async () => {
+        const skillOpportunity = {
+          skill_id: 'skill_1',
+          skill_description: 'skill opportunity',
+        };
         const skillFetchResponse = {
           suggestions: [
             {
@@ -763,13 +771,16 @@ describe('Contribution and review service', () => {
               author_name: 'author',
               change_cmd: {
                 state_name: 'Generic Content',
+                new_value: {html: ''},
+                old_value: {html: ''},
+                skill_id: '',
                 content_id: 'content_0',
               },
               last_updated_msecs: 0,
             },
           ],
           target_id_to_opportunity_dict: {
-            skill_1: 'skill opportunity',
+            skill_1: skillOpportunity,
           },
           next_offset: 1,
         };
@@ -786,7 +797,7 @@ describe('Contribution and review service', () => {
           suggestionIdToDetails: {
             skill_suggestion_1: {
               suggestion: skillFetchResponse.suggestions[0],
-              details: 'skill opportunity',
+              details: skillOpportunity,
             },
           },
           more: false,

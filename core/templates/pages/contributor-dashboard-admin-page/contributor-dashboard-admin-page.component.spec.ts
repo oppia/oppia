@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Contributor dashboard admin page.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   TestBed,
@@ -523,7 +521,11 @@ describe('ContributorDashboardAdminPageComponent', () => {
         const contributorDashboardAdminBackendApiServiceSpy = spyOn(
           contributorDashboardAdminBackendApiService,
           'viewTranslationContributionStatsAsync'
-        ).and.returnValue(Promise.resolve());
+        ).and.returnValue(
+          Promise.resolve({
+            translation_contribution_stats: [],
+          })
+        );
         const viewTranslationAction = {
           isValid: () => true,
           username: 'user1',

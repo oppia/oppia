@@ -16,8 +16,6 @@
  * @fileoverview Tests for translate-text service.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -26,13 +24,17 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {
   StateAndContent,
+  TranslatableItem,
   TranslateTextService,
 } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import {TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING} from 'domain/exploration/written-translation.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {AppConstants} from 'app.constants';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {
+  FetchExplorationBackendResponse,
+  ReadOnlyExplorationBackendApiService,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 
 class MockPlatformFeatureService {
@@ -64,6 +66,54 @@ describe('TranslateTextService', () => {
     };
   };
 
+  const createSampleReadOnlyExplorationBackendResponse = (
+    initStateName: string = 'stateName1'
+  ): FetchExplorationBackendResponse => {
+    return {
+      exploration_id: '0',
+      is_logged_in: true,
+      session_id: 'KERH',
+      draft_change_list_id: 0,
+      displayable_language_codes: [],
+      exploration: {
+        init_state_name: initStateName,
+        param_changes: [],
+        param_specs: {},
+        states: {},
+        title: 'Exploration',
+        language_code: 'en',
+        next_content_id_index: 5,
+        objective: 'To learn',
+      },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: initStateName,
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        edits_allowed: true,
+      },
+      version: 1,
+      can_edit: true,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: true,
+      record_playthrough_probability: 1,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
+      most_recently_reached_checkpoint_state_name: 'State A',
+      most_recently_reached_checkpoint_exp_version: 1,
+    };
+  };
+
   beforeEach(() => {
     mockPlatformFeatureService = new MockPlatformFeatureService();
     readOnlyExplorationBackendApiService = jasmine.createSpyObj(
@@ -71,9 +121,9 @@ describe('TranslateTextService', () => {
       ['fetchExplorationAsync']
     );
     readOnlyExplorationBackendApiService.fetchExplorationAsync.and.returnValue(
-      Promise.resolve({
-        exploration: {init_state_name: 'stateName1', states: {}},
-      })
+      Promise.resolve(
+        createSampleReadOnlyExplorationBackendResponse('stateName1')
+      )
     );
     computeGraphService = jasmine.createSpyObj('ComputeGraphService', [
       'computeBfsTraversalOfStates',
@@ -324,7 +374,7 @@ describe('TranslateTextService', () => {
     }));
 
     it('should return no more available for states with no texts', fakeAsync(() => {
-      const expectedTextAndAvailability = {
+      const expectedTextAndAvailability: TranslatableItem = {
         text: 'text1',
         more: false,
         status: 'pending',
@@ -355,7 +405,7 @@ describe('TranslateTextService', () => {
     }));
 
     it('should return no text or metadata for completely empty states', fakeAsync(() => {
-      const expectedTextAndAvailability = {
+      const expectedTextAndAvailability: TranslatableItem = {
         text: '',
         more: false,
         status: 'pending',
