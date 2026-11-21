@@ -79,12 +79,14 @@ describe('ImageClickInputValidationService', () => {
               label: 'FirstLabel',
               region: {
                 area: [[0]],
+                regionType: 'Rectangle',
               },
             },
             {
               label: 'SecondLabel',
               region: {
                 area: [[0]],
+                regionType: 'Rectangle',
               },
             },
           ],
