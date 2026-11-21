@@ -383,6 +383,21 @@ const blogShareButtonSelector = '.share-blog-post-button';
 const blogSuggestedForYouSectionSelector = '.post-to-recommend-section';
 const blogSuggestedForYouHeadingSelector = '.post-to-recommend-section-heading';
 
+// Get Started page.
+const getStartedUrl = testConstants.URLs.GetStarted;
+const contactUrl = testConstants.URLs.Contact;
+const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
+const electromagnetismUrl = testConstants.URLs.Electromagnetism;
+const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
+const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
+const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
+// The "create one here" link points to Google's sign-up entry point, which
+// redirects to testConstants.URLs.ExternalLink.GoogleSignUp.
+const googleSignUpLinkUrl = 'https://accounts.google.com/SignUp';
+const getStartedPageHeading = '.e2e-test-get-started-page';
+const getStartedPageLink = (text: string): string =>
+  `.oppia-get-started a:text-is("${text}")`;
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Changes the language of the lesson.
@@ -2455,6 +2470,90 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     const navigationUtils = new NavigationUtils(this);
     await navigationUtils.navigateToSplashPage(expectedURL);
+  }
+
+  /**
+   * Navigates to the Get Started page.
+   */
+  async navigateToGetStartedPage(): Promise<void> {
+    await this.goto(getStartedUrl);
+    await this.expectElementToBeVisible(getStartedPageHeading);
+  }
+
+  /**
+   * Checks that the "create one here" link on the Get Started page points to the Google account sign-up page.
+   * The link is not opened, since it leads to an external site.
+   */
+  async expectCreateOneHereLinkOnGetStartedPageToBeCorrect(): Promise<void> {
+    await this.expectLinkToHaveHref(
+      getStartedPageLink('create one here'),
+      googleSignUpLinkUrl
+    );
+  }
+
+  /**
+   * Checks that the "Welcome to Oppia" link on the Get Started page points to the "Welcome to Oppia" exploration.
+   * The link is not opened, since it leads to an external site.
+   */
+  async expectWelcomeToOppiaLinkOnGetStartedPageToBeCorrect(): Promise<void> {
+    await this.expectLinkToHaveHref(
+      getStartedPageLink('Welcome to Oppia'),
+      welcomeToOppiaUrl
+    );
+  }
+
+  /**
+   * Checks that the "Get Electrified!" link on the Get Started page points to the "Get Electrified!" collection.
+   * The link is not opened, since it leads to an external site.
+   */
+  async expectGetElectrifiedLinkOnGetStartedPageToBeCorrect(): Promise<void> {
+    await this.expectLinkToHaveHref(
+      getStartedPageLink('Get Electrified!'),
+      electromagnetismUrl
+    );
+  }
+
+  /**
+   * Checks that the "Programming with Carla" link on the Get Started page points to the "Programming with Carla" collection.
+   * The link is not opened, since it leads to an external site.
+   */
+  async expectProgrammingWithCarlaLinkOnGetStartedPageToBeCorrect(): Promise<void> {
+    await this.expectLinkToHaveHref(
+      getStartedPageLink('Programming with Carla'),
+      programmingWithCarlaUrl
+    );
+  }
+
+  /**
+   * Checks that the "in our user documentation" link on the Get Started page points to the "Creating an Exploration" user documentation.
+   * The link is not opened, since it leads to an external site.
+   */
+  async expectInOurUserDocumentationLinkOnGetStartedPageToBeCorrect(): Promise<void> {
+    await this.expectLinkToHaveHref(
+      getStartedPageLink('in our user documentation'),
+      creatingAnExplorationUrl
+    );
+  }
+
+  /**
+   * Checks that the "embed it in your own web page" link on the Get Started page points to the "Embedding an Exploration" user documentation.
+   * The link is not opened, since it leads to an external site.
+   */
+  async expectEmbedItInYourOwnWebPageLinkOnGetStartedPageToBeCorrect(): Promise<void> {
+    await this.expectLinkToHaveHref(
+      getStartedPageLink('embed it in your own web page'),
+      embeddingAnExplorationUrl
+    );
+  }
+
+  /**
+   * Clicks the "discover more ways to get involved" link on the Get Started
+   * page and checks that it opens the Contact page.
+   */
+  async clickDiscoverMoreWaysToGetInvolvedLinkOnGetStartedPage(): Promise<void> {
+    const link = getStartedPageLink('discover more ways to get involved');
+    await this.expectElementToBeVisible(link);
+    await this.clickButtonToNavigateToNewPage(link, contactUrl);
   }
 
   /**
