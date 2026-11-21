@@ -18,13 +18,14 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     learner_goals_services,
     learner_progress_services,
     topic_domain,
     topic_services,
+    user_domain,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -247,7 +248,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
     def test_number_of_topics_cannot_exceed_max(self) -> None:
         # Add MAX_CURRENT_GOALS_COUNT topics.
         topic_ids = [
-            'SAMPLE_TOPIC_ID_%s' % index
+            'sample_id_%s' % index
             for index in (range(0, MAX_CURRENT_GOALS_COUNT))
         ]
         for topic_id in topic_ids:
@@ -261,9 +262,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         # Now if we try to add another topic at the end of the list,
         # it shouldn't be added as the list length would exceed
         # MAX_CURRENT_GOALS_COUNT.
-        learner_goals_services.mark_topic_to_learn(
-            self.viewer_id, 'SAMPLE_TOPIC_ID_MAX'
-        )
+        learner_goals_services.mark_topic_to_learn(self.viewer_id, 'sample_max')
         self.assertEqual(
             self._get_all_topic_ids_to_learn(self.viewer_id), topic_ids
         )
@@ -397,3 +396,53 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             non_existent_user_id
         )
         self.assertEqual(learner_goals, [])
+
+    def test_get_learner_goals_returns_none_when_model_does_not_exist(
+        self,
+    ) -> None:
+        self.assertIsNone(
+            learner_goals_services.get_learner_goals(self.viewer_id)
+        )
+
+    def test_get_learner_goals_returns_saved_goals(self) -> None:
+        learner_goals_services.mark_topic_to_learn(
+            self.viewer_id, self.TOPIC_ID_1
+        )
+
+        learner_goals = learner_goals_services.get_learner_goals(self.viewer_id)
+
+        assert learner_goals is not None
+        self.assertEqual(learner_goals.id, self.viewer_id)
+        self.assertEqual(learner_goals.topic_ids_to_learn, [self.TOPIC_ID_1])
+        self.assertEqual(learner_goals.topic_ids_to_master, [])
+
+    def test_save_learner_goals_rejects_invalid_goals(self) -> None:
+        learner_goals = user_domain.LearnerGoals(
+            self.viewer_id, [self.TOPIC_ID_1], [self.TOPIC_ID_1]
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected a topic to not be in both topic_ids_to_learn and '
+            'topic_ids_to_master',
+        ):
+            learner_goals_services.save_learner_goals(learner_goals)
+
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get(self.viewer_id, strict=False)
+        )
+
+    def test_save_learner_goals_updates_existing_goals(self) -> None:
+        learner_goals_services.mark_topic_to_learn(
+            self.viewer_id, self.TOPIC_ID_1
+        )
+        learner_goals = learner_goals_services.get_learner_goals(self.viewer_id)
+        assert learner_goals is not None
+        learner_goals.add_topic_id_to_learn(self.TOPIC_ID_2)
+
+        learner_goals_services.save_learner_goals(learner_goals)
+
+        self.assertEqual(
+            self._get_all_topic_ids_to_learn(self.viewer_id),
+            [self.TOPIC_ID_1, self.TOPIC_ID_2],
+        )

@@ -22,7 +22,7 @@ from core import feconf
 from core.domain import user_domain
 from core.platform import models
 
-from typing import List
+from typing import List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -52,14 +52,33 @@ def get_learner_goals_from_model(
     )
 
 
+def get_learner_goals(user_id: str) -> Optional[user_domain.LearnerGoals]:
+    """Returns the learner goals of the given user.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        LearnerGoals|None. The learner goals domain object of the user, or
+        None if the user has no learner goals saved.
+    """
+    learner_goals_model = user_models.LearnerGoalsModel.get(
+        user_id, strict=False
+    )
+    if learner_goals_model is None:
+        return None
+    return get_learner_goals_from_model(learner_goals_model)
+
+
 def save_learner_goals(learner_goals: user_domain.LearnerGoals) -> None:
-    """Save a learner goals domain object as an LearnerGoalsModel entity
-    in the datastore.
+    """Validates a learner goals domain object and saves it as a
+    LearnerGoalsModel entity in the datastore.
 
     Args:
         learner_goals: LearnerGoals. The learner goals domain object to
             be saved in the datastore.
     """
+    learner_goals.validate()
     learner_goals_dict = learner_goals.to_dict()
 
     learner_goals_model = user_models.LearnerGoalsModel.get(
@@ -91,13 +110,9 @@ def mark_topic_to_learn(user_id: str, topic_id: str) -> bool:
     Raises:
         Exception. Given topic is already present.
     """
-    learner_goals_model = user_models.LearnerGoalsModel.get(
-        user_id, strict=False
-    )
-    if not learner_goals_model:
-        learner_goals_model = user_models.LearnerGoalsModel(id=user_id)
-
-    learner_goals = get_learner_goals_from_model(learner_goals_model)
+    learner_goals = get_learner_goals(user_id)
+    if learner_goals is None:
+        learner_goals = user_domain.LearnerGoals(user_id, [], [])
 
     goals_limit_exceeded = False
     topic_ids_count = len(learner_goals.topic_ids_to_learn)
@@ -127,12 +142,9 @@ def remove_topics_from_learn_goal(
     Raises:
         Exception. Given topic does not exist.
     """
-    learner_goals_model = user_models.LearnerGoalsModel.get(
-        user_id, strict=False
-    )
+    learner_goals = get_learner_goals(user_id)
 
-    if learner_goals_model:
-        learner_goals = get_learner_goals_from_model(learner_goals_model)
+    if learner_goals is not None:
         for topic_id in topic_ids_to_remove:
             if topic_id in learner_goals.topic_ids_to_learn:
                 learner_goals.remove_topic_id_from_learn(topic_id)
@@ -155,12 +167,8 @@ def get_all_topic_ids_to_learn(user_id: str) -> List[str]:
         list(str). A list of the ids of the topics that are in the
         learner goals of the user.
     """
-    learner_goals_model = user_models.LearnerGoalsModel.get(
-        user_id, strict=False
-    )
+    learner_goals = get_learner_goals(user_id)
 
-    if learner_goals_model:
-        learner_goals = get_learner_goals_from_model(learner_goals_model)
-
+    if learner_goals is not None:
         return learner_goals.topic_ids_to_learn
     return []
