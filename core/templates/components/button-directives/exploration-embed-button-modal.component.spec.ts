@@ -121,17 +121,18 @@ describe('ExplorationEmbedButtonModalComponent', () => {
     }).toThrowError('No CodeDiv was found!');
   });
 
-  it('should throw Error if selection is null', fakeAsync(() => {
-    const removeAllRanges = jasmine.createSpy('removeAllRanges');
-    const addRange = jasmine.createSpy('addRange');
+  it('should throw Error if selection is null', () => {
     spyOn(window, 'getSelection').and.returnValue(null);
-
     let embedUrlDiv = fixture.debugElement.query(
       By.css('.oppia-embed-modal-code')
     );
-    embedUrlDiv.nativeElement.click();
-    fixture.detectChanges();
-    expect(addRange).not.toHaveBeenCalled();
-    expect(removeAllRanges).not.toHaveBeenCalled();
-  }));
+    let event = new MouseEvent('click');
+    Object.defineProperty(event, 'currentTarget', {
+      value: embedUrlDiv.nativeElement,
+    });
+
+    expect(() => {
+      component.selectText(event);
+    }).toThrowError('Unable to Select!');
+  });
 });

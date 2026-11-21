@@ -36,11 +36,12 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {OppiaFooterComponent} from './oppia-footer.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {FormsModule} from '@angular/forms';
 import {FeedbackModalComponent} from './feedback-modal.component';
+import {FeedbackModalType} from 'domain/feedback/feedback.model';
 
 class MockWindowRef {
   nativeWindow = {
@@ -153,10 +154,25 @@ describe('OppiaFooterComponent', () => {
   });
 
   it('should open site feedback modal', () => {
+    const modalFixture = jasmine.createSpyObj<NgbModalRef>(
+      'NgbModalRef',
+      ['close', 'dismiss'],
+      {
+        componentInstance: {
+          feedbackModalType: null,
+        },
+      }
+    );
+    const openSpy = ngbModal.open as jasmine.Spy<NgbModal['open']>;
+    openSpy.and.returnValue(modalFixture);
+
     component.openSiteFeedbackModal();
     expect(ngbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
       backdrop: 'static',
     });
+    expect(modalFixture.componentInstance.feedbackModalType).toBe(
+      FeedbackModalType.SITE_ISSUE
+    );
   });
 
   it('should return true if not processing subscription and email address is invalid', () => {
