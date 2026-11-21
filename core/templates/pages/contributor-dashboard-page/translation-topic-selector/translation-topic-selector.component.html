@@ -3,7 +3,7 @@
        tabindex="0"
        (keydown.enter)="toggleDropdown()"
        (click)="toggleDropdown()">
-    {{activeTopicName}}
+    {{getActiveTopicName()}}
     <span class="fas fa-caret-down oppia-translation-topic-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
     </span>
   </div>
@@ -16,10 +16,10 @@
         <div class="oppia-translation-topic-selector-dropdown-label">{{subject.key}}</div>
         <div class="oppia-translation-topic-selector-dropdown-option oppia-translation-topic-selector-dropdown-option-indented e2e-test-topic-selector-option"
              *ngFor="let option of subject.value"
-             (click)="selectOption(option.name)"
-             (keydown.enter)="selectOption(option.name)"
+             (click)="selectOption(option.id)"
+             (keydown.enter)="selectOption(option.id)"
              tabindex="0"
-             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option.name === activeTopicName}">
+             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option.id === activeTopicId}">
           <span class="e2e-test-topic-name">{{option.name}}</span>
           <span *ngIf="option.completeness !== null"
                 class="oppia-translation-topic-selector-completeness"
@@ -32,10 +32,10 @@
       <ng-template #noClassroomTopics>
         <div class="oppia-translation-topic-selector-dropdown-option e2e-test-topic-selector-option"
              *ngFor="let option of subject.value"
-             (click)="selectOption(option.name)"
-             (keydown.enter)="selectOption(option.name)"
+             (click)="selectOption(option.id)"
+             (keydown.enter)="selectOption(option.id)"
              tabindex="0"
-             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option.name === activeTopicName}">
+             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option.id === activeTopicId}">
           <span class="e2e-test-topic-name">{{option.name}}</span>
           <span *ngIf="option.completeness !== null"
                 class="oppia-translation-topic-selector-completeness"

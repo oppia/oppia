@@ -476,6 +476,7 @@ class MigrateExplorationJobTests(
 
         expected_opp_summary_dict = {
             'id': 'exp_1',
+            'topic_id': 'topic_id_1',
             'topic_name': 'topic',
             'chapter_title': 'Title 1',
             'story_title': 'A story title',
@@ -945,6 +946,7 @@ class AuditExplorationMigrationJobTests(
 
         expected_opp_summary_dict = {
             'id': 'exp_1',
+            'topic_id': 'topic_id_1',
             'topic_name': 'topic',
             'chapter_title': 'Title 1',
             'story_title': 'A story title',

@@ -257,6 +257,7 @@ describe('Contributions and review component', () => {
         opportunities: [
           ExplorationOpportunitySummary.createFromBackendDict({
             id: '1',
+            topic_id: 'topic_id_1',
             topic_name: 'Topic 1',
             story_title: 'Story 1',
             chapter_title: 'Chapter 1',
@@ -273,6 +274,7 @@ describe('Contributions and review component', () => {
           }),
           ExplorationOpportunitySummary.createFromBackendDict({
             id: '2',
+            topic_id: 'topic_id_2',
             topic_name: 'Topic 2',
             story_title: 'Story 2',
             chapter_title: 'Chapter 2',
@@ -888,9 +890,9 @@ describe('Contributions and review component', () => {
       ).calls.reset();
       component.activeExplorationId = 'exp1';
       component.ngOnChanges({
-        activeTopicName: {
-          currentValue: 'Topic 2',
-          previousValue: 'Topic 1',
+        activeTopicId: {
+          currentValue: 'topic_id_2',
+          previousValue: 'topic_id_1',
           firstChange: false,
           isFirstChange: () => false,
         },
@@ -2077,6 +2079,7 @@ describe('Contributions and review component', () => {
           labelColor: '',
           actionButtonTitle: 'Translations',
           isPinned: false,
+          topicId: 'topic_id_1',
           topicName: 'Topic 1',
           totalCount: 1,
           translationsCount: 2,
@@ -2094,6 +2097,7 @@ describe('Contributions and review component', () => {
           labelColor: '',
           actionButtonTitle: 'Translations',
           isPinned: false,
+          topicId: 'topic_id_2',
           topicName: 'Topic 2',
           totalCount: 2,
           translationsCount: 4,
@@ -2161,12 +2165,13 @@ describe('Contributions and review component', () => {
       const openSnackbarSpy = spyOn(component, 'openSnackbarWithAction');
 
       const dict = {
-        topic_name: 'Topic 1',
+        topic_id: 'topic_id_1',
         exploration_id: '1',
       };
       component.opportunities = [
         new ExplorationOpportunitySummary(
           '1',
+          'topic_id_1',
           'Topic 1',
           'Story 1',
           'heading',
@@ -2179,6 +2184,7 @@ describe('Contributions and review component', () => {
         ),
         new ExplorationOpportunitySummary(
           '2',
+          'topic_id_1',
           'Topic 1',
           'Story 1',
           'heading',
@@ -2191,6 +2197,7 @@ describe('Contributions and review component', () => {
         ),
         new ExplorationOpportunitySummary(
           '3',
+          'topic_id_1',
           'Topic 1',
           'Story 1',
           'heading',
@@ -2207,7 +2214,7 @@ describe('Contributions and review component', () => {
       component.pinReviewableTranslationOpportunity(dict);
 
       expect(openSnackbarSpy).toHaveBeenCalledWith(
-        'Topic 1',
+        'topic_id_1',
         '1',
         'A pinned opportunity already exists for this topic and language.',
         'Pin Anyway'
@@ -2224,12 +2231,13 @@ describe('Contributions and review component', () => {
         ).and.returnValue(Promise.resolve({}));
 
         const dict = {
-          topic_name: 'Topic 3',
+          topic_id: 'topic_id_3',
           exploration_id: '8',
         };
         component.opportunities = [
           new ExplorationOpportunitySummary(
             '1',
+            'topic_id_1',
             'Topic 1',
             'Story 1',
             'heading',
@@ -2242,6 +2250,7 @@ describe('Contributions and review component', () => {
           ),
           new ExplorationOpportunitySummary(
             '2',
+            'topic_id_1',
             'Topic 1',
             'Story 1',
             'heading',
@@ -2254,6 +2263,7 @@ describe('Contributions and review component', () => {
           ),
           new ExplorationOpportunitySummary(
             '3',
+            'topic_id_1',
             'Topic 1',
             'Story 1',
             'heading',
@@ -2272,7 +2282,7 @@ describe('Contributions and review component', () => {
 
         expect(
           pinReviewableTranslationOpportunityAsyncSpy
-        ).toHaveBeenCalledWith('Topic 3', component.languageCode, '8');
+        ).toHaveBeenCalledWith('topic_id_3', component.languageCode, '8');
       })
     );
 
@@ -2285,14 +2295,14 @@ describe('Contributions and review component', () => {
       component.languageCode = 'en';
 
       component.unpinReviewableTranslationOpportunity({
-        topic_name: 'Dummy Topic 1',
+        topic_id: 'dummy_topic_id_1',
         exploration_id: '1',
       });
       tick();
 
       expect(
         unpinReviewableTranslationOpportunityAsyncSpy
-      ).toHaveBeenCalledWith('Dummy Topic 1', component.languageCode, '1');
+      ).toHaveBeenCalledWith('dummy_topic_id_1', component.languageCode, '1');
     }));
 
     it('should open snackbar and handle action', fakeAsync(() => {
@@ -2310,13 +2320,14 @@ describe('Contributions and review component', () => {
           };
         }
       );
-      spyOn(
+      const pinSpy = spyOn(
         contributionOpportunitiesService,
         'pinReviewableTranslationOpportunityAsync'
       ).and.returnValue(Promise.resolve());
+      component.languageCode = 'en';
 
       component.openSnackbarWithAction(
-        'testTopic',
+        'testTopicId',
         'testExploration',
         'Test message',
         'Action text'
@@ -2325,6 +2336,12 @@ describe('Contributions and review component', () => {
       tick();
       fixture.detectChanges();
       tick();
+
+      expect(pinSpy).toHaveBeenCalledWith(
+        'testTopicId',
+        'en',
+        'testExploration'
+      );
     }));
 
     // TODO(#9749): Rename and actually assert on something. This test currently
@@ -2447,8 +2464,8 @@ describe('Contributions and review component', () => {
     });
 
     it('should load more opportunities correctly', () => {
-      spyOn(translationTopicService, 'getActiveTopicName').and.returnValue(
-        'activeTopicName'
+      spyOn(translationTopicService, 'getActiveTopicId').and.returnValue(
+        'activeTopicId'
       );
       component.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
         expect(Object.keys(component.contributions)).toContain('suggestion_1');
@@ -2467,7 +2484,7 @@ describe('Contributions and review component', () => {
       expect(getReviewableQuestionSuggestionsAsyncSpy).toHaveBeenCalledWith(
         false,
         'Date',
-        'activeTopicName'
+        'activeTopicId'
       );
 
       getReviewableQuestionSuggestionsAsyncSpy.and.returnValue(
@@ -2813,18 +2830,18 @@ describe('Contributions and review component', () => {
       );
     });
     it('should update topicReady when active topic changes', fakeAsync(() => {
-      const getActiveTopicNameSpy = spyOn(
+      const getActiveTopicIdSpy = spyOn(
         translationTopicService,
-        'getActiveTopicName'
+        'getActiveTopicId'
       );
 
-      getActiveTopicNameSpy.and.returnValue(null);
+      getActiveTopicIdSpy.and.returnValue(null);
       mockActiveTopicEventEmitter.emit();
       tick();
 
       expect(component.topicReady).toBe(false);
 
-      getActiveTopicNameSpy.and.returnValue('Math');
+      getActiveTopicIdSpy.and.returnValue('math_topic_id');
       mockActiveTopicEventEmitter.emit();
       tick();
 

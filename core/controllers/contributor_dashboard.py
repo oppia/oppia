@@ -86,7 +86,7 @@ class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
 
     cursor: Optional[str]
     language_code: Optional[str]
-    topic_name: Optional[str]
+    topic_id: Optional[str]
     search_query: Optional[str]
 
 
@@ -111,7 +111,7 @@ class ContributionOpportunitiesHandler(
                 },
                 'default_value': None,
             },
-            'topic_name': {
+            'topic_id': {
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
@@ -149,12 +149,12 @@ class ContributionOpportunitiesHandler(
             )
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
-            topic_name = self.normalized_request.get('topic_name')
+            topic_id = self.normalized_request.get('topic_id')
             if language_code is None:
                 raise self.InvalidInputException
             translation_opportunities, next_cursor, more = (
                 self._get_translation_opportunity_dicts(
-                    language_code, topic_name, search_cursor
+                    language_code, topic_id, search_cursor
                 )
             )
         else:
@@ -278,7 +278,7 @@ class ContributionOpportunitiesHandler(
     def _get_translation_opportunity_dicts(
         self,
         language_code: str,
-        topic_name: Optional[str],
+        topic_id: Optional[str],
         search_cursor: Optional[str],
     ) -> Tuple[
         List[opportunity_domain.PartialExplorationOpportunitySummaryDict],
@@ -290,8 +290,8 @@ class ContributionOpportunitiesHandler(
         Args:
             language_code: str. The language for which translation opportunities
                 should be fetched.
-            topic_name: str or None. The topic for which translation
-                opportunities should be fetched. If topic_name is None or empty,
+            topic_id: str or None. The ID of the topic for which translation
+                opportunities should be fetched. If topic_id is None or empty,
                 fetch translation opportunities from all topics.
             search_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise, the
@@ -309,7 +309,7 @@ class ContributionOpportunitiesHandler(
         """
         opportunities, next_cursor, more = (
             opportunity_services.get_translation_opportunities(
-                language_code, topic_name, search_cursor
+                language_code, topic_id, search_cursor
             )
         )
         opportunity_dicts = [opp.to_dict() for opp in opportunities]
@@ -323,7 +323,7 @@ class ContributionOpportunitiesHandlerV2NormalizedRequestDict(TypedDict):
 
     cursor: Optional[str]
     language_code: str
-    topic_name: Optional[str]
+    topic_id: Optional[str]
     entity_type: str
 
 
@@ -345,7 +345,7 @@ class ContributionOpportunitiesHandlerV2(
                     'validators': [{'id': 'is_supported_audio_language_code'}],
                 },
             },
-            'topic_name': {
+            'topic_id': {
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
@@ -371,12 +371,12 @@ class ContributionOpportunitiesHandlerV2(
 
         cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request['language_code']
-        topic_name = self.normalized_request.get('topic_name')
+        topic_id = self.normalized_request.get('topic_id')
         entity_type = self.normalized_request.get('entity_type')
 
         opportunities, next_cursor, more = (
             opportunity_services.get_translation_opportunities_with_new_models(
-                entity_type, language_code, topic_name, cursor
+                entity_type, language_code, topic_id, cursor
             )
         )
         opportunity_dicts = [opp.to_dict() for opp in opportunities]
@@ -394,7 +394,7 @@ class ReviewableOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    topic_name: Optional[str]
+    topic_id: Optional[str]
     language_code: str
 
 
@@ -409,7 +409,7 @@ class ReviewableOpportunitiesHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'topic_name': {
+            'topic_id': {
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
@@ -426,14 +426,14 @@ class ReviewableOpportunitiesHandler(
         assert self.normalized_request is not None
         # Default value is None, since this is a GET request handler, which
         # means all request parameters come in as strings.
-        topic_name = self.normalized_request.get('topic_name', None)
+        topic_id = self.normalized_request.get('topic_id', None)
         language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
             opportunity_domain.PartialExplorationOpportunitySummaryDict
         ] = []
         if self.user_id:
             for opp in self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name, language
+                self.user_id, topic_id, language
             ):
                 opportunity_dicts.append(opp.to_dict())
         self.values = {
@@ -442,7 +442,7 @@ class ReviewableOpportunitiesHandler(
         self.render_json(self.values)
 
     def _get_reviewable_exploration_opportunity_summaries(
-        self, user_id: str, topic_name: Optional[str], language: Optional[str]
+        self, user_id: str, topic_id: Optional[str], language: Optional[str]
     ) -> List[opportunity_domain.ExplorationOpportunitySummary]:
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
@@ -451,7 +451,7 @@ class ReviewableOpportunitiesHandler(
         Args:
             user_id: str. The user ID of the user for which to filter
                 translation suggestions.
-            topic_name: str|None. A topic name for which to filter the
+            topic_id: str|None. The ID of the topic for which to filter the
                 exploration opportunity summaries. If it is None, all available
                 exploration opportunity summaries will be returned, regardless
                 of the topic.
@@ -463,6 +463,10 @@ class ReviewableOpportunitiesHandler(
         Returns:
             list(ExplorationOpportunitySummary). A list of the matching
             exploration opportunity summaries.
+
+        Raises:
+            InvalidInputException. The supplied topic ID does not correspond
+                to an existing topic.
         """
         # 1. Fetch the IDs of all published explorations in the topics'
         #    published stories.
@@ -474,15 +478,15 @@ class ReviewableOpportunitiesHandler(
         # 4. Move any pinned summaries to the top.
 
         pinned_opportunity_summary = None
-        if topic_name is None:
+        if topic_id is None:
             topic_exp_ids = (
                 topic_services.get_all_published_story_exploration_ids()
             )
         else:
-            topic = topic_fetchers.get_topic_by_name(topic_name)
+            topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
             if topic is None:
                 raise self.InvalidInputException(
-                    'The supplied input topic: %s is not valid' % topic_name
+                    'The supplied input topic ID: %s is not valid' % topic_id
                 )
             if language and self.user_id:
                 pinned_opportunity_summary = (
@@ -532,7 +536,7 @@ class ReviewableOpportunitiesHandlerV2NormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    topic_name: Optional[str]
+    topic_id: Optional[str]
     language_code: Optional[str]
     entity_type: str
 
@@ -548,7 +552,7 @@ class ReviewableOpportunitiesHandlerV2(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'topic_name': {
+            'topic_id': {
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
@@ -576,14 +580,14 @@ class ReviewableOpportunitiesHandlerV2(
         ):
             raise self.NotFoundException
 
-        topic_name = self.normalized_request.get('topic_name', None)
+        topic_id = self.normalized_request.get('topic_id', None)
         language = self.normalized_request.get('language_code')
         entity_type = self.normalized_request.get('entity_type')
 
         opportunity_dicts = []
         if self.user_id:
             for opp in self._get_reviewable_translation_opportunities(
-                self.user_id, entity_type, topic_name, language
+                self.user_id, entity_type, topic_id, language
             ):
                 opportunity_dicts.append(opp.to_dict())
         self.values = {
@@ -595,7 +599,7 @@ class ReviewableOpportunitiesHandlerV2(
         self,
         user_id: str,
         entity_type: Optional[str],
-        topic_name: Optional[str],
+        topic_id: Optional[str],
         language: Optional[str],
     ) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
         """Returns translation opportunities that have translation suggestions
@@ -606,23 +610,28 @@ class ReviewableOpportunitiesHandlerV2(
             entity_type: str|None. The type of the entity to filter by. If
                 None, opportunities of every translatable entity type are
                 returned.
-            topic_name: str|None. A topic name.
+            topic_id: str|None. The ID of the topic to filter by. If None or
+                empty, opportunities from all topics are returned.
             language: str|None. ISO 639-1 language code.
 
         Returns:
             list(TranslationOpportunityCardInfo). A list of the matching
             translation opportunities.
-        """
-        # The dashboard sends an empty topic name when its topic filter is set
-        # to "all", which means the same thing as sending no topic at all.
-        if not topic_name:
-            topic_name = None
 
-        if topic_name is not None:
-            topic = topic_fetchers.get_topic_by_name(topic_name)
+        Raises:
+            InvalidInputException. The supplied topic ID does not correspond
+                to an existing topic.
+        """
+        # An empty topic ID means the same thing as sending no topic at all,
+        # i.e. that opportunities from every topic are wanted.
+        if not topic_id:
+            topic_id = None
+
+        if topic_id is not None:
+            topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
             if topic is None:
                 raise self.InvalidInputException(
-                    'The supplied input topic: %s is not valid' % topic_name
+                    'The supplied input topic ID: %s is not valid' % topic_id
                 )
 
         in_review_suggestion_target_ids = suggestion_services.get_reviewable_translation_suggestion_target_ids(
@@ -651,12 +660,14 @@ class ReviewableOpportunitiesHandlerV2(
                 )
             )
 
-        filtered_opportunities = []
-        for opp in opportunities:
-            if topic_name is None or opp.topic_name == topic_name:
-                filtered_opportunities.append(opp)
-
-        return filtered_opportunities
+        # An opportunity can be linked to several topics, but its topic_name
+        # only reflects one of them, so the filter must check all the linked
+        # topic IDs.
+        return [
+            opp
+            for opp in opportunities
+            if topic_id is None or topic_id in opp.topic_ids
+        ]
 
 
 class TranslatableContentsHandlerV2NormalizedRequestDict(TypedDict):
@@ -853,16 +864,23 @@ class LessonsPinningHandler(
 
     @acl_decorators.open_access
     def put(self) -> None:
-        """Handles pinning/unpinning lessons."""
+        """Handles pinning/unpinning lessons.
+
+        Raises:
+            InvalidInputException. The supplied topic ID does not correspond
+                to an existing topic.
+        """
         assert self.normalized_payload is not None
         assert self.user_id is not None
-        topic_name = self.normalized_payload.get('topic_id')
+        topic_id = self.normalized_payload.get('topic_id')
         language_code = self.normalized_payload.get('language_code')
         opportunity_id = self.normalized_payload.get('opportunity_id')
         entity_type = self.normalized_payload['entity_type']
-        if language_code and topic_name:
-            topic = topic_fetchers.get_topic_by_name(topic_name)
-            topic_id = topic.id
+        if language_code and topic_id:
+            if topic_fetchers.get_topic_by_id(topic_id, strict=False) is None:
+                raise self.InvalidInputException(
+                    'The supplied input topic ID: %s is not valid' % topic_id
+                )
             opportunity_services.update_pinned_opportunity_model(
                 self.user_id,
                 language_code,
@@ -1068,7 +1086,7 @@ class OpportunitiesCountHandlerNormalizedRequestDict(TypedDict):
     """
 
     language_code: Optional[str]
-    topic_name: Optional[str]
+    topic_id: Optional[str]
     entity_type: Optional[str]
 
 
@@ -1092,7 +1110,7 @@ class OpportunitiesCountHandler(
                 },
                 'default_value': None,
             },
-            'topic_name': {
+            'topic_id': {
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
@@ -1121,7 +1139,7 @@ class OpportunitiesCountHandler(
 
         assert self.normalized_request is not None
         language_code = self.normalized_request.get('language_code')
-        topic_name = self.normalized_request.get('topic_name')
+        topic_id = self.normalized_request.get('topic_id')
         entity_type = self.normalized_request.get('entity_type')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
@@ -1135,12 +1153,12 @@ class OpportunitiesCountHandler(
                 self.user_id,
             ):
                 count = opportunity_services.get_translation_opportunities_count_with_new_models(
-                    entity_type, language_code, topic_name
+                    entity_type, language_code, topic_id
                 )
             else:
                 count = (
                     opportunity_services.get_translation_opportunities_count(
-                        language_code, topic_name
+                        language_code, topic_id
                     )
                 )
         else:
@@ -1344,10 +1362,22 @@ class FeaturedTranslationLanguagesHandler(
         )
 
 
+class TranslatableTopicDict(TypedDict):
+    """A dictionary representing a translatable topic. The ID is used to
+    identify the topic, since topic names can change, and the name is used
+    for display purposes.
+    """
+
+    id: str
+    name: str
+
+
 class TranslatableTopicNamesHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Provides names of all translatable topics in the datastore."""
+    """Provides the IDs and names of all translatable topics in the
+    datastore.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -1356,16 +1386,17 @@ class TranslatableTopicNamesHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        topic_names = [summary.name for summary in topic_summaries]
-        self.values = {'topic_names': topic_names}
+        topics = [
+            TranslatableTopicDict(id=summary.id, name=summary.name)
+            for summary in topic_summaries
+        ]
+        self.values = {'topics': topics}
         self.render_json(self.values)
 
 
-class TranslatableTopicDict(TypedDict):
+class TranslatableTopicWithCompletenessDict(TranslatableTopicDict):
     """Dict for a translatable topic and its translation completeness."""
 
-    name: str
-    id: str
     completeness: Optional[float]
 
 
@@ -1373,7 +1404,7 @@ class TranslatableTopicNamesPerClassroomHandlerDict(TypedDict):
     """A dictionary representing all topics associated to classroom."""
 
     classroom: str
-    topics: List[TranslatableTopicDict]
+    topics: List[TranslatableTopicWithCompletenessDict]
 
 
 class TranslatableTopicNamesPerClassroomHandlerNormalizedRequestDict(TypedDict):
@@ -1390,8 +1421,9 @@ class TranslatableTopicNamesPerClassroomHandler(
         TranslatableTopicNamesPerClassroomHandlerNormalizedRequestDict,
     ]
 ):
-    """Provides names of all translatable topics associated with classroom in
-    the datastore."""
+    """Provides the IDs and names of all translatable topics, grouped by the
+    classroom they are associated with.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -1431,7 +1463,9 @@ class TranslatableTopicNamesPerClassroomHandler(
             )
 
         # Group topics by classroom and format response.
-        topics_per_classroom: Dict[str, List[TranslatableTopicDict]] = {}
+        topics_per_classroom: Dict[
+            str, List[TranslatableTopicWithCompletenessDict]
+        ] = {}
         for summary in topic_fetchers.get_all_topic_summaries():
             classroom_name = topic_id_to_classroom.get(summary.id, '')
             completeness = (
@@ -1440,8 +1474,8 @@ class TranslatableTopicNamesPerClassroomHandler(
                 else None
             )
             topics_per_classroom.setdefault(classroom_name, []).append(
-                TranslatableTopicDict(
-                    name=summary.name, id=summary.id, completeness=completeness
+                TranslatableTopicWithCompletenessDict(
+                    id=summary.id, name=summary.name, completeness=completeness
                 )
             )
 
@@ -1454,7 +1488,7 @@ class TranslatableTopicNamesPerClassroomHandler(
                     )
                 )
         self.values = {
-            'topic_names_per_classroom': [
+            'topics_per_classroom': [
                 TranslatableTopicNamesPerClassroomHandlerDict(
                     classroom=classroom, topics=topics
                 )

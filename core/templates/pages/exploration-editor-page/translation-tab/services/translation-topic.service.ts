@@ -19,7 +19,7 @@
 
 import {EventEmitter, Injectable} from '@angular/core';
 
-import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {
   ContributionOpportunitiesService,
   // eslint-disable-next-line max-len
@@ -33,7 +33,9 @@ export class TranslationTopicService {
   // This property is initialized using async methods
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  private activeTopicName!: string;
+  // The active topic is tracked by its ID rather than by its name, since
+  // topic names can change.
+  private activeTopicId!: string;
   private _activeTopicChangedEventEmitter = new EventEmitter<void>();
 
   constructor(
@@ -41,23 +43,24 @@ export class TranslationTopicService {
     private loggerService: LoggerService
   ) {}
 
-  getActiveTopicName(): string {
-    return this.activeTopicName;
+  getActiveTopicId(): string {
+    return this.activeTopicId;
   }
 
-  setActiveTopicName(newActiveTopicName: string): void {
-    this.ContributionOpportunitiesService.getTranslatableTopicNamesAsync().then(
-      data => {
+  setActiveTopicId(newActiveTopicId: string): void {
+    this.ContributionOpportunitiesService.getTranslatableTopicsAsync().then(
+      topics => {
         if (
-          newActiveTopicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL &&
-          data.indexOf(newActiveTopicName) < 0
+          newActiveTopicId !==
+            ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL &&
+          !topics.some(topic => topic.id === newActiveTopicId)
         ) {
           this.loggerService.error(
-            `Invalid active topic name: ${newActiveTopicName}`
+            `Invalid active topic ID: ${newActiveTopicId}`
           );
           return;
         }
-        this.activeTopicName = newActiveTopicName;
+        this.activeTopicId = newActiveTopicId;
         this._activeTopicChangedEventEmitter.emit();
       }
     );
