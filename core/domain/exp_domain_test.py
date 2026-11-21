@@ -617,6 +617,9 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             logged_out_learner_progress_dict,
         )
 
+    def test_validation_passes_for_valid_properties(self) -> None:
+        self.transient_checkpoint_url.validate()
+
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
     # wrong inputs that we can normally catch by typing.
@@ -3556,6 +3559,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.tags = ['computer science', 'analysis', 'a b c']
         exploration.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_non_string_title(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.title = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected title to be a string, received 0'
+        ):
+            exploration.validate()
+
     def test_title_category_and_objective_validation(self) -> None:
         """Test that titles, categories and objectives are validated only in
         'strict' mode.
@@ -4863,6 +4877,39 @@ title: Title
         )
 
 
+class CleanMathExpressionTests(test_utils.GenericTestBase):
+    """Tests for the clean_math_expression function."""
+
+    def test_trig_function_powers_are_moved_to_the_end(self) -> None:
+        self.assertEqual(
+            exp_domain.clean_math_expression('sin^2(x)'), '(sin(x))^2'
+        )
+
+    def test_parentheses_are_added_to_trig_functions(self) -> None:
+        self.assertEqual(exp_domain.clean_math_expression('cosA'), 'cos(A)')
+
+    def test_unicode_characters_are_replaced_with_text(self) -> None:
+        self.assertEqual(
+            exp_domain.clean_math_expression('√(x)\xb7α'),
+            'sqrt(x)*alpha',
+        )
+
+    def test_inverse_trig_functions_are_renamed(self) -> None:
+        self.assertEqual(
+            exp_domain.clean_math_expression('asin(x)+acos(x)+atan(x)'),
+            'arcsin(x)+arccos(x)+arctan(x)',
+        )
+
+    def test_comma_is_replaced_by_decimal_point_only_between_digits(
+        self,
+    ) -> None:
+        self.assertEqual(exp_domain.clean_math_expression('3,5'), '3.5')
+        self.assertEqual(exp_domain.clean_math_expression('x,y'), 'x,y')
+
+    def test_cdot_is_replaced_with_multiplication_sign(self) -> None:
+        self.assertEqual(exp_domain.clean_math_expression('2\\cdot3'), '2*3')
+
+
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -5239,6 +5286,15 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             self.exp_summary.is_solely_owned_by_user(self.owner_id)
         )
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
+
+    def test_does_user_have_any_role(self) -> None:
+        self.assertTrue(self.exp_summary.does_user_have_any_role(self.owner_id))
+        self.assertTrue(self.exp_summary.does_user_have_any_role('editor_id'))
+        self.assertTrue(
+            self.exp_summary.does_user_have_any_role('voice_artist_id')
+        )
+        self.assertTrue(self.exp_summary.does_user_have_any_role('viewer_id'))
+        self.assertFalse(self.exp_summary.does_user_have_any_role('other_id'))
 
     def test_is_solely_owned_by_user_other_users(self) -> None:
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('editor_id'))
