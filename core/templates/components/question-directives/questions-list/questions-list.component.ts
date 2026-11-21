@@ -35,10 +35,7 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 import {SkillLinkageModificationsArray} from 'domain/question/editable-question-backend-api.service';
-import {
-  SkillSummary,
-  SkillSummaryBackendDict,
-} from 'domain/skill/skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {
   Misconception,
   MisconceptionSkillMap,
@@ -61,6 +58,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionsListService} from 'services/questions-list.service';
 import {QuestionValidationService} from 'services/question-validation.service';
+import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
 import {UtilsService} from 'services/utils.service';
@@ -69,11 +67,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {RemoveQuestionSkillLinkModalComponent} from '../modal-templates/remove-question-skill-link-modal.component';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-
-export interface GroupedSkillSummaries {
-  current: SkillSummaryBackendDict[];
-  others: SkillSummaryBackendDict[];
-}
 
 @Component({
   selector: 'oppia-questions-list',
