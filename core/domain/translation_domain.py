@@ -27,7 +27,17 @@ from core.domain import (  # pylint: disable=invalid-import-from
     translatable_object_registry,
 )
 
-from typing import Any, Dict, Final, List, Optional, TypedDict, Union
+from typing import (
+    Any,
+    Dict,
+    Final,
+    List,
+    Mapping,
+    Optional,
+    TypedDict,
+    Union,
+    cast,
+)
 
 
 class ContentType(enum.Enum):
@@ -560,6 +570,48 @@ class EntityTranslationDict(TypedDict):
     translations: Dict[str, feconf.TranslatedContentDict]
 
 
+def convert_to_stored_translations_dict(
+    stored_translations: Mapping[str, feconf.StoredTranslationValueType],
+) -> feconf.StoredTranslationsDict:
+    """Converts the translations field of an EntityTranslationsModel into the
+    format in which each content ID maps to its manual and automatic
+    translations. Values stored in the older format (a single translation per
+    content ID) are treated as manual translations.
+
+    Args:
+        stored_translations: dict(str, StoredTranslationValueType). The
+            translations field of an EntityTranslationsModel.
+
+    Returns:
+        StoredTranslationsDict. A dict mapping each content ID to a dict that
+        contains its manual and automatic translations.
+    """
+    converted_translations: feconf.StoredTranslationsDict = {}
+    for content_id, stored_value in stored_translations.items():
+        # TODO(#24714): Remove this branch once all existing
+        # EntityTranslationsModels have been migrated to the current format,
+        # since no model will use the older format after that.
+        if 'content_value' in stored_value:
+            # Here we use cast because only a TranslatedContentDict, i.e. a
+            # value in the older format, has a 'content_value' key.
+            manual_translation_dict = cast(
+                feconf.TranslatedContentDict, stored_value
+            )
+            converted_translations[content_id] = {
+                feconf.TranslationType.MANUAL.value: manual_translation_dict,
+                feconf.TranslationType.AUTO.value: None,
+            }
+            continue
+
+        # Values without a 'content_value' key are already keyed by
+        # TranslationType values.
+        converted_translations[content_id] = {
+            translation_type.value: stored_value.get(translation_type.value)
+            for translation_type in feconf.TranslationType
+        }
+    return converted_translations
+
+
 class EntityTranslation:
     """A domain object to store all translations for a given versioned-entity
     in a given language.
@@ -575,6 +627,7 @@ class EntityTranslation:
         entity_version: int,
         language_code: str,
         translations: Dict[str, TranslatedContent],
+        auto_translations: Optional[Dict[str, TranslatedContent]] = None,
     ):
         """Constructs an TranslatableContent domain object.
 
@@ -585,16 +638,26 @@ class EntityTranslation:
             entity_version: int. The version of the corresponding entity.
             language_code: str. The language code for the translations.
             translations: dict(str, TranslatedContent). A dict mapping each
-                content_id in the entity to its TranslatedContent.
+                content_id in the entity to its manual TranslatedContent, i.e.
+                the translation that was approved by a human.
+            auto_translations: dict(str, TranslatedContent). A dict mapping
+                content_ids to their automatic (machine generated)
+                TranslatedContent. These are drafts for translators and are
+                never shown to learners. If None, an empty dict is used.
         """
         self.entity_id = entity_id
         self.entity_type = entity_type.value
         self.entity_version = entity_version
         self.language_code = language_code
         self.translations = translations
+        self.auto_translations = (
+            auto_translations if auto_translations is not None else {}
+        )
 
     def to_dict(self) -> EntityTranslationDict:
         """Returns the dict representation of the EntityTranslation object.
+        Only the manual translations are included, since this dict is sent to
+        learner-facing clients.
 
         Returns:
             EntityTranslationDict. The dict representation of the
@@ -644,6 +707,91 @@ class EntityTranslation:
             content_id_to_translated_content,
         )
 
+    def to_stored_translations_dict(self) -> feconf.StoredTranslationsDict:
+        """Returns the manual and automatic translations in the format in
+        which they are stored in EntityTranslationsModel.
+
+        Returns:
+            StoredTranslationsDict. A dict mapping each content ID to a dict
+            that contains its manual and automatic translations.
+        """
+        content_ids = list(self.translations.keys()) + [
+            content_id
+            for content_id in self.auto_translations
+            if content_id not in self.translations
+        ]
+        stored_translations: feconf.StoredTranslationsDict = {}
+        for content_id in content_ids:
+            manual_translation = self.translations.get(content_id)
+            auto_translation = self.auto_translations.get(content_id)
+            stored_translations[content_id] = {
+                feconf.TranslationType.MANUAL.value: (
+                    None
+                    if manual_translation is None
+                    else manual_translation.to_dict()
+                ),
+                feconf.TranslationType.AUTO.value: (
+                    None
+                    if auto_translation is None
+                    else auto_translation.to_dict()
+                ),
+            }
+        return stored_translations
+
+    @classmethod
+    def from_stored_translations_dict(
+        cls,
+        entity_id: str,
+        entity_type: str,
+        entity_version: int,
+        language_code: str,
+        stored_translations: Mapping[str, feconf.StoredTranslationValueType],
+    ) -> EntityTranslation:
+        """Creates the EntityTranslation from the translations stored in an
+        EntityTranslationsModel.
+
+        Args:
+            entity_id: str. The ID of the corresponding entity.
+            entity_type: str. The type of the corresponding entity.
+            entity_version: int. The version of the corresponding entity.
+            language_code: str. The language code for the translations.
+            stored_translations: dict(str, StoredTranslationValueType). The
+                translations field of the EntityTranslationsModel.
+
+        Returns:
+            EntityTranslation. The EntityTranslation object created using the
+            given stored translations.
+        """
+        translations = {}
+        auto_translations = {}
+        for (
+            content_id,
+            translations_by_type,
+        ) in convert_to_stored_translations_dict(stored_translations).items():
+            manual_translation_dict = translations_by_type[
+                feconf.TranslationType.MANUAL.value
+            ]
+            auto_translation_dict = translations_by_type[
+                feconf.TranslationType.AUTO.value
+            ]
+            if manual_translation_dict is not None:
+                translations[content_id] = TranslatedContent.from_dict(
+                    manual_translation_dict
+                )
+            if auto_translation_dict is not None:
+                auto_translations[content_id] = TranslatedContent.from_dict(
+                    auto_translation_dict
+                )
+
+        return cls(
+            entity_id,
+            feconf.TranslatableEntityType(entity_type),
+            entity_version,
+            language_code,
+            translations,
+            auto_translations,
+        )
+
     def validate(self) -> None:
         """Validates the EntityTranslation object.
 
@@ -681,6 +829,20 @@ class EntityTranslation:
                     % translated_content.needs_update
                 )
 
+        for content_id, auto_translation in self.auto_translations.items():
+            if not isinstance(content_id, str):
+                raise utils.ValidationError(
+                    'content_id must be a string, recieved %r' % content_id
+                )
+            # Automatic translations that go out of date are removed instead
+            # of being marked as needing an update, so that they get
+            # regenerated.
+            if auto_translation.needs_update is not False:
+                raise utils.ValidationError(
+                    'Automatic translations should not need an update, but '
+                    'the one for content_id %s does.' % content_id
+                )
+
     def add_translation(
         self,
         content_id: str,
@@ -701,8 +863,27 @@ class EntityTranslation:
             content_value, content_format, needs_update
         )
 
+    def add_auto_translation(
+        self,
+        content_id: str,
+        content_value: str,
+        content_format: TranslatableContentFormat,
+    ) -> None:
+        """Adds (or replaces) the automatic translation of the given content.
+
+        Args:
+            content_id: str. The ID of the content.
+            content_value: str. The machine generated translation.
+            content_format: TranslatableContentFormat. The format of the
+                content.
+        """
+        self.auto_translations[content_id] = TranslatedContent(
+            content_value, content_format, False
+        )
+
     def remove_translations(self, content_ids: List[str]) -> None:
-        """Remove translations for the given list of content Ids.
+        """Remove the manual and automatic translations for the given list of
+        content Ids.
 
         Args:
             content_ids: list(str). The list of content Ids for removing
@@ -711,6 +892,19 @@ class EntityTranslation:
         for content_id in content_ids:
             if content_id in self.translations:
                 del self.translations[content_id]
+        self.remove_auto_translations(content_ids)
+
+    def remove_auto_translations(self, content_ids: List[str]) -> None:
+        """Removes the automatic translations for the given list of content
+        Ids, e.g. because their source content has changed.
+
+        Args:
+            content_ids: list(str). The list of content Ids for removing
+                automatic translations.
+        """
+        for content_id in content_ids:
+            if content_id in self.auto_translations:
+                del self.auto_translations[content_id]
 
     def mark_translations_needs_update(self, content_ids: List[str]) -> None:
         """Marks translation needs update for the given list of content Ids.

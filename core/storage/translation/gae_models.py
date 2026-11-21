@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, TypedDict
+from typing import Dict, List, Mapping, Optional, Sequence, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -60,8 +60,11 @@ class EntityTranslationsModel(base_models.BaseModel):
     language_code = datastore_services.StringProperty(
         required=True, indexed=True
     )
-    # A dict representing content-id as keys and dict(TranslatedContent)
-    # as values.
+    # A dict representing content-id as keys and nested dicts as values. Each
+    # nested dict contains 'manual' and 'auto' (see feconf.TranslationType) as
+    # keys and dict(TranslatedContent) or None as values. Models written
+    # before automatic translations were introduced map each content-id
+    # directly to its (manual) dict(TranslatedContent) instead.
     translations = datastore_services.JsonProperty(required=True)
 
     @staticmethod
@@ -208,7 +211,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_code: str,
-        translations: Dict[str, feconf.TranslatedContentDict],
+        translations: Mapping[str, feconf.StoredTranslationValueType],
     ) -> EntityTranslationsModel:
         """Creates and returns a new EntityTranslationsModel instance.
 
@@ -217,8 +220,12 @@ class EntityTranslationsModel(base_models.BaseModel):
             entity_id: str. The ID of the entity.
             entity_version: int. The version of the entity.
             language_code: str. The language code for the entity.
-            translations: dict(str, TranslatedContentDict). A dict representing
-                content-id as keys and dict(TranslatedContent) as values.
+            translations: dict(str, StoredTranslationValueType). A dict
+                representing content-id as keys and dicts containing the
+                manual and automatic dict(TranslatedContent) as values. The
+                older format, in which each content-id maps directly to its
+                manual dict(TranslatedContent), is also accepted until all
+                existing models have been migrated.
 
         Returns:
             EntityTranslationsModel. Returns a new EntityTranslationsModel.

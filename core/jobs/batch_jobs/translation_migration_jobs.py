@@ -133,7 +133,7 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
                         entity_translation.entity_id,
                         entity_translation.entity_version,
                         entity_translation.language_code,
-                        entity_translation.to_dict()['translations'],
+                        entity_translation.to_stored_translations_dict(),
                     )
                 )
             translation_model.update_timestamps()

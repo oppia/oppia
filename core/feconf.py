@@ -25,7 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Callable, Dict, Final, List, TypedDict, Union
+from typing import Callable, Dict, Final, List, Optional, TypedDict, Union
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -1814,6 +1814,30 @@ class TranslatedContentDict(TypedDict):
     content_value: ContentValueType
     needs_update: bool
     content_format: str
+
+
+class TranslationType(enum.Enum):
+    """Represents all possible translation types. Manual translations are the
+    ones approved by a human reviewer, and automatic translations are machine
+    generated drafts that are only shown to translators.
+    """
+
+    AUTO = 'auto'
+    MANUAL = 'manual'
+
+
+# The format in which EntityTranslationsModel stores translations. Each content
+# ID maps to a dict keyed by TranslationType values, whose values are the
+# corresponding translations (or None, if there is no such translation).
+StoredTranslationsDict = Dict[str, Dict[str, Optional[TranslatedContentDict]]]
+
+# The type of a value in the translations field of an EntityTranslationsModel.
+# It is either a dict keyed by TranslationType values, or a single (manual)
+# TranslatedContentDict, which is how translations were stored before
+# automatic translations were introduced.
+StoredTranslationValueType = Union[
+    Dict[str, Optional[TranslatedContentDict]], TranslatedContentDict
+]
 
 
 class VoiceoverRegenerationState(enum.Enum):

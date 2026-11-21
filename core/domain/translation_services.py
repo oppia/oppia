@@ -116,7 +116,7 @@ def add_new_translation(
         entity_id,
         entity_version,
         language_code,
-        entity_translation.to_dict()['translations'],
+        entity_translation.to_stored_translations_dict(),
     )
     model.update_timestamps()
     model.put()
@@ -156,6 +156,9 @@ def _apply_changes(
             entity_translation.mark_translations_needs_update(
                 [change.content_id]
             )
+            # The source content has changed, so its automatic translation is
+            # out of date. It is removed so that it can be generated again.
+            entity_translation.remove_auto_translations([change.content_id])
         elif change.cmd == (
             exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE
         ):
@@ -229,7 +232,7 @@ def compute_translation_related_change(
                 entity_translation.entity_id,
                 entity_translation.entity_version + 1,
                 entity_translation.language_code,
-                entity_translation.to_dict()['translations'],
+                entity_translation.to_stored_translations_dict(),
             )
         )
     return new_translation_models, translation_counts
@@ -278,7 +281,7 @@ def compute_translation_related_changes_upon_revert(
                 entity_translation.entity_id,
                 reverted_exploration.version,
                 entity_translation.language_code,
-                entity_translation.to_dict()['translations'],
+                entity_translation.to_stored_translations_dict(),
             )
         )
     return new_translation_models, translation_counts
