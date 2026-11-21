@@ -29,3 +29,6 @@
 .oppia-checkbox-margin {
   margin-right: 6px;
 }
+.oppia-signup-page-container .oppia-signup-license-text a:focus {
+  outline: 2px solid rgb(23, 23, 255);
+}
