@@ -2818,8 +2818,12 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/can_manage_contributors_role/translation'
             )
+            self.assertEqual(response['success'], 1)
 
-        self.assertEqual(response['success'], 1)
+            response = self.get_json(
+                '/can_manage_contributors_role/submit_translation'
+            )
+            self.assertEqual(response['success'], 1)
         self.logout()
 
     def test_translation_admin_cannot_manage_question_role(self) -> None:

@@ -431,7 +431,9 @@ export class TranslationModalComponent {
       })
       .catch(error => {
         this.isGeneratingTranslation = false;
-        this.alertsService.addWarning('Failed to generate translation.');
+        const errorMessage =
+          error?.error?.error || 'Failed to generate translation.';
+        this.alertsService.addWarning(errorMessage);
       });
   }
 

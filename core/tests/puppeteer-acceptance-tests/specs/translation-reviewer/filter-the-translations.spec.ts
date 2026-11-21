@@ -50,7 +50,9 @@ describe('Translation Reviewer', function () {
 
     translationSubmitter = await UserFactory.createNewUser(
       'translatorSubmitter',
-      'translatorSubmitter@example.com'
+      'translatorSubmitter@example.com',
+      [ROLES.TRANSLATION_SUBMITTER],
+      ['hi', 'ak']
     );
     curriculumAdm = await UserFactory.createNewUser(
       'curriculumAdm',

@@ -109,9 +109,27 @@ describe('Translation Coordinator', function () {
       'Fractions'
     );
 
+    // Grant translationSubmitter translation submit rights for Hindi so they
+    // can access the Translate Text tab (gated by
+    // can_submit_translation_for_language_codes).
+    await translationCoordinator.navigateToContributorDashboardAdminPage();
+    await translationCoordinator.switchToTabInContributorAdminPage(
+      'Translation Submitters'
+    );
+    await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await translationCoordinator.addUsernameInUsernameInputModal(
+      'translationSubmitter'
+    );
+    await translationCoordinator.addLanguageInLanguageSelectorModal(
+      'hi',
+      'हिन्दी (Hindi)'
+    );
+    await translationCoordinator.closeLanguageSelectorModal();
+
     // Navigate to contributor dashboard and submit one translation.
     await translationSubmitter.navigateToLearnerDashboard();
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
+
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
