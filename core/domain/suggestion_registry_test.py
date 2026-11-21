@@ -50,10 +50,20 @@ from typing import Dict, Final, List, Optional, TypedDict, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import opportunity_models, suggestion_models
+    from mypy_imports import (
+        opportunity_models,
+        suggestion_models,
+        translation_models,
+    )
 
-suggestion_models, opportunity_models = models.Registry.import_models(
-    [models.Names.SUGGESTION, models.Names.OPPORTUNITY]
+(suggestion_models, opportunity_models, translation_models) = (
+    models.Registry.import_models(
+        [
+            models.Names.SUGGESTION,
+            models.Names.OPPORTUNITY,
+            models.Names.TRANSLATION,
+        ]
+    )
 )
 
 ChangeType = Dict[
@@ -2161,6 +2171,66 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(translations), 1)
         self.assertEqual(translations[0].language_code, 'hi')
         self.assertEqual(len(translations[0].translations), 1)
+
+    def test_accepting_auto_generated_suggestion_saves_manual_translation(
+        self,
+    ) -> None:
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version, 'hi'
+        )
+        entity_translation.add_auto_translation(
+            'content',
+            '<p>Automatic translation</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+        )
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            exp.id,
+            exp.version,
+            'hi',
+            entity_translation.to_stored_translations_dict(),
+        ).put()
+
+        change_cmd = dict(self.suggestion_dict['change_cmd'])
+        change_cmd['was_auto_generated'] = True
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            change_cmd,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.'
+        )
+
+        updated_entity_translation = (
+            translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exp.id,
+                exp.version,
+                'hi',
+            )
+        )
+        self.assertEqual(
+            updated_entity_translation.translations['content'].content_value,
+            change_cmd['translation_html'],
+        )
+        self.assertEqual(
+            updated_entity_translation.auto_translations[
+                'content'
+            ].content_value,
+            '<p>Automatic translation</p>',
+        )
 
     def test_accept_suggestion_saves_to_current_exploration_version(
         self,

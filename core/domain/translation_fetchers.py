@@ -97,14 +97,14 @@ def get_entity_translation_from_model(
         EntityTranslation. An instance of EntityTranslation object, created from
         its model.
     """
-    entity_translation = translation_domain.EntityTranslation.from_dict(
-        {
-            'entity_id': entity_translation_model.entity_id,
-            'entity_type': entity_translation_model.entity_type,
-            'entity_version': entity_translation_model.entity_version,
-            'language_code': entity_translation_model.language_code,
-            'translations': entity_translation_model.translations,
-        }
+    entity_translation = (
+        translation_domain.EntityTranslation.from_stored_translations_dict(
+            entity_translation_model.entity_id,
+            entity_translation_model.entity_type,
+            entity_translation_model.entity_version,
+            entity_translation_model.language_code,
+            entity_translation_model.translations,
+        )
     )
     return entity_translation
 
