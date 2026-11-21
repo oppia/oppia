@@ -544,6 +544,9 @@ def regenerate_voiceover_for_exploration_content(
         content_id: str. The content ID.
         language_accent_code: str. The language accent code for the voiceover.
 
+    Raises:
+        ValueError. If content_id is a rule input content ID.
+
     Returns:
         tuple(Voiceover, list(dict(str, str|float))). A tuple containing the
         voiceover object and a list of dictionaries. The voiceover object
