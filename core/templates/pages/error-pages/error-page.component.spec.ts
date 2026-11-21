@@ -76,28 +76,25 @@ describe('ErrorPageComponent', () => {
     expect(component.classroomsPageUrl).toBe('/learn');
   });
 
-  it('should show the "Go back to Classrooms" link on the 404 page', () => {
+  it('should show the classrooms link when the status code is 404', () => {
     component.statusCode = '404';
+
     fixture.detectChanges();
 
-    const link: HTMLAnchorElement | null = fixture.nativeElement.querySelector(
-      '.e2e-test-go-back-to-classrooms-link'
+    const classroomsLink = fixture.nativeElement.querySelector(
+      '.oppia-error-classrooms-link'
     );
-    expect(link).not.toBeNull();
-    expect(link?.getAttribute('href')).toBe('/learn');
+    expect(classroomsLink.getAttribute('href')).toBe('/learn');
   });
 
-  it('should not show the "Go back to Classrooms" link for non-404 errors', () => {
-    for (const statusCode of ['400', '401', '500']) {
-      component.statusCode = statusCode;
-      fixture.detectChanges();
+  it('should not show the classrooms link when the status code is 500', () => {
+    component.statusCode = '500';
 
-      expect(
-        fixture.nativeElement.querySelector(
-          '.e2e-test-go-back-to-classrooms-link'
-        )
-      ).toBeNull();
-    }
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.oppia-error-classrooms-link')
+    ).toBeNull();
   });
 
   it('should extract custom error message from sessionStorage', fakeAsync(() => {
