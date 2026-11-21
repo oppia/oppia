@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import os
 
-from core import feconf, utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
 from core.domain import (
     change_domain,
@@ -1397,6 +1397,76 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Translation exceeds the allowed character limit. The translation '
             'for the above content must be 36 characters or fewer.',
+        ):
+            suggestion.validate()
+
+    def test_validate_suggestion_with_too_long_topic_name_fails(
+        self,
+    ) -> None:
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        change_cmd = dict(expected_suggestion_dict['change_cmd'])
+        change_cmd['content_id'] = feconf.TOPIC_NAME_CONTENT_ID
+        change_cmd['translation_html'] = 'a' * (
+            android_validation_constants.MAX_CHARS_IN_TOPIC_NAME + 1
+        )
+        expected_suggestion_dict['change_cmd'] = change_cmd
+
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+            target_type=feconf.ENTITY_TYPE_TOPIC,
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Translation exceeds the allowed character limit. The translation '
+            'for the above content must be %s characters or fewer.'
+            % android_validation_constants.MAX_CHARS_IN_TOPIC_NAME,
+        ):
+            suggestion.validate()
+
+    def test_validate_suggestion_with_too_long_topic_description_fails(
+        self,
+    ) -> None:
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        change_cmd = dict(expected_suggestion_dict['change_cmd'])
+        change_cmd['content_id'] = feconf.TOPIC_DESCRIPTION_CONTENT_ID
+        change_cmd['translation_html'] = 'a' * (
+            android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION + 1
+        )
+        expected_suggestion_dict['change_cmd'] = change_cmd
+
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+            target_type=feconf.ENTITY_TYPE_TOPIC,
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Translation exceeds the allowed character limit. The translation '
+            'for the above content must be %s characters or fewer.'
+            % android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION,
         ):
             suggestion.validate()
 
