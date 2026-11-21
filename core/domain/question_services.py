@@ -38,7 +38,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import question_models, skill_models, transaction_services
 
-(question_models, skill_models) = models.Registry.import_models(
+question_models, skill_models = models.Registry.import_models(
     [models.Names.QUESTION, models.Names.SKILL]
 )
 
@@ -633,7 +633,15 @@ def replace_skill_id_for_all_questions(
         curr_skill_id: str. ID of the current skill.
         curr_skill_description: str. Description of the current skill.
         new_skill_id: str. ID of the superseding skill.
+
+    Raises:
+        Exception. The current skill ID and new skill ID are the same.
     """
+    if curr_skill_id == new_skill_id:
+        raise Exception(
+            'Current skill ID and new skill ID should not be the same.'
+        )
+
     old_question_skill_link_models = (
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
             curr_skill_id
@@ -642,34 +650,59 @@ def replace_skill_id_for_all_questions(
     old_question_skill_links = get_question_skill_links_of_skill(
         curr_skill_id, curr_skill_description
     )
-    new_question_skill_link_models = []
-    question_ids = set()
-    for question_skill_link in old_question_skill_links:
-        question_ids.add(question_skill_link.question_id)
-        new_question_skill_link_models.append(
-            question_models.QuestionSkillLinkModel.create(
-                question_skill_link.question_id,
-                new_skill_id,
-                question_skill_link.skill_difficulty,
-            )
-        )
-    question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
-        list(old_question_skill_link_models)
-    )
-    question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
-        new_question_skill_link_models
-    )
 
-    old_questions = question_models.QuestionModel.get_multi(list(question_ids))
+    question_ids = list({link.question_id for link in old_question_skill_links})
+    dest_link_ids = [
+        question_models.QuestionSkillLinkModel.get_model_id(q_id, new_skill_id)
+        for q_id in question_ids
+    ]
+    existing_dest_models = question_models.QuestionSkillLinkModel.get_multi(
+        dest_link_ids
+    )
+    existing_dest_question_ids = {
+        model.question_id for model in existing_dest_models if model is not None
+    }
+
+    new_question_skill_link_models = []
+    for question_skill_link in old_question_skill_links:
+        if question_skill_link.question_id not in existing_dest_question_ids:
+            existing_dest_question_ids.add(question_skill_link.question_id)
+            new_question_skill_link_models.append(
+                question_models.QuestionSkillLinkModel(
+                    id=question_models.QuestionSkillLinkModel.get_model_id(
+                        question_skill_link.question_id, new_skill_id
+                    ),
+                    question_id=question_skill_link.question_id,
+                    skill_id=new_skill_id,
+                    skill_difficulty=question_skill_link.skill_difficulty,
+                )
+            )
+
+    if old_question_skill_link_models:
+        question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
+            list(old_question_skill_link_models)
+        )
+    if new_question_skill_link_models:
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            new_question_skill_link_models
+        )
+
+    old_questions = question_models.QuestionModel.get_multi(question_ids)
     new_questions = []
     for question in old_questions:
         # Ruling out the possibility of None for mypy type checking.
         assert question is not None
         new_question = copy.deepcopy(question)
-        new_question.linked_skill_ids.remove(curr_skill_id)
-        new_question.linked_skill_ids.append(new_skill_id)
+        new_question.linked_skill_ids = [
+            skill_id
+            for skill_id in new_question.linked_skill_ids
+            if skill_id != curr_skill_id
+        ]
+        if new_skill_id not in new_question.linked_skill_ids:
+            new_question.linked_skill_ids.append(new_skill_id)
         new_questions.append(new_question)
-    question_models.QuestionModel.put_multi_questions(new_questions)
+    if new_questions:
+        question_models.QuestionModel.put_multi_questions(new_questions)
 
 
 def get_displayable_question_skill_link_details(
