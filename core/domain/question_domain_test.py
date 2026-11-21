@@ -808,7 +808,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # for state) and StateDict do not contain this older key. So, because of
         # this MyPy throws an `TypedDict "StateDict" has no key` error. Thus to
         # avoid the error, we used ignore here.
-        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-unknown-key]
             'voiceovers_mapping': {
                 'content': {
                     'duration_secs': 0.0,
@@ -827,7 +827,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # for state) and StateDict do not contain this older key. So, because of
         # this MyPy throws an `TypedDict "StateDict" has no key` error. Thus to
         # avoid the error, we used ignore here.
-        self.question_state_dict['content_ids_to_audio_translations'] = (  # type: ignore[typeddict-item]
+        self.question_state_dict['content_ids_to_audio_translations'] = (  # type: ignore[typeddict-unknown-key]
             test_data['voiceovers_mapping']
         )
 
@@ -921,7 +921,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_question_state_dict_conversion_from_v30_to_v31(self) -> None:
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
-        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-unknown-key]
             'voiceovers_mapping': {'content': {'audio_metadata': {}}}
         }
 
@@ -1116,7 +1116,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         ]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
-        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-unknown-key]
             'voiceovers_mapping': {
                 'temp_id': {},
                 'temp_id_2': {},
@@ -1126,7 +1126,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        self.question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
+        self.question_state_dict['written_translations'] = {  # type: ignore[typeddict-unknown-key]
             'translations_mapping': {
                 'temp_id': {},
                 'temp_id_2': {},
@@ -1291,7 +1291,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        self.question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
+        self.question_state_dict['written_translations'] = {  # type: ignore[typeddict-unknown-key]
             'translations_mapping': {
                 'temp_id_1': {'en': {'html': 'html_body_1'}},
                 'temp_id_2': {'en': {'html': 'html_body_2'}},
@@ -1304,7 +1304,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        test_value['state']['next_content_id_index'] = 0  # type: ignore[typeddict-item]
+        test_value['state']['next_content_id_index'] = 0  # type: ignore[typeddict-unknown-key]
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version']
@@ -1388,7 +1388,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
-        test_value['state']['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+        test_value['state']['recorded_voiceovers'] = {  # type: ignore[typeddict-unknown-key]
             'voiceovers_mapping': {}
         }
         test_value['state_schema_version'] = 35
@@ -1423,7 +1423,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
-        test_value['state']['recorded_voiceovers'] = {'voiceovers_mapping': {}}  # type: ignore[typeddict-item]
+        test_value['state']['recorded_voiceovers'] = {'voiceovers_mapping': {}}  # type: ignore[typeddict-unknown-key]
         test_value['state_schema_version'] = 35
 
         with self.swap_to_always_return(
@@ -1646,12 +1646,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question_state_dict['interaction']['customization_args'] = {}
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
-        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-unknown-key]
             'voiceovers_mapping': {}
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        self.question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
+        self.question_state_dict['written_translations'] = {  # type: ignore[typeddict-unknown-key]
             'translations_mapping': {}
         }
 
@@ -1736,7 +1736,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_question_state_dict_conversion_from_v40_to_v41(self) -> None:
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        self.question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
+        self.question_state_dict['written_translations'] = {  # type: ignore[typeddict-unknown-key]
             'translations_mapping': {}
         }
         self.question_state_dict['interaction']['id'] = 'TextInput'
@@ -1766,10 +1766,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         ]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        self.question_state_dict['next_content_id_index'] = 0  # type: ignore[typeddict-item]
+        self.question_state_dict['next_content_id_index'] = 0  # type: ignore[typeddict-unknown-key]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
-        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-unknown-key]
             'voiceovers_mapping': {}
         }
 
@@ -1824,7 +1824,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         ]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        test_value['state']['next_content_id_index'] = 0  # type: ignore[typeddict-item]
+        test_value['state']['next_content_id_index'] = 0  # type: ignore[typeddict-unknown-key]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}  # type: ignore[typeddict-item]
