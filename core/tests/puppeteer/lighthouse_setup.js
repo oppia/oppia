@@ -53,6 +53,8 @@ const SETUP_WATCHDOG_MS = 20 * 60 * 1000;
 // messages into these elements after a data-generation or save action.
 const statusMessageSelector = '.oppia-status-message-container';
 const toastMessageSelector = '.e2e-test-toast-message';
+// The toast the editor shows after a manual save succeeds.
+const saveSuccessMessage = 'Changes saved.';
 
 var explorationEditorUrl = 'Exploration editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
@@ -85,6 +87,12 @@ var endIneractionSelector = '.e2e-test-interaction-tile-EndExploration';
 var saveInteractionButton = '.e2e-test-save-interaction';
 var saveChangesButton = '.e2e-test-save-changes';
 var saveDraftButton = '.e2e-test-save-draft-button';
+var autosaveIndicatorSelector = '.e2e-test-autosave-indicator';
+// The editor reports save failures in modals rather than in a toast, so these
+// selectors let the save wait fail with the modal's text instead of waiting for
+// a toast that will never appear.
+var versionMismatchModalSelector = '.e2e-test-lost-changes-modal';
+var saveErrorModalSelector = '.oppia-error-modal-body';
 var publishExplorationButton = '.e2e-test-publish-exploration';
 var explorationTitleInput = '.e2e-test-exploration-title-input-modal';
 var explorationGoalInput = '.e2e-test-exploration-objective-input-modal';
@@ -184,20 +192,44 @@ const logStep = async function (name, step) {
   console.log(`[lighthouse-setup] ${name} done (${elapsedSeconds}s)`);
 };
 
+// Applies the viewport and default timeouts used by every page the setup
+// drives, so a stuck Puppeteer call fails within the shard's per-action budget
+// instead of hanging until the CI step times out.
+const configurePage = async function (page) {
+  await page.setViewport({
+    width: 1920,
+    height: 1080,
+  });
+  await page.setDefaultTimeout(SETUP_ACTION_TIMEOUT_MS);
+  await page.setDefaultNavigationTimeout(SETUP_NAVIGATION_TIMEOUT_MS);
+};
+
 // Runs a setup step with a time limit, and retries it if it fails.
 //
-// Each attempt gets timeoutMs milliseconds. If the action throws, or takes
-// longer than that, the attempt counts as failed and we try again, up to
-// maxAttempts times.
+// Each attempt gets timeoutMs milliseconds and its own page. If the action
+// throws, or takes longer than that, the attempt counts as failed and we try
+// again, up to maxAttempts times. Running each attempt on a fresh page lets a
+// timed-out attempt be aborted by closing that page, so the abandoned
+// Puppeteer calls cannot keep driving the page that the retry is using. Pages
+// share the browser's cookie jar, so the login performed by earlier steps still
+// applies.
 //
 // Why: Puppeteer functions like page.$$, page.evaluate and page.select have no
 // timeout of their own. If the browser renderer gets stuck, one of them can
 // wait forever and freeze the whole shard for the rest of the CI job. Giving
 // each attempt its own deadline (and retrying) means a brief hiccup either
 // clears on the retry or fails quickly with the step name, instead of hanging.
-const retryStep = async function (name, action, maxAttempts, timeoutMs) {
+const retryStep = async function (
+  browser,
+  name,
+  action,
+  maxAttempts,
+  timeoutMs
+) {
   let lastError = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const attemptPage = await browser.newPage();
+    await configurePage(attemptPage);
     let timeoutId = null;
     const deadlinePromise = new Promise((resolve, reject) => {
       timeoutId = setTimeout(
@@ -206,9 +238,12 @@ const retryStep = async function (name, action, maxAttempts, timeoutMs) {
         timeoutMs
       );
     });
+
+    const attemptPromise = action(attemptPage);
+    attemptPromise.catch(() => undefined);
     try {
       lastError = null;
-      await Promise.race([action(), deadlinePromise]);
+      await Promise.race([attemptPromise, deadlinePromise]);
       return;
     } catch (error) {
       lastError = error;
@@ -220,6 +255,11 @@ const retryStep = async function (name, action, maxAttempts, timeoutMs) {
       console.log(error);
     } finally {
       clearTimeout(timeoutId);
+      // Closing the page stops any Puppeteer call from this attempt that is
+      // still running, so it cannot interfere with the next attempt. The page
+      // might already be gone if the browser crashed, so ignore errors from
+      // closing it.
+      await attemptPage.close().catch(() => undefined);
     }
   }
   throw lastError;
@@ -256,6 +296,74 @@ const waitForStatusMessage = async function (
     `Timed out after ${timeoutMs}ms waiting for status message ` +
       `"${expectedText}". Last observed text in ${selector}: ` +
       `"${observedText}".`
+  );
+};
+
+// Waits until the editor is not autosaving.
+//
+// The editor autosaves the draft shortly after every edit, and a manual save
+// discards that draft. If an autosave lands after the manual save, it recreates
+// the draft against the pre-save version, and the backend reports a version
+// mismatch instead of saving. Waiting for the autosave indicator to disappear
+// keeps the two saves from overlapping.
+const waitForAutosaveToFinish = async function (page) {
+  await page.waitForFunction(
+    selector => document.querySelector(selector) === null,
+    {timeout: SETUP_ACTION_TIMEOUT_MS},
+    autosaveIndicatorSelector
+  );
+};
+
+// Returns a description of the modal that blocked a save, or an empty string
+// when no such modal is on the page.
+const getSaveFailureDescription = async function (page) {
+  return page.evaluate(
+    selectors => {
+      const modals = [
+        ['version mismatch', selectors.versionMismatch],
+        ['error', selectors.error],
+      ];
+      for (const [name, selector] of modals) {
+        const element = document.querySelector(selector);
+        if (element) {
+          const modal = element.closest('ngb-modal-window') || element;
+          const text = modal.textContent.replace(/\s+/g, ' ').trim();
+          return `${name} modal: "${text}"`;
+        }
+      }
+      return '';
+    },
+    {
+      versionMismatch: versionMismatchModalSelector,
+      error: saveErrorModalSelector,
+    }
+  );
+};
+
+// Waits for the toast that confirms a manual save, failing as soon as a save
+// error or version-mismatch modal appears so the shard reports the modal text
+// instead of a bare timeout.
+const waitForExplorationSaveResult = async function (page) {
+  const deadline = Date.now() + SETUP_STATUS_MESSAGE_TIMEOUT_MS;
+  let observedToastText = '';
+  while (Date.now() < deadline) {
+    observedToastText = await page.evaluate(sel => {
+      const element = document.querySelector(sel);
+      return element ? element.textContent.trim() : '';
+    }, toastMessageSelector);
+    if (observedToastText === saveSuccessMessage) {
+      return;
+    }
+    const failureDescription = await getSaveFailureDescription(page);
+    if (failureDescription) {
+      throw new Error(`Exploration save failed with a ${failureDescription}`);
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  throw new Error(
+    `Timed out after ${SETUP_STATUS_MESSAGE_TIMEOUT_MS}ms waiting for the ` +
+      `'${saveSuccessMessage}' toast. Last observed toast text: ` +
+      `"${observedToastText}".`
   );
 };
 
@@ -483,17 +591,15 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.waitForTimeout(2000);
 
     await page.waitForSelector(saveChangesButton, {visible: true});
+    // Let any pending autosave finish before saving manually, so the autosave
+    // cannot recreate the draft after the manual save discards it.
+    await waitForAutosaveToFinish(page);
     await page.click(saveChangesButton);
 
     await page.waitForSelector(saveDraftButton, {visible: true});
     await page.click(saveDraftButton);
 
-    await waitForStatusMessage(
-      page,
-      toastMessageSelector,
-      'Changes saved.',
-      SETUP_STATUS_MESSAGE_TIMEOUT_MS
-    );
+    await waitForExplorationSaveResult(page);
 
     await page.waitForTimeout(3000);
     await page.waitForSelector(publishExplorationButton);
@@ -1020,7 +1126,7 @@ const enableFeatureFlagForAllUsers = async function (
   // double-accept one, which Puppeteer rejects with "Cannot accept dialog
   // which is already handled!".
   const acceptDialog = async dialog => {
-    await dialog.accept();
+    await dialog.accept().catch(() => undefined);
   };
   page.on('dialog', acceptDialog);
   try {
@@ -1393,24 +1499,20 @@ const shard2Setup = async function (browser, page) {
 const shard3Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 3 audits the classroom-admin (curriculum admin) and voiceover-admin
-  // (voiceover admin) role-gated pages, so these roles are assigned. Enabling
-  // the new_lesson_player feature flag below also requires the release
-  // coordinator role. Its other pages (classrooms, classroom, creator-dashboard,
-  // exploration-editor, exploration-player, exploration-player-embed,
-  // community-library, pending-account-deletion) are public or login-only, so no
-  // topic/story/skill generation is needed here.
+  // (voiceover admin) role-gated pages, so these roles are assigned. The
+  // release coordinator role is still assigned because the per-URL feature flag
+  // toggles in puppeteer-login-script.js need it. Its other pages (classrooms,
+  // classroom, creator-dashboard, exploration-editor, exploration-player,
+  // exploration-player-embed, community-library, pending-account-deletion) are
+  // public or login-only, so no topic/story/skill generation is needed here.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN', 'RELEASE_COORDINATOR'])
   );
 
-  await logStep('enabling new lesson player feature flag', () =>
-    retryStep(
-      'enabling the new_lesson_player feature flag',
-      () => enableFeatureFlagForAllUsers(browser, page, 'new_lesson_player'),
-      2,
-      150000
-    )
-  );
+  // The new_lesson_player flag is toggled per audited URL in
+  // puppeteer-login-script.js, so that the legacy exploration player pages
+  // (which need it disabled) and the new lesson player pages (which need it
+  // enabled) can both be audited in this shard.
   // The exploration editor setup creates the exploration that backs the
   // exploration-editor, exploration-player and exploration-player-embed pages.
   await logStep('exploration editor setup', () =>
@@ -1445,20 +1547,16 @@ const shard4Setup = async function (browser, page) {
   // Shard 4 audits the topics-and-skills-dashboard (curriculum admin), the
   // topic/story/skill editors, the diagnostic test player page, and the
   // practice, node-practice, mastery-challenge and end-of-arc-test pages.
-  // Enabling the story_editor_arcs feature flag below requires the release
-  // coordinator role.
+  // The release coordinator role is still assigned because the per-URL feature
+  // flag toggles in puppeteer-login-script.js need it.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
   );
 
-  await logStep('enabling story editor arcs feature flag', () =>
-    retryStep(
-      'enabling the story_editor_arcs feature flag',
-      () => enableFeatureFlagForAllUsers(browser, page, 'story_editor_arcs'),
-      2,
-      150000
-    )
-  );
+  // The story_editor_arcs flag is toggled per audited URL in
+  // puppeteer-login-script.js, so that the legacy practice page (which needs
+  // it disabled) and the node-practice, mastery-challenge and end-of-arc-test
+  // pages (which need it enabled) can all be audited in this shard.
   // The structures step seeds the staging topic (dummy-topic-one), its story
   // and subtopic. The staging topic backs the topic/story/practice/subtopic
   // pages, and its story nodes back the node-practice page.
@@ -1502,11 +1600,12 @@ const shard5Setup = async function (browser, page) {
 
   await logStep('enabling learner groups feature flag', () =>
     retryStep(
+      browser,
       'enabling the learner_groups_are_enabled feature flag',
-      () =>
+      attemptPage =>
         enableFeatureFlagForAllUsers(
           browser,
-          page,
+          attemptPage,
           'learner_groups_are_enabled'
         ),
       2,
@@ -1516,11 +1615,12 @@ const shard5Setup = async function (browser, page) {
 
   await logStep('enabling technical feedback feature flag', () =>
     retryStep(
+      browser,
       'enabling the technical_feedback_dashboard_enabled feature flag',
-      () =>
+      attemptPage =>
         enableFeatureFlagForAllUsers(
           browser,
-          page,
+          attemptPage,
           'technical_feedback_dashboard_enabled'
         ),
       2,
@@ -1580,14 +1680,7 @@ const main = async function () {
     args: [],
   });
   const page = await browser.newPage();
-  await page.setViewport({
-    width: 1920,
-    height: 1080,
-  });
-  // Bound every wait and navigation that does not pass its own timeout so a
-  // single stuck step cannot stall the shard indefinitely.
-  await page.setDefaultTimeout(SETUP_ACTION_TIMEOUT_MS);
-  await page.setDefaultNavigationTimeout(SETUP_NAVIGATION_TIMEOUT_MS);
+  await configurePage(page);
   // Last-resort ceiling for the whole setup; see SETUP_WATCHDOG_MS.
   const watchdogId = setTimeout(() => {
     console.error(

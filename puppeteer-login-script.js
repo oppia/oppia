@@ -60,11 +60,32 @@ const ERROR_PAGE_SELECTOR = '.oppia-error-page-main-content';
 // The /error routes are themselves error pages, so the absence check below is
 // skipped for them.
 const ERROR_ROUTE_PREFIX = '/error';
-// The single path whose landing URL is verified after the navigation below.
-// The signup page is only served to an account that has not completed
-// registration, so a registered account would be redirected away from it and
-// the audit would silently score the wrong page.
+
+// The host element rendered by the iframed error page
+// (<oppia-error-iframed-page-root>). An embedded lesson that failed to load
+// renders this element instead of the generic error page, so it has to be
+// checked separately. The intentional /error/iframed audit is an error route and
+// is therefore skipped by the call site below.
+const IFRAMED_ERROR_PAGE_SELECTOR = 'oppia-error-iframed-page-root';
+// The selector for a route component rendered by the Angular router. Every
+// audited page mounts its route component as a sibling of <router-outlet>, so
+// finding one means the router has activated a route.
+const RENDERED_ROUTE_SELECTOR = 'oppia-root > :not(router-outlet)';
+// The signup route, and the only path whose landing URL is verified after the
+// navigation below. The signup page is only served to an account that has not
+// completed registration, so a registered account would be redirected away
+// from it and the audit would silently score the wrong page. Other audited
+// routes either render the error page when they cannot be served (which
+// assertErrorPageIsAbsent rejects) or redirect intentionally (for example
+// /learn forwards to the only published classroom), so they are not checked
+// here.
 const SIGNUP_PATH = '/signup';
+
+// Feature flags whose value has to differ between pages audited in the same
+// shard. The release coordinator role (assigned in the shard setup) is what
+// authorises the per-URL toggle below.
+const NEW_LESSON_PLAYER_FLAG = 'new_lesson_player';
+const STORY_EDITOR_ARCS_FLAG = 'story_editor_arcs';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -105,6 +126,102 @@ const getAuditUsernameForUrl = function (url) {
   return pathname.startsWith('/learner-group/') ? 'username2' : 'username1';
 };
 
+/**
+ * Returns the CSRF token for the logged-in session, stripping the five-byte
+ * XSSI prefix that the backend adds to every JSON response.
+ *
+ * @param {puppeteer.Page} page - The page to issue the request from.
+ * @returns {Promise<string>} - The CSRF token.
+ */
+const getCsrfToken = async function (page) {
+  return page.evaluate(async () => {
+    const response = await fetch('/csrfhandler', {credentials: 'same-origin'});
+    const responseText = await response.text();
+    return JSON.parse(responseText.substring(5)).token;
+  });
+};
+
+/**
+ * Sets a feature flag's force-enable-for-all-users value through the release
+ * coordinator handler, which is the same endpoint the release coordinator page
+ * uses. The value is persisted to the shared datastore that the audit server
+ * reads.
+ *
+ * @param {puppeteer.Page} page - The page to issue the request from.
+ * @param {string} flagName - The feature flag name.
+ * @param {boolean} enabled - Whether the flag should be force-enabled.
+ */
+const setFeatureFlag = async function (page, flagName, enabled) {
+  const csrfToken = await getCsrfToken(page);
+  const succeeded = await page.evaluate(
+    async (csrfToken, flagName, enabled) => {
+      const response = await fetch('/feature_flags', {
+        method: 'PUT',
+        credentials: 'same-origin',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({
+          csrf_token: csrfToken,
+          payload: JSON.stringify({
+            action: 'update_feature_flag',
+            feature_flag_name: flagName,
+            force_enable_for_all_users: enabled,
+            rollout_percentage: 0,
+            user_group_ids: [],
+          }),
+        }).toString(),
+      });
+      if (!response.ok) {
+        return false;
+      }
+      const body = await response.text();
+      try {
+        const parsed = JSON.parse(body.substring(5));
+        return !parsed.error;
+      } catch (error) {
+        return response.ok;
+      }
+    },
+    csrfToken,
+    flagName,
+    enabled
+  );
+  if (!succeeded) {
+    throw new Error(`Failed to set feature flag ${flagName} to ${enabled}.`);
+  }
+};
+
+/**
+ * Returns the feature flag values that the given audited URL requires, or an
+ * empty object when the URL does not care about either flag. Deriving the
+ * requirement from the URL (rather than from the page's position in its shard)
+ * keeps the toggle correct even if the shard ordering changes.
+ *
+ * @param {string} url - The audited URL.
+ * @returns {Object} - A map from flag name to the required boolean value.
+ */
+const getRequiredFeatureFlagStates = function (url) {
+  const pathname = new URL(url).pathname;
+  const states = {};
+  if (pathname.startsWith('/lesson') || pathname.startsWith('/embed/lesson')) {
+    states[NEW_LESSON_PLAYER_FLAG] = true;
+  } else if (
+    pathname.startsWith('/explore') ||
+    pathname.startsWith('/embed/exploration')
+  ) {
+    states[NEW_LESSON_PLAYER_FLAG] = false;
+  }
+  if (pathname.endsWith('/practice/session')) {
+    states[STORY_EDITOR_ARCS_FLAG] = false;
+  } else if (
+    /\/practice\/[^/]+$/.test(pathname) ||
+    pathname.endsWith('/mastery-challenge') ||
+    pathname.indexOf('/test/arc/') !== -1
+  ) {
+    states[STORY_EDITOR_ARCS_FLAG] = true;
+  }
+  return states;
+};
+
 module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(LOGIN_NAVIGATION_TIMEOUT_MS);
@@ -140,12 +257,23 @@ module.exports = async (browser, context) => {
       await setRole(page, 'BLOG_ADMIN');
     }
   }
+  if (process.env.LIGHTHOUSE_SKIP_LOGIN !== '1') {
+    const requiredFlagStates = getRequiredFeatureFlagStates(context.url);
+    // The flag value is set unconditionally (rather than only when it differs
+    // from an in-memory value), because the login script may run in a fresh
+    // process per audited URL while the flag's value persists in the datastore.
+    // Skipping the PUT when an in-memory value happened to match left the
+    // datastore in whatever state a previous page/process had set.
+    for (const flagName of Object.keys(requiredFlagStates)) {
+      await setFeatureFlag(page, flagName, requiredFlagStates[flagName]);
+    }
+  }
   await seedBlankPagesForLighthouseRuns(browser, page, context);
   if (!isErrorRoute(context.url)) {
     await assertErrorPageIsAbsent(page, context.url);
   }
   if (new URL(context.url).pathname === SIGNUP_PATH) {
-    assertLandedOnRequestedPath(page, context.url);
+    assertSignupPageLoaded(page, context.url);
   }
   await page.close();
 };
@@ -162,6 +290,39 @@ const isErrorRoute = function (url) {
   return (
     pathname === ERROR_ROUTE_PREFIX ||
     pathname.startsWith(ERROR_ROUTE_PREFIX + '/')
+  );
+};
+
+// Puppeteer reports both navigation and wait timeouts as a TimeoutError.
+// Other navigation failures (DNS, connection refused, an aborted navigation)
+// mean the page was never reached, so they must fail the audit instead of
+// being treated as a slow page.
+const isTimeoutError = function (error) {
+  return error instanceof Error && error.name === 'TimeoutError';
+};
+
+/**
+ * Waits until the audited page has either rendered the error page or finished
+ * loading an Angular route.
+ *
+ * A navigation can resolve (or time out) before the router has activated the
+ * route, especially when a guard has to make a backend request first.
+ * Inspecting the DOM at that point would miss an error page that is about to
+ * render. Waiting for one of these states means the checks that follow run
+ * against the page the audit will actually score.
+ *
+ * @param {puppeteer.Page} page - The page to wait on.
+ */
+const waitForReadyOrErrorState = async function (page) {
+  await page.waitForFunction(
+    (errorSelector, iframedErrorSelector, routeSelector) =>
+      document.querySelector(errorSelector) !== null ||
+      document.querySelector(iframedErrorSelector) !== null ||
+      document.querySelector(routeSelector) !== null,
+    {timeout: LOGIN_WAIT_TIMEOUT_MS, polling: 100},
+    ERROR_PAGE_SELECTOR,
+    IFRAMED_ERROR_PAGE_SELECTOR,
+    RENDERED_ROUTE_SELECTOR
   );
 };
 
@@ -184,12 +345,30 @@ const assertErrorPageIsAbsent = async function (page, url) {
     // the page has rendered. networkidle2 tolerates those requests.
     await page.goto(url, {waitUntil: 'networkidle2'});
   } catch (error) {
-    // The page was reached but never went network-idle, usually because of a
-    // slow or long-lived request. Inspect whatever it rendered instead of
-    // failing here; a page that actually rendered the error page is still
-    // caught by the check below.
+    // Only a navigation timeout means the page was reached but never went
+    // network-idle (usually because of a slow or long-lived request). Any
+    // other failure means the page was not reached at all, so it must fail
+    // the audit instead of being inspected.
+    if (!isTimeoutError(error)) {
+      throw error;
+    }
     // eslint-disable-next-line no-console
     console.log(error);
+  }
+  try {
+    // The navigation can finish before the Angular router has activated the
+    // route, especially when a guard waits on a backend request. Wait for the
+    // route (or the error page) to render so the checks below inspect the
+    // page the audit will actually score.
+    await waitForReadyOrErrorState(page);
+  } catch (error) {
+    if (!isTimeoutError(error)) {
+      throw error;
+    }
+    throw new Error(
+      `Lighthouse cannot audit ${url}: the page neither rendered a route nor ` +
+        'the Oppia error page before the check timed out.'
+    );
   }
   const errorPageIsPresent = await page.evaluate(
     selector => document.querySelector(selector) !== null,
@@ -202,21 +381,37 @@ const assertErrorPageIsAbsent = async function (page, url) {
         'page instead of its content.'
     );
   }
+  const iframedErrorPageIsPresent = await page.evaluate(
+    selector => document.querySelector(selector) !== null,
+    IFRAMED_ERROR_PAGE_SELECTOR
+  );
+  if (iframedErrorPageIsPresent) {
+    throw new Error(
+      `Lighthouse cannot audit ${url}: the ` +
+        `${IFRAMED_ERROR_PAGE_SELECTOR} element is present in the DOM, which ` +
+        'means the embedded lesson rendered the Oppia iframe error page ' +
+        'instead of its content.'
+    );
+  }
 };
 
 /**
- * Asserts that the loaded page is still at the path of the audited URL.
+ * Asserts that the /signup audit actually landed on /signup.
  *
- * The error-page check above only rejects a URL that rendered the error page,
- * so a URL that silently redirected elsewhere would still be scored, and would
- * be recorded under the page it landed on because LHCI reports lhr.finalUrl.
- * That is exactly how the signup audit disappeared: a registered account makes
- * /signup redirect to the homepage, which then forwards to a dashboard.
+ * This is deliberately signup-specific. The error-page check above only
+ * rejects a URL that rendered the error page, so a URL that silently
+ * redirected elsewhere would still be scored, and would be recorded under the
+ * page it landed on because LHCI reports lhr.finalUrl. That is exactly how the
+ * signup audit disappeared: a registered account makes /signup redirect to the
+ * homepage, which then forwards to a dashboard. The check is not applied to
+ * every audited URL because some routes redirect on purpose (for example
+ * /learn forwards to the only published classroom), while routes that redirect
+ * to an error page are already caught by assertErrorPageIsAbsent.
  *
  * @param {puppeteer.Page} page - The page to inspect.
- * @param {string} url - The audited URL whose path must be the loaded one.
+ * @param {string} url - The audited /signup URL.
  */
-const assertLandedOnRequestedPath = function (page, url) {
+const assertSignupPageLoaded = function (page, url) {
   const requestedPath = new URL(url).pathname;
   const loadedPath = new URL(page.url()).pathname;
   if (loadedPath !== requestedPath) {
