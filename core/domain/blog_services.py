@@ -920,6 +920,13 @@ def update_blog_models_author_and_published_on_date(
     blog_post = get_blog_post_by_id(blog_post_id, strict=True)
     blog_post_rights = get_blog_post_rights(blog_post_id, strict=True)
 
+    # This admin operation corrects metadata on already-published posts.
+    # Reject drafts before changing any of their persisted models.
+    if not blog_post_rights.blog_post_is_published:
+        raise utils.ValidationError(
+            'Cannot change the author or publication date of a draft blog post.'
+        )
+
     blog_post.author_id = author_id
     supported_date_string = date + ', 00:00:00:00'
     blog_post.published_on = utils.convert_string_to_naive_datetime_object(
@@ -936,7 +943,8 @@ def update_blog_models_author_and_published_on_date(
     blog_post_model.update_timestamps()
     blog_post_model.put()
 
-    blog_post_rights.editor_ids.append(blog_post.author_id)
+    if blog_post.author_id not in blog_post_rights.editor_ids:
+        blog_post_rights.editor_ids.append(blog_post.author_id)
     save_blog_post_rights(blog_post_rights)
 
 
