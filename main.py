@@ -25,6 +25,7 @@ from core.controllers import (
     acl_decorators,
     admin,
     android,
+    android_feature_flag,
     base,
     beam_jobs,
     blog_admin,
@@ -1428,7 +1429,8 @@ URLS = [
         android.AndroidPlatformParametersHandler,
     ),
     get_redirect_route(
-        r'/android_feature_flags', android.AndroidFeatureFlagsHandler
+        r'/android_feature_flags',
+        android_feature_flag.AndroidFeatureFlagsHandler,
     ),
     get_redirect_route('/android_data', android.AndroidActivityHandler),
     get_redirect_route(
