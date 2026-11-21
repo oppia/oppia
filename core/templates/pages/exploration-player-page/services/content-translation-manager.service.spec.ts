@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the content translation manager service.
  */
 
-// @ts-nocheck
-
 import {
   discardPeriodicTasks,
   fakeAsync,
@@ -47,7 +45,11 @@ import {PlayerPositionService} from '../services/player-position.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
 import {AudioPreloaderService} from '../services/audio-preloader.service';
-import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {
+  VoiceoverAdminDataResponse,
+  VoiceoverBackendApiService,
+} from 'domain/voiceover/voiceover-backend-api.service';
+import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {Exploration} from 'domain/exploration/exploration.model';
@@ -159,9 +161,16 @@ describe('Content translation manager service', () => {
       'en-US',
     ]);
     spyOn(entityVoiceoversService, 'getActiveEntityVoiceovers').and.returnValue(
-      {
-        automatedVoiceoversAudioOffsetsMsecs: {content: 100},
-      }
+      EntityVoiceovers.createFromBackendDict({
+        entity_id: 'exp_1',
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_accent_code: 'en-US',
+        voiceovers_mapping: {},
+        automated_voiceovers_audio_offsets_msecs: {
+          content: [{token: 'Hello', audio_offset_msecs: 100}],
+        },
+      })
     );
     spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
     spyOn(
@@ -400,7 +409,9 @@ describe('Content translation manager service', () => {
     ).toHaveBeenCalledWith('fr', ['en-US']);
     expect(
       automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets
-    ).toHaveBeenCalledWith({content: 100});
+    ).toHaveBeenCalledWith({
+      content: [{token: 'Hello', audioOffsetMsecs: 100}],
+    });
     expect(
       automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges
     ).toHaveBeenCalled();
@@ -429,9 +440,10 @@ describe('Content translation manager service', () => {
       {value: 'en', displayed: 'English'},
       {value: 'fr', displayed: 'French'},
     ];
-    const voiceoverResponse = {
-      languageAccentMasterList: {en: ['en-US']},
-      languageCodesMapping: {en: 'English'},
+    const voiceoverResponse: VoiceoverAdminDataResponse = {
+      languageAccentMasterList: {en: {'en-US': 'English (United States)'}},
+      languageCodesMapping: {en: {'en-US': true}},
+      autoGeneratableLanguageAccentCodes: [],
     };
 
     spyOn(
@@ -462,10 +474,10 @@ describe('Content translation manager service', () => {
       contentTranslationLanguageService.setCurrentContentLanguageCode
     ).toHaveBeenCalledWith('fr');
     expect(voiceoverPlayerService.languageAccentMasterList).toEqual({
-      en: ['en-US'],
+      en: {'en-US': 'English (United States)'},
     });
     expect(voiceoverPlayerService.languageCodesMapping).toEqual({
-      en: 'English',
+      en: {'en-US': true},
     });
     expect(
       voiceoverPlayerService.setLanguageAccentCodesDescriptions

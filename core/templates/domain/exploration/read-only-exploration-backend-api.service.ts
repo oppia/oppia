@@ -48,7 +48,7 @@ export interface FetchExplorationBackendResponse {
   is_logged_in: boolean;
   session_id: string;
   version: number;
-  preferred_audio_language_code: string;
+  preferred_audio_language_code: string | null;
   preferred_language_codes: string[];
   auto_tts_enabled: boolean;
   record_playthrough_probability: number;
