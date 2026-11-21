@@ -48,6 +48,7 @@
   flex-direction: row;
   gap: 16px;
   padding: 48px 16px 52px;
+  position: relative;
 }
 
 
@@ -406,8 +407,17 @@
 
 .donate-learners-text {
   color: #333;
+  display: grid;
   flex-grow: 1;
   font-size: 14px;
+}
+
+.donate-learners-quote {
+  grid-area: 1 / 1;
+}
+
+.donate-learners-quote-hidden {
+  visibility: hidden;
 }
 
 .donate-learners-tile {
@@ -440,4 +450,29 @@
 
 .donate-today-content > p:nth-child(3) {
   margin-bottom: 16px;
+}
+
+.donate-learner-carousel-indicators {
+  bottom: 14px;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.donate-learner-carousel-indicator {
+  background-clip: content-box;
+  background-color: #808080;
+  border: 0;
+  border-radius: 50%;
+  box-sizing: content-box;
+  cursor: pointer;
+  height: 12px;
+  padding: 6px;
+  width: 12px;
+}
+
+.donate-learner-carousel-indicator.active {
+  background-color: #005240;
 }
