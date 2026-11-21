@@ -26,7 +26,7 @@ from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Set, Union, cast
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -469,6 +469,15 @@ class TestVersionedModel(base_models.VersionedModel):
     description = datastore_services.StringProperty(indexed=True)
 
 
+class TestVersionedModelWithoutCommitLog(base_models.VersionedModel):
+    """Model that inherits the VersionedModel for testing, without an
+    associated commit log entry class.
+    """
+
+    SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
+
+
 class TestBaseFeedbackModel(base_models.BaseFeedbackModel):
     """Model that inherits BaseFeedbackModel for testing."""
 
@@ -819,6 +828,31 @@ class VersionedModelTests(test_utils.GenericTestBase):
                 TestSnapshotMetadataModel.get_by_id(model_snapshot_id)
             )
 
+    def test_force_deletion_of_model_without_commit_log_class(self) -> None:
+        model_id = 'model_id'
+        model = TestVersionedModelWithoutCommitLog(id=model_id)
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model_snapshot_ids = [
+            model.get_snapshot_id(model.id, version_number)
+            for version_number in range(1, model.version + 1)
+        ]
+
+        model.delete(
+            feconf.SYSTEM_COMMITTER_ID, 'commit_msg', force_deletion=True
+        )
+
+        self.assertIsNone(
+            TestVersionedModelWithoutCommitLog.get_by_id(model_id)
+        )
+        for model_snapshot_id in model_snapshot_ids:
+            self.assertIsNone(
+                TestSnapshotContentModel.get_by_id(model_snapshot_id)
+            )
+            self.assertIsNone(
+                TestSnapshotMetadataModel.get_by_id(model_snapshot_id)
+            )
+
     def test_delete_multi(self) -> None:
         model_1_id = 'model_1_id'
         model_1 = TestVersionedModel(id=model_1_id)
@@ -900,6 +934,26 @@ class VersionedModelTests(test_utils.GenericTestBase):
             'model_id1',
         ):
             model1.get_snapshots_metadata('model_id1', [10])
+
+    def test_get_snapshots_metadata_of_deleted_model_when_allowed(
+        self,
+    ) -> None:
+        model1 = TestVersionedModel(id='model_id1')
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete_msg')
+
+        snapshots_metadata = TestVersionedModel.get_snapshots_metadata(
+            'model_id1', [1, 2], allow_deleted=True
+        )
+
+        self.assertEqual(
+            [metadata['version_number'] for metadata in snapshots_metadata],
+            [1, 2],
+        )
+        self.assertEqual(snapshots_metadata[1]['commit_message'], 'delete_msg')
+        self.assertEqual(
+            snapshots_metadata[1]['commit_type'], feconf.COMMIT_TYPE_DELETE
+        )
 
     def test_get_version(self) -> None:
         model1 = TestVersionedModel(id='model_id1')
@@ -1262,6 +1316,34 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
         feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
             page_size=2
         )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_2', 'feedback_1'],
+        )
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
+    def test_fetch_page_skips_extra_fetch_when_datastore_reports_no_more(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+
+        # The local datastore emulator reports more results whenever a page is
+        # full, so a full page that is already known to be the last one is
+        # simulated here.
+        def mock_fetch_page(
+            query: datastore_services.Query,
+            page_size: int,
+            **unused_kwargs: Optional[datastore_services.Cursor],
+        ) -> Tuple[Sequence[TestBaseFeedbackModel], None, bool]:
+            return query.fetch(page_size), None, False
+
+        with self.swap(datastore_services.Query, 'fetch_page', mock_fetch_page):
+            feedback_models, next_cursor, more = (
+                TestBaseFeedbackModel.fetch_page(page_size=2)
+            )
 
         self.assertEqual(
             [feedback_model.id for feedback_model in feedback_models],
