@@ -43,6 +43,7 @@ export interface TranslatableItem {
   contentType?: string;
   interactionId?: string | null;
   ruleType?: string | null;
+  translationStatus?: string;
 }
 
 export type Status = 'pending' | 'submitted';
@@ -57,7 +58,8 @@ export class StateAndContent {
     public dataFormat: string,
     public contentType: string,
     public interactionId?: string | null,
-    public ruleType?: string | null
+    public ruleType?: string | null,
+    public translationStatus?: string
   ) {}
 }
 
@@ -181,11 +183,13 @@ export class TranslateTextService {
       contentType,
       interactionId,
       ruleType,
+      translationStatus,
     }: {
       dataFormat?: string;
       contentType?: string;
       interactionId?: string | null;
       ruleType?: string | null;
+      translationStatus?: string;
     } = this.stateAndContent[this.activeIndex] || {};
     return {
       text: text,
@@ -196,6 +200,7 @@ export class TranslateTextService {
       contentType: contentType,
       interactionId: interactionId,
       ruleType: ruleType,
+      translationStatus: translationStatus,
     };
   }
 
@@ -245,7 +250,8 @@ export class TranslateTextService {
                 translatableItem.dataFormat,
                 translatableItem.contentType,
                 translatableItem.interactionId,
-                translatableItem.ruleType
+                translatableItem.ruleType,
+                translatableItem.status
               )
             );
             stateHasText = true;

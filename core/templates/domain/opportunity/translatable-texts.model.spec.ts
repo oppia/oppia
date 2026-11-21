@@ -31,6 +31,7 @@ describe('Translatable Texts model', () => {
       content_type: 'content',
       interaction_id: null,
       rule_type: null,
+      status: 'new',
     };
   };
 
@@ -54,11 +55,11 @@ describe('Translatable Texts model', () => {
   it('should get state name to content id mapping', () => {
     const expectedStatewiseContents = {
       state1: {
-        1: new TranslatableItem('text1', 'html', 'content', null, null),
-        2: new TranslatableItem('text2', 'html', 'content', null, null),
+        1: new TranslatableItem('text1', 'html', 'content', null, null, 'new'),
+        2: new TranslatableItem('text2', 'html', 'content', null, null, 'new'),
       },
       state2: {
-        1: new TranslatableItem('text3', 'html', 'content', null, null),
+        1: new TranslatableItem('text3', 'html', 'content', null, null, 'new'),
       },
     };
     expect(sampleTranslatableTexts.stateWiseContents).toEqual(
@@ -78,18 +79,21 @@ describe('Translatable Texts model', () => {
           content_type: 'content',
           content_format: 'html',
           content_value: 'text1',
+          status: 'new',
         },
         {
           content_id: '2',
           content_type: 'content',
           content_format: 'html',
           content_value: 'text2',
+          status: 'new',
         },
         {
           content_id: '3',
           content_type: 'content',
           content_format: 'html',
           content_value: 'text3',
+          status: 'new',
         },
       ],
       version: '2',
@@ -100,9 +104,9 @@ describe('Translatable Texts model', () => {
 
     const expectedStatewiseContents = {
       'Generic Content': {
-        1: new TranslatableItem('text1', 'html', 'content', null, null),
-        2: new TranslatableItem('text2', 'html', 'content', null, null),
-        3: new TranslatableItem('text3', 'html', 'content', null, null),
+        1: new TranslatableItem('text1', 'html', 'content', null, null, 'new'),
+        2: new TranslatableItem('text2', 'html', 'content', null, null, 'new'),
+        3: new TranslatableItem('text3', 'html', 'content', null, null, 'new'),
       },
     };
 
@@ -121,6 +125,7 @@ describe('Translatable Texts model', () => {
           content_format: 'html',
           content_value: 'text1',
           grouping_key: 'state1',
+          status: 'new',
         },
         {
           content_id: '2',
@@ -128,6 +133,7 @@ describe('Translatable Texts model', () => {
           content_format: 'html',
           content_value: 'text2',
           grouping_key: 'state1',
+          status: 'new',
         },
         {
           content_id: '3',
@@ -135,12 +141,14 @@ describe('Translatable Texts model', () => {
           content_format: 'html',
           content_value: 'text3',
           grouping_key: 'state2',
+          status: 'new',
         },
         {
           content_id: '4',
           content_type: 'content',
           content_format: 'html',
           content_value: 'text4',
+          status: 'new',
         },
       ],
       version: '2',
@@ -151,14 +159,14 @@ describe('Translatable Texts model', () => {
 
     const expectedStatewiseContents = {
       state1: {
-        1: new TranslatableItem('text1', 'html', 'content', null, null),
-        2: new TranslatableItem('text2', 'html', 'content', null, null),
+        1: new TranslatableItem('text1', 'html', 'content', null, null, 'new'),
+        2: new TranslatableItem('text2', 'html', 'content', null, null, 'new'),
       },
       state2: {
-        3: new TranslatableItem('text3', 'html', 'content', null, null),
+        3: new TranslatableItem('text3', 'html', 'content', null, null, 'new'),
       },
       'Generic Content': {
-        4: new TranslatableItem('text4', 'html', 'content', null, null),
+        4: new TranslatableItem('text4', 'html', 'content', null, null, 'new'),
       },
     };
 
