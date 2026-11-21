@@ -23,6 +23,7 @@ import {ContributorDashboardAdminBackendApiService} from '../services/contributo
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationProviderOption} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {AlertsService} from 'services/alerts.service';
+import {AppConstants} from 'app.constants';
 import AUTO_TRANSLATION_PROVIDER_MAPPING from 'assets/auto_translation_provider_mapping.json';
 
 import './translation-configuration-tab.component.css';
@@ -95,8 +96,14 @@ export class TranslationConfigurationTabComponent implements OnInit {
     const allOppiaLanguages =
       this.languageUtilService.getAllVoiceoverLanguageCodes();
 
+    // Lessons are written in English, so English is never a target language
+    // for automatic translation.
     this.unmappedLanguageOptions = allOppiaLanguages
-      .filter(code => !(code in this.providerMapping))
+      .filter(
+        code =>
+          code !== AppConstants.DEFAULT_LANGUAGE_CODE &&
+          !(code in this.providerMapping)
+      )
       .map(code => ({
         code,
         name: this.getLanguageName(code),

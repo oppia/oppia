@@ -299,7 +299,7 @@
 }
 
 .oppia-auto-translate-warning-box {
-  align-items: center;
+  align-items: flex-start;
   background-color: #e3b007;
   border: 1px solid #ffe082;
   border-radius: 4px;

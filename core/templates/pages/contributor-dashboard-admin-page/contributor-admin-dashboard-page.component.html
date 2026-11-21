@@ -30,12 +30,15 @@
     </div>
   </div>
   <div class="dashboard-content">
-    <div class="dashboard-content-primary e2e-test-translation-configuration-content"
-         *ngIf="activeTab === TAB_NAME_TRANSLATION_CONFIGURATION">
-      <oppia-translation-configuration-tab></oppia-translation-configuration-tab>
-    </div>
-    <div class="dashboard-content-primary"
-         *ngIf="!checkMobileView() && activeTab !== TAB_NAME_TRANSLATION_CONFIGURATION">
+    <!-- The translation configuration is shown below the tab bar (or the
+         dropdown on mobile), in place of the filters and the stats table, so
+         that the other tabs stay reachable. -->
+    <ng-template #translationConfigurationContent>
+      <div class="translation-configuration-content e2e-test-translation-configuration-content">
+        <oppia-translation-configuration-tab></oppia-translation-configuration-tab>
+      </div>
+    </ng-template>
+    <div class="dashboard-content-primary" *ngIf="!checkMobileView()">
       <div>
         <ul class="dashboard-tabs">
           <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}" *ngIf="isTranslationCoordinator">
@@ -77,6 +80,7 @@
           </li>
         </ul>
       </div>
+      <ng-container *ngIf="activeTab !== TAB_NAME_TRANSLATION_CONFIGURATION; else translationConfigurationContent">
       <div class="filter-container">
         <div class="filter-rights-sub-container">
           <div class="add-rights-button-container">
@@ -128,9 +132,9 @@
         </div>
       </div>
       <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
+      </ng-container>
     </div>
-    <div class="dashboard-content-mobile"
-         *ngIf="checkMobileView() && activeTab !== TAB_NAME_TRANSLATION_CONFIGURATION">
+    <div class="dashboard-content-mobile" *ngIf="checkMobileView()">
       <div class="dropdown">
         <mat-form-field class="choices-field">
           <mat-select placeholder="Contribution Type"
@@ -143,6 +147,7 @@
           </mat-select>
         </mat-form-field>
       </div>
+      <ng-container *ngIf="activeTab !== TAB_NAME_TRANSLATION_CONFIGURATION; else translationConfigurationContent">
       <div class="filter-container">
         <div class="add-rights-button-container">
           <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) && !isCoordinatorTab()">
@@ -192,6 +197,7 @@
         </div>
       </div>
       <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
+      </ng-container>
     </div>
   </div>
 </div>

@@ -77,6 +77,8 @@
           <p class="oppia-keybaord-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
           <div *ngIf="isAutomaticTranslationSuggestionsEnabled() && activeDataFormat === 'html'" class="oppia-auto-translate-button-container">
             <button class="btn btn-default oppia-auto-translate-button e2e-test-auto-translate-button"
+                    (mousedown)="saveTranslationEditorSelection()"
+                    (focus)="saveTranslationEditorSelection()"
                     (click)="generateTranslation()"
                     [disabled]="isGeneratingTranslation">
               <i class="material-icons oppia-translate-icon" *ngIf="!isGeneratingTranslation">auto_awesome</i>
@@ -92,7 +94,7 @@
             <!-- Show a red warning for every RTE component type whose interior
                  text fields were auto-translated and still need the submitter
                  to open and confirm the customization modal. -->
-            <p *ngIf="rteComponentsNeedingConfirmation.size > 0" class="oppia-auto-translate-red-text">
+            <p *ngIf="rteComponentsNeedingConfirmation.length > 0" class="oppia-auto-translate-red-text">
               Please open and confirm the translated text inside:
               <strong>{{ getUnconfirmedRteComponentLabels().join(', ') }}</strong>
             </p>
@@ -174,7 +176,7 @@
     <!-- After submitter has confirmed all RTE component translations, show
          a reminder to double-check accuracy of the translated fields. -->
     <div class="oppia-translation-image-verify"
-         *ngIf="hasImageInAutoTranslation && rteComponentsNeedingConfirmation.size === 0">
+         *ngIf="hasImageInAutoTranslation && rteComponentsNeedingConfirmation.length === 0">
       <p class="oppia-translation-image-verify-text text-danger">
         Please verify that the auto-translated text inside embedded components (e.g. image alt text) is accurate.
       </p>
