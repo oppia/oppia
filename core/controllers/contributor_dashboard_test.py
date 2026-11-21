@@ -2607,8 +2607,8 @@ class TranslatableContentsHandlerTest(test_utils.GenericTestBase):
 
         # Ensure exploration-specific/unwanted fields are NOT returned.
         self.assertNotIn('state_name', content)
-        self.assertNotIn('interaction_id', content)
-        self.assertNotIn('rule_type', content)
+        self.assertIsNone(content['interaction_id'])
+        self.assertIsNone(content['rule_type'])
 
     def test_handler_returns_200_for_skill(self) -> None:
         response = self.get_json(

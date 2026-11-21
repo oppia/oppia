@@ -703,7 +703,9 @@ class ComputeUpdatedExpOpportunityModel(beam.DoFn):  # type: ignore[misc]
         with datastore_services.get_ndb_context():
             opp_id = f'{entity_translation_model.entity_type}.{entity_translation_model.entity_id}'
             opportunity_model = (
-                opportunity_models.TranslationOpportunityModel.get_by_id(opp_id)
+                opportunity_models.TranslationOpportunityModel.get(
+                    opp_id, strict=False
+                )
             )
             if opportunity_model is None:
                 return

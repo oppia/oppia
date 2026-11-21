@@ -20,7 +20,6 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {
   TranslatableTexts,
-  TranslatableTextsBackendDict,
   TranslatableTextsBackendDictV2,
 } from 'domain/opportunity/translatable-texts.model';
 import {

@@ -142,10 +142,10 @@ const createTranslatableContentsResponse = (
     >
   >
 ) => {
-  const translatable_contents = [];
+  const translatableContents = [];
   for (const [stateName, contentIds] of Object.entries(mapping)) {
     for (const [contentId, item] of Object.entries(contentIds)) {
-      translatable_contents.push({
+      translatableContents.push({
         content_id: contentId,
         content_type: item.content_type || 'content',
         content_format: item.content_format || 'html',
@@ -158,7 +158,7 @@ const createTranslatableContentsResponse = (
     }
   }
   return {
-    translatable_contents,
+    translatable_contents: translatableContents,
     version: 1,
   };
 };

@@ -844,7 +844,7 @@ def delete_exploration_opportunities(exp_ids: List[str]) -> None:
 def delete_exploration_opportunities_corresponding_to_topic(
     topic_id: str,
 ) -> None:
-    """Deletes translation opportunities corresponding to the given topic.
+    """Deletes exploration translation opportunities corresponding to the given topic.
 
     Args:
         topic_id: str. The ID of the topic.
@@ -852,9 +852,14 @@ def delete_exploration_opportunities_corresponding_to_topic(
     translation_opportunity_models = (
         opportunity_models.TranslationOpportunityModel.get_by_topic(topic_id)
     )
-    if translation_opportunity_models:
+    exp_opportunity_models = [
+        model
+        for model in translation_opportunity_models
+        if model.entity_type == feconf.ENTITY_TYPE_EXPLORATION
+    ]
+    if exp_opportunity_models:
         opportunity_models.TranslationOpportunityModel.delete_multi(
-            list(translation_opportunity_models)
+            exp_opportunity_models
         )
 
 

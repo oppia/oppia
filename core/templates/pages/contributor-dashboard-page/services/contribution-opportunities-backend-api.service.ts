@@ -22,7 +22,6 @@ import {Injectable} from '@angular/core';
 
 import {
   ExplorationOpportunitySummary,
-  ExplorationOpportunitySummaryBackendDict,
   TranslationOpportunityCardInfoBackendDict,
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 import {
@@ -45,12 +44,6 @@ interface SkillContributionOpportunitiesBackendDict {
   more: boolean;
 }
 
-interface TranslationContributionOpportunitiesBackendDict {
-  opportunities: ExplorationOpportunitySummaryBackendDict[];
-  next_cursor: string;
-  more: boolean;
-}
-
 interface TranslationContributionOpportunitiesBackendDictV2 {
   opportunities: TranslationOpportunityCardInfoBackendDict[];
   next_cursor: string;
@@ -59,10 +52,6 @@ interface TranslationContributionOpportunitiesBackendDictV2 {
 
 interface OpportunitiesCountBackendDict {
   total_count: number;
-}
-
-interface ReviewableTranslationOpportunitiesBackendDict {
-  opportunities: ExplorationOpportunitySummaryBackendDict[];
 }
 
 interface ReviewableTranslationOpportunitiesBackendDictV2 {

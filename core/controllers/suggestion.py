@@ -1304,12 +1304,7 @@ def _get_target_id_to_exploration_opportunity_dict(
     suggestions: Sequence[suggestion_registry.BaseSuggestion],
 ) -> Dict[
     str,
-    Optional[
-        Union[
-            opportunity_domain.PartialExplorationOpportunitySummaryDict,
-            opportunity_domain.TranslationOpportunityCardInfoDict,
-        ]
-    ],
+    Optional[opportunity_domain.TranslationOpportunityCardInfoDict,],
 ]:
     """Returns a dict of target_id to exploration opportunity dict, which can be in
     ExplorationOpportunitySummary or TranslationOpportunityCardInfo representation
