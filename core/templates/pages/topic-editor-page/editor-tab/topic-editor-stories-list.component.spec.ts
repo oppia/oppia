@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the stories list viewer.
  */
 
-// @ts-nocheck
-
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
@@ -27,7 +25,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
@@ -230,7 +228,7 @@ describe('topicEditorStoriesList', () => {
   });
 
   it('should delete story when user deletes story', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue(modalRef);
+    spyOn(ngbModal, 'open').and.returnValue(modalRef as NgbModalRef);
     spyOn(topicUpdateService, 'removeCanonicalStory');
     component.storySummaries = storySummaries;
 
@@ -247,7 +245,7 @@ describe('topicEditorStoriesList', () => {
 
   it('should close modal when user click cancel button', () => {
     modalRef.result = Promise.reject();
-    spyOn(ngbModal, 'open').and.returnValue(modalRef);
+    spyOn(ngbModal, 'open').and.returnValue(modalRef as NgbModalRef);
     component.deleteCanonicalStory('storyId');
 
     expect(ngbModal.open).toHaveBeenCalled();
@@ -267,7 +265,9 @@ describe('topicEditorStoriesList', () => {
       ' without saving changes',
     () => {
       modalRef.componentInstance = {body: 'xyz'};
-      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
+        modalRef as NgbModalRef
+      );
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
       component.openStoryEditor('storyId');
@@ -281,7 +281,9 @@ describe('topicEditorStoriesList', () => {
     () => {
       modalRef.componentInstance = {body: 'xyz'};
       modalRef.result = Promise.reject();
-      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
+        modalRef as NgbModalRef
+      );
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
       component.openStoryEditor('storyId');

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the navbar of the topic editor.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -61,7 +59,7 @@ class MockWindowRef {
     ) {
       callback({returnValue: null});
     },
-    open: (url: string) => {},
+    open: (url: string, target: string) => {},
     gtag: () => {},
   };
 
@@ -591,16 +589,14 @@ describe('Topic Editor Navbar', () => {
   });
 
   it('should save topic when user saves topic changes', fakeAsync(() => {
-    const modalspy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: boolean, opt: boolean) => {
-        return {
-          componentInstance: {
-            topicIsPublished: true,
-          },
-          result: Promise.resolve('commitMessage'),
-        } as NgbModalRef;
-      }
-    );
+    const modalspy = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: {
+          topicIsPublished: true,
+        },
+        result: Promise.resolve('commitMessage'),
+      } as NgbModalRef;
+    });
     topicEditorStateService.setTopic(topic);
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
@@ -630,16 +626,14 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it('should close save topic modal when user clicks cancel', fakeAsync(() => {
-    const modalspy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: boolean, opt: boolean) => {
-        return {
-          componentInstance: {
-            topicIsPublished: true,
-          },
-          result: Promise.reject(),
-        } as NgbModalRef;
-      }
-    );
+    const modalspy = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: {
+          topicIsPublished: true,
+        },
+        result: Promise.reject(),
+      } as NgbModalRef;
+    });
     topicEditorStateService.setTopic(topic);
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
@@ -879,7 +873,7 @@ describe('Topic Editor Navbar', () => {
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg: boolean, opt: boolean) => {
+      spyOn(ngbModal, 'open').and.callFake(() => {
         return {
           result: Promise.resolve('success'),
         } as NgbModalRef;
@@ -908,10 +902,9 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(
-      componentInstance as TopicEditorNavbarComponent,
-      '_navigateToPreview' as keyof TopicEditorNavbarComponent
-    );
+    const navigateSpy = jasmine.createSpy('_navigateToPreview');
+    // eslint-disable-next-line dot-notation
+    componentInstance['_navigateToPreview'] = navigateSpy;
 
     const mockModalRef = {
       componentInstance: {},
@@ -934,10 +927,9 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(
-      componentInstance as TopicEditorNavbarComponent,
-      '_navigateToPreview' as keyof TopicEditorNavbarComponent
-    );
+    const navigateSpy = jasmine.createSpy('_navigateToPreview');
+    // eslint-disable-next-line dot-notation
+    componentInstance['_navigateToPreview'] = navigateSpy;
 
     const mockModalRef = {
       componentInstance: {},
@@ -960,10 +952,9 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(
-      componentInstance as TopicEditorNavbarComponent,
-      '_navigateToMainTab' as keyof TopicEditorNavbarComponent
-    );
+    const navigateSpy = jasmine.createSpy('_navigateToMainTab');
+    // eslint-disable-next-line dot-notation
+    componentInstance['_navigateToMainTab'] = navigateSpy;
 
     const mockModalRef = {
       componentInstance: {},
@@ -986,10 +977,9 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(
-      componentInstance as TopicEditorNavbarComponent,
-      '_navigateToMainTab' as keyof TopicEditorNavbarComponent
-    );
+    const navigateSpy = jasmine.createSpy('_navigateToMainTab');
+    // eslint-disable-next-line dot-notation
+    componentInstance['_navigateToMainTab'] = navigateSpy;
 
     const mockModalRef = {
       componentInstance: {},

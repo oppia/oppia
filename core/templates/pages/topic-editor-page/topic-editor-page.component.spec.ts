@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for topic editor page component.
  */
 
-// @ts-nocheck
-
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
@@ -41,7 +39,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockPlatformFeatureService {
@@ -223,7 +221,7 @@ describe('Topic editor page', () => {
 
     const mockModalRef = {
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
     component.confirmBeforeLeavingQuestions(runSpy);
@@ -245,7 +243,7 @@ describe('Topic editor page', () => {
 
     const mockModalRef = {
       result: Promise.reject(),
-    };
+    } as NgbModalRef;
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
     component.confirmBeforeLeavingQuestions(runSpy);

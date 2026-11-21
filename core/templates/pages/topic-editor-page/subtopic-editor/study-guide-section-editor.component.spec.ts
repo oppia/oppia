@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for StudyGuideSectionEditorComponent
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
@@ -84,13 +82,9 @@ describe('Study Guide Section editor component', () => {
       ['getHeadingText', 'getContentHtml']
     );
 
-    mockSection.getHeadingText.and.returnValue(
-      new SubtitledUnicode('heading', 'section_heading_0')
-    );
+    mockSection.getHeadingText.and.returnValue('heading');
 
-    mockSection.getContentHtml.and.returnValue(
-      new SubtitledHtml('content', 'section_content_1')
-    );
+    mockSection.getContentHtml.and.returnValue('content');
 
     component.isEditable = true;
     component.index = 2;
@@ -176,8 +170,8 @@ describe('Study Guide Section editor component', () => {
     expect(sectionUpdateSpy).toHaveBeenCalledWith(
       sampleStudyGuide,
       2,
-      new SubtitledUnicode('heading', 'section_heading_0'),
-      new SubtitledHtml('content', 'section_content_1'),
+      'heading',
+      'content',
       10
     );
 
@@ -186,8 +180,8 @@ describe('Study Guide Section editor component', () => {
     expect(sectionUpdateSpy).toHaveBeenCalledWith(
       sampleStudyGuide,
       2,
-      new SubtitledUnicode('heading', 'section_heading_0'),
-      new SubtitledHtml('content', 'section_content_1'),
+      'heading',
+      'content',
       10
     );
   });
