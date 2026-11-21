@@ -245,6 +245,89 @@ describe('TopNavigationBarComponent', () => {
     })
   );
 
+  it('should close the sidebar only when a resize makes the window wide', () => {
+    const isWindowNarrow = spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(component, 'truncateNavbar').and.stub();
+    component.ngOnInit();
+    component.toggleSidebar(new Event('click'));
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'hidden'
+    );
+
+    mockResizeEmitter.emit();
+    expect(component.isSidebarShown()).toBeTrue();
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'hidden'
+    );
+
+    isWindowNarrow.and.returnValue(false);
+    mockResizeEmitter.emit();
+    expect(component.isSidebarShown()).toBeFalse();
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'auto'
+    );
+  });
+
+  it('should provide an accessible mobile menu control with a visible X', fakeAsync(() => {
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(component, 'truncateNavbar').and.stub();
+    fixture.detectChanges();
+    tick(501);
+
+    const menuControl = fixture.debugElement.query(
+      By.css('.e2e-mobile-test-navbar-button')
+    );
+    expect(menuControl.nativeElement.getAttribute('role')).toBe('button');
+    expect(menuControl.nativeElement.getAttribute('aria-label')).toBe(
+      'I18N_TOPNAV_OPEN_MENU'
+    );
+    expect(menuControl.nativeElement.getAttribute('aria-expanded')).toBe(
+      'false'
+    );
+
+    menuControl.triggerEventHandler(
+      'keydown.enter',
+      new KeyboardEvent('keydown', {key: 'Enter'})
+    );
+    fixture.detectChanges();
+
+    expect(component.isSidebarShown()).toBeTrue();
+    expect(menuControl.nativeElement.getAttribute('aria-label')).toBe(
+      'I18N_TOPNAV_CLOSE_MENU'
+    );
+    expect(menuControl.nativeElement.getAttribute('aria-expanded')).toBe(
+      'true'
+    );
+    const closeIcon = menuControl.query(By.css('.oppia-navbar-close-icon'));
+    expect(closeIcon.nativeElement.textContent.trim()).toBe('✕');
+    expect(closeIcon.nativeElement.getAttribute('aria-hidden')).toBe('true');
+
+    const spaceKeydownEvent = new KeyboardEvent('keydown', {
+      key: ' ',
+      cancelable: true,
+    });
+    menuControl.triggerEventHandler('keydown.space', spaceKeydownEvent);
+    fixture.detectChanges();
+
+    expect(spaceKeydownEvent.defaultPrevented).toBeTrue();
+    expect(component.isSidebarShown()).toBeTrue();
+
+    menuControl.triggerEventHandler(
+      'keyup.space',
+      new KeyboardEvent('keyup', {key: ' '})
+    );
+    fixture.detectChanges();
+
+    expect(component.isSidebarShown()).toBeFalse();
+    expect(menuControl.nativeElement.getAttribute('aria-label')).toBe(
+      'I18N_TOPNAV_OPEN_MENU'
+    );
+    expect(menuControl.nativeElement.getAttribute('aria-expanded')).toBe(
+      'false'
+    );
+  }));
+
   it("should show Oppia's logos", () => {
     expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp')).toBe(
       '/assets/images/logo/288x128_logo_white.webp'
