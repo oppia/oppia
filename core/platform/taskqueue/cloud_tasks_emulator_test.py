@@ -203,3 +203,146 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
                 self.fail('No pattern matched for line: %s.' % line)
 
         self.assertEqual(matched, patterns)
+
+
+class CloudTasksEmulatorGenericTestBaseTests(test_utils.TestBase):
+
+    def test_future_task_remains_queued(self) -> None:
+        handled_tasks: List[str] = []
+
+        # Here we use type Any because the emulator passes payloads with
+        # arbitrary values to task handlers.
+        def task_handler(
+            url: str,
+            unused_payload: Dict[str, Any],
+            unused_queue_name: str,
+            unused_task_name: Optional[str] = None,
+        ) -> None:
+            handled_tasks.append(url)
+
+        emulator = cloud_tasks_emulator.Emulator(
+            task_handler=task_handler,
+            automatic_task_handling=False,
+        )
+        task = emulator.create_task('queue', 'dummy_url')
+        task.scheduled_for = 100.0
+
+        class StopQueueProcessing(Exception):
+            """Stops queue processing during the test."""
+
+            pass
+
+        def stop_sleep(unused_seconds: float) -> None:
+            raise StopQueueProcessing('stop')
+
+        with (
+            self.swap(time, 'time', lambda: 0.0),
+            self.swap(time, 'sleep', stop_sleep),
+        ):
+            with self.assertRaisesRegex(StopQueueProcessing, '^stop$'):
+                emulator._process_queue(  # pylint: disable=protected-access
+                    'queue'
+                )
+
+        self.assertEqual(emulator.get_number_of_tasks('queue'), 1)
+        self.assertEqual(handled_tasks, [])
+
+    def test_due_task_with_non_dict_payload_is_passed_to_handler(self) -> None:
+        # Here we use object because this test captures non-dict payloads.
+        handled_payloads: List[object] = []
+
+        # Here we use object because the emulator passes non-dict payloads
+        # through to the task handler.
+        def task_handler(
+            url: str,
+            payload: object,
+            queue_name: str,
+            task_name: Optional[str] = None,
+        ) -> None:
+            self.assertEqual(url, 'dummy_url')
+            self.assertEqual(queue_name, 'queue')
+            self.assertIsNotNone(task_name)
+            handled_payloads.append(payload)
+
+        emulator = cloud_tasks_emulator.Emulator(
+            task_handler=task_handler,
+            automatic_task_handling=False,
+        )
+        # Here we use MyPy ignore because this test passes a non-dict payload
+        # to verify that the emulator forwards it unchanged.
+        task = emulator.create_task(
+            'queue',
+            'dummy_url',
+            payload=[1, 2, 3],  # type: ignore[arg-type]
+        )
+        task.scheduled_for = 0.0
+
+        class StopQueueProcessing(Exception):
+            """Stops queue processing during the test."""
+
+            pass
+
+        def stop_sleep(unused_seconds: float) -> None:
+            raise StopQueueProcessing('stop')
+
+        with (
+            self.swap(time, 'time', lambda: 1.0),
+            self.swap(time, 'sleep', stop_sleep),
+        ):
+            with self.assertRaisesRegex(StopQueueProcessing, '^stop$'):
+                emulator._process_queue(  # pylint: disable=protected-access
+                    'queue'
+                )
+
+        self.assertEqual(handled_payloads, [[1, 2, 3]])
+        self.assertEqual(emulator.get_number_of_tasks('queue'), 0)
+
+    def test_empty_queue_name_selects_all_queues(self) -> None:
+        handled_urls: List[str] = []
+
+        # Here we use type Any because the emulator passes payloads with
+        # arbitrary values to task handlers.
+        def task_handler(
+            url: str,
+            payload: Optional[Dict[str, Any]],
+            queue_name: str,
+            task_name: Optional[str] = None,
+        ) -> None:
+            self.assertIsNone(payload)
+            self.assertEqual(queue_name, '')
+            self.assertIsNotNone(task_name)
+            handled_urls.append(url)
+
+        emulator = cloud_tasks_emulator.Emulator(
+            task_handler=task_handler,
+            automatic_task_handling=False,
+        )
+        emulator.create_task('', 'dummy_url')
+        emulator.create_task('', 'another_url', task_name='explicit_task_name')
+
+        self.assertEqual(emulator.get_number_of_tasks(''), 2)
+        emulator.process_and_flush_tasks('')
+
+        self.assertEqual(handled_urls, ['dummy_url', 'another_url'])
+        self.assertEqual(emulator.get_number_of_tasks(''), 0)
+
+    def test_invalid_task_without_schedule_time_asserts(self) -> None:
+        # Here we use type Any because the emulator passes payloads with
+        # arbitrary values to task handlers.
+        def task_handler(
+            unused_url: str,
+            unused_payload: Optional[Dict[str, Any]],
+            unused_queue_name: str,
+            unused_task_name: Optional[str] = None,
+        ) -> None:
+            self.fail('The task handler should not run for an invalid task.')
+
+        emulator = cloud_tasks_emulator.Emulator(
+            task_handler=task_handler,
+            automatic_task_handling=False,
+        )
+        task = emulator.create_task('queue', 'dummy_url')
+        task.scheduled_for = None
+
+        with self.assertRaisesRegex(AssertionError, '^$'):
+            emulator._process_queue('queue')  # pylint: disable=protected-access
