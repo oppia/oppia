@@ -15,7 +15,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
             "allowedCommonJsDependencies": ["path", "stream", "zlib"],
             "outputPath": "dist/oppia-angular",
@@ -107,12 +107,22 @@
               {
                 "glob": "**/*",
                 "input": "node_modules/ckeditor4",
-                "output": "/third_party/ckeditor"
+                "output": "/third_party/ckeditor",
+                "ignore": [
+                  "**/*.scss",
+                  "**/*.sass",
+                  "**/*.less"
+                ]
               },
               {
                 "glob": "**/*",
                 "input": "node_modules/ckeditor4-bootstrapck",
-                "output": "/third_party/ckeditor-bootstrapck"
+                "output": "/third_party/ckeditor-bootstrapck",
+                "ignore": [
+                  "**/*.scss",
+                  "**/*.sass",
+                  "**/*.less"
+                ]
               }
             ],
             "styles": [
@@ -124,7 +134,13 @@
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css"
-            ]
+            ],
+            "customWebpackConfig": {
+              "path": "./webpack.config.js",
+              "mergeRules": {
+                "externals": "replace"
+              }
+            }
           },
           "configurations": {
             "production": {
@@ -164,7 +180,7 @@
           }
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
             "browserTarget": "oppia-angular:build"
           },

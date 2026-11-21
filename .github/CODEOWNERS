@@ -76,6 +76,7 @@
 /core/templates/utility/string-utility*.ts @oppia/lace-frontend-reviewers
 /proxy.conf.json @oppia/lace-frontend-reviewers
 /angular.json @oppia/lace-frontend-reviewers
+/webpack.config.js @oppia/lace-frontend-reviewers
 /src @oppia/lace-frontend-reviewers
 
 # TS typing
