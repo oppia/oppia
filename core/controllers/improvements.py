@@ -107,6 +107,7 @@ class ExplorationImprovementsHandler(
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str) -> None:
+        """Handles GET requests."""
         open_tasks, resolved_task_types_by_state_name = (
             improvements_services.fetch_exploration_tasks(
                 exp_fetchers.get_exploration_by_id(exploration_id)
@@ -126,6 +127,7 @@ class ExplorationImprovementsHandler(
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id: str) -> None:
+        """Handles POST requests."""
         assert self.normalized_payload is not None
         task_entries = self.normalized_payload['task_entries']
         task_entries_to_put = []
@@ -195,6 +197,7 @@ class ExplorationImprovementsHistoryHandler(
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         urlsafe_start_cursor = self.normalized_request.get('cursor')
 
@@ -240,6 +243,7 @@ class ExplorationImprovementsConfigHandler(
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str) -> None:
+        """Handles GET requests."""
         self.render_json(
             {
                 'exploration_id': exploration_id,

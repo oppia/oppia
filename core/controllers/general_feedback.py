@@ -395,6 +395,7 @@ class LessonFeedbackDetailHandler(
         exploration_id: str,
         feedback_id: str,
     ) -> None:
+        """Handles GET requests."""
         feedback = general_feedback_services.get_lesson_feedback(feedback_id)
         if feedback is None:
             raise self.NotFoundException(
@@ -413,6 +414,7 @@ class LessonFeedbackDetailHandler(
         exploration_id: str,
         feedback_id: str,
     ) -> None:
+        """Handles POST requests."""
         assert self.normalized_payload is not None
         assert self.user_id is not None
         payload = self.normalized_payload
@@ -503,6 +505,7 @@ class LessonFeedbackListHandler(
         self,
         exploration_id: str,
     ) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         req = self.normalized_request
         status = req.get('status')
@@ -806,6 +809,7 @@ class PlatformFeedbackListHandler(
         dashboard: str,
         dashboard_id: str,
     ) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         req = self.normalized_request
         status = req.get('status')
@@ -898,6 +902,7 @@ class PlatformFeedbackDetailHandler(
         dashboard_id: str,
         report_id: str,
     ) -> None:
+        """Handles GET requests."""
         feedback = general_feedback_services.get_platform_feedback(
             report_id=report_id,
         )
@@ -924,6 +929,7 @@ class PlatformFeedbackDetailHandler(
         dashboard_id: str,
         report_id: str,
     ) -> None:
+        """Handles POST requests."""
         assert self.normalized_payload is not None
         payload = self.normalized_payload
         status = payload['status']
@@ -956,5 +962,6 @@ class GeneralFeedbackCaptchaConfigHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         site_key = captcha_services.get_turnstile_site_key()
         self.render_json({'site_key': site_key})

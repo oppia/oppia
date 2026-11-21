@@ -1355,6 +1355,7 @@ class TranslatableTopicNamesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_names = [summary.name for summary in topic_summaries]
         self.values = {'topic_names': topic_names}

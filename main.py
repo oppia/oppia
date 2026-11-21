@@ -169,6 +169,7 @@ class SplashRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         self.redirect('/')
 
 

@@ -435,6 +435,7 @@ class StartCertificateAssessmentHandler(
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self) -> None:
+        """Handles POST requests."""
         assert self.normalized_payload is not None
         assert self.user_id is not None
         try:
@@ -502,6 +503,7 @@ class SubmitCertificateAssessmentHandler(
 
     @acl_decorators.can_submit_assessment_response
     def post(self, attempt_id: str) -> None:
+        """Handles POST requests."""
         assert self.normalized_payload is not None
         # Here we use type Any because each submitted answer can hold a
         # selected answer of any accepted interaction answer type.

@@ -33,7 +33,7 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     # arguments and even when we don't use them we need to allow them so that
     # there is no error in the callsite.
     @acl_decorators.open_access
-    def get(self, **kwargs: Dict[str, str]) -> None:
+    def get(self, **_kwargs: Dict[str, str]) -> None:
         """Handles GET requests."""
         url = self.request.uri
 

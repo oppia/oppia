@@ -137,7 +137,7 @@ class SubtopicViewerPageRevisionRedirectHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, *args: str) -> None:
+    def get(self, *_args: str) -> None:
         """Handles GET requests and redirects to study guide URL."""
         classroom_url_fragment = self.request.route_kwargs.get(
             'classroom_url_fragment'
@@ -218,7 +218,7 @@ class TopicViewerPageRevisionRedirectHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, *args: str) -> None:
+    def get(self, *_args: str) -> None:
         """Handles GET requests and redirects to study guide URL."""
         classroom_url_fragment = self.request.route_kwargs.get(
             'classroom_url_fragment'
@@ -343,7 +343,7 @@ class PracticeSessionAccessValidationPage(
     }
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, _: str, **kwargs: str) -> None:
+    def get(self, _: str, **_kwargs: str) -> None:
         """Handles GET requests."""
 
         assert self.normalized_request is not None
