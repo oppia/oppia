@@ -268,16 +268,26 @@ export class UrlService {
   }
 
   /**
-   * This function returns the arc ID from the end-of-arc URL.
-   * @return {string} the arc ID.
+   * This function returns the module ID from the end-of-module URL.
+   * @return {string} the module ID.
    */
-  getArcIdFromUrl(): string {
+  getModuleIdFromUrl(): string {
     const pathname = this.getPathname();
-    const match = pathname.match(/\/test\/arc\/(\d+)/);
+    const match = pathname.match(/\/test\/module\/(\d+)/);
     if (match) {
       return decodeURIComponent(match[1]);
     }
     return '';
+  }
+
+  /**
+   * This function returns the story ID from the module practice URL. The
+   * story_id query param scopes a module ID to a specific story, since module
+   * IDs are only unique within their story.
+   * @return {string} the story ID, or an empty string if it is absent.
+   */
+  getStoryIdFromPracticeUrl(): string {
+    return this.getUrlParams().story_id || '';
   }
 
   /**

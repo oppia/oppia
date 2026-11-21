@@ -22,7 +22,7 @@ import enum
 
 from core.domain import feature_flag_domain
 
-from typing import List
+from typing import Dict, List
 
 
 class FeatureNames(enum.Enum):
@@ -105,7 +105,10 @@ class FeatureNames(enum.Enum):
     TECHNICAL_FEEDBACK_DASHBOARD_ENABLED = (
         'technical_feedback_dashboard_enabled'
     )
-    STORY_EDITOR_ARCS = 'story_editor_arcs'
+    # This value is the model ID of the FeatureFlagConfigModel that stores
+    # this flag's state. The migration job renames the persisted row from
+    # 'story_editor_arcs' to this value.
+    STORY_EDITOR_MODULES = 'story_editor_modules'
     ENABLE_DROPDOWN_PAGINATION = 'enable_dropdown_pagination'
 
 
@@ -125,6 +128,13 @@ class FeatureNames(enum.Enum):
 # testers. 'prod' feature has been fully tested so that it can be enabled in the
 # production environment.
 
+
+# Maps renamed feature flags to their legacy storage names. The flag settings
+# stored under the legacy name are used until the migration job renames the
+# persisted model, so that deploying the rename does not reset the flag.
+FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME: Dict[str, str] = {
+    FeatureNames.STORY_EDITOR_MODULES.value: 'story_editor_arcs',
+}
 
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
@@ -146,7 +156,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
-    FeatureNames.STORY_EDITOR_ARCS,
+    FeatureNames.STORY_EDITOR_MODULES,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
@@ -363,10 +373,11 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.TEST,
         )
     ),
-    FeatureNames.STORY_EDITOR_ARCS.value: (
+    FeatureNames.STORY_EDITOR_MODULES.value: (
         (
-            'This flag enables arc-based chapter groupings in the story editor, '
-            'allowing creators to organize chapters into named arcs.',
+            'This flag enables module-based chapter groupings in the story '
+            'editor, allowing creators to organize chapters into named '
+            'modules.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),

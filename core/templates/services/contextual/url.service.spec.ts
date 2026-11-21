@@ -267,7 +267,7 @@ describe('Url Service', () => {
 
   it('should correctly retrieve selected subtopics from url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      StoryEditorArcs: {isEnabled: true},
+      StoryEditorModules: {isEnabled: true},
     });
     mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
@@ -276,7 +276,7 @@ describe('Url Service', () => {
 
   it('should throw error for invalid practice session url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      StoryEditorArcs: {isEnabled: true},
+      StoryEditorModules: {isEnabled: true},
     });
     mockLocation.pathname = '/topic/abcdefgijklm';
     expect(() => {
@@ -431,7 +431,7 @@ describe('Url Service', () => {
 
   it('should correctly retrieve node id from practice url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      StoryEditorArcs: {isEnabled: true},
+      StoryEditorModules: {isEnabled: true},
     });
     mockLocation.pathname = '/learn/math/fractions/practice/1';
     expect(urlService.getNodeIdFromPracticeUrl()).toBe('1');
@@ -440,14 +440,25 @@ describe('Url Service', () => {
     expect(urlService.getNodeIdFromPracticeUrl()).toBe('');
   });
 
-  it('should correctly retrieve arc id from url', () => {
+  it('should correctly retrieve module id from url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      StoryEditorArcs: {isEnabled: true},
+      StoryEditorModules: {isEnabled: true},
     });
-    mockLocation.pathname = '/learn/math/fractions/test/arc/1';
-    expect(urlService.getArcIdFromUrl()).toBe('1');
+    mockLocation.pathname = '/learn/math/fractions/test/module/1';
+    expect(urlService.getModuleIdFromUrl()).toBe('1');
 
     mockLocation.pathname = '/learn/math/fractions/practice';
-    expect(urlService.getArcIdFromUrl()).toBe('');
+    expect(urlService.getModuleIdFromUrl()).toBe('');
+  });
+
+  it('should correctly retrieve story id from practice url', () => {
+    mockLocation.search = '?story_id=story_1';
+    expect(urlService.getStoryIdFromPracticeUrl()).toBe('story_1');
+
+    mockLocation.search = '?selected_subtopic_ids=%5B1%5D';
+    expect(urlService.getStoryIdFromPracticeUrl()).toBe('');
+
+    mockLocation.search = '';
+    expect(urlService.getStoryIdFromPracticeUrl()).toBe('');
   });
 });

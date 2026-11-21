@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Top module navigation bar shown above story arcs.
+ * @fileoverview Top module navigation bar shown above story modules.
  */
 
 import {
@@ -38,7 +38,7 @@ interface ModuleNavigationGroup {
   accentColor: string;
   showPractice: boolean;
   isPracticeCompleted: boolean;
-  arcId: string;
+  moduleId: string;
 }
 
 export interface ModuleNavigationLessonSelection {
@@ -56,8 +56,8 @@ export class ModuleNavigationComponent
 {
   @Input() moduleGroups: ModuleNavigationGroup[] = [];
   @Input() activeLessonNumber: number | null = null;
-  // The arc whose practice card is currently selected in the navbar.
-  @Input() activePracticeArcId: string = '';
+  // The module whose practice card is currently selected in the navbar.
+  @Input() activePracticeModuleId: string = '';
   // True when this component is rendered inside the topic editor's preview
   // tab, where the fixed editor header bar adds height to the header stack.
   @Input() isInTopicEditorPreview: boolean = false;
@@ -160,13 +160,14 @@ export class ModuleNavigationComponent
     });
   }
 
-  onPracticeClick(arcId: string): void {
-    this.practiceSelected.emit(arcId);
+  onPracticeClick(moduleId: string): void {
+    this.practiceSelected.emit(moduleId);
   }
 
-  isActivePractice(arcId: string): boolean {
+  isActivePractice(moduleId: string): boolean {
     return (
-      this.activePracticeArcId !== '' && this.activePracticeArcId === arcId
+      this.activePracticeModuleId !== '' &&
+      this.activePracticeModuleId === moduleId
     );
   }
 
