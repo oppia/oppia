@@ -84,6 +84,7 @@ export class ExplorationSaveAndPublishButtonsComponent
 
   discardChanges(): void {
     this.explorationSaveService.discardChanges();
+    this.isModalDisplayed = false;
   }
 
   getChangeListLength(): number {
@@ -183,6 +184,7 @@ export class ExplorationSaveAndPublishButtonsComponent
       )
       .then(
         () => {
+          this.isModalDisplayed = false;
           this.saveIsInProcess = false;
           this.loadingDotsAreShown = false;
         },
@@ -191,6 +193,7 @@ export class ExplorationSaveAndPublishButtonsComponent
   }
 
   ngOnInit(): void {
+    this.isModalDisplayed = false;
     this.saveIsInProcess = false;
     this.publishIsInProcess = false;
     this.loadingDotsAreShown = false;
