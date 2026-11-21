@@ -769,7 +769,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id, self.user_id_b, '01/22/31126'
             )
 
-
     def test_update_blog_model_author_and_publish_on_with_invalid_blog_id(
         self,
     ) -> None:
