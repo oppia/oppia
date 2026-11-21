@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for ClassroomNavigationLinksComponent.
  */
 
-// @ts-nocheck
-
 import {HttpClientModule} from '@angular/common/http';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
@@ -185,7 +183,12 @@ describe('ClassroomNavigationLinksComponent', () => {
     spyOn(
       i18nLanguageCodeService,
       'getClassroomTranslationKeys'
-    ).and.returnValue({name: 'I18N_CLASROOM_MATH_NAME'});
+    ).and.returnValue({
+      name: 'I18N_CLASROOM_MATH_NAME',
+      courseDetails: 'I18N_CLASROOM_MATH_COURSE_DETAILS',
+      topicListIntro: 'I18N_CLASROOM_MATH_TOPICS_LIST_INTRO',
+      teaserText: 'I18N_CLASROOM_MATH_TEASER_TEXT',
+    });
 
     const result = component.getClassroomNameTranslationkey(classroomName);
 

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for TopNavigationBarComponent.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -717,13 +715,9 @@ describe('TopNavigationBarComponent', () => {
       return null;
     });
 
-    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue({
-      top: 1,
-      height: 100,
-      left: 0,
-      width: 200,
-      right: 202,
-    });
+    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue(
+      new DOMRect(0, 1, 200, 100)
+    );
 
     spyOn(window, 'getComputedStyle').and.callFake((el: HTMLElement) => {
       return {
@@ -835,13 +829,9 @@ describe('TopNavigationBarComponent', () => {
       return selector === '.dummy' ? dummyLearnTab : dummyDropdown;
     });
 
-    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue({
-      top: 1,
-      height: 100,
-      left: 0,
-      width: 200,
-      right: 202,
-    });
+    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue(
+      new DOMRect(0, 1, 200, 100)
+    );
 
     spyOn(window, 'getComputedStyle').and.returnValue({
       minWidth: 'invalid-px',

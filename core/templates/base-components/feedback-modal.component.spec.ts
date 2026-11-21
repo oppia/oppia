@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for FeedbackModalComponent.
  */
 
-// @ts-nocheck
-
 import {
   Component,
   EventEmitter,
@@ -78,11 +76,18 @@ class MockImageReceiverComponent {
 }
 
 class MockWindowRef {
+  reloadSpy: jasmine.Spy = jasmine.createSpy('reload');
+
   nativeWindow: {
-    location: {
-      href: string;
-      reload: jasmine.Spy;
-    };
+    // When signIn() redirects with a login URL, production assigns the URL
+    // string directly to nativeWindow.location. When loginUrl is empty, it
+    // calls location.reload() on the mock object.
+    location:
+      | {
+          href: string;
+          reload: jasmine.Spy;
+        }
+      | string;
     navigator: {userAgent: string};
     innerWidth: number;
     innerHeight: number;
@@ -94,7 +99,7 @@ class MockWindowRef {
   } = {
     location: {
       href: 'https://www.oppia.org/learn/math',
-      reload: jasmine.createSpy('reload'),
+      reload: this.reloadSpy,
     },
     navigator: {
       userAgent: 'test-agent',
@@ -644,7 +649,7 @@ describe('FeedbackModalComponent', () => {
     component.signIn();
     flushMicrotasks();
 
-    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    expect(windowRef.reloadSpy).toHaveBeenCalled();
   }));
 
   it('should select typo category and disable technical logs checkbox', () => {
