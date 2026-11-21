@@ -461,6 +461,63 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
             entity_translations.translations['content_id_1'].needs_update, False
         )
 
+    def test_add_translation_adds_translated_content(self) -> None:
+        entity_translations = translation_domain.EntityTranslation.create_empty(
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 'en'
+        )
+
+        entity_translations.add_translation(
+            'content_id_1',
+            'My name is Nikhil.',
+            translation_domain.TranslatableContentFormat.HTML,
+            False,
+        )
+
+        translated_content = entity_translations.translations['content_id_1']
+        self.assertEqual(translated_content.content_value, 'My name is Nikhil.')
+        self.assertFalse(translated_content.needs_update)
+
+    def test_remove_translations_ignores_content_ids_without_translation(
+        self,
+    ) -> None:
+        entity_translations = translation_domain.EntityTranslation.create_empty(
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 'en'
+        )
+        entity_translations.add_translation(
+            'content_id_1',
+            'My name is Nikhil.',
+            translation_domain.TranslatableContentFormat.HTML,
+            False,
+        )
+
+        entity_translations.remove_translations(
+            ['content_id_1', 'unknown_content_id']
+        )
+
+        self.assertEqual(entity_translations.translations, {})
+
+    def test_mark_translations_needs_update_ignores_content_ids_without_translation(
+        self,
+    ) -> None:
+        entity_translations = translation_domain.EntityTranslation.create_empty(
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 'en'
+        )
+        entity_translations.add_translation(
+            'content_id_1',
+            'My name is Nikhil.',
+            translation_domain.TranslatableContentFormat.HTML,
+            False,
+        )
+
+        entity_translations.mark_translations_needs_update(
+            ['content_id_1', 'unknown_content_id']
+        )
+
+        self.assertTrue(
+            entity_translations.translations['content_id_1'].needs_update
+        )
+        self.assertNotIn('unknown_content_id', entity_translations.translations)
+
     def test_validate_entity_type(self) -> None:
         translation_dict = {
             'content_id_1': translation_domain.TranslatedContent(
@@ -855,6 +912,19 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.add_content_id_for_translation(
                 existing_content_id
             )
+
+    def test_add_content_id_for_translation_adds_empty_translations(
+        self,
+    ) -> None:
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            {'translations_mapping': {}}
+        )
+
+        written_translations.add_content_id_for_translation('feedback_1')
+
+        self.assertEqual(
+            written_translations.translations_mapping, {'feedback_1': {}}
+        )
 
     def test_delete_content_id_for_translations_deletes_content_id(
         self,
