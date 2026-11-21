@@ -452,13 +452,13 @@ export class BaseUser {
    * @param {string} selector - The CSS selector of the element to clear text from.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    // Using Control+A to select all text, then Backspace to delete it.
+    // Select all text, then press Backspace to delete it. ControlOrMeta is
+    // Control on Linux/Windows and Command on macOS, where Control+A only moves
+    // the cursor to the start of the field instead of selecting all text.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
     await element.click();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
+    await this.page.keyboard.press('ControlOrMeta+A');
     await this.page.keyboard.press('Backspace');
   }
 

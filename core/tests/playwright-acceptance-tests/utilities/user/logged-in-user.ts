@@ -1246,6 +1246,23 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the given page using the profile dropdown in the navbar.
+   * @param {'Blog Dashboard'} page - The page or dashboard to navigate to.
+   */
+  async navigateToPageUsingProfileMenu(page: 'Blog Dashboard'): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    const selector = `.e2e-test-${page.toLowerCase().replace(/ /g, '-')}-link`;
+    await this.expectElementToBeVisible(selector);
+    await this.clickOnElementWithSelector(selector);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Navigates to the Preferences Page Using Profile Dropdown Menu.
    */
   async navigateToPreferencesPageUsingProfileDropdown(): Promise<void> {
