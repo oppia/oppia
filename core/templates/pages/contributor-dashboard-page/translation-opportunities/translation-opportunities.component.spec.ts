@@ -283,6 +283,7 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
+          userIsReviewer: false,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
         {
@@ -295,6 +296,7 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
+          userIsReviewer: false,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
       ]);
@@ -328,6 +330,7 @@ describe('Translation opportunities component', () => {
         totalCount: 4,
         translationsCount: 2,
         reviewerOnlyContentCount: 0,
+        userIsReviewer: false,
         entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
       });
       expect(component.allOpportunities['2']).toEqual({
@@ -340,6 +343,7 @@ describe('Translation opportunities component', () => {
         totalCount: 10,
         translationsCount: 4,
         reviewerOnlyContentCount: 0,
+        userIsReviewer: false,
         entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
       });
 
@@ -359,6 +363,7 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
+          userIsReviewer: false,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
         {
@@ -371,52 +376,48 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
+          userIsReviewer: false,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
       ]);
     }
   );
 
-  it(
-    'should subtract reviewer_only_content_count from totalCount for ' +
-      'non-reviewers',
-    () => {
-      spyOn(
-        translationLanguageService,
-        'getActiveLanguageCode'
-      ).and.returnValue('en');
+  it('should keep totalCount as full content count for non-reviewers', () => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
 
-      // The component defaults to userIsReviewer = false.
-      const opportunitiesWithListContent = [
-        ExplorationOpportunitySummary.createFromBackendDict({
-          id: '1',
-          topic_name: 'topic_1',
-          story_title: 'Story title 1',
-          chapter_title: 'Chapter title 1',
-          content_count: 10,
-          translation_counts: {
-            en: 3,
-          },
-          translation_in_review_counts: {
-            en: 0,
-          },
-          language_code: 'en',
-          is_pinned: false,
-          reviewer_only_content_count: 4,
-        }),
-      ];
+    // The component defaults to userIsReviewer = false.
+    const opportunitiesWithListContent = [
+      ExplorationOpportunitySummary.createFromBackendDict({
+        id: '1',
+        topic_name: 'topic_1',
+        story_title: 'Story title 1',
+        chapter_title: 'Chapter title 1',
+        content_count: 10,
+        translation_counts: {
+          en: 3,
+        },
+        translation_in_review_counts: {
+          en: 0,
+        },
+        language_code: 'en',
+        is_pinned: false,
+        reviewer_only_content_count: 4,
+      }),
+    ];
 
-      const {opportunitiesDicts} = component.getPresentableOpportunitiesData({
-        opportunities: opportunitiesWithListContent,
-        more: false,
-      });
+    const {opportunitiesDicts} = component.getPresentableOpportunitiesData({
+      opportunities: opportunitiesWithListContent,
+      more: false,
+    });
 
-      // For non-reviewers, totalCount should be 10 - 4 = 6.
-      expect(opportunitiesDicts[0].totalCount).toEqual(6);
-      // ProgressPercentage = (3 / 6) * 100 = 50.00.
-      expect(opportunitiesDicts[0].progressPercentage).toEqual('50.00');
-    }
-  );
+    // Total count should remain 10 for accurate exploration-wide progress.
+    expect(opportunitiesDicts[0].totalCount).toEqual(10);
+    // ProgressPercentage = (3 / 10) * 100 = 30.00.
+    expect(opportunitiesDicts[0].progressPercentage).toEqual('30.00');
+  });
 
   it(
     'should not subtract reviewer_only_content_count from totalCount for ' +
@@ -457,10 +458,12 @@ describe('Translation opportunities component', () => {
       expect(opportunitiesDicts[0].totalCount).toEqual(10);
       // ProgressPercentage = (3 / 10) * 100 = 30.00.
       expect(opportunitiesDicts[0].progressPercentage).toEqual('30.00');
+      // Should correctly propagate userIsReviewer to the presentation layer.
+      expect(opportunitiesDicts[0].userIsReviewer).toBe(true);
     }
   );
 
-  it('should open translation modal when clicking button', fakeAsync(() => {
+  it('should open translation modal and reload opportunities on resolve', fakeAsync(() => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en'
     );
@@ -474,9 +477,70 @@ describe('Translation opportunities component', () => {
     });
     component.ngOnInit();
     tick();
+
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'emit'
+    );
+
+    let resolveModal: (value?: unknown) => void = () => {};
+    translationModal.result = new Promise((resolve, reject) => {
+      resolveModal = resolve;
+    });
+
     component.onClickButton('2');
     tick();
     expect(modalService.open).toHaveBeenCalled();
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).not.toHaveBeenCalled();
+
+    resolveModal();
+    tick();
+
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).toHaveBeenCalled();
+  }));
+
+  it('should reload opportunities when translation modal is rejected', fakeAsync(() => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
+    spyOn(
+      contributionOpportunitiesService,
+      'getTranslationOpportunitiesAsync'
+    ).and.resolveTo({
+      opportunities: opportunitiesArray,
+      more: false,
+    });
+    component.ngOnInit();
+    tick();
+
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'emit'
+    );
+
+    let rejectModal: (reason?: unknown) => void = () => {};
+    translationModal.result = new Promise((resolve, reject) => {
+      rejectModal = reject;
+    });
+
+    component.onClickButton('2');
+    tick();
+    expect(modalService.open).toHaveBeenCalled();
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).not.toHaveBeenCalled();
+
+    rejectModal();
+    tick();
+
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).toHaveBeenCalled();
   }));
 
   it('should not open translation modal when user is not logged', fakeAsync(() => {
