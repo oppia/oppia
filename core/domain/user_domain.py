@@ -23,6 +23,7 @@ import re
 
 from core import feconf, utils
 from core.constants import constants
+from core.domain import user_domain_errors
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -969,6 +970,59 @@ class ExpUserLastPlaythrough:
         """
         self.last_played_exp_version = last_played_exp_version
         self.last_played_state_name = last_played_state_name
+
+    def validate(self) -> None:
+        """Validates the properties of the ExpUserLastPlaythrough.
+
+        Checks that need other models (e.g. that the exploration exists, that
+        last_played_exp_version is at most its current version, or that
+        last_played_state_name is a state of that version) are done in
+        ExpUserLastPlaythroughModelValidationJob instead, since fetching
+        another model falls outside the scope of domain layer validation.
+
+        Raises:
+            InvalidLastPlaythroughUserIdError. The user_id is not a valid
+                user ID.
+            InvalidLastPlaythroughExplorationIdError. The exploration_id is
+                not a non-empty string.
+            InvalidLastPlayedExpVersionError. The last_played_exp_version is
+                not an integer >= 1.
+            InvalidLastPlayedStateNameError. The last_played_state_name is not
+                a non-empty string.
+        """
+        if not isinstance(self.user_id, str) or not utils.is_user_id_valid(
+            self.user_id
+        ):
+            raise user_domain_errors.InvalidLastPlaythroughUserIdError(
+                self.user_id
+            )
+
+        # The format of exploration IDs and state names is not checked here,
+        # since the Exploration domain object owns those rules. Whether they
+        # refer to an existing exploration and state is checked by
+        # ExpUserLastPlaythroughModelValidationJob.
+        if not isinstance(self.exploration_id, str) or not self.exploration_id:
+            raise user_domain_errors.InvalidLastPlaythroughExplorationIdError(
+                self.exploration_id
+            )
+
+        # A bool is also an int in Python, so it is ruled out explicitly.
+        if (
+            isinstance(self.last_played_exp_version, bool)
+            or not isinstance(self.last_played_exp_version, int)
+            or self.last_played_exp_version < 1
+        ):
+            raise user_domain_errors.InvalidLastPlayedExpVersionError(
+                self.last_played_exp_version
+            )
+
+        if (
+            not isinstance(self.last_played_state_name, str)
+            or not self.last_played_state_name
+        ):
+            raise user_domain_errors.InvalidLastPlayedStateNameError(
+                self.last_played_state_name
+            )
 
 
 class IncompleteActivities:
