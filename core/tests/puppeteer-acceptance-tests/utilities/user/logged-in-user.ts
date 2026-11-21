@@ -151,6 +151,7 @@ const explorationCategoryDropdown =
 const lessonInfoButton = 'button.oppia-lesson-info';
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
 const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
+const lessonInfoModalSelector = '.oppia-modal-lesson-information-card';
 const contributorProfileLink = '.e2e-test-contributor-icon';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
@@ -4747,6 +4748,11 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(closeLessonInfoButton, true);
     await this.clickOnElementWithSelector(closeLessonInfoButton);
     await this.expectElementToBeVisible(lessonInfoCardSelector, false);
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length === 0,
+      {},
+      lessonInfoModalSelector
+    );
   }
 
   /**
