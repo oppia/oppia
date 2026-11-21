@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Edit Thumbnail Modal Component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {EditThumbnailModalComponent} from './edit-thumbnail-modal.component';
@@ -50,10 +48,10 @@ describe('Edit Thumbnail Modal Component', () => {
   let closeSpy: jasmine.Spy;
   let dismissSpy: jasmine.Spy;
 
-  class MockReaderObject {
-    result = null;
+  class MockReaderObject extends FileReader {
     onload: () => string;
     constructor() {
+      super();
       this.onload = () => {
         return 'Fake onload executed';
       };
@@ -65,13 +63,18 @@ describe('Edit Thumbnail Modal Component', () => {
     }
   }
 
-  class MockImageObject {
+  class MockImageObject extends Image {
     source = null;
     onload: () => string;
     constructor() {
+      super();
       this.onload = () => {
         return 'Fake onload executed';
       };
+    }
+
+    get src(): string {
+      return '';
     }
 
     set src(url: string) {
