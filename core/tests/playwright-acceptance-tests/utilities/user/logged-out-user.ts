@@ -370,6 +370,8 @@ const blogPostPublishDateSelector = '.mobile-published-date';
 const blogPostTagContainerSelector = '.e2e-test-blog-tag-container';
 const blogPaginationSelector = '.e2e-test-pagination';
 const blogPaginationNextSelector = '.e2e-test-pagination-next-button';
+const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
+const blogPostTagSelector = '.e2e-test-blog-post-tag';
 const postsDisplayHeadingSelector = '.posts-display-heading';
 
 // Selectors for the blog post page.
@@ -4010,6 +4012,43 @@ export class LoggedOutUser extends BaseUser {
   async expectBlogPostWithTitleToBePresent(title: string): Promise<void> {
     await this.expectTextContentToContain(blogPostListSelector, title);
     showMessage(`Blog post with title "${title}" is present.`);
+  }
+
+  /**
+   * Expects all blog posts to have at least one tag.
+   */
+  async expectBlogPostsToHaveAtLeastOneTag(): Promise<void> {
+    const postTagContainers = this.page.locator(blogPostTagContainerSelector);
+    await expect(postTagContainers.first()).toBeVisible();
+    const count = await postTagContainers.count();
+    for (let i = 0; i < count; i++) {
+      const tags = postTagContainers.nth(i).locator(blogPostTagSelector);
+      await expect(tags.first()).toBeVisible();
+    }
+  }
+
+  /**
+   * Function to check whether the pagination controls are visible.
+   */
+  async expectBlogPaginationControlsVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPaginationSelector);
+  }
+
+  /**
+   * Clicks the previous button in the blog pagination controls.
+   */
+  async clickPreviousBlogPage(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const firstPostTitle = await this.page
+      .locator(blogPostTitleSelector)
+      .first()
+      .textContent();
+
+    await this.clickOnElementWithSelector(blogPaginationPrevSelector);
+
+    await expect(
+      this.page.locator(blogPostTitleSelector).first()
+    ).not.toHaveText(firstPostTitle ?? '');
   }
 
   /**

@@ -312,8 +312,8 @@
     },
     {
       "name": "logged-out-user/view-blog-posts",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/view-blog-posts.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/view-blog-posts.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties",
