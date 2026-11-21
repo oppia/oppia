@@ -10310,6 +10310,9 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             draft_change_list_id=2,
         ).put()
 
+        exp_before = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
+        self.assertEqual(exp_before.version, 3)
+
         user_data_before = user_models.ExplorationUserDataModel.get(
             self.USER_ID, self.EXP_ID1
         )
@@ -10320,15 +10323,34 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_data_before.draft_change_list_exp_version, 2)
         self.assertEqual(user_data_before.draft_change_list_id, 2)
 
-        swap_upgrade = self.swap_to_always_return(
+        def _mock_try_upgrading_draft_to_exp_version(
+            draft_change_list: List[exp_domain.ExplorationChange],
+            current_draft_version: int,
+            to_exp_version: int,
+            exp_id: str,
+        ) -> None:
+            """Mock for try_upgrading_draft_to_exp_version that returns None."""
+            self.assertEqual(
+                [change.to_dict() for change in draft_change_list],
+                self.draft_change_list_dict,
+            )
+            self.assertEqual(current_draft_version, 2)
+            self.assertEqual(to_exp_version, 3)
+            self.assertEqual(exp_id, self.EXP_ID1)
+
+        mock_upgrade_counter = test_utils.CallCounter(
+            _mock_try_upgrading_draft_to_exp_version
+        )
+        with self.swap(
             draft_upgrade_services,
             'try_upgrading_draft_to_exp_version',
-            value=None,
-        )
-        with swap_upgrade:
+            mock_upgrade_counter,
+        ):
             updated_exp = exp_services.get_exp_with_draft_applied(
                 self.EXP_ID1, self.USER_ID
             )
+
+        self.assertEqual(mock_upgrade_counter.times_called, 1)
         self.assertIsNotNone(updated_exp)
         assert updated_exp is not None
         new_content_dict = updated_exp.init_state.content.to_dict()
@@ -11289,6 +11311,10 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         self.assertIsNone(version_history_model_v2)
 
     def test_revert_version_history_when_model_is_missing(self) -> None:
+        original_title = exp_fetchers.get_exploration_by_id(
+            self.exploration.id
+        ).title
+
         change_list = [
             exp_domain.ExplorationChange(
                 {
@@ -11301,6 +11327,12 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.exploration.id, change_list, 'Updated title'
         )
+
+        exp_v2 = exp_fetchers.get_exploration_by_id(self.exploration.id)
+        self.assertEqual(exp_v2.version, 2)
+        self.assertEqual(exp_v2.title, 'New Title')
+        self.assertNotEqual(exp_v2.title, original_title)
+
         version_history_id_v1 = (
             self.version_history_model_class.get_instance_id(
                 self.exploration.id, 1
@@ -11316,6 +11348,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         )
         reverted_exp = exp_fetchers.get_exploration_by_id(self.exploration.id)
         self.assertEqual(reverted_exp.version, 3)
+        self.assertEqual(reverted_exp.title, original_title)
 
         version_history_id_v3 = (
             self.version_history_model_class.get_instance_id(
@@ -12240,13 +12273,75 @@ title: Title
         equal checkpoint.
         """
         self.login(self.VIEWER_EMAIL)
-        # Logged-in user is at 'Introduction' at version 1.
-        user_services.update_learner_checkpoint_progress(
-            self.viewer_id, self.EXP_ID, 'Introduction', 1
+        # Mark 'New state' as a checkpoint so exploration has two real
+        # checkpoints: 'Introduction' (index 0) and 'New state' (index 1),
+        # producing version 2.
+        change_list = _get_change_list(
+            'New state', exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT, True
         )
-        # Logged-out user is also at 'Introduction' at version 1.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, 'Add second checkpoint'
+        )
+
+        # Set the logged-in learner's furthest progress to 'New state' at
+        # version 2.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'New state', 2
+        )
+        # Move the logged-in learner's most-recent progress back to
+        # 'Introduction' at version 2.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 2
+        )
+
+        # Give the logged-out learner only 'Introduction' at version 2.
         exp_services.update_logged_out_user_progress(
-            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 2
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID
+        )
+        exp_user_data_before = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID
+        )
+        assert exp_user_data_before is not None
+        assert logged_out_user_data is not None
+
+        # Explicitly establish that both records have the same most-recent
+        # checkpoint state and version, but different furthest states.
+        self.assertEqual(
+            exp_user_data_before.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name,
+        )
+        self.assertEqual(
+            exp_user_data_before.most_recently_reached_checkpoint_state_name,
+            'Introduction',
+        )
+        self.assertEqual(
+            exp_user_data_before.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+        )
+        self.assertEqual(
+            exp_user_data_before.most_recently_reached_checkpoint_exp_version, 2
+        )
+        self.assertEqual(
+            exp_user_data_before.furthest_reached_checkpoint_state_name,
+            'New state',
+        )
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction',
+        )
+        self.assertNotEqual(
+            exp_user_data_before.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+        )
+        self.assertEqual(
+            exp_user_data_before.furthest_reached_checkpoint_exp_version, 2
+        )
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 2
         )
 
         exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
@@ -12262,14 +12357,14 @@ title: Title
             'Introduction',
         )
         self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2
         )
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_state_name,
-            'Introduction',
+            'New state',
         )
         self.assertEqual(
-            exp_user_data.furthest_reached_checkpoint_exp_version, 1
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2
         )
         self.logout()
 
