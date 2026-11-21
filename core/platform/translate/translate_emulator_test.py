@@ -61,3 +61,13 @@ class TranslateEmulatorTests(test_utils.GenericTestBase):
             'en', 'hi', '<p>unknown sentence</p>'
         )
         self.assertEqual(result, '<p>Mock translation of: unknown sentence</p>')
+
+    def test_fallback_preserves_blank_and_non_translatable_html(self) -> None:
+        result = self.emulator.generate_translation(
+            'en',
+            'hi',
+            '<p>  <span translate="no">technical text</span> visible text</p>',
+        )
+
+        self.assertIn('<span translate="no">technical text</span>', result)
+        self.assertIn('Mock translation of:  visible text', result)
