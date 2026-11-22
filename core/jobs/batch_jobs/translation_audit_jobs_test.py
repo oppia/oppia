@@ -382,6 +382,45 @@ class AuditInvalidHtmlTagsInTranslationsJobTests(job_test_utils.JobTestBase):
             ]
         )
 
+    def test_run_with_non_string_html_translation_reports_error(self) -> None:
+        self._create_translation_model(
+            'exp_1',
+            1,
+            'pt',
+            {
+                'content_0': self._create_html_translation(
+                    '<div><p>Ola</p></div>'
+                ),
+                'content_1': {
+                    'content_value': ['<p>Ola</p>'],
+                    'content_format': 'html',
+                    'needs_update': False,
+                },
+            },
+        )
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'TRANSLATION MODELS SCANNED: 1'
+                ),
+                job_run_result.JobRunResult.as_stderr(
+                    'Invalid HTML tags in exploration exp_1 version 1 (pt): '
+                    'content_0: div; '
+                    'content_1: HTML content value is not a string'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'TRANSLATION MODELS WITH INVALID HTML TAGS: 1'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'ENTITIES WITH INVALID HTML TAGS IN TRANSLATIONS: 1'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'TRANSLATIONS CONTAINING <div>: 1'
+                ),
+            ]
+        )
+
     def test_run_with_invalid_tags_only_in_older_version_reports_zero_counts(
         self,
     ) -> None:

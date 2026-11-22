@@ -27,6 +27,7 @@ from core.platform import models
 
 import apache_beam as beam
 import bs4
+import result
 from typing import Dict, Iterable, Iterator, List, Tuple
 
 MYPY = False
@@ -195,8 +196,9 @@ ALLOWED_HTML_TAGS = frozenset(
 EntityVersionKey = Tuple[str, str, int]
 
 # The language code of an EntityTranslationsModel and the invalid HTML tags in
-# its translations, keyed by content ID.
-LanguageAndInvalidTags = Tuple[str, Dict[str, List[str]]]
+# its translations, keyed by content ID. Translations whose HTML could not be
+# checked hold an error message instead of the tags.
+LanguageAndInvalidTags = Tuple[str, Dict[str, result.Result[List[str], str]]]
 
 
 def get_invalid_html_tags(html_string: str) -> List[str]:
@@ -221,7 +223,7 @@ def get_invalid_html_tags(html_string: str) -> List[str]:
 
 def _get_invalid_html_tags_by_content_id(
     translations: Dict[str, feconf.TranslatedContentDict],
-) -> Dict[str, List[str]]:
+) -> Dict[str, result.Result[List[str], str]]:
     """Returns the invalid HTML tags in each HTML translation.
 
     Args:
@@ -229,11 +231,12 @@ def _get_invalid_html_tags_by_content_id(
             an EntityTranslationsModel, keyed by content ID.
 
     Returns:
-        dict(str, list(str)). The invalid tags keyed by the content ID of the
-        translation they appear in. Translations without invalid tags are
-        omitted.
+        dict(str, Result(list(str), str)). The invalid tags keyed by the
+        content ID of the translation they appear in or an error message if
+        the HTML of the translation is not a string. Translations without
+        invalid tags are omitted.
     """
-    invalid_tags_by_content_id: Dict[str, List[str]] = {}
+    invalid_tags_by_content_id: Dict[str, result.Result[List[str], str]] = {}
     for content_id, translated_content in translations.items():
         if (
             translated_content['content_format']
@@ -241,10 +244,14 @@ def _get_invalid_html_tags_by_content_id(
         ):
             continue
         content_value = translated_content['content_value']
-        assert isinstance(content_value, str)
+        if not isinstance(content_value, str):
+            invalid_tags_by_content_id[content_id] = result.Err(
+                'HTML content value is not a string'
+            )
+            continue
         invalid_tags = get_invalid_html_tags(content_value)
         if invalid_tags:
-            invalid_tags_by_content_id[content_id] = invalid_tags
+            invalid_tags_by_content_id[content_id] = result.Ok(invalid_tags)
     return invalid_tags_by_content_id
 
 
@@ -260,9 +267,9 @@ def _get_keyed_invalid_translations(
         model: EntityTranslationsModel. The model to check.
 
     Yields:
-        tuple(tuple(str, str, int), tuple(str, dict(str, list(str)))). The
-        (entity type, entity ID, entity version) key, and the language code
-        with the invalid tags keyed by content ID.
+        tuple(tuple(str, str, int), tuple(str, dict(str, Result(list(str),
+        str)))). The (entity type, entity ID, entity version) key, and the
+        language code with the invalid tags or error keyed by content ID.
     """
     invalid_tags_by_content_id = _get_invalid_html_tags_by_content_id(
         model.translations
@@ -284,13 +291,13 @@ def _get_invalid_translation_report(
     Args:
         entity_version_key: tuple(str, str, int). The (entity type, entity ID,
             entity version) of the translations.
-        language_and_invalid_tags: tuple(str, dict(str, list(str))). The
-            language code of the translations and their invalid tags keyed by
-            content ID.
+        language_and_invalid_tags: tuple(str, dict(str, Result)). The
+            language code of the translations and their invalid tags or an
+            error, keyed by content ID.
 
     Returns:
-        JobRunResult. The stderr report listing the invalid tags of each
-        translation.
+        JobRunResult. The stderr report listing the invalid tags or error of
+        each translation.
     """
     entity_type, entity_id, entity_version = entity_version_key
     language_code, invalid_tags_by_content_id = language_and_invalid_tags
@@ -302,8 +309,16 @@ def _get_invalid_translation_report(
             entity_version,
             language_code,
             '; '.join(
-                '%s: %s' % (content_id, ', '.join(tags))
-                for content_id, tags in sorted(
+                '%s: %s'
+                % (
+                    content_id,
+                    (
+                        ', '.join(tags_result.unwrap())
+                        if tags_result.is_ok()
+                        else tags_result.unwrap_err()
+                    ),
+                )
+                for content_id, tags_result in sorted(
                     invalid_tags_by_content_id.items()
                 )
             ),
@@ -320,7 +335,7 @@ def _get_entity_key(
     Args:
         entity_version_key: tuple(str, str, int). The (entity type, entity ID,
             entity version) of the translations.
-        unused_language_and_invalid_tags: tuple(str, dict(str, list(str))).
+        unused_language_and_invalid_tags: tuple(str, dict(str, Result)).
             The language code and invalid tags of the translations.
 
     Returns:
@@ -340,15 +355,21 @@ def _get_invalid_tags(
     Args:
         unused_entity_version_key: tuple(str, str, int). The (entity type,
             entity ID, entity version) of the translations.
-        language_and_invalid_tags: tuple(str, dict(str, list(str))). The
-            language code of the translations and their invalid tags keyed by
-            content ID.
+        language_and_invalid_tags: tuple(str, dict(str, Result)). The
+            language code of the translations and their invalid tags or an
+            error, keyed by content ID.
 
     Returns:
-        list(str). The invalid tags of all the translations.
+        list(str). The invalid tags of all the translations. Translations
+        whose HTML could not be checked are skipped.
     """
     _, invalid_tags_by_content_id = language_and_invalid_tags
-    return [tag for tags in invalid_tags_by_content_id.values() for tag in tags]
+    return [
+        tag
+        for tags_result in invalid_tags_by_content_id.values()
+        if tags_result.is_ok()
+        for tag in tags_result.unwrap()
+    ]
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -410,15 +431,15 @@ class GetLatestInvalidHtmlTranslations(beam.PTransform):  # type: ignore[misc]
             | 'Group invalid translations with latest versions'
             >> beam.CoGroupByKey()
             | 'Keep invalid translations of latest versions'
-            >> beam.FlatMap(
-                lambda grouped: (
+            >> beam.FlatMapTuple(
+                lambda entity_version_key, grouped: (
                     [
-                        (grouped[0], language_and_invalid_tags)
-                        for language_and_invalid_tags in grouped[1][
+                        (entity_version_key, language_and_invalid_tags)
+                        for language_and_invalid_tags in grouped[
                             'invalid_translations'
                         ]
                     ]
-                    if list(grouped[1]['is_latest_version'])
+                    if list(grouped['is_latest_version'])
                     else []
                 )
             )
