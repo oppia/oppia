@@ -4746,6 +4746,53 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_can_submit_translation_suggestions(self) -> None:
+        self.assertFalse(
+            user_services.can_submit_translation_suggestions(self.translator_id)
+        )
+
+        user_services.allow_user_to_submit_translation_in_language(
+            self.translator_id, 'hi'
+        )
+
+        self.assertTrue(
+            user_services.can_submit_translation_suggestions(self.translator_id)
+        )
+        self.assertTrue(
+            user_services.can_submit_translation_suggestions(
+                self.translator_id, language_code='hi'
+            )
+        )
+        self.assertFalse(
+            user_services.can_submit_translation_suggestions(
+                self.translator_id, language_code='ar'
+            )
+        )
+
+    def test_remove_translation_submit_rights_in_language(self) -> None:
+        user_services.allow_user_to_submit_translation_in_language(
+            self.translator_id, 'hi'
+        )
+        user_services.allow_user_to_submit_translation_in_language(
+            self.translator_id, 'ar'
+        )
+
+        user_services.remove_translation_submit_rights_in_language(
+            self.translator_id, 'hi'
+        )
+
+        self.assertFalse(
+            user_services.can_submit_translation_suggestions(
+                self.translator_id, language_code='hi'
+            )
+        )
+        # Rights in other languages are kept.
+        self.assertTrue(
+            user_services.can_submit_translation_suggestions(
+                self.translator_id, language_code='ar'
+            )
+        )
+
     def test_remove_question_review_rights(self) -> None:
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         self.assertTrue(

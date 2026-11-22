@@ -1334,6 +1334,51 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
+    def test_can_submit_translation_for_language_codes_incorrect_type(
+        self,
+    ) -> None:
+        # To avoid pylint's line-too-long error, new variable is created here.
+        user_contribution_rights = self.user_contribution_rights
+        user_contribution_rights.can_submit_translation_for_language_codes = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected can_submit_translation_for_language_codes to be a list',
+        ):
+            self.user_contribution_rights.validate()
+
+    def test_incorrect_language_code_for_translation_submission_raise_error(
+        self,
+    ) -> None:
+        self.user_contribution_rights.can_submit_translation_for_language_codes = [  # pylint: disable=line-too-long
+            'invalid_lang_code'
+        ]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language_code: invalid_lang_code'
+        ):
+            self.user_contribution_rights.validate()
+
+    def test_can_submit_translation_for_language_codes_with_duplicate_values(
+        self,
+    ) -> None:
+        self.user_contribution_rights.can_submit_translation_for_language_codes = [  # pylint: disable=line-too-long
+            'hi'
+        ]
+        self.user_contribution_rights.validate()
+
+        self.user_contribution_rights.can_submit_translation_for_language_codes = [  # pylint: disable=line-too-long
+            'hi',
+            'hi',
+        ]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected can_submit_translation_for_language_codes list not to '
+            'have duplicate values',
+        ):
+            self.user_contribution_rights.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_can_review_voiceover_for_language_codes_incorrect_type(
         self,
     ) -> None:

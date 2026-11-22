@@ -44,8 +44,8 @@ describe('Auto-Translate Feature', function () {
       'autotranslator@example.com'
     );
     translationAdmin = await UserFactory.createNewUser(
-      'translationAdmin',
-      'translationAdmin@example.com',
+      'translationAdmAuto',
+      'translationAdmAuto@example.com',
       [ROLES.TRANSLATION_ADMIN]
     );
 
