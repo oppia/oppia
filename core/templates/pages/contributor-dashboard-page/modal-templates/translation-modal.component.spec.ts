@@ -2142,6 +2142,38 @@ describe('Translation Modal Component', () => {
   });
 
   describe('translateRteComponentFields', () => {
+    it('should skip an RTE field whose value is not valid JSON', fakeAsync(() => {
+      const html =
+        '<oppia-noninteractive-image alt-with-value="not valid json"' +
+        ' caption-with-value="&amp;quot;Cat photo&amp;quot;"' +
+        ' filepath-with-value="&amp;quot;img.svg&amp;quot;">' +
+        '</oppia-noninteractive-image>';
+      spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          translated_text: 'Foto de gato',
+          translation_provider: 'Google',
+        })
+      );
+
+      let result: string = '';
+      // eslint-disable-next-line dot-notation
+      component['translateRteComponentFields'](html, 'en', 'es').then(r => {
+        result = r;
+      });
+      flushMicrotasks();
+
+      // Only the caption is sent for translation, since the alt text could
+      // not be decoded.
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).toHaveBeenCalledOnceWith('Cat photo', 'en', 'es');
+      expect(result).toContain('Foto de gato');
+      expect(result).toContain('alt-with-value="not valid json"');
+    }));
+
     it(
       'should translate alt and caption of an image RTE component and add ' +
         'image to rteComponentsNeedingConfirmation',
