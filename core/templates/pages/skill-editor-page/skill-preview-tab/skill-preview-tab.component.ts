@@ -58,7 +58,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   questionsFetched!: boolean;
   skill!: Skill;
   htmlData!: string;
-  questionDicts!: Question[];
+  questions!: Question[];
   displayedQuestions!: Question[];
   displayCardIsInitialized: boolean = false;
   ALLOWED_QUESTION_INTERACTIONS: string[] = [];
@@ -95,9 +95,9 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       .fetchQuestionsAsync([this.skillId], this.QUESTION_COUNT, false)
       .then(response => {
         this.questionsFetched = true;
-        this.questionDicts = response;
+        this.questions = response;
         this.displayedQuestions = response;
-        if (this.questionDicts.length) {
+        if (this.questions.length) {
           this.selectQuestionToPreview(0);
         }
       });
@@ -115,7 +115,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    this.displayedQuestions = this.questionDicts.filter(question => {
+    this.displayedQuestions = this.questions.filter(question => {
       var contentData = question.getStateData().content.html;
       var interactionType = question.getStateData().interaction.id;
       var htmlContentIsMatching = Boolean(
