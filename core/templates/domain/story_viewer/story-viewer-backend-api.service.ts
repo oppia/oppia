@@ -36,13 +36,11 @@ import {
 
 interface StoryChapterCompletionBackendResponse {
   next_node_id: string;
-  ready_for_review_test: boolean;
   summaries: LearnerExplorationSummaryBackendDict[];
 }
 
 export interface StoryChapterCompletionResponse {
   nextNodeId: string;
-  readyForReviewTest: boolean;
   summaries: LearnerExplorationSummary[];
 }
 
@@ -123,7 +121,6 @@ export class StoryViewerBackendApiService {
               LearnerExplorationSummary.createFromBackendDict(expSummary)
             ),
             nextNodeId: data.next_node_id,
-            readyForReviewTest: data.ready_for_review_test,
           });
         },
         errorResponse => {

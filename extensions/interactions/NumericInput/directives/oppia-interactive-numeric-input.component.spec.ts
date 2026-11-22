@@ -218,6 +218,57 @@ describe('InteractiveNumericInput', () => {
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
 
+  it('should treat a null update from the schema editor as an empty answer', () => {
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
+    const updateCurrentAnswerSpy = spyOn(
+      currentInteractionService,
+      'updateCurrentAnswer'
+    );
+    const updateAnswerIsValidSpy = spyOn(
+      currentInteractionService,
+      'updateAnswerIsValid'
+    );
+    component.answer = 20;
+
+    component.onAnswerChange(null);
+
+    expect(component.answer).toBeNull();
+    expect(updateAnswerIsValidSpy).toHaveBeenCalledOnceWith(false);
+    expect(updateCurrentAnswerSpy).toHaveBeenCalledOnceWith(null);
+    expect(detectChangesSpy).toHaveBeenCalled();
+  });
+
+  it('should not submit a stale valid answer after the input is cleared', () => {
+    const updateAnswerIsValidSpy = spyOn(
+      currentInteractionService,
+      'updateAnswerIsValid'
+    );
+    spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(
+      true
+    );
+    const onSubmitSpy = spyOn(currentInteractionService, 'onSubmit');
+    component.requireNonnegativeInput = false;
+
+    component.onAnswerChange(25);
+    expect(component.isAnswerValid()).toBeTrue();
+
+    component.onAnswerChange(null);
+
+    expect(component.answer).toBeNull();
+    expect(component.isAnswerValid()).toBeFalse();
+    component.submitAnswer(component.answer);
+    expect(onSubmitSpy).not.toHaveBeenCalled();
+    expect(updateAnswerIsValidSpy).toHaveBeenCalledWith(false);
+    expect(component.errorMessageI18nKey).toBe(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_RESPONSE'
+    );
+  });
+
   it('should set an error when user submits with no response', () => {
     spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(
       true

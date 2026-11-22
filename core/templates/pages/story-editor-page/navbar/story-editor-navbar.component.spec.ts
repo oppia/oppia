@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the story editor navbar component.
  */
 
-// @ts-nocheck
-
 import {Story, StoryBackendDict} from 'domain/story/story.model';
 import {StoryNode} from 'domain/story/story-node.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -31,7 +29,10 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {StoryEditorNavbarComponent} from './story-editor-navbar.component';
 import {StoryEditorUnpublishModalComponent} from '../modal-templates/story-editor-unpublish-modal.component';
-import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
+import {
+  EditableStoryBackendApiService,
+  StoryPublicationAction,
+} from 'domain/story/editable-story-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
@@ -592,6 +593,7 @@ describe('Story editor navbar component', () => {
       'onChangeActiveTab'
     ).and.returnValue(mockStoryInitializedEventEmitter);
     let getStoryNodeSpy = spyOn(component, 'getStoryNodeData');
+    spyOn(storyEditorStateService, 'hasLoadedStory').and.returnValue(true);
 
     component.ngOnInit();
     fixture.detectChanges();
@@ -606,6 +608,26 @@ describe('Story editor navbar component', () => {
 
     expect(component.currentTab).toBe('story_editor');
   });
+
+  it(
+    'should not get story node data when switching to the chapter editor ' +
+      'before the story has loaded',
+    () => {
+      let mockActiveTabChangedEventEmitter = new EventEmitter<string>();
+      spyOnProperty(
+        storyEditorNavigationService,
+        'onChangeActiveTab'
+      ).and.returnValue(mockActiveTabChangedEventEmitter);
+      let getStoryNodeSpy = spyOn(component, 'getStoryNodeData');
+      spyOn(storyEditorStateService, 'hasLoadedStory').and.returnValue(false);
+
+      component.ngOnInit();
+      mockActiveTabChangedEventEmitter.emit('chapter_editor');
+
+      expect(component.currentTab).toBe('chapter_editor');
+      expect(getStoryNodeSpy).not.toHaveBeenCalled();
+    }
+  );
 
   it('should get story node data', () => {
     story = Story.createFromBackendDict(storyBackendDict);
@@ -949,11 +971,17 @@ describe('Story editor navbar component', () => {
     let changeStoryStatusSpy = spyOn(
       storyEditorStateService,
       'changeStoryPublicationStatus'
-    ).and.callFake((newStatus: string, callback: () => void) => {
-      if (callback) {
-        callback();
+    ).and.callFake(
+      (
+        publicationAction: StoryPublicationAction,
+        successCallback: (value?: Object) => void
+      ) => {
+        if (successCallback) {
+          successCallback();
+        }
+        return true;
       }
-    });
+    );
     let unpublishStorySpy = spyOn(component, 'unpublishStory');
     let loadStorySpy = spyOn(
       storyEditorStateService,

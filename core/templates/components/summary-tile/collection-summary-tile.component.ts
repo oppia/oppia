@@ -40,13 +40,12 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   @Input() getCollectionTitle!: string;
   @Input() getLastUpdatedMsec!: number;
   @Input() getObjective!: string;
-  @Input() getNodeCount!: string;
+  @Input() getNodeCount!: number;
   @Input() getCategory!: string;
   @Input() getThumbnailIconUrl!: string;
   @Input() getThumbnailBgColor!: string;
   @Input() isPlaylistTile: boolean = false;
   @Input() isLinkedToEditorPage: boolean = false;
-  @Input() showLearnerDashboardIconsIfPossible!: string;
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
   @Input() mobileCutoffPx!: number;

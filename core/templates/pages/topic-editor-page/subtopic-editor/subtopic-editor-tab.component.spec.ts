@@ -537,6 +537,22 @@ describe('Subtopic editor tab', () => {
     expect(component.htmlData).toEqual('test html');
   });
 
+  it('should update html data when the rich-text editor emits a new value', () => {
+    component.htmlData = 'old html';
+
+    component.onHtmlDataChange('new html');
+
+    expect(component.htmlData).toEqual('new html');
+  });
+
+  it('should reset html data to empty string for a non-string value', () => {
+    component.htmlData = 'old html';
+
+    component.onHtmlDataChange(null);
+
+    expect(component.htmlData).toEqual('');
+  });
+
   it(
     'should subscribe to onStudyGuideLoaded when restructured' +
       ' study guides feature is enabled',
@@ -647,7 +663,7 @@ describe('Subtopic editor tab', () => {
       ).and.callThrough();
 
       component.ngOnInit();
-      component.deleteSection(0, '');
+      component.deleteSection(0);
       tick();
 
       expect(modalSpy).toHaveBeenCalled();
@@ -668,7 +684,7 @@ describe('Subtopic editor tab', () => {
       ).and.callThrough();
 
       component.ngOnInit();
-      component.deleteSection(0, '');
+      component.deleteSection(0);
       tick();
 
       expect(modalSpy).toHaveBeenCalled();

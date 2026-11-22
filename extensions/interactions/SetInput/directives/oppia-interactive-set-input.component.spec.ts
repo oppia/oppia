@@ -113,6 +113,25 @@ describe('InteractiveSetInputComponent', () => {
     expect(component.errorMessage).toBe('');
   });
 
+  it('should ignore a non-array update from the schema editor', () => {
+    component.answer = ['unique1'];
+    component.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
+
+    component.updateAnswer(null);
+
+    expect(component.answer).toEqual(['unique1']);
+    expect(component.errorMessage).toBe(
+      'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR'
+    );
+  });
+
+  it('should keep only string elements from the schema editor update', () => {
+    component.updateAnswer(['unique1', 2, 'unique2']);
+
+    expect(component.answer).toEqual(['unique1', 'unique2']);
+    expect(component.errorMessage).toBe('');
+  });
+
   it('should initialise component when user adds interaction', () => {
     spyOn(
       currentInteractionService,
@@ -198,12 +217,17 @@ describe('InteractiveSetInputComponent', () => {
     expect(component.answer).toEqual(['test1', 'test2']);
   });
 
-  it('should not update answer when user does not edit saved solution', () => {
-    component.answer = ['test1'];
+  it('should keep the same answer reference when the value is unchanged', () => {
+    // The schema editor re-emits the exact array reference bound to
+    // 'localValue'. Reassigning a freshly filtered array here would change the
+    // reference and trigger an infinite change-detection loop, so the incoming
+    // reference must be preserved when the value is unchanged.
+    const answer = ['test1'];
+    component.answer = answer;
 
-    component.updateAnswer(['test1']);
+    component.updateAnswer(answer);
 
-    expect(component.answer).toEqual(['test1']);
+    expect(component.answer).toBe(answer);
   });
 
   it('should return the label for focus target', () => {

@@ -134,10 +134,7 @@ export class UrlService {
     let pathname = this.getPathname();
     // The following segment is for getting the fragment from the new learner
     // pages.
-    if (
-      pathname.startsWith('/learn') &&
-      pathname.match(/\/story\/|\/review-test\//g)
-    ) {
+    if (pathname.startsWith('/learn') && pathname.match(/\/story\//g)) {
       return decodeURIComponent(pathname.split('/')[5]);
     }
     // The following section is for getting the URL fragment from the
@@ -319,9 +316,7 @@ export class UrlService {
    */
   getStoryIdFromUrl(): string {
     let pathname = this.getPathname();
-    var matchedPath = pathname.match(
-      /\/(story_editor|review-test)\/(\w|-){12}/g
-    );
+    var matchedPath = pathname.match(/\/story_editor\/(\w|-){12}/g);
     if (matchedPath) {
       return matchedPath[0].split('/')[2];
     }

@@ -230,7 +230,6 @@ describe('Exploration Summary Tile Component', () => {
     component.isCollectionPreviewTile = true;
     component.isPlaylistTile = true;
     component.parentExplorationIds = ['1', '2', '3'];
-    component.showLearnerDashboardIconsIfPossible = 'true';
     component.isContainerNarrow = true;
     component.isOwnedByCurrentUser = true;
     fixture.detectChanges();
@@ -467,9 +466,11 @@ describe('Exploration Summary Tile Component', () => {
   }));
 
   it(
-    'should fail to get the average ratings of the exploration' +
-      ' if rating are undefined',
+    'should return a null average rating when the exploration has no' +
+      ' ratings',
     fakeAsync(() => {
+      // An exploration that nobody has rated yet has all-zero rating counts,
+      // which is what the tile falls back to when 'ratings' is not supplied.
       const ratingsSpy = spyOn(
         ratingComputationService,
         'computeAverageRating'
@@ -479,7 +480,13 @@ describe('Exploration Summary Tile Component', () => {
       tick();
       fixture.detectChanges();
 
-      expect(ratingsSpy).not.toHaveBeenCalled();
+      expect(ratingsSpy).toHaveBeenCalledWith({
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      });
       expect(averageRatings).toBeNull();
     })
   );

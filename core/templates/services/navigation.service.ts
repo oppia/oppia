@@ -19,6 +19,8 @@
 
 import {Injectable} from '@angular/core';
 
+export type KeyboardEventName = 'enter' | 'tab' | 'shiftTab';
+
 interface KeyFunc {
   shiftKeyIsPressed: boolean;
   keyCode: number;
@@ -26,26 +28,16 @@ interface KeyFunc {
 
 interface KeyboardEventToCodes {
   [keys: string]: KeyFunc;
-  enter: {
-    shiftKeyIsPressed: boolean;
-    keyCode: number;
-  };
-  tab: {
-    shiftKeyIsPressed: boolean;
-    keyCode: number;
-  };
-  shiftTab: {
-    shiftKeyIsPressed: boolean;
-    keyCode: number;
-  };
+  enter: KeyFunc;
+  tab: KeyFunc;
+  shiftTab: KeyFunc;
 }
 
-export interface EventToCodes {
-  [keys: string]: string;
-  enter: string;
-  tab: string;
-  shiftTab: string;
-}
+// Each key is optional because a menu item only handles the keyboard events
+// that make sense at its position in the menu. For example, the first item of a
+// menu closes it on shift+tab (since shift+tab moves focus out of the menu),
+// whereas the items after it only handle enter.
+export type EventToCodes = Partial<Record<KeyboardEventName, string>>;
 
 @Injectable({
   providedIn: 'root',
@@ -85,7 +77,7 @@ export class NavigationService {
     this.activeMenuName = menuName;
   }
 
-  closeSubmenu(evt: KeyboardEvent): void {
+  closeSubmenu(evt: Event): void {
     this.activeMenuName = '';
   }
 
@@ -105,7 +97,9 @@ export class NavigationService {
     menuName: string,
     eventsTobeHandled: EventToCodes
   ): void {
-    let targetEvents = Object.keys(eventsTobeHandled);
+    // 'Object.keys()' widens the keys to 'string', so they are narrowed back
+    // to 'KeyboardEventName' here, which is all that 'EventToCodes' allows.
+    let targetEvents = Object.keys(eventsTobeHandled) as KeyboardEventName[];
     for (let i = 0; i < targetEvents.length; i++) {
       let keyCodeSpec = this.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
       if (

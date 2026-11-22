@@ -920,14 +920,26 @@ class SuggestionTranslateContent(BaseSuggestion):
             list(str). The list of html content strings.
         """
         content_strings = []
-        if isinstance(self.change_cmd.translation_html, list):
-            content_strings.extend(self.change_cmd.translation_html)
+        # Here we use cast because translation_html can be a string or a list of
+        # strings at runtime, although AddWrittenTranslationCmd declares it as str.
+        translation_html = cast(
+            Union[str, List[str]],
+            self.change_cmd.translation_html,
+        )
+        if isinstance(translation_html, list):
+            content_strings.extend(translation_html)
         else:
-            content_strings.append(self.change_cmd.translation_html)
-        if isinstance(self.change_cmd.content_html, list):
-            content_strings.extend(self.change_cmd.content_html)
+            content_strings.append(translation_html)
+        # Here we use cast because content_html can be a string or a list of
+        # strings at runtime, although AddWrittenTranslationCmd declares it as str.
+        content_html = cast(
+            Union[str, List[str]],
+            self.change_cmd.content_html,
+        )
+        if isinstance(content_html, list):
+            content_strings.extend(content_html)
         else:
-            content_strings.append(self.change_cmd.content_html)
+            content_strings.append(content_html)
         return content_strings
 
     def get_target_entity_html_strings(self) -> List[str]:
@@ -2036,10 +2048,12 @@ class ContributorCertificateInfoDict(TypedDict):
     from_date: str
     to_date: str
     team_lead: str
-    contribution_hours: str
+    contribution_hours: float
     contribution_word_count: int
     language: Optional[str]
     certificate_profile_name: str
+    translated_word_count: int
+    reviewed_word_count: int
 
 
 class ContributorCertificateInfo:
@@ -2052,10 +2066,12 @@ class ContributorCertificateInfo:
         from_date: str,
         to_date: str,
         team_lead: str,
-        contribution_hours: str,
+        contribution_hours: float,
         contribution_word_count: int,
         language: Optional[str],
         certificate_profile_name: str,
+        translated_word_count: int = 0,
+        reviewed_word_count: int = 0,
     ) -> None:
         self.from_date = from_date
         self.to_date = to_date
@@ -2064,6 +2080,8 @@ class ContributorCertificateInfo:
         self.contribution_word_count = contribution_word_count
         self.language = language
         self.certificate_profile_name = certificate_profile_name
+        self.translated_word_count = translated_word_count
+        self.reviewed_word_count = reviewed_word_count
 
     def to_dict(self) -> ContributorCertificateInfoDict:
         """Returns a dict representation of a ContributorCertificateInfo
@@ -2081,6 +2099,8 @@ class ContributorCertificateInfo:
             'contribution_word_count': self.contribution_word_count,
             'language': self.language,
             'certificate_profile_name': self.certificate_profile_name,
+            'translated_word_count': self.translated_word_count,
+            'reviewed_word_count': self.reviewed_word_count,
         }
 
 

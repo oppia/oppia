@@ -58,7 +58,7 @@ describe('ExplorationModeService', () => {
       true
     );
     explorationModeService.init();
-    expect(explorationModeService.getCurrentMode()).toBe(
+    expect(explorationModeService.currentMode).toBe(
       EXPLORATION_MODE.EDITOR_PREVIEW
     );
   });
@@ -67,7 +67,7 @@ describe('ExplorationModeService', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
     spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
     explorationModeService.init();
-    expect(explorationModeService.getCurrentMode()).toBe(
+    expect(explorationModeService.currentMode).toBe(
       EXPLORATION_MODE.QUESTION_PLAYER
     );
   });
@@ -75,27 +75,16 @@ describe('ExplorationModeService', () => {
   it('should set the exploration mode correctly', () => {
     spyOn(currentEngineService, 'setExplorationEngineService');
     explorationModeService.setExplorationMode();
-    expect(explorationModeService.getCurrentMode()).toBe(
+    expect(explorationModeService.currentMode).toBe(
       EXPLORATION_MODE.EXPLORATION
     );
     expect(currentEngineService.setExplorationEngineService).toHaveBeenCalled();
   });
 
-  it('should set the pretest mode correctly', () => {
-    spyOn(currentEngineService, 'setQuestionPlayerEngineService');
-    explorationModeService.setPretestMode();
-    expect(explorationModeService.getCurrentMode()).toBe(
-      EXPLORATION_MODE.PRETEST
-    );
-    expect(
-      currentEngineService.setQuestionPlayerEngineService
-    ).toHaveBeenCalled();
-  });
-
   it('should set the question player mode correctly', () => {
     spyOn(currentEngineService, 'setQuestionPlayerEngineService');
     explorationModeService.setQuestionPlayerMode();
-    expect(explorationModeService.getCurrentMode()).toBe(
+    expect(explorationModeService.currentMode).toBe(
       EXPLORATION_MODE.QUESTION_PLAYER
     );
     expect(
@@ -106,7 +95,7 @@ describe('ExplorationModeService', () => {
   it('should set the diagnostic test player mode correctly', () => {
     spyOn(currentEngineService, 'setDiagnosticTestPlayerEngineService');
     explorationModeService.setDiagnosticTestPlayerMode();
-    expect(explorationModeService.getCurrentMode()).toBe(
+    expect(explorationModeService.currentMode).toBe(
       EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER
     );
     expect(
@@ -117,16 +106,13 @@ describe('ExplorationModeService', () => {
   it('should set the story chapter mode correctly', () => {
     spyOn(currentEngineService, 'setExplorationEngineService');
     explorationModeService.setStoryChapterMode();
-    expect(explorationModeService.getCurrentMode()).toBe(
+    expect(explorationModeService.currentMode).toBe(
       EXPLORATION_MODE.STORY_CHAPTER
     );
     expect(currentEngineService.setExplorationEngineService).toHaveBeenCalled();
   });
 
   it('should check if in question mode', () => {
-    explorationModeService.setPretestMode();
-    expect(explorationModeService.isInQuestionMode()).toBeTrue();
-
     explorationModeService.setQuestionPlayerMode();
     expect(explorationModeService.isInQuestionMode()).toBeTrue();
 
@@ -147,9 +133,6 @@ describe('ExplorationModeService', () => {
     expect(explorationModeService.isPresentingIsolatedQuestions()).toBeTrue();
 
     explorationModeService.setDiagnosticTestPlayerMode();
-    expect(explorationModeService.isPresentingIsolatedQuestions()).toBeTrue();
-
-    explorationModeService.setPretestMode();
     expect(explorationModeService.isPresentingIsolatedQuestions()).toBeTrue();
 
     explorationModeService.setExplorationMode();
@@ -187,7 +170,7 @@ describe('ExplorationModeService', () => {
       node_id: 'some_id',
     });
     explorationModeService.setExplorationModeFromUrl();
-    expect(explorationModeService.getCurrentMode()).toBe(
+    expect(explorationModeService.currentMode).toBe(
       EXPLORATION_MODE.STORY_CHAPTER
     );
   });
@@ -195,7 +178,7 @@ describe('ExplorationModeService', () => {
   it('should set exploration mode from URL when parameters are absent', () => {
     spyOn(urlService, 'getUrlParams').and.returnValue({});
     explorationModeService.setExplorationModeFromUrl();
-    expect(explorationModeService.getCurrentMode()).toBe(
+    expect(explorationModeService.currentMode).toBe(
       EXPLORATION_MODE.EXPLORATION
     );
   });

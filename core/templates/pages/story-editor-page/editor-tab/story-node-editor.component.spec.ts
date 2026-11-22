@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for the story node editor directive.
  */
-// @ts-nocheck
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -26,7 +25,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
@@ -138,10 +137,7 @@ describe('Story node editor component', () => {
   let alertsService: AlertsService;
   let storyEditorStateService: StoryEditorStateService;
   let focusManagerService: FocusManagerService;
-  let modalRef: {
-    componentInstance: Record<string, string>;
-    result: Promise<string | object | void>;
-  };
+  let modalRef: NgbModalRef;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let mockEventEmitterLast = new EventEmitter();
 
@@ -282,7 +278,15 @@ describe('Story node editor component', () => {
 
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(storyEditorStateService, 'getSkillSummaries').and.returnValue([
-      {id: '1', description: 'Skill description'},
+      {
+        id: '1',
+        description: 'Skill description',
+        language_code: 'en',
+        version: 1,
+        misconception_count: 0,
+        skill_model_created_on: 0,
+        skill_model_last_updated: 0,
+      },
     ]);
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
     spyOn(storyEditorStateService, 'getClassroomUrlFragment').and.returnValue(
@@ -305,7 +309,7 @@ describe('Story node editor component', () => {
     modalRef = {
       componentInstance: {},
       result: Promise.resolve('success'),
-    };
+    } as NgbModalRef;
   });
 
   afterEach(() => {
@@ -568,8 +572,8 @@ describe('Story node editor component', () => {
       storyUpdateService.setStoryNodePlannedPublicationDateMsecs
     ).toHaveBeenCalledTimes(0);
 
-    let oldDateString = '2000-09-09';
-    component.updatePlannedPublicationDate(oldDateString);
+    let pastDate = new Date('2000-09-09');
+    component.updatePlannedPublicationDate(pastDate);
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     expect(
       storyUpdateService.setStoryNodePlannedPublicationDateMsecs
@@ -577,9 +581,8 @@ describe('Story node editor component', () => {
     expect(component.plannedPublicationDate).toBe(null);
     expect(component.plannedPublicationDateIsInPast).toBe(true);
 
-    let futureDateString = '2037-04-20';
-    component.updatePlannedPublicationDate(futureDateString);
-    let futureDate = new Date(futureDateString);
+    let futureDate = new Date('2037-04-20');
+    component.updatePlannedPublicationDate(futureDate);
     expect(storySpy).toHaveBeenCalledWith(
       component.story,
       component.nodeId,
@@ -588,15 +591,43 @@ describe('Story node editor component', () => {
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     expect(component.plannedPublicationDateIsInPast).toBe(false);
 
-    component.updatePlannedPublicationDate('');
+    component.updatePlannedPublicationDate(null);
     expect(storySpy).toHaveBeenCalled();
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     expect(component.plannedPublicationDate).toBe(null);
     expect(component.plannedPublicationDateIsInPast).toBe(false);
 
     component.plannedPublicationDate = new Date();
-    component.updatePlannedPublicationDate(oldDateString);
+    component.updatePlannedPublicationDate(pastDate);
     expect(storySpy).toHaveBeenCalled();
+  });
+
+  it('should convert the date input value into a Date', () => {
+    component.setEditablePlannedPublicationDate('2037-04-20');
+    expect(component.editablePlannedPublicationDate).toEqual(
+      new Date('2037-04-20')
+    );
+
+    component.setEditablePlannedPublicationDate('');
+    expect(component.editablePlannedPublicationDate).toBeNull();
+  });
+
+  it('should update planned publication date when passed a Date', () => {
+    let storySpy = spyOn(
+      storyUpdateService,
+      'setStoryNodePlannedPublicationDateMsecs'
+    );
+    component.plannedPublicationDate = null;
+    let futureDate = new Date('2037-04-20');
+
+    component.updatePlannedPublicationDate(futureDate);
+
+    expect(storySpy).toHaveBeenCalledWith(
+      component.story,
+      component.nodeId,
+      futureDate.getTime()
+    );
+    expect(component.plannedPublicationDateIsInPast).toBe(false);
   });
 
   it(
@@ -793,6 +824,22 @@ describe('Story node editor component', () => {
     component.updateLocalEditableOutline('value');
 
     expect(component.editableOutline).toBe('value');
+  });
+
+  it('should not update chapter outline for a non-string value', () => {
+    component.editableOutline = 'outline';
+
+    component.updateLocalEditableOutline(['non-string value']);
+
+    expect(component.editableOutline).toBe('outline');
+  });
+
+  it('should not update chapter outline when the value is unchanged', () => {
+    component.editableOutline = 'outline';
+
+    component.updateLocalEditableOutline('outline');
+
+    expect(component.editableOutline).toBe('outline');
   });
 
   it(

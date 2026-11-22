@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the story editor component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -40,6 +38,7 @@ import {NewChapterTitleModalComponent} from '../modal-templates/new-chapter-titl
 import {DeleteChapterModalComponent} from '../modal-templates/delete-chapter-modal.component';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {StoryNode} from 'domain/story/story-node.model';
+import {DateTimeFormatService} from 'services/date-time-format.service';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {
@@ -328,7 +327,7 @@ describe('Story Editor Component having three story nodes', () => {
       }),
     ];
 
-    const event1: CdkDragDrop<string[]> = {
+    const event1: CdkDragDrop<StoryNode[]> = {
       previousIndex: 1,
       currentIndex: 0,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -340,7 +339,7 @@ describe('Story Editor Component having three story nodes', () => {
       isPointerOverContainer: false,
       distance: {x: 0, y: 0},
     };
-    const event2: CdkDragDrop<string[]> = {
+    const event2: CdkDragDrop<StoryNode[]> = {
       previousIndex: 1,
       currentIndex: 2,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -352,7 +351,7 @@ describe('Story Editor Component having three story nodes', () => {
       isPointerOverContainer: false,
       distance: {x: 0, y: 0},
     };
-    const event3: CdkDragDrop<string[]> = {
+    const event3: CdkDragDrop<StoryNode[]> = {
       previousIndex: 0,
       currentIndex: 1,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -383,6 +382,20 @@ describe('Story Editor Component having three story nodes', () => {
 
     expect(storyUpdateService.rearrangeNodeInStory).toHaveBeenCalledTimes(2);
   }));
+
+  it('should get the locale date time hour string from the service', () => {
+    const dateTimeFormatService = TestBed.inject(DateTimeFormatService);
+    spyOn(dateTimeFormatService, 'getLocaleDateTimeHourString').and.returnValue(
+      'Jan 1, 2026, 1:00 PM'
+    );
+
+    const formattedDate = component.getLocaleDateTimeHourString(1000000000);
+
+    expect(
+      dateTimeFormatService.getLocaleDateTimeHourString
+    ).toHaveBeenCalledWith(1000000000);
+    expect(formattedDate).toEqual('Jan 1, 2026, 1:00 PM');
+  });
 
   it('should move a chapter up in list', () => {
     let rearrangeNodeSpy = spyOn(component, 'rearrangeNodeInList');
@@ -738,13 +751,11 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should call windowref to open a tab', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      open: jasmine.createSpy('open', () => {}),
-    });
+    const openSpy = spyOn(windowRef.nativeWindow, 'open');
 
     component.returnToTopicEditorPage();
 
-    expect(windowRef.nativeWindow.open).toHaveBeenCalled();
+    expect(openSpy).toHaveBeenCalled();
   });
 
   it('should fetch story when story is initialized', () => {

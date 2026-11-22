@@ -194,7 +194,6 @@ describe('Question Player Component', () => {
     expect(component.currentProgress).toBe(0);
     expect(component.totalScore).toBe(0.0);
     expect(component.scorePerSkillMapping).toEqual({});
-    expect(component.testIsPassed).toBe(true);
     expect(
       questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit
     ).toHaveBeenCalledWith(false);
@@ -264,7 +263,6 @@ describe('Question Player Component', () => {
     );
     spyOn(component, 'calculateScores').and.stub();
     spyOn(component, 'calculateMasteryDegrees').and.stub();
-    spyOn(component, 'hasUserPassedTest').and.returnValue(true);
 
     component.userIsLoggedIn = true;
     let data = JSON.stringify({
@@ -275,7 +273,6 @@ describe('Question Player Component', () => {
     tick();
     tick();
 
-    expect(component.testIsPassed).toBe(true);
     expect(component.calculateScores).toHaveBeenCalled();
     expect(component.userIsLoggedIn).toBe(true);
   }));
@@ -366,48 +363,12 @@ describe('Question Player Component', () => {
 
     component.questionPlayerConfig = {
       resultActionButtons: [],
-      questionPlayerMode: {
-        modeType: '',
-        passCutoff: 0,
-      },
       skillDescriptions: [],
       skillList: [],
       questionCount: 0,
       questionsSortedByDifficulty: false,
     } as QuestionPlayerConfig;
     expect(component.showActionButtonsFooter()).toBe(false);
-  });
-
-  it('should check if the user has passed the test or not', () => {
-    component.questionPlayerConfig = {
-      questionPlayerMode: {
-        modeType: 'PASS_FAIL',
-        passCutoff: 1.5,
-      },
-    } as QuestionPlayerConfig;
-    component.scorePerSkillMapping = {
-      skill1: {
-        score: 5,
-        total: 8,
-        description: '',
-      },
-      skill2: {
-        score: 8,
-        total: 8,
-        description: '',
-      },
-    };
-
-    expect(component.hasUserPassedTest()).toBe(false);
-
-    component.questionPlayerConfig = {
-      questionPlayerMode: {
-        modeType: 'PASS_FAIL',
-        passCutoff: 0.5,
-      },
-    } as QuestionPlayerConfig;
-
-    expect(component.hasUserPassedTest()).toBe(true);
   });
 
   it('should get score percentage to set score bar width', () => {
@@ -458,10 +419,6 @@ describe('Question Player Component', () => {
     };
     component.questionPlayerConfig = {
       resultActionButtons: [],
-      questionPlayerMode: {
-        modeType: '',
-        passCutoff: 0,
-      },
       skillList: ['skillId1'],
       skillDescriptions: ['description1'],
       questionCount: 0,
@@ -510,10 +467,6 @@ describe('Question Player Component', () => {
     };
     component.questionPlayerConfig = {
       resultActionButtons: [],
-      questionPlayerMode: {
-        modeType: '',
-        passCutoff: 0,
-      },
       skillList: ['skillId1'],
       skillDescriptions: ['description1'],
       questionCount: 0,
@@ -588,102 +541,8 @@ describe('Question Player Component', () => {
     });
   });
 
-  it(
-    'should open concept card modal when user clicks on review' + ' and retry',
-    () => {
-      spyOn(component, 'openConceptCardModal').and.stub();
-      component.failedSkillIds = ['skillId1'];
-
-      component.reviewConceptCardAndRetryTest();
-
-      expect(component.openConceptCardModal).toHaveBeenCalled();
-    }
-  );
-
-  it(
-    'should throw error when user clicks on review and retry' +
-      ' and there are no failed skills',
-    () => {
-      component.failedSkillIds = [];
-
-      expect(() => component.reviewConceptCardAndRetryTest()).toThrowError(
-        'No failed skills'
-      );
-    }
-  );
-
-  it('should get color for score based on score per skill', () => {
-    let scorePerSkill = {
-      score: 5,
-      total: 7,
-      description: '',
-    };
-    component.questionPlayerConfig = {
-      questionPlayerMode: {
-        modeType: 'NOT_PASS_FAIL',
-        passCutoff: 1.5,
-      },
-    } as QuestionPlayerConfig;
-
-    expect(component.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
-
-    component.questionPlayerConfig = {
-      questionPlayerMode: {
-        modeType: 'PASS_FAIL',
-        passCutoff: 1.5,
-      },
-    } as QuestionPlayerConfig;
-
-    expect(component.getColorForScore(scorePerSkill)).toBe('rgb(217, 92, 12)');
-
-    component.questionPlayerConfig = {
-      questionPlayerMode: {
-        modeType: 'PASS_FAIL',
-        passCutoff: 0.5,
-      },
-    } as QuestionPlayerConfig;
-
-    expect(component.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
-  });
-
-  it('should get color for score bar based on score per skill', () => {
-    let scorePerSkill = {
-      score: 5,
-      total: 7,
-      description: '',
-    };
-    component.questionPlayerConfig = {
-      questionPlayerMode: {
-        modeType: 'NOT_PASS_FAIL',
-        passCutoff: 1.5,
-      },
-    } as QuestionPlayerConfig;
-
-    expect(component.getColorForScoreBar(scorePerSkill)).toBe(
-      'rgb(32, 93, 134)'
-    );
-
-    component.questionPlayerConfig = {
-      questionPlayerMode: {
-        modeType: 'PASS_FAIL',
-        passCutoff: 1.5,
-      },
-    } as QuestionPlayerConfig;
-
-    expect(component.getColorForScoreBar(scorePerSkill)).toBe(
-      'rgb(217, 92, 12)'
-    );
-
-    component.questionPlayerConfig = {
-      questionPlayerMode: {
-        modeType: 'PASS_FAIL',
-        passCutoff: 0.5,
-      },
-    } as QuestionPlayerConfig;
-
-    expect(component.getColorForScoreBar(scorePerSkill)).toBe(
-      'rgb(32, 93, 134)'
-    );
+  it('should get color for score bar', () => {
+    expect(component.getColorForScoreBar()).toBe('rgb(32, 93, 134)');
   });
 
   it('should open skill mastery modal when user clicks on skill', fakeAsync(() => {
@@ -807,18 +666,6 @@ describe('Question Player Component', () => {
     } as unknown as QuestionPlayerConfig;
 
     expect(component.isSortByDifficulty()).toBe(false);
-  });
-
-  it('should return false when pass or fail mode is absent', () => {
-    component.questionPlayerConfig = {
-      resultActionButtons: [],
-      skillList: [],
-      skillDescriptions: [],
-      questionCount: 0,
-      questionsSortedByDifficulty: false,
-    };
-
-    expect(component.isInPassOrFailMode()).toBe(false);
   });
 
   it('should create empty score and mastery mappings when skill list is absent', () => {
