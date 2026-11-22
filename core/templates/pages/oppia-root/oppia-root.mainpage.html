@@ -5,6 +5,17 @@
   </head>
   <body>
     <oppia-root></oppia-root>
+    <!-- Production paints this markup before Angular boots; the development
+         shell hides it because it has no critical CSS for the lightweight
+         routes. -->
+    <div id="oppia-prerender-shell">
+      ___OPPIA_PRERENDERED_CONTENT___
+    </div>
+    <script>
+      if (/^\/(terms|maintenance)\/?$/.test(location.pathname)) {
+        document.getElementById('oppia-prerender-shell').style.display = 'none';
+      }
+    </script>
     <script type="application/json" id="oppia-feature-flags">
       ___OPPIA_FEATURE_FLAGS___
     </script>

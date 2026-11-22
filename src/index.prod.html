@@ -13,16 +13,133 @@
     </script>
     <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
-    <link rel="preload" media="screen"
-          href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap"
-          as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link data-oppia-preconnect href="https://fonts.googleapis.com" crossorigin>
+    <link data-oppia-preconnect href="https://storage.googleapis.com" crossorigin>
+    <!-- The lightweight routes use Arial from the inline critical CSS. The
+         resource loader removes this link before it can block their paint. -->
+    <link data-oppia-font-stylesheet
+          href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Critical layout for the lightweight /terms and /maintenance pages.
+         The global stylesheets are removed on these routes, so these rules
+         are the complete stylesheet for the prerendered markup. -->
+    <script>
+      if (/^\/(terms|maintenance)\/?$/.test(location.pathname)) {
+        document.documentElement.classList.add('oppia-lite-page');
+      }
+    </script>
+    <style>
+      html.oppia-lite-page {
+        background-color: #e8e7e3;
+        font-size: 62.5%;
+        height: 100%;
+      }
+      .oppia-lite-page body {
+        background-color: #e8e7e3;
+        color: rgba(0, 0, 0, 0.87);
+        font-size: 1.6em !important;
+        height: 100%;
+        margin: 0 auto;
+        overflow-x: hidden;
+        padding: 0;
+      }
+      .oppia-lite-page oppia-root,
+      .oppia-lite-page oppia-root *,
+      .oppia-lite-page oppia-terms-page-root,
+      .oppia-lite-page oppia-maintenance-page-root,
+      .oppia-lite-page terms-page,
+      .oppia-lite-page oppia-maintenance-page {
+        font-family: Arial, Helvetica, sans-serif !important;
+      }
+      .oppia-lite-page oppia-root,
+      .oppia-lite-page oppia-terms-page-root,
+      .oppia-lite-page oppia-maintenance-page-root,
+      .oppia-lite-page terms-page,
+      .oppia-lite-page oppia-maintenance-page {
+        display: block;
+      }
+      /* Both hosts share one grid cell so the swap cannot move either page.
+         The wrapper is display: contents on other routes to avoid changing
+         their layout. */
+      #oppia-prerender-container {
+        display: contents;
+      }
+      .oppia-lite-page #oppia-prerender-container {
+        display: grid;
+        grid-template-columns: 100%;
+      }
+      .oppia-lite-page #oppia-prerender-container > oppia-root,
+      .oppia-lite-page #oppia-prerender-container > #oppia-prerender-shell {
+        grid-area: 1 / 1;
+      }
+      .oppia-lite-page oppia-root {
+        display: none;
+      }
+      .oppia-lite-page #oppia-prerender-shell {
+        display: block;
+      }
+      .oppia-lite-page.oppia-angular-ready oppia-root {
+        display: block;
+      }
+      .oppia-lite-page.oppia-angular-ready #oppia-prerender-shell {
+        visibility: hidden;
+      }
+      .oppia-lite-page p {
+        line-height: 1.2;
+        margin-bottom: 18px;
+      }
+      .oppia-lite-page .oppia-long-text p {
+        line-height: 1.4;
+        margin: 1.4em 0;
+      }
+      .oppia-lite-page .oppia-page-cards-container {
+        margin: auto;
+        max-width: 95%;
+        position: relative;
+        width: 660px;
+      }
+      .oppia-lite-page .mat-card {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
+          0 1px 2px rgba(0, 0, 0, 0.24);
+        box-sizing: border-box;
+        display: block;
+      }
+      .oppia-lite-page .oppia-page-cards-container .oppia-page-card {
+        margin: 40px auto 80px;
+        padding: 30px 55px 30px 45px;
+      }
+      .oppia-lite-page .oppia-page-card h2 {
+        margin: 16px 0;
+      }
+      .oppia-lite-page .oppia-h2-text {
+        margin-top: 40px;
+      }
+      .oppia-lite-page .oppia-main-body {
+        margin: 0 auto;
+        max-width: 960px;
+        padding: 0 16px;
+      }
+      .oppia-lite-page .oppia-navbar {
+        background: #00645c;
+        color: #fff;
+        padding: 8px 16px;
+      }
+      .oppia-lite-page .oppia-logo {
+        height: 64px;
+        width: 144px;
+      }
+    </style>
   </head>
 
   <body>
-    <oppia-root></oppia-root>
+    <div id="oppia-prerender-container">
+      <oppia-root></oppia-root>
+      <!-- The backend fills this host for /terms and /maintenance so the
+           existing Angular component markup paints with the initial HTML. -->
+      <div id="oppia-prerender-shell">___OPPIA_PRERENDERED_CONTENT___</div>
+    </div>
     <script type="application/json" id="oppia-feature-flags">
       ___OPPIA_FEATURE_FLAGS___
     </script>

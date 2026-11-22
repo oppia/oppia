@@ -403,16 +403,17 @@ module.exports = {
         },
         {
           matchingUrlPattern: 'http://[^/]+/terms$',
+          // The lite app shell paints this page from prerendered markup.
           pagePerfThresholds: {
-            fcp: 24300,
-            speedIndex: 24300,
-            lcp: 51000,
-            tbt: 1020,
-            cls: 0.15,
+            fcp: 2500,
+            speedIndex: 3000,
+            lcp: 3500,
+            tbt: 500,
+            cls: 0.1,
           },
           accessibilityMinScore: 0.95,
           overrides: {
-            'categories:performance': ['error', {minScore: 0}],
+            'categories:performance': ['error', {minScore: 0.9}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
           },
         },
@@ -878,18 +879,18 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://localhost:8181/maintenance$',
-          // The maintenance page is a plain page on the shared app shell.
-          // These thresholds are based on measurements taken with response
-          // compression, which matches the production Google Front End, and
-          // keep a wide margin over the measured mobile values.
+          // The lite app shell paints this page from prerendered markup.
           pagePerfThresholds: {
-            fcp: 15000,
-            speedIndex: 15000,
-            lcp: 20000,
-            tbt: 3000,
-            cls: 0.15,
+            fcp: 2500,
+            speedIndex: 3000,
+            lcp: 5000,
+            tbt: 500,
+            cls: 0.1,
           },
           accessibilityMinScore: 0.9,
+          overrides: {
+            'categories:performance': ['error', {minScore: 0.9}],
+          },
         },
         {
           matchingUrlPattern: '^http://localhost:8181/lesson/.+$',

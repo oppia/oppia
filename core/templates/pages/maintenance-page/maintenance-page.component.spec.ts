@@ -57,11 +57,4 @@ describe('Maintenance page', () => {
       documentAttributeCustomizationService.addAttribute
     ).toHaveBeenCalledWith('lang', 'en');
   });
-
-  it('should get static image url', () => {
-    let imagePath = '/path/to/image.png';
-    let staticImageUrl = component.getStaticImageUrl(imagePath);
-
-    expect(staticImageUrl).toBe('/assets/images/path/to/image.png');
-  });
 });

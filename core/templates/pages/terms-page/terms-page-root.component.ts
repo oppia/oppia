@@ -16,43 +16,47 @@
  * @fileoverview Root component for Terms Page.
  */
 
-import {Component, OnDestroy} from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
-import {Subscription} from 'rxjs';
-
-import {AppConstants} from 'app.constants';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {markAngularContentReady} from 'pages/oppia-root/bootstrap-module';
 import {PageHeadService} from 'services/page-head.service';
+
+const DESCRIPTION =
+  'Oppia is a non-profit open-source learning platform. ' +
+  'Read our terms for creating and sharing lessons.';
+
+export const TERMS_PAGE_TITLE = 'Terms of Use | Oppia';
+export const TERMS_PAGE_META = [
+  {
+    PROPERTY_TYPE: 'itemprop',
+    PROPERTY_VALUE: 'description',
+    CONTENT: DESCRIPTION,
+  },
+  {
+    PROPERTY_TYPE: 'property',
+    PROPERTY_VALUE: 'og:description',
+    CONTENT: DESCRIPTION,
+  },
+] as const;
 
 @Component({
   selector: 'oppia-terms-page-root',
   templateUrl: './terms-page-root.component.html',
 })
-export class TermsPageRootComponent implements OnDestroy {
-  directiveSubscriptions = new Subscription();
-  constructor(
-    private pageHeadService: PageHeadService,
-    private translateService: TranslateService
-  ) {}
-
-  setPageTitleAndMetaTags(): void {
-    let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.TITLE
-    );
-    this.pageHeadService.updateTitleAndMetaTags(
-      translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.META
-    );
-  }
+export class TermsPageRootComponent implements OnInit, AfterViewInit {
+  constructor(private pageHeadService: PageHeadService) {}
 
   ngOnInit(): void {
-    this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
-        this.setPageTitleAndMetaTags();
-      })
+    // These values are static for this page. Setting them directly keeps the
+    // lightweight bootstrap independent of the translation loader.
+    this.pageHeadService.updateTitleAndMetaTags(
+      TERMS_PAGE_TITLE,
+      TERMS_PAGE_META
     );
   }
 
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
+  ngAfterViewInit(): void {
+    // The child page view is laid out by this point, so revealing it cannot
+    // create a layout shift against the prerendered markup.
+    markAngularContentReady();
   }
 }

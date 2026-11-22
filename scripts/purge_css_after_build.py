@@ -17,8 +17,43 @@
 from __future__ import annotations
 
 import glob
+import json
 import os
+import shutil
 import subprocess
+import tempfile
+
+# PurgeCSS 4/5 requires a newer Node than the version pinned for CI. Version
+# 3 is the last release that works with the Node 16 toolchain used by builds.
+PURGE_CSS_PACKAGE = 'purgecss@3.1.3'
+
+# Selectors that are assembled at runtime or supplied by Angular Material.
+# PurgeCSS only sees literal class names in the built HTML/JS, so these need
+# to be preserved explicitly.
+SAFELIST = [
+    'html',
+    'body',
+    'mat-',
+    'cdk-',
+    'ngx-',
+    'oppia-',
+    'navbar',
+    'modal',
+    'dropdown',
+    'tooltip',
+    'popover',
+    'fade',
+    'show',
+    'active',
+    'open',
+    'collaps',
+    'ng-',
+    'fa-',
+    'fas',
+    'far',
+    'fab',
+    'material-icons',
+]
 
 
 def main() -> None:
@@ -27,13 +62,10 @@ def main() -> None:
     if not os.path.exists(build_dir):
         return
 
-    # Get all HTML/TS/JS files in build to scan
-    content_files = []
-    for pattern in [
+    content_patterns = [
         os.path.join(build_dir, '**', '*.html'),
         os.path.join(build_dir, '**', '*.js'),
-    ]:
-        content_files.extend(glob.glob(pattern, recursive=True))
+    ]
 
     css_files = []
     for pattern in [
@@ -42,44 +74,32 @@ def main() -> None:
     ]:
         css_files.extend(glob.glob(pattern))
 
-    if not css_files or not content_files:
+    if not css_files:
         return
 
-    for css_file in css_files:
+    # The CLI takes the content globs as arguments; writing them to a config
+    # file avoids hitting the OS argument-length limit for large builds.
+    with tempfile.TemporaryDirectory() as temp_dir:
+        config_filepath = os.path.join(temp_dir, 'purgecss.config.json')
+        output_dir = os.path.join(temp_dir, 'out')
+        os.makedirs(output_dir)
+        config = {
+            'content': [os.path.abspath(p) for p in content_patterns],
+            'css': [os.path.abspath(css_file) for css_file in css_files],
+            'output': output_dir,
+            'safelist': SAFELIST,
+        }
+        with open(config_filepath, 'w', encoding='utf-8') as config_file:
+            json.dump(config, config_file)
+
         try:
             result = subprocess.run(
                 [
                     'npx',
-                    'purgecss',
-                    '--css',
-                    css_file,
-                    '--content',
-                    *content_files,
-                    '--output',
-                    css_file,
-                    '--safelist',
-                    'html',
-                    'body',
-                    'mat-',
-                    'cdk-',
-                    'ngx-',
-                    'oppia-',
-                    'navbar',
-                    'modal',
-                    'dropdown',
-                    'tooltip',
-                    'popover',
-                    'fade',
-                    'show',
-                    'active',
-                    'open',
-                    'collaps',
-                    'ng-',
-                    'fa-',
-                    'fas',
-                    'far',
-                    'fab',
-                    'material-icons',
+                    '--yes',
+                    PURGE_CSS_PACKAGE,
+                    '--config',
+                    os.path.relpath(config_filepath, os.getcwd()),
                 ],
                 check=False,
                 stdout=subprocess.PIPE,
@@ -87,10 +107,18 @@ def main() -> None:
             )
             if result.returncode != 0:
                 print(
-                    f'PurgeCSS failed for {css_file}: {result.stderr.decode()}'
+                    'PurgeCSS failed: %s'
+                    % result.stderr.decode(errors='replace')
                 )
+                return
         except Exception as e:
-            print(f'Error running purgecss on {css_file}: {e}')
+            print('Error running purgecss: %s' % e)
+            return
+
+        for css_file in css_files:
+            purged_file = os.path.join(output_dir, os.path.basename(css_file))
+            if os.path.exists(purged_file):
+                shutil.copyfile(purged_file, css_file)
 
 
 if __name__ == '__main__':

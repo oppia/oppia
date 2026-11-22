@@ -958,6 +958,97 @@ class BuildTests(test_utils.GenericTestBase):
             finally:
                 os.chdir(old_working_dir)
 
+    def test_defer_global_stylesheets(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                os.makedirs('build', exist_ok=True)
+                html = (
+                    '<head><link rel="stylesheet" href="/build/styles.css">'
+                    '</head><body></body>'
+                )
+                html_filepath = os.path.join(
+                    'build', 'oppia-root.mainpage.html'
+                )
+                with open(html_filepath, 'w', encoding='utf-8') as html_file:
+                    html_file.write(html)
+
+                build.defer_global_stylesheets()
+
+                with open(html_filepath, 'r', encoding='utf-8') as html_file:
+                    updated_html = html_file.read()
+
+                self.assertIn(
+                    '<link data-oppia-global-stylesheet '
+                    'href="/build/styles.css">'
+                    '<noscript><link rel="stylesheet" '
+                    'href="/build/styles.css"></noscript>',
+                    updated_html,
+                )
+            finally:
+                os.chdir(old_working_dir)
+
+    def test_defer_global_stylesheets_without_html(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                build.defer_global_stylesheets()
+            finally:
+                os.chdir(old_working_dir)
+
+    def test_defer_resources_for_lite_pages(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                build.defer_resources_for_lite_pages()
+
+                os.makedirs('build', exist_ok=True)
+                html_filepath = os.path.join(
+                    'build', 'oppia-root.mainpage.html'
+                )
+                html = (
+                    '<head><link data-oppia-preconnect '
+                    'href="https://fonts.example" crossorigin>'
+                    '<link data-oppia-global-stylesheet '
+                    'href="/build/styles.css"><link '
+                    'data-oppia-font-stylesheet href="https://fonts.example">'
+                    '</head><body><script src="/build/main.js" type="module">'
+                    '</script></body>'
+                )
+                with open(html_filepath, 'w', encoding='utf-8') as html_file:
+                    html_file.write(html)
+
+                build.defer_resources_for_lite_pages()
+
+                with open(html_filepath, 'r', encoding='utf-8') as html_file:
+                    updated_html = html_file.read()
+
+                self.assertIn(
+                    '<template class="oppia-deferred-angular-script">'
+                    '<script src="/build/main.js" type="module"></script>'
+                    '</template>',
+                    updated_html,
+                )
+                self.assertIn(
+                    'link[data-oppia-global-stylesheet], '
+                    'link[data-oppia-font-stylesheet]',
+                    updated_html,
+                )
+                self.assertIn('link[data-oppia-preconnect]', updated_html)
+                self.assertIn('discardDeferredAssets', updated_html)
+                self.assertIn('restoreAngularScripts', updated_html)
+                self.assertIn(
+                    'window.setTimeout(restoreAngularScripts, 0)',
+                    updated_html,
+                )
+                self.assertIn('(terms|maintenance)', updated_html)
+                self.assertNotIn('modulepreload', updated_html)
+            finally:
+                os.chdir(old_working_dir)
+
 
 class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
     """Test the end to end build methods."""

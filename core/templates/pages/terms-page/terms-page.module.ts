@@ -21,23 +21,11 @@ import {TermsPageComponent} from 'pages/terms-page/terms-page.component';
 import {TermsPageRootComponent} from './terms-page-root.component';
 import {CommonModule} from '@angular/common';
 import {TermsPageRoutingModule} from './terms-page-routing.module';
-import {RouterModule} from '@angular/router';
 
-import {BaseModule} from 'base-components/base.module';
-import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 import {MatCardModule} from '@angular/material/card';
-import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
-  imports: [
-    BaseModule,
-    BackgroundBannerModule,
-    MatCardModule,
-    TranslateModule,
-    CommonModule,
-    RouterModule,
-    TermsPageRoutingModule,
-  ],
+  imports: [CommonModule, MatCardModule, TermsPageRoutingModule],
   declarations: [TermsPageComponent, TermsPageRootComponent],
   entryComponents: [TermsPageComponent, TermsPageRootComponent],
 })

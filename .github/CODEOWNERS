@@ -55,6 +55,8 @@
 # Angular Migration team
 /core/templates/pages/base-root.component.ts @oppia/lace-frontend-reviewers
 /core/controllers/oppia_root*.py @oppia/lace-frontend-reviewers
+/core/domain/angular_prerender_services.py @oppia/lace-backend-reviewers
+/core/domain/angular_prerender_services_test.py @oppia/lace-backend-reviewers
 /core/templates/components/shared_parts/ @oppia/lace-frontend-reviewers
 /core/templates/services/loader.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/code-mirror/ @oppia/lace-frontend-reviewers
@@ -819,3 +821,4 @@
 /core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
 /core/domain/takeout_*.py @oppia/core-reviewers
 /core/domain/wipeout_*.py @oppia/core-reviewers
+/PERF_SCORE_IMPROVEMENTS.md @oppia/dev-workflow-reviewers

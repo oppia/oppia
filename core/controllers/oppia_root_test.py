@@ -137,3 +137,23 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
             ],
             False,
         )
+
+    def test_prerendered_content_is_injected_for_target_pages(self) -> None:
+        """Tests that the target pages ship their Angular markup in the shell."""
+        for path, expected_markup in (
+            ('/terms', '<terms-page>'),
+            ('/maintenance', '<oppia-maintenance-page>'),
+        ):
+            response = self.get_html_response(path, expected_status_int=200)
+            response.mustcontain(expected_markup)
+            self.assertNotIn(
+                '___OPPIA_PRERENDERED_CONTENT___', response.body.decode('utf-8')
+            )
+
+    def test_prerendered_content_is_absent_for_other_pages(self) -> None:
+        """Tests that unrelated routes do not ship the prerendered markup."""
+        response = self.get_html_response('/', expected_status_int=200)
+        body = response.body.decode('utf-8')
+
+        self.assertNotIn('<terms-page>', body)
+        self.assertNotIn('<oppia-maintenance-page>', body)

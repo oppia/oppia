@@ -475,6 +475,140 @@ def build_using_ng() -> None:
     ), 'angular generated bundle should be non-empty'
 
 
+def defer_global_stylesheets() -> None:
+    """Makes the Angular-generated global stylesheets deferrable.
+
+    The large stylesheets are not needed for the prerendered markup on the
+    lightweight routes, so they are emitted as inert links. The resource loader
+    discards them on those routes and promotes them immediately on all other
+    routes. A noscript link keeps them available when scripts are disabled.
+    """
+    html_filepath = os.path.join('build', 'oppia-root.mainpage.html')
+    if not os.path.exists(html_filepath):
+        return
+
+    with open(html_filepath, 'r', encoding='utf-8') as html_file:
+        html = html_file.read()
+
+    def _make_deferrable(match: re.Match) -> str:
+        """Converts one stylesheet link into an inert link."""
+        stylesheet_link = match.group(0)
+        href_match = re.search(r'href="([^"]+)"', stylesheet_link)
+        if href_match is None:
+            return stylesheet_link
+        inert_link = '<link data-oppia-global-stylesheet href="%s">' % (
+            href_match.group(1)
+        )
+        return inert_link + '<noscript>' + stylesheet_link + '</noscript>'
+
+    html = re.sub(r'<link[^>]*rel="stylesheet"[^>]*>', _make_deferrable, html)
+
+    with open(html_filepath, 'w', encoding='utf-8') as html_file:
+        html_file.write(html)
+
+
+def defer_resources_for_lite_pages() -> None:
+    """Defers Angular boot and drops global CSS on lite pages.
+
+    The inline critical CSS is complete for /terms and /maintenance, so their
+    global stylesheet, font and preconnect links are removed before they can
+    block the first paint. Angular scripts are restored after load so the
+    prerendered markup paints before LiteAppModule replaces it. Module preloads
+    are intentionally omitted: Lighthouse puts them on the critical path and
+    delays first paint. Other routes restore every link and script immediately.
+    """
+    html_filepath = os.path.join('build', 'oppia-root.mainpage.html')
+    if not os.path.exists(html_filepath):
+        return
+
+    with open(html_filepath, 'r', encoding='utf-8') as html_file:
+        html = html_file.read()
+
+    script_pattern = re.compile(
+        r'<script\b[^>]*\bsrc="/build/[^"]+"[^>]*></script>'
+    )
+    inert_scripts = ''.join(
+        '<template class="oppia-deferred-angular-script">'
+        f'{script_tag}</template>'
+        for script_tag in script_pattern.findall(html)
+    )
+    html = script_pattern.sub('', html)
+
+    loader = """
+<script>
+(function () {
+  var isLitePage = /^\\/(terms|maintenance)\\/?$/.test(location.pathname);
+  var restoreDeferredAssets = function () {
+    var stylesheets = document.querySelectorAll(
+      'link[data-oppia-global-stylesheet], link[data-oppia-font-stylesheet]'
+    );
+    Array.prototype.forEach.call(stylesheets, function (link) {
+      link.setAttribute('rel', 'stylesheet');
+      link.removeAttribute('data-oppia-global-stylesheet');
+      link.removeAttribute('data-oppia-font-stylesheet');
+    });
+
+    var preconnects = document.querySelectorAll('link[data-oppia-preconnect]');
+    Array.prototype.forEach.call(preconnects, function (inertLink) {
+      var link = document.createElement('link');
+      link.setAttribute('rel', 'preconnect');
+      link.setAttribute('href', inertLink.getAttribute('href'));
+      if (inertLink.hasAttribute('crossorigin')) {
+        link.setAttribute('crossorigin', '');
+      }
+      document.head.appendChild(link);
+      inertLink.remove();
+    });
+  };
+
+  var discardDeferredAssets = function () {
+    var links = document.querySelectorAll(
+      'link[data-oppia-global-stylesheet], link[data-oppia-font-stylesheet], ' +
+      'link[data-oppia-preconnect]'
+    );
+    Array.prototype.forEach.call(links, function (link) {
+      link.remove();
+    });
+  };
+
+  var restoreAngularScripts = function () {
+    var templates = document.querySelectorAll(
+      'template.oppia-deferred-angular-script'
+    );
+    Array.prototype.forEach.call(templates, function (template) {
+      var source = template.content.querySelector('script');
+      if (!source) {
+        template.remove();
+        return;
+      }
+      var script = document.createElement('script');
+      Array.prototype.forEach.call(source.attributes, function (attribute) {
+        script.setAttribute(attribute.name, attribute.value);
+      });
+      script.textContent = source.textContent;
+      document.body.appendChild(script);
+      template.remove();
+    });
+  };
+
+  if (isLitePage) {
+    discardDeferredAssets();
+    window.addEventListener('load', function () {
+      window.setTimeout(restoreAngularScripts, 0);
+    });
+  } else {
+    restoreDeferredAssets();
+    restoreAngularScripts();
+  }
+})();
+</script>
+"""
+    html = html.replace('</body>', f'{inert_scripts}{loader}</body>', 1)
+
+    with open(html_filepath, 'w', encoding='utf-8') as html_file:
+        html_file.write(html)
+
+
 def sync_angular_css_hashes() -> None:
     """Updates hashes.json with Angular CLI generated CSS filenames.
 
@@ -814,9 +948,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         if not options.skip_ng_build:
             build_using_ng()
             sync_angular_css_hashes()
+            defer_global_stylesheets()
+            defer_resources_for_lite_pages()
             try:
-                import subprocess
-
                 subprocess.run(
                     ['python', '-m', 'scripts.purge_css_after_build'],
                     check=False,
