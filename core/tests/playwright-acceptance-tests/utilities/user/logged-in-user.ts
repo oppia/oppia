@@ -110,6 +110,7 @@ const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
+const blogDashboardMenuLink = '.e2e-test-blog-dashboard-link';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
@@ -1246,19 +1247,15 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the given page using the profile dropdown in the navbar.
-   * @param {'Blog Dashboard'} page - The page or dashboard to navigate to.
+   * Navigates to the Blog Dashboard using the profile dropdown in the navbar.
    */
-  async navigateToPageUsingProfileMenu(page: 'Blog Dashboard'): Promise<void> {
-    await this.page.evaluate(() => {
-      window.scrollTo(0, 0);
-    });
+  async navigateToBlogDashboardUsingProfileDropdown(): Promise<void> {
+    await this.scrollToTopOfPage();
     await this.expectElementToBeVisible(profileDropdown);
     await this.clickOnElementWithSelector(profileDropdown);
 
-    const selector = `.e2e-test-${page.toLowerCase().replace(/ /g, '-')}-link`;
-    await this.expectElementToBeVisible(selector);
-    await this.clickOnElementWithSelector(selector);
+    await this.expectElementToBeVisible(blogDashboardMenuLink);
+    await this.clickOnElementWithSelector(blogDashboardMenuLink);
     await this.waitForPageToFullyLoad();
   }
 

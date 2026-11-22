@@ -24,7 +24,6 @@ import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const ROLES = testConstants.Roles;
 const URLS = testConstants.URLs;
@@ -32,7 +31,7 @@ const URLS = testConstants.URLs;
 test.describe.configure({mode: 'serial'});
 
 test.describe('Blog Post Writer', function () {
-  let blogPostWriter: BlogPostEditor & LoggedInUser & LoggedOutUser;
+  let blogPostWriter: BlogPostEditor & LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
     blogPostWriter = await UserFactory.createNewUser(
@@ -46,7 +45,7 @@ test.describe('Blog Post Writer', function () {
   test('should be able to register on the blog platform', async function () {
     // Navigate to blog dashboard.
     await blogPostWriter.reloadPage();
-    await blogPostWriter.navigateToPageUsingProfileMenu('Blog Dashboard');
+    await blogPostWriter.navigateToBlogDashboardUsingProfileDropdown();
     await blogPostWriter.expectPageURLToContain(URLS.BlogDashboard);
 
     // Use username that is more than 35 characters long.
