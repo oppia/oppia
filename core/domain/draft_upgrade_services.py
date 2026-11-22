@@ -58,6 +58,42 @@ class InvalidDraftConversionException(Exception):
     pass
 
 
+def convert_states_in_draft_change_list(
+    draft_change_list: List[exp_domain.ExplorationChange],
+    from_version: int,
+    to_version: int,
+) -> Optional[List[exp_domain.ExplorationChange]]:
+    """Converts a list of ExplorationChange domain objects from
+    from_version to to_version of the states schema.
+
+    Args:
+        draft_change_list: list(ExplorationChange). The list of
+            ExplorationChange domain objects to upgrade.
+        from_version: int. The starting states schema version.
+        to_version: int. The target states schema version.
+
+    Returns:
+        list(ExplorationChange) or None. A list of ExplorationChange domain
+        objects after conversion or None if conversion fails.
+    """
+    current_version = from_version
+    while current_version < to_version:
+        conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
+            current_version,
+            current_version + 1,
+        )
+        if not hasattr(DraftUpgradeUtil, conversion_fn_name):
+            logging.warning('%s is not implemented' % conversion_fn_name)
+            return None
+        conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
+        try:
+            draft_change_list = conversion_fn(draft_change_list)
+        except InvalidDraftConversionException:
+            return None
+        current_version += 1
+    return draft_change_list
+
+
 def try_upgrading_draft_to_exp_version(
     draft_change_list: List[exp_domain.ExplorationChange],
     current_draft_version: int,
@@ -110,18 +146,14 @@ def try_upgrading_draft_to_exp_version(
             != exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION
         ):
             return None
-        conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
-            commit.commit_cmds[0]['from_version'],
-            commit.commit_cmds[0]['to_version'],
+        converted_draft_change_list = convert_states_in_draft_change_list(
+            draft_change_list,
+            int(commit.commit_cmds[0]['from_version']),
+            int(commit.commit_cmds[0]['to_version']),
         )
-        if not hasattr(DraftUpgradeUtil, conversion_fn_name):
-            logging.warning('%s is not implemented' % conversion_fn_name)
+        if converted_draft_change_list is None:
             return None
-        conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
-        try:
-            draft_change_list = conversion_fn(draft_change_list)
-        except InvalidDraftConversionException:
-            return None
+        draft_change_list = converted_draft_change_list
         upgrade_times += 1
     return draft_change_list
 

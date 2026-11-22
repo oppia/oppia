@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf, utils
 from core.constants import constants
 from core.domain import (
@@ -51,17 +53,23 @@ if MYPY:  # pragma: no cover
         opportunity_models,
         stats_models,
         translation_models,
+        user_models,
     )
 
-(exp_models, opportunity_models, stats_models, translation_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.EXPLORATION,
-            models.Names.OPPORTUNITY,
-            models.Names.STATISTICS,
-            models.Names.TRANSLATION,
-        ]
-    )
+(
+    exp_models,
+    opportunity_models,
+    stats_models,
+    translation_models,
+    user_models,
+) = models.Registry.import_models(
+    [
+        models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
+        models.Names.STATISTICS,
+        models.Names.TRANSLATION,
+        models.Names.USER,
+    ]
 )
 
 
@@ -682,6 +690,137 @@ class MigrateExplorationJobTests(
                     ),
                 ]
             )
+
+    def test_unmigrated_exp_migrates_drafts_alongside_exploration(self) -> None:
+        exp_model = exp_models.ExplorationModel(
+            id=self.NEW_EXP_ID,
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+        )
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_summary_model = exp_models.ExpSummaryModel(
+            **{
+                'id': self.NEW_EXP_ID,
+                'title': exp_model.title,
+                'category': exp_model.category,
+                'objective': exp_model.objective,
+                'language_code': exp_model.language_code,
+                'tags': exp_model.tags,
+                'ratings': None,
+                'scaled_average_rating': 4.0,
+                'exploration_model_last_updated': exp_model.last_updated,
+                'exploration_model_created_on': exp_model.created_on,
+                'first_published_msec': None,
+                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'community_owned': False,
+                'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
+                'editor_ids': [],
+                'voice_artist_ids': [],
+                'viewer_ids': [],
+                'contributor_ids': [],
+                'contributors_summary': {},
+                'version': exp_model.version,
+            }
+        )
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
+
+        upgradable_draft_change_list = [
+            {
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Draft updated title',
+                'old_value': None,
+            }
+        ]
+        unupgradable_draft_change_list = [
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': '(untitled state)',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+                ),
+                'new_value': [],
+                'old_value': None,
+            }
+        ]
+        draft_timestamp = datetime.datetime(2023, 6, 22, 0, 0, 0)
+        user_models.ExplorationUserDataModel(
+            id='user_1.%s' % self.NEW_EXP_ID,
+            user_id='user_1',
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=upgradable_draft_change_list,
+            draft_change_list_last_updated=draft_timestamp,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1,
+        ).put()
+        user_models.ExplorationUserDataModel(
+            id='user_2.%s' % self.NEW_EXP_ID,
+            user_id='user_2',
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=unupgradable_draft_change_list,
+            draft_change_list_last_updated=draft_timestamp,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1,
+        ).put()
+        user_models.ExplorationUserDataModel(
+            id='user_3.%s' % self.NEW_EXP_ID,
+            user_id='user_3',
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=None,
+        ).put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='EXP MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='EXP RELATED MODELS GENERATED SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT PROCESSED SUCCESS: 2'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT MIGRATED SUCCESS: 2'
+                ),
+            ]
+        )
+
+        migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
+        self.assertEqual(migrated_exp_model.version, 2)
+        self.assertEqual(
+            migrated_exp_model.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
+        )
+
+        user_1_data_model = user_models.ExplorationUserDataModel.get(
+            'user_1', self.NEW_EXP_ID
+        )
+        assert user_1_data_model is not None
+        self.assertEqual(
+            user_1_data_model.draft_change_list, upgradable_draft_change_list
+        )
+        self.assertEqual(user_1_data_model.draft_change_list_exp_version, 2)
+
+        user_2_data_model = user_models.ExplorationUserDataModel.get(
+            'user_2', self.NEW_EXP_ID
+        )
+        assert user_2_data_model is not None
+        self.assertIsNone(user_2_data_model.draft_change_list)
+        self.assertIsNone(user_2_data_model.draft_change_list_last_updated)
+        self.assertIsNone(user_2_data_model.draft_change_list_exp_version)
 
 
 # Exploration migration backend tests with BEAM jobs involves creating and
@@ -2122,3 +2261,349 @@ class ExpSnapshotsMigrationJobTests(
                         ),
                     ]
                 )
+
+
+class MigrateExplorationDraftJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
+
+    JOB_CLASS = exp_migration_jobs.MigrateExplorationDraftJob
+
+    NEW_EXP_ID = 'exp_1'
+    EXP_ID_ONE = 'exp_one'
+    EXP_ID_TWO = 'exp_two'
+    EXP_TITLE = 'title'
+    DRAFT_DATETIME = datetime.datetime(2023, 6, 22, 0, 0, 0)
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_migrated_exp_with_up_to_date_draft_is_not_migrated(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title=self.EXP_TITLE, category='category'
+        )
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
+        draft_change_list = [
+            {
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Updated title',
+                'old_value': None,
+            }
+        ]
+        user_models.ExplorationUserDataModel(
+            id='user_1.%s' % self.NEW_EXP_ID,
+            user_id='user_1',
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=self.DRAFT_DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1,
+        ).put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT PROCESSED SUCCESS: 1'
+                ),
+            ]
+        )
+
+        user_data_model = user_models.ExplorationUserDataModel.get(
+            'user_1', self.NEW_EXP_ID
+        )
+        assert user_data_model is not None
+        self.assertEqual(user_data_model.draft_change_list, draft_change_list)
+        self.assertEqual(user_data_model.draft_change_list_exp_version, 1)
+
+    def test_migrated_exp_with_outdated_draft_migrates_and_discards(
+        self,
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title=self.EXP_TITLE, category='category'
+        )
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
+        migration_change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': (
+                        exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION
+                    ),
+                    'from_version': '55',
+                    'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION),
+                }
+            )
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID,
+            self.NEW_EXP_ID,
+            migration_change_list,
+            'Ran Exploration Migration job.',
+        )
+
+        upgradable_draft_v55 = [
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'new_value': {
+                    'content_id': 'content_0',
+                    'html': '<p>Content</p>',
+                },
+                'old_value': None,
+            }
+        ]
+        unupgradable_draft_v55 = [
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED
+                ),
+                'new_value': {'voiceovers_mapping': {'content_0': {}}},
+                'old_value': None,
+            }
+        ]
+        user_models.ExplorationUserDataModel(
+            id='user_1.%s' % self.NEW_EXP_ID,
+            user_id='user_1',
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=upgradable_draft_v55,
+            draft_change_list_last_updated=self.DRAFT_DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1,
+        ).put()
+        user_models.ExplorationUserDataModel(
+            id='user_2.%s' % self.NEW_EXP_ID,
+            user_id='user_2',
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=unupgradable_draft_v55,
+            draft_change_list_last_updated=self.DRAFT_DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1,
+        ).put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT MIGRATED SUCCESS: 2'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT PROCESSED SUCCESS: 2'
+                ),
+            ]
+        )
+
+        user_1_data_model = user_models.ExplorationUserDataModel.get(
+            'user_1', self.NEW_EXP_ID
+        )
+        assert user_1_data_model is not None
+        self.assertEqual(user_1_data_model.draft_change_list_exp_version, 2)
+        self.assertEqual(
+            user_1_data_model.draft_change_list, upgradable_draft_v55
+        )
+
+        user_2_data_model = user_models.ExplorationUserDataModel.get(
+            'user_2', self.NEW_EXP_ID
+        )
+        assert user_2_data_model is not None
+        self.assertIsNone(user_2_data_model.draft_change_list)
+        self.assertIsNone(user_2_data_model.draft_change_list_last_updated)
+        self.assertIsNone(user_2_data_model.draft_change_list_exp_version)
+
+    def test_unmigrated_exp_with_older_unupgradable_draft_discards_draft(
+        self,
+    ) -> None:
+        exp_model = exp_models.ExplorationModel(
+            id=self.NEW_EXP_ID,
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+        )
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
+        exp_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Created exploration.',
+            [{'cmd': exp_domain.CMD_CREATE_NEW}],
+        )
+        exp_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Edited title.',
+            [
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Intermediate title edit',
+                }
+            ],
+        )
+
+        user_models.ExplorationUserDataModel(
+            id='user_1.%s' % self.NEW_EXP_ID,
+            user_id='user_1',
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=[
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Draft title',
+                    'old_value': None,
+                }
+            ],
+            draft_change_list_last_updated=self.DRAFT_DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1,
+        ).put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT MIGRATED SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT PROCESSED SUCCESS: 1'
+                ),
+            ]
+        )
+
+        user_1_data_model = user_models.ExplorationUserDataModel.get(
+            'user_1', self.NEW_EXP_ID
+        )
+        assert user_1_data_model is not None
+        self.assertIsNone(user_1_data_model.draft_change_list)
+        self.assertIsNone(user_1_data_model.draft_change_list_last_updated)
+        self.assertIsNone(user_1_data_model.draft_change_list_exp_version)
+
+    def test_invalid_draft_version_greater_than_exp_version_raises_error(
+        self,
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title=self.EXP_TITLE, category='category'
+        )
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
+        draft_change_list = [
+            {
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Draft title',
+                'old_value': None,
+            }
+        ]
+        user_models.ExplorationUserDataModel(
+            id='user_1.%s' % self.NEW_EXP_ID,
+            user_id='user_1',
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=self.DRAFT_DATETIME,
+            draft_change_list_exp_version=5,
+            draft_change_list_id=1,
+        ).put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'EXP DRAFT PROCESSED ERROR: "(\'user_1.exp_1\', '
+                        'InvalidInputException(\'Current draft version is '
+                        'greater than the exploration version.\'))": 1'
+                    )
+                )
+            ]
+        )
+
+        user_1_data_model = user_models.ExplorationUserDataModel.get(
+            'user_1', self.NEW_EXP_ID
+        )
+        assert user_1_data_model is not None
+        self.assertEqual(user_1_data_model.draft_change_list, draft_change_list)
+        self.assertEqual(user_1_data_model.draft_change_list_exp_version, 5)
+
+
+class AuditExplorationDraftMigrationJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
+
+    JOB_CLASS = exp_migration_jobs.AuditExplorationDraftMigrationJob
+
+    NEW_EXP_ID = 'exp_1'
+    EXP_TITLE = 'title'
+    DRAFT_DATETIME = datetime.datetime(2023, 6, 22, 0, 0, 0)
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_unmigrated_draft_is_audited_without_updating_datastore(
+        self,
+    ) -> None:
+        exp_model = exp_models.ExplorationModel(
+            id=self.NEW_EXP_ID,
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+        )
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        draft_change_list = [
+            {
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Draft updated title',
+                'old_value': None,
+            }
+        ]
+        user_models.ExplorationUserDataModel(
+            id='user_1.%s' % self.NEW_EXP_ID,
+            user_id='user_1',
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=self.DRAFT_DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1,
+        ).put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT MIGRATED SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='EXP DRAFT PROCESSED SUCCESS: 1'
+                ),
+            ]
+        )
+
+        user_1_data_model = user_models.ExplorationUserDataModel.get(
+            'user_1', self.NEW_EXP_ID
+        )
+        assert user_1_data_model is not None
+        self.assertEqual(user_1_data_model.draft_change_list_exp_version, 1)
