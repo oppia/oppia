@@ -342,10 +342,8 @@ describe('Exploration save and publish buttons component', () => {
 
   it('should discard changes when exploration is changed', () => {
     spyOn(explorationSaveService, 'discardChanges');
-    component.isModalDisplayed = true;
     component.discardChanges();
     expect(explorationSaveService.discardChanges).toHaveBeenCalled();
-    expect(component.isModalDisplayed).toBe(false);
   });
 
   it('should get whether exploration is saveable', () => {
@@ -454,7 +452,10 @@ describe('Exploration save and publish buttons component', () => {
   }));
 
   it('should open save prompt modal again after saving changes', fakeAsync(() => {
-    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+    let changeListSpy = spyOn(
+      changeListService,
+      'getChangeList'
+    ).and.returnValue(new Array(51));
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.resolve(),
     } as NgbModalRef);
@@ -464,8 +465,13 @@ describe('Exploration save and publish buttons component', () => {
     tick();
 
     expect(ngbModal.open).toHaveBeenCalledTimes(1);
+    expect(component.isModalDisplayed).toBe(true);
+
+    changeListSpy.and.returnValue([]);
+    component.getChangeListLength();
     expect(component.isModalDisplayed).toBe(false);
 
+    changeListSpy.and.returnValue(new Array(51));
     component.getChangeListLength();
     tick();
 

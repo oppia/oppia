@@ -84,7 +84,6 @@ export class ExplorationSaveAndPublishButtonsComponent
 
   discardChanges(): void {
     this.explorationSaveService.discardChanges();
-    this.isModalDisplayed = false;
   }
 
   getChangeListLength(): number {
@@ -92,7 +91,9 @@ export class ExplorationSaveAndPublishButtonsComponent
 
     const MIN_CHANGES_DISPLAY_PROMPT = 50;
 
-    if (
+    if (countChanges < MIN_CHANGES_DISPLAY_PROMPT) {
+      this.isModalDisplayed = false;
+    } else if (
       countChanges >= MIN_CHANGES_DISPLAY_PROMPT &&
       !this.isModalDisplayed &&
       !this.saveIsInProcess
@@ -184,7 +185,6 @@ export class ExplorationSaveAndPublishButtonsComponent
       )
       .then(
         () => {
-          this.isModalDisplayed = false;
           this.saveIsInProcess = false;
           this.loadingDotsAreShown = false;
         },
@@ -193,7 +193,6 @@ export class ExplorationSaveAndPublishButtonsComponent
   }
 
   ngOnInit(): void {
-    this.isModalDisplayed = false;
     this.saveIsInProcess = false;
     this.publishIsInProcess = false;
     this.loadingDotsAreShown = false;
