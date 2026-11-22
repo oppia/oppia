@@ -1002,6 +1002,35 @@ class TopicEditorTests(
 
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+        ]
+    )
+    def test_editable_topic_handler_get_with_no_deleted_skills(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id)
+        )
+
+        skill_descriptions = response['skill_id_to_description_dict']
+        self.assertIn(self.skill_id, skill_descriptions)
+        self.assertIn(self.skill_id_2, skill_descriptions)
+        self.assertEqual(
+            self._get_sent_email_messages('testadmin@example.com'), []
+        )
+
+        self.logout()
+
     def test_editable_topic_handler_put_fails_with_long_commit_message(
         self,
     ) -> None:
