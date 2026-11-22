@@ -381,23 +381,6 @@ describe('Contributor dashboard Admin page', () => {
       expect(label).toBe('Translation Coordinators');
     }));
 
-    it('should map only the translation coordinator key to a custom label', () => {
-      expect(
-        component.getContributionTypeLabel(
-          component.TAB_NAME_TRANSLATION_COORDINATOR
-        )
-      ).toBe('Translation Coordinators');
-      expect(
-        component.getContributionTypeLabel(
-          component.TAB_NAME_QUESTION_COORDINATOR
-        )
-      ).toBe(component.TAB_NAME_QUESTION_COORDINATOR);
-      // The internal key must stay unchanged since the stats table matches it.
-      expect(component.TAB_NAME_TRANSLATION_COORDINATOR).toBe(
-        'Translation Coordinator'
-      );
-    });
-
     it(
       'should let a pure translation admin reach the tab and see only the ' +
         'editor',

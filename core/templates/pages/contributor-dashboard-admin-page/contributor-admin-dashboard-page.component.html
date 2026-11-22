@@ -129,7 +129,7 @@
                       (valueChange)="updateSelectedContributionType($event)"
                       class="e2e-test-tab-selection-dropdown">
             <mat-option *ngFor="let choice of CONTRIBUTION_TYPES" [value]="choice">
-              {{ getContributionTypeLabel(choice) }}
+              {{ choice }}
             </mat-option>
           </mat-select>
         </mat-form-field>
