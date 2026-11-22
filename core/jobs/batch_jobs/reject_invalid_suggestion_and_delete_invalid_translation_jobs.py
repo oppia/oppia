@@ -703,12 +703,8 @@ class ComputeUpdatedExpOpportunityModel(beam.DoFn):  # type: ignore[misc]
         with datastore_services.get_ndb_context():
             opp_id = f'{entity_translation_model.entity_type}.{entity_translation_model.entity_id}'
             opportunity_model = (
-                opportunity_models.TranslationOpportunityModel.get(
-                    opp_id, strict=False
-                )
+                opportunity_models.TranslationOpportunityModel.get(opp_id)
             )
-            if opportunity_model is None:
-                return
 
             new_translation_count = len(
                 entity_translation_model.translations.keys()
@@ -747,15 +743,10 @@ class GetLatestModel(beam.DoFn):  # type: ignore[misc]
         """
         with datastore_services.get_ndb_context():
             entity_id, entity_translation_models = element
-            version_list = list(
-                model.entity_version for model in entity_translation_models
+            latest_model = max(
+                entity_translation_models,
+                key=lambda model: int(model.entity_version),
             )
-            latest_version = max(version_list)
-            latest_model = entity_translation_models[0]
-            for model in entity_translation_models:
-                if model.entity_version == latest_version:
-                    latest_model = model
-                    break
 
             yield (entity_id, latest_model)
 
