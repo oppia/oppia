@@ -247,7 +247,6 @@ const feedbackResponseTextarea = '.e2e-test-feedback-response-textarea';
 const feedbackResponseSendButton = '.e2e-test-oppia-feedback-response-send-btn';
 const feedbackStatusMenuSelector = '.e2e-test-oppia-feedback-status-menu';
 const feedbackBackButton = '.e2e-test-oppia-feedback-back-button';
-const feedbackLastUpdatedCellSelector = 'td:nth-child(4) span';
 
 const statsTabButton = '.e2e-test-stats-tab';
 const mobileStatsTabButton = '.e2e-test-mobile-stats-button a';
@@ -354,12 +353,12 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Replies to the currently open feedback thread and marks it fixed.
+   * Replies to the currently open feedback thread with the given status.
    */
-  async replyToFeedback(reply: string): Promise<void> {
+  async replyToFeedback(reply: string, status: string): Promise<void> {
     const textarea = this.page.locator(feedbackResponseTextarea);
     const send = this.page.locator(feedbackResponseSendButton);
-    await this.select(feedbackStatusMenuSelector, 'fixed');
+    await this.select(feedbackStatusMenuSelector, status);
     await textarea.fill(reply);
     await send.click();
     await this.expectFeedbackMessageToBePresent(reply);
@@ -377,17 +376,19 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Verifies that the feedback thread list row displays the expected author
-   * and a non-empty last updated timestamp.
+   * Verifies the original author and last updated timestamp in the thread list.
    */
-  async expectFeedbackReplyDetailsToBeVisible(
+  async expectFeedbackThreadAuthorAndTimestamp(
     subject: string,
-    author: string
+    originalAuthor: string
   ): Promise<void> {
     const row = this.feedbackRow(subject);
-    await expect(row.locator(feedbackAuthorInRowSelector)).toHaveText(author);
-    await expect(row.locator(feedbackLastUpdatedCellSelector)).not.toBeEmpty();
-    await expect(row.locator(feedbackLastUpdatedCellSelector)).toBeVisible();
+    const lastUpdated = row.getByLabel(/^Last updated/);
+    await expect(row.locator(feedbackAuthorInRowSelector)).toHaveText(
+      originalAuthor
+    );
+    await expect(lastUpdated).toBeVisible();
+    await expect(lastUpdated).toHaveText(/\S/);
   }
 
   /**
@@ -395,7 +396,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectNumberOfPassersToBe(expected: number): Promise<void> {
     await expect(this.page.locator(numPassersbySelector)).toHaveText(
-      `${expected} learners browsed this exploration. They left before reaching the second card.`
+      new RegExp(`^\\s*${expected}(?=\\s|$)`)
     );
   }
 

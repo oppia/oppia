@@ -138,9 +138,9 @@ test.describe('Lesson Creator', function () {
     );
     await lessonCreator.expectFeedbackStatusInList(subject, 'Open');
     await lessonCreator.viewFeedbackThread(subject);
-    await lessonCreator.replyToFeedback('Thanks, issue noted.');
+    await lessonCreator.replyToFeedback('Thanks, issue noted.', 'fixed');
     await lessonCreator.goBackToTheFeedbackTab();
-    await lessonCreator.expectFeedbackReplyDetailsToBeVisible(
+    await lessonCreator.expectFeedbackThreadAuthorAndTimestamp(
       subject,
       'LessonCreator'
     );
