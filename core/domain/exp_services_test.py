@@ -6803,70 +6803,65 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             exp_services.apply_change_list('test_id', [change_list])
 
     def test_get_number_of_ratings(self) -> None:
-        self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
-        exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
+        # The exploration ID has to match the entity ID regex, because it is
+        # validated when a rating event is recorded.
+        exp_id = 'exp_0_id'
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        exp = exp_fetchers.get_exploration_summary_by_id(exp_id)
 
         self.assertEqual(exp_services.get_number_of_ratings(exp.ratings), 0)
 
-        rating_services.assign_rating_to_exploration(
-            self.owner_id, self.EXP_0_ID, 5
-        )
+        rating_services.assign_rating_to_exploration(self.owner_id, exp_id, 5)
         self.assertEqual(exp_services.get_number_of_ratings(exp.ratings), 1)
 
-        rating_services.assign_rating_to_exploration(
-            self.USER_ID_1, self.EXP_0_ID, 3
-        )
+        rating_services.assign_rating_to_exploration(self.USER_ID_1, exp_id, 3)
         self.process_and_flush_pending_tasks()
-        exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
+        exp = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertEqual(exp_services.get_number_of_ratings(exp.ratings), 2)
 
-        rating_services.assign_rating_to_exploration(
-            self.USER_ID_2, self.EXP_0_ID, 5
-        )
+        rating_services.assign_rating_to_exploration(self.USER_ID_2, exp_id, 5)
         self.process_and_flush_pending_tasks()
-        exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
+        exp = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertEqual(exp_services.get_number_of_ratings(exp.ratings), 3)
 
     def test_get_average_rating(self) -> None:
-        self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
-        exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
+        # The exploration ID has to match the entity ID regex, because it is
+        # validated when a rating event is recorded.
+        exp_id = 'exp_0_id'
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        exp = exp_fetchers.get_exploration_summary_by_id(exp_id)
 
         self.assertEqual(exp_services.get_average_rating(exp.ratings), 0)
 
         self.assertEqual(exp_services.get_average_rating({}), 0)
 
-        rating_services.assign_rating_to_exploration(
-            self.owner_id, self.EXP_0_ID, 5
-        )
+        rating_services.assign_rating_to_exploration(self.owner_id, exp_id, 5)
         self.assertEqual(exp_services.get_average_rating(exp.ratings), 5)
 
-        rating_services.assign_rating_to_exploration(
-            self.USER_ID_1, self.EXP_0_ID, 2
-        )
+        rating_services.assign_rating_to_exploration(self.USER_ID_1, exp_id, 2)
 
-        exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
+        exp = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertEqual(exp_services.get_average_rating(exp.ratings), 3.5)
 
     def test_get_lower_bound_wilson_rating_from_exp_summary(self) -> None:
-        self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
-        exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
+        # The exploration ID has to match the entity ID regex, because it is
+        # validated when a rating event is recorded.
+        exp_id = 'exp_0_id'
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        exp = exp_fetchers.get_exploration_summary_by_id(exp_id)
 
         self.assertEqual(exp_services.get_scaled_average_rating(exp.ratings), 0)
 
-        rating_services.assign_rating_to_exploration(
-            self.owner_id, self.EXP_0_ID, 5
-        )
+        rating_services.assign_rating_to_exploration(self.owner_id, exp_id, 5)
         self.assertAlmostEqual(
             exp_services.get_scaled_average_rating(exp.ratings),
             1.8261731658956,
             places=4,
         )
 
-        rating_services.assign_rating_to_exploration(
-            self.USER_ID_1, self.EXP_0_ID, 4
-        )
+        rating_services.assign_rating_to_exploration(self.USER_ID_1, exp_id, 4)
 
-        exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
+        exp = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertAlmostEqual(
             exp_services.get_scaled_average_rating(exp.ratings),
             2.056191454757,
