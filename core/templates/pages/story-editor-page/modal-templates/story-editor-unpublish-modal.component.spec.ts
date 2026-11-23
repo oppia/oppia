@@ -84,6 +84,59 @@ describe('Story Editor Unpublish Modal Component', () => {
     });
   });
 
+  it('should show the story choice instead of the chapter reason when the feature flag is enabled', () => {
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    component.isStoryUnpublishing = true;
+
+    expect(component.shouldShowStoryUnpublishingChoice()).toBe(true);
+    expect(component.shouldShowChapterUnpublishingReason()).toBe(false);
+  });
+
+  it('should explain both unpublishing choices in the story modal', () => {
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    component.isStoryUnpublishing = true;
+    fixture.detectChanges();
+
+    let modalText = fixture.nativeElement.textContent.replace(/\s+/g, ' ');
+    expect(modalText).toContain(
+      'Are you unpublishing this story permanently or temporarily?'
+    );
+    expect(modalText).toContain('Temporarily');
+    expect(modalText).toContain('Permanently');
+
+    component.selectTemporary();
+    fixture.detectChanges();
+    modalText = fixture.nativeElement.textContent.replace(/\s+/g, ' ');
+    expect(modalText).toContain(
+      'within 24 hours to avoid disrupting learners currently engaged with it'
+    );
+    expect(modalText).toContain('translation opportunities will be retained');
+
+    component.selectPermanent();
+    fixture.detectChanges();
+    modalText = fixture.nativeElement.textContent.replace(/\s+/g, ' ');
+    expect(modalText).toContain(
+      'All translation opportunities linked to this story will be deleted'
+    );
+    expect(modalText).toContain(
+      'open translation suggestions will be automatically rejected'
+    );
+  });
+
+  it('should retain the temporary choice when the feature flag is enabled', () => {
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    component.isStoryUnpublishing = true;
+    const spy = spyOn(ngbActiveModal, 'close');
+
+    component.selectTemporary();
+    component.confirm();
+
+    expect(spy).toHaveBeenCalledWith({
+      mode: 'temporary_unpublish',
+      reason: null,
+    });
+  });
+
   it('should not close when showing the choice screen', () => {
     mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
       false;

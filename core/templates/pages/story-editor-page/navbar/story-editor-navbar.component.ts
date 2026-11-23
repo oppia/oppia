@@ -274,28 +274,30 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   unpublishStory(): void {
-    this.ngbModal
-      .open(StoryEditorUnpublishModalComponent, {backdrop: 'static'})
-      .result.then(
-        result => {
-          if (result?.mode) {
-            this.storyEditorStateService.changeStoryPublicationStatus(
-              result.mode,
-              () => {
-                this.storyIsPublished =
-                  this.storyEditorStateService.isStoryPublished();
-                this.forceValidateExplorations = true;
-                this._validateStory();
-              }
-            );
-          }
-        },
-        () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
+    const modalRef = this.ngbModal.open(StoryEditorUnpublishModalComponent, {
+      backdrop: 'static',
+    });
+    modalRef.componentInstance.isStoryUnpublishing = true;
+    modalRef.result.then(
+      result => {
+        if (result?.mode) {
+          this.storyEditorStateService.changeStoryPublicationStatus(
+            result.mode,
+            () => {
+              this.storyIsPublished =
+                this.storyEditorStateService.isStoryPublished();
+              this.forceValidateExplorations = true;
+              this._validateStory();
+            }
+          );
         }
-      );
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 
   changeChapterStatus(newStatus: string): void {

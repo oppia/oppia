@@ -1,4 +1,4 @@
-<div *ngIf="isSerialChapterFeatureFlagEnabled()">
+<div *ngIf="shouldShowChapterUnpublishingReason()">
   <div class="modal-header">
     <span *ngIf="unpublishedChapters.length === 1">Unpublish Chapter</span>
     <span *ngIf="unpublishedChapters.length > 1">Unpublish Chapters</span>
@@ -76,10 +76,10 @@
   </div>
 </div>
 
-<div *ngIf="!isSerialChapterFeatureFlagEnabled()">
+<div *ngIf="shouldShowStoryUnpublishingChoice()">
   <div *ngIf="showingChoiceScreen">
     <div class="modal-header">
-      <p>Are you unpublishing this story temporarily or permanently?</p>
+      <p>Are you unpublishing this story permanently or temporarily?</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary"
@@ -104,16 +104,14 @@
   <div *ngIf="!showingChoiceScreen">
     <div class="modal-header">
       <p *ngIf="mode === 'temporary_unpublish'">
-        Are you sure you want to temporarily unpublish this story? Temporarily
-        unpublishing a story will retain any corresponding translation
-        opportunities on the Contributor Dashboard. Please republish the story
+        Are you sure you want to temporarily unpublish this story? Its
+        translation opportunities will be retained. Please republish the story
         within 24 hours to avoid disrupting learners currently engaged with it.
       </p>
       <p *ngIf="mode === 'permanent_unpublish'">
-        Are you sure you want to permanently unpublish this story? Permanently
-        unpublishing a story will delete any corresponding translation
-        opportunities from the Contributor Dashboard and reject any related
-        pending translation suggestions.
+        Are you sure you want to permanently unpublish this story? All
+        translation opportunities linked to this story will be deleted, and any
+        open translation suggestions will be automatically rejected.
       </p>
     </div>
     <div class="modal-footer">

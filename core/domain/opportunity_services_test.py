@@ -1025,6 +1025,35 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         )
         self.assertEqual(len(translation_opportunities), 0)
 
+    def test_temporarily_unpublishing_story_retains_exploration_opportunity(
+        self,
+    ) -> None:
+        self.add_exploration_0_to_story()
+        translation_opportunities_before_unpublishing, _, _ = (
+            opportunity_services.get_translation_opportunities(
+                'hi', 'topic', None
+            )
+        )
+        self.assertEqual(len(translation_opportunities_before_unpublishing), 1)
+
+        topic_services.unpublish_story(
+            self.TOPIC_ID,
+            self.STORY_ID,
+            self.admin_id,
+            topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+        )
+
+        translation_opportunities_after_unpublishing, _, _ = (
+            opportunity_services.get_translation_opportunities(
+                'hi', 'topic', None
+            )
+        )
+        self.assertEqual(len(translation_opportunities_after_unpublishing), 1)
+        self.assertEqual(
+            translation_opportunities_after_unpublishing[0].id,
+            translation_opportunities_before_unpublishing[0].id,
+        )
+
     def test_unpublish_story_rejects_translation_suggestions(self) -> None:
         self.add_exploration_0_to_story()
         self.create_translation_suggestion_for_exploration_0_and_verify()
@@ -1035,6 +1064,24 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
+
+    def test_temporarily_unpublishing_story_does_not_reject_suggestions(
+        self,
+    ) -> None:
+        self.add_exploration_0_to_story()
+        self.create_translation_suggestion_for_exploration_0_and_verify()
+
+        topic_services.unpublish_story(
+            self.TOPIC_ID,
+            self.STORY_ID,
+            self.admin_id,
+            topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+        )
+
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
+        self.assertEqual(
+            suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
 
     def test_add_question_increments_skill_opportunity_question_count(
         self,

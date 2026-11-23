@@ -482,7 +482,8 @@ describe('Story editor navbar component', () => {
     ).and.returnValue(mockStoryInitializedEventEmitter);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return {
-        result: Promise.resolve({mode: 'permanent'}),
+        componentInstance: {},
+        result: Promise.resolve({mode: 'permanent_unpublish'}),
       } as NgbModalRef;
     });
 
@@ -513,7 +514,28 @@ describe('Story editor navbar component', () => {
     tick(1000);
     fixture.detectChanges();
     expect(modalSpy).toHaveBeenCalled();
+    expect(
+      modalSpy.calls.mostRecent().returnValue.componentInstance
+        .isStoryUnpublishing
+    ).toBe(true);
     expect(component.storyIsPublished).toBe(false);
+  }));
+
+  it('should not unpublish the story when the modal is canceled', fakeAsync(() => {
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {},
+      result: Promise.reject('cancelled'),
+    } as NgbModalRef);
+    const changeStoryPublicationStatusSpy = spyOn(
+      storyEditorStateService,
+      'changeStoryPublicationStatus'
+    );
+
+    component.unpublishStory();
+    tick();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(changeStoryPublicationStatusSpy).not.toHaveBeenCalled();
   }));
 
   it('should toggle warning text', () => {
