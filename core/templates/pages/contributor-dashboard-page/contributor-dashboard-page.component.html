@@ -8,12 +8,11 @@
             [attr.aria-label]="item.value.ariaLabel">
           <div *ngIf="item.value.enabled"
                class="oppia-tabs-container">
-            <a role="button"
-               (click)="onTabClick(item.key)"
-               href="javascript:void(0);"
-               class="oppia-opportunities-tabs-text e2e-test-{{item.key}}">
-              {{item.value.tabName}}
-            </a>
+            <button type="button"
+                    (click)="onTabClick(item.key)"
+                    class="oppia-opportunities-tabs-button e2e-test-{{item.key}}">
+              <span class="oppia-opportunities-tabs-text">{{item.value.tabName}}</span>
+            </button>
             <div class="oppia-active-tab-highlighter"></div>
           </div>
         </li>
@@ -104,6 +103,7 @@
                   <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
                   <translation-topic-selector class="oppia-topic-selector"
                                               [activeTopicName]="topicName"
+                                              [activeLanguageCode]="languageCode"
                                               (setActiveTopicName)="onChangeTopic($event)">
                   </translation-topic-selector>
                 </div>
@@ -151,6 +151,7 @@
                   <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
                   <translation-topic-selector class="oppia-topic-selector"
                                               [activeTopicName]="topicName"
+                                              [activeLanguageCode]="languageCode"
                                               (setActiveTopicName)="onChangeTopic($event)">
                   </translation-topic-selector>
                 </div>
