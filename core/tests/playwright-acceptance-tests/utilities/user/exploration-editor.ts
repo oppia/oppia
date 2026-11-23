@@ -233,7 +233,7 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
 const addTitleBar = 'input#explorationTitle';
 
 const feedbackTabButton = '.e2e-test-feedback-tab';
-const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button a';
+const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button button';
 const feedbackCardSelector = '.e2e-test-exploration-feedback-card';
 const startNewThreadButton = '.e2e-test-start-new-thread-button';
 const createFeedbackThreadModal = 'oppia-create-feedback-thread-modal';
@@ -249,7 +249,7 @@ const feedbackStatusMenuSelector = '.e2e-test-oppia-feedback-status-menu';
 const feedbackBackButton = '.e2e-test-oppia-feedback-back-button';
 
 const statsTabButton = '.e2e-test-stats-tab';
-const mobileStatsTabButton = '.e2e-test-mobile-stats-button a';
+const mobileStatsTabButton = '.e2e-test-mobile-stats-button button';
 const statsCardSelector = '.e2e-test-exploration-stats-card';
 const numPassersbySelector = '.e2e-test-num-passersby';
 
