@@ -2402,15 +2402,46 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
 
     def test_get_request_do_not_raise_notimplemented_error(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
-            self.get_json('/mock', expected_status_int=405)
+            self.get_json('/mock', expected_status_int=404)
 
-    def test_post_request_on_handler_without_post_returns_405(self) -> None:
+    def test_post_request_on_handler_without_post_returns_404(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock',
                 {},
-                expected_status_int=405,
+                expected_status_int=404,
             )
+
+
+class UnsupportedGetOnHtmlHandlerTests(test_utils.GenericTestBase):
+    """Tests that a GET on an HTML handler without get renders the 404 page."""
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Mock HTML handler that only supports POST."""
+
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+        def post(self) -> None:
+            """Handles POST requests."""
+            self.render_json({})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+                debug=feconf.DEBUG,
+            )
+        )
+
+    def test_get_on_html_handler_without_get_returns_404_page(self) -> None:
+        with self.swap(self, 'testapp', self.testapp):
+            response = self.testapp.get('/mock', expect_errors=True)
+            self.assertEqual(response.status_int, 404)
+            self.assertTrue(len(response.body) > 0)
 
 
 class HeadRequestWithoutGetTests(test_utils.GenericTestBase):

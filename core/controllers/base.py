@@ -244,10 +244,6 @@ class BaseHandler(
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Status code used when the handler does not define the requested HTTP
-    # method. Handlers that stand for a missing resource override this to 404.
-    UNSUPPORTED_METHOD_STATUS_CODE = 405
-
     # Here we use type Any because the sub-classes of BaseHandler can contain
     # different schemas with different types of values, like str, complex Dicts
     # and etc.
@@ -691,43 +687,21 @@ class BaseHandler(
         return False
 
     def _handle_unsupported_method(self, method_name: str) -> None:
-        """Responds with an error for an HTTP method that this handler does
-        not define: 405 with an Allow header, or 404 for handlers that
-        represent a missing resource (see Error404Handler).
+        """Responds with Oppia's 404 for an HTTP method this handler lacks.
 
         Args:
             method_name: str. Lowercase HTTP method name.
         """
-        if self.UNSUPPORTED_METHOD_STATUS_CODE == 404:
+        if method_name == 'get':
             logging.warning('Invalid URL requested: %s', self.request.uri)
             self.error(404)
-            self._render_exception(
-                {
-                    'error': 'Could not find the resource %s.'
-                    % self.request.uri,
-                    'status_code': 404,
-                }
-            )
-            return
-        allowed = [
-            method.upper()
-            for method in ('get', 'post', 'put', 'delete')
-            if hasattr(self.__class__, method)
-        ]
-        if 'GET' in allowed:
-            allowed.append('HEAD')
-        logging.warning(
-            'Method %s not allowed for %s', method_name, self.request.uri
-        )
-        self.error(405)
-        self._render_exception(
-            {
-                'error': 'Method %s not allowed for %s.'
-                % (method_name.upper(), self.request.uri),
-                'status_code': 405,
+            values: ResponseValueDict = {
+                'error': 'Could not find the resource %s.' % self.request.uri,
+                'status_code': 404,
             }
-        )
-        self.response.headers['Allow'] = ', '.join(allowed)
+            self._render_exception(values)
+        else:
+            self.handle_exception(self.NotFoundException(), self.app.debug)
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'head' method with different number of arguments and types.
@@ -737,7 +711,20 @@ class BaseHandler(
         header.
         """
         if not hasattr(self.__class__, 'get'):
-            self._handle_unsupported_method('head')
+            allowed = [
+                method.upper()
+                for method in ('get', 'post', 'put', 'delete')
+                if hasattr(self.__class__, method)
+            ]
+            self.error(405)
+            self._render_exception(
+                {
+                    'error': 'Invalid method HEAD for %s'
+                    % self.__class__.__name__,
+                    'status_code': 405,
+                }
+            )
+            self.response.headers['Allow'] = ', '.join(allowed)
             return
         getattr(self, 'get')(*args, **kwargs)
 
@@ -1074,9 +1061,7 @@ class BaseHandler(
 class Error404Handler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles 404 errors."""
 
-    # This handler is the catch-all for URLs that match no route, so every
-    # request method must be answered with a 404 rather than a 405.
-    UNSUPPORTED_METHOD_STATUS_CODE = 404
+    pass
 
 
 class RaiseErrorOnGet:
