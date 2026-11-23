@@ -20,7 +20,9 @@ from __future__ import annotations
 
 import datetime
 import json
+import math
 import numbers
+import re
 import sys
 
 from core import feconf, utils
@@ -2388,3 +2390,149 @@ class LearnerAnswerInfo:
         """
         learner_answer_info_dict = self.to_dict()
         return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))
+
+
+class SolutionHitEventLogEntryDict(TypedDict):
+    """Dictionary representing a SolutionHitEventLogEntry object."""
+
+    exp_id: str
+    exp_version: int
+    state_name: str
+    session_id: str
+    time_spent_in_state_secs: float
+    event_schema_version: int
+
+
+class SolutionHitEventLogEntry:
+    """Domain object for a solution hit event log entry.
+
+    Mirrors
+    core/storage/statistics/gae_models.py::SolutionHitEventLogEntryModel.
+    """
+
+    def __init__(
+        self,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        time_spent_in_state_secs: float,
+        event_schema_version: int,
+    ) -> None:
+        """Constructs a SolutionHitEventLogEntry domain object.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Current version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            time_spent_in_state_secs: float. Time since start of this state
+                before this event occurred, in seconds.
+            event_schema_version: int. The version of the event schema used.
+        """
+        self.exp_id = exp_id
+        self.exp_version = exp_version
+        self.state_name = state_name
+        self.session_id = session_id
+        self.time_spent_in_state_secs = time_spent_in_state_secs
+        self.event_schema_version = event_schema_version
+
+    def to_dict(self) -> SolutionHitEventLogEntryDict:
+        """Returns a dict representing this domain object.
+
+        Returns:
+            SolutionHitEventLogEntryDict. A dict version of
+            SolutionHitEventLogEntry suitable for use.
+        """
+        return {
+            'exp_id': self.exp_id,
+            'exp_version': self.exp_version,
+            'state_name': self.state_name,
+            'session_id': self.session_id,
+            'time_spent_in_state_secs': self.time_spent_in_state_secs,
+            'event_schema_version': self.event_schema_version,
+        }
+
+    def validate(self) -> None:
+        """Validates various properties of the SolutionHitEventLogEntry.
+
+        Raises:
+            ValidationError. One or more attributes are invalid.
+        """
+        if not isinstance(self.exp_id, str):
+            raise utils.ValidationError(
+                'Expected exp_id to be a string, received %s'
+                % type(self.exp_id)
+            )
+        if not re.match(constants.ENTITY_ID_REGEX, self.exp_id):
+            raise utils.ValidationError(
+                'Invalid exp_id %s: does not match %s'
+                % (self.exp_id, constants.ENTITY_ID_REGEX)
+            )
+
+        if not isinstance(self.exp_version, int) or isinstance(
+            self.exp_version, bool
+        ):
+            raise utils.ValidationError(
+                'Expected exp_version to be an int, received %s'
+                % type(self.exp_version)
+            )
+        if self.exp_version < 1:
+            raise utils.ValidationError(
+                'Expected exp_version to be a positive integer, received %s'
+                % self.exp_version
+            )
+
+        if not isinstance(self.state_name, str) or not self.state_name:
+            raise utils.ValidationError(
+                'Expected state_name to be a non-empty string, received %s'
+                % self.state_name
+            )
+        if len(self.state_name) > constants.MAX_STATE_NAME_LENGTH:
+            raise utils.ValidationError(
+                'Expected state_name to be at most %s characters, received %s'
+                % (constants.MAX_STATE_NAME_LENGTH, self.state_name)
+            )
+
+        if not isinstance(self.session_id, str) or not self.session_id:
+            raise utils.ValidationError(
+                'Expected session_id to be a non-empty string, received %s'
+                % self.session_id
+            )
+
+        if (
+            not isinstance(self.time_spent_in_state_secs, (float, int))
+            or isinstance(self.time_spent_in_state_secs, bool)
+            or math.isnan(self.time_spent_in_state_secs)
+            or math.isinf(self.time_spent_in_state_secs)
+        ):
+            raise utils.ValidationError(
+                'Expected time_spent_in_state_secs to be a finite number, '
+                'received %s' % self.time_spent_in_state_secs
+            )
+        if self.time_spent_in_state_secs < 0.0:
+            raise utils.ValidationError(
+                'Expected time_spent_in_state_secs to be at least 0.0, '
+                'received %s' % self.time_spent_in_state_secs
+            )
+
+        if not isinstance(self.event_schema_version, int) or isinstance(
+            self.event_schema_version, bool
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be an int, received %s'
+                % type(self.event_schema_version)
+            )
+        if (
+            self.event_schema_version < 1
+            or self.event_schema_version
+            > feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be between 1 and %s, '
+                'received %s'
+                % (
+                    feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+                    self.event_schema_version,
+                )
+            )
