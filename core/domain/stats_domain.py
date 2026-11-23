@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 import numbers
+import re
 import sys
 
 from core import feconf, utils
@@ -36,7 +37,17 @@ from core.domain import (  # pylint: disable=invalid-import-from
     playthrough_issue_registry,
 )
 
-from typing import Any, Dict, Final, List, Literal, Optional, TypedDict, Union
+from typing import (
+    Any,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    TypedDict,
+    Union,
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -70,6 +81,18 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 # The maximum size in bytes the answer_details can take in
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
+
+# Allowed play types for event models.
+ALLOWED_PLAY_TYPES: Final = (
+    feconf.PLAY_TYPE_NORMAL,
+    feconf.PLAY_TYPE_PLAYTEST,
+)
+
+# Types that a param value of a maybe leave exploration event can have. These
+# match the types accepted by ExplorationMaybeLeaveHandler in reader.py.
+MaybeLeaveExplorationEventParamValueType = Union[
+    str, int, float, Dict[str, str], List[str]
+]
 
 IssuesCustomizationArgsDictType = Dict[
     str, Dict[str, Union[str, int, List[str]]]
@@ -2388,3 +2411,206 @@ class LearnerAnswerInfo:
         """
         learner_answer_info_dict = self.to_dict()
         return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))
+
+
+class MaybeLeaveExplorationEventLogEntryDict(TypedDict):
+    """Dictionary representing a MaybeLeaveExplorationEventLogEntry object."""
+
+    event_type: str
+    exploration_id: str
+    exploration_version: int
+    state_name: str
+    session_id: str
+    client_time_spent_in_secs: float
+    params: Dict[str, MaybeLeaveExplorationEventParamValueType]
+    play_type: str
+    event_schema_version: int
+
+
+class MaybeLeaveExplorationEventLogEntry:
+    """Domain object for an event where a learner may have left an
+    exploration.
+
+    Mirrors MaybeLeaveExplorationEventLogEntryModel in
+    core/storage/statistics/gae_models.py.
+    """
+
+    def __init__(
+        self,
+        event_type: str,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        session_id: str,
+        client_time_spent_in_secs: float,
+        # Here we use Mapping instead of Dict because the event handler and
+        # the storage model annotate params as Dict[str, str], and Dict does
+        # not accept a dict whose values have a narrower type.
+        params: Mapping[str, MaybeLeaveExplorationEventParamValueType],
+        play_type: str,
+        event_schema_version: int,
+    ) -> None:
+        """Constructs a MaybeLeaveExplorationEventLogEntry domain object.
+
+        Args:
+            event_type: str. The type of event. Must equal
+                feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION.
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of the exploration.
+            state_name: str. Name of the current state.
+            session_id: str. ID of the current learner session.
+            client_time_spent_in_secs: float. Time the learner spent in the
+                exploration, in seconds.
+            params: dict(str, *). Current parameter values, map of parameter
+                name to value.
+            play_type: str. Which type of playthrough this is. Must be one of
+                feconf.PLAY_TYPE_NORMAL or feconf.PLAY_TYPE_PLAYTEST.
+            event_schema_version: int. The version of the event schema used.
+        """
+        self.event_type = event_type
+        self.exploration_id = exploration_id
+        self.exploration_version = exploration_version
+        self.state_name = state_name
+        self.session_id = session_id
+        self.client_time_spent_in_secs = client_time_spent_in_secs
+        self.params = params
+        self.play_type = play_type
+        self.event_schema_version = event_schema_version
+
+    def to_dict(self) -> MaybeLeaveExplorationEventLogEntryDict:
+        """Returns a dict representing this domain object.
+
+        Returns:
+            dict. A dict version of MaybeLeaveExplorationEventLogEntry.
+        """
+        return {
+            'event_type': self.event_type,
+            'exploration_id': self.exploration_id,
+            'exploration_version': self.exploration_version,
+            'state_name': self.state_name,
+            'session_id': self.session_id,
+            'client_time_spent_in_secs': self.client_time_spent_in_secs,
+            'params': dict(self.params),
+            'play_type': self.play_type,
+            'event_schema_version': self.event_schema_version,
+        }
+
+    def validate(self) -> None:
+        """Validates various properties of the
+        MaybeLeaveExplorationEventLogEntry.
+
+        Raises:
+            ValidationError. One or more attributes are invalid.
+        """
+        if not isinstance(self.event_type, str):
+            raise utils.ValidationError(
+                'Expected event_type to be a string, received %s'
+                % type(self.event_type)
+            )
+        if self.event_type != feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION:
+            raise utils.ValidationError(
+                'Expected event_type to be %s, received %s'
+                % (feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION, self.event_type)
+            )
+
+        if not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+                'Expected exploration_id to be a string, received %s'
+                % type(self.exploration_id)
+            )
+        if not re.match(constants.ENTITY_ID_REGEX, self.exploration_id):
+            raise utils.ValidationError(
+                'Invalid exploration_id %s: does not match %s'
+                % (self.exploration_id, constants.ENTITY_ID_REGEX)
+            )
+
+        if not isinstance(self.exploration_version, int) or isinstance(
+            self.exploration_version, bool
+        ):
+            raise utils.ValidationError(
+                'Expected exploration_version to be an int, received %s'
+                % type(self.exploration_version)
+            )
+        if self.exploration_version < 1:
+            raise utils.ValidationError(
+                'Expected exploration_version to be a positive integer, '
+                'received %s' % self.exploration_version
+            )
+
+        if not isinstance(self.state_name, str):
+            raise utils.ValidationError(
+                'Expected state_name to be a string, received %s'
+                % type(self.state_name)
+            )
+        # This is the same check that exp_domain uses for state names.
+        utils.require_valid_name(self.state_name, 'a state name')
+
+        if not isinstance(self.session_id, str) or not self.session_id:
+            raise utils.ValidationError(
+                'Expected session_id to be a non-empty string, received %s'
+                % self.session_id
+            )
+
+        # Ints are accepted as well as floats, since a whole number of seconds
+        # can be passed as an int, and the datastore stores it as a float.
+        if not isinstance(
+            self.client_time_spent_in_secs, (int, float)
+        ) or isinstance(self.client_time_spent_in_secs, bool):
+            raise utils.ValidationError(
+                'Expected client_time_spent_in_secs to be a number, '
+                'received %s' % type(self.client_time_spent_in_secs)
+            )
+        # 0.0 is valid, since events migrated from StateHit use 0.0.
+        if self.client_time_spent_in_secs < 0:
+            raise utils.ValidationError(
+                'Expected client_time_spent_in_secs to be non-negative, '
+                'received %s' % self.client_time_spent_in_secs
+            )
+
+        if not isinstance(self.params, dict):
+            raise utils.ValidationError(
+                'Expected params to be a dict, received %s' % type(self.params)
+            )
+        for param_name, param_value in self.params.items():
+            if not isinstance(param_name, str):
+                raise utils.ValidationError(
+                    'Expected param name to be a string, received %s'
+                    % type(param_name)
+                )
+            if not isinstance(param_value, (str, int, float, dict, list)):
+                raise utils.ValidationError(
+                    'Expected param value to be one of str, int, float, dict '
+                    'or list, received %s' % type(param_value)
+                )
+
+        if not isinstance(self.play_type, str):
+            raise utils.ValidationError(
+                'Expected play_type to be a string, received %s'
+                % type(self.play_type)
+            )
+        if self.play_type not in ALLOWED_PLAY_TYPES:
+            raise utils.ValidationError(
+                'Expected play_type to be one of %s, received %s'
+                % (list(ALLOWED_PLAY_TYPES), self.play_type)
+            )
+
+        if not isinstance(self.event_schema_version, int) or isinstance(
+            self.event_schema_version, bool
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be an int, received %s'
+                % type(self.event_schema_version)
+            )
+        if (
+            self.event_schema_version < 1
+            or self.event_schema_version
+            > feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be between 1 and %s, '
+                'received %s'
+                % (
+                    feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+                    self.event_schema_version,
+                )
+            )

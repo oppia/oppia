@@ -3017,3 +3017,242 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.learner_answer_info, 'Expected created_on to be a datetime'
         )
+
+
+class MaybeLeaveExplorationEventLogEntryTests(test_utils.GenericTestBase):
+    """Tests for MaybeLeaveExplorationEventLogEntry domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.entry = stats_domain.MaybeLeaveExplorationEventLogEntry(
+            feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
+            'exp_id',
+            1,
+            'state name',
+            'session_id',
+            12.5,
+            {'param_key': 'param_value'},
+            feconf.PLAY_TYPE_NORMAL,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+
+    def test_valid_entry_passes_validation(self) -> None:
+        self.entry.validate()
+
+    def test_to_dict(self) -> None:
+        expected_dict: stats_domain.MaybeLeaveExplorationEventLogEntryDict = {
+            'event_type': feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
+            'exploration_id': 'exp_id',
+            'exploration_version': 1,
+            'state_name': 'state name',
+            'session_id': 'session_id',
+            'client_time_spent_in_secs': 12.5,
+            'params': {'param_key': 'param_value'},
+            'play_type': feconf.PLAY_TYPE_NORMAL,
+            'event_schema_version': feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        }
+        self.assertEqual(self.entry.to_dict(), expected_dict)
+
+    def test_event_type_must_be_string(self) -> None:
+        setattr(self.entry, 'event_type', 123)
+        self._assert_validation_error(
+            self.entry, 'Expected event_type to be a string'
+        )
+
+    def test_event_type_must_match_expected_constant(self) -> None:
+        self.entry.event_type = 'invalid_event_type'
+        self._assert_validation_error(
+            self.entry,
+            'Expected event_type to be %s'
+            % feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
+        )
+
+    def test_exploration_id_must_be_string(self) -> None:
+        setattr(self.entry, 'exploration_id', 123)
+        self._assert_validation_error(
+            self.entry, 'Expected exploration_id to be a string'
+        )
+
+    def test_exploration_id_must_match_entity_id_regex(self) -> None:
+        self.entry.exploration_id = ''
+        self._assert_validation_error(self.entry, 'Invalid exploration_id')
+
+        self.entry.exploration_id = 'invalid!id'
+        self._assert_validation_error(self.entry, 'Invalid exploration_id')
+
+        self.entry.exploration_id = 'a' * 13
+        self._assert_validation_error(self.entry, 'Invalid exploration_id')
+
+    def test_exploration_version_must_be_int(self) -> None:
+        setattr(self.entry, 'exploration_version', '1')
+        self._assert_validation_error(
+            self.entry, 'Expected exploration_version to be an int'
+        )
+
+    def test_exploration_version_must_not_be_bool(self) -> None:
+        setattr(self.entry, 'exploration_version', True)
+        self._assert_validation_error(
+            self.entry, 'Expected exploration_version to be an int'
+        )
+
+    def test_exploration_version_must_be_positive(self) -> None:
+        self.entry.exploration_version = 0
+        self._assert_validation_error(
+            self.entry, 'Expected exploration_version to be a positive integer'
+        )
+
+        self.entry.exploration_version = -1
+        self._assert_validation_error(
+            self.entry, 'Expected exploration_version to be a positive integer'
+        )
+
+    def test_state_name_must_be_string(self) -> None:
+        setattr(self.entry, 'state_name', 123)
+        self._assert_validation_error(
+            self.entry, 'Expected state_name to be a string'
+        )
+
+    def test_state_name_must_be_a_valid_name(self) -> None:
+        self.entry.state_name = ''
+        self._assert_validation_error(
+            self.entry,
+            'The length of a state name should be between 1 and 50 characters',
+        )
+
+        self.entry.state_name = 'a' * 51
+        self._assert_validation_error(
+            self.entry,
+            'The length of a state name should be between 1 and 50 characters',
+        )
+
+        self.entry.state_name = ' state name'
+        self._assert_validation_error(
+            self.entry, 'Names should not start or end with whitespace.'
+        )
+
+        self.entry.state_name = 'state  name'
+        self._assert_validation_error(
+            self.entry,
+            'Adjacent whitespace in a state name should be collapsed.',
+        )
+
+        self.entry.state_name = 'state:name'
+        self._assert_validation_error(
+            self.entry, 'Invalid character : in a state name'
+        )
+
+    def test_session_id_must_be_non_empty_string(self) -> None:
+        setattr(self.entry, 'session_id', 123)
+        self._assert_validation_error(
+            self.entry, 'Expected session_id to be a non-empty string'
+        )
+
+        self.entry.session_id = ''
+        self._assert_validation_error(
+            self.entry, 'Expected session_id to be a non-empty string'
+        )
+
+    def test_client_time_spent_in_secs_must_be_number(self) -> None:
+        setattr(self.entry, 'client_time_spent_in_secs', '1.5')
+        self._assert_validation_error(
+            self.entry, 'Expected client_time_spent_in_secs to be a number'
+        )
+
+    def test_client_time_spent_in_secs_must_not_be_bool(self) -> None:
+        setattr(self.entry, 'client_time_spent_in_secs', True)
+        self._assert_validation_error(
+            self.entry, 'Expected client_time_spent_in_secs to be a number'
+        )
+
+    def test_client_time_spent_in_secs_must_be_non_negative(self) -> None:
+        self.entry.client_time_spent_in_secs = -0.5
+        self._assert_validation_error(
+            self.entry,
+            'Expected client_time_spent_in_secs to be non-negative',
+        )
+
+    def test_zero_and_int_client_time_spent_in_secs_pass_validation(
+        self,
+    ) -> None:
+        # Events migrated from StateHit store 0.0 as the time spent.
+        self.entry.client_time_spent_in_secs = 0.0
+        self.entry.validate()
+
+        self.entry.client_time_spent_in_secs = 2
+        self.entry.validate()
+
+    def test_params_must_be_dict(self) -> None:
+        setattr(self.entry, 'params', 'not_a_dict')
+        self._assert_validation_error(
+            self.entry, 'Expected params to be a dict'
+        )
+
+    def test_params_keys_must_be_string(self) -> None:
+        setattr(self.entry, 'params', {123: 'value'})
+        self._assert_validation_error(
+            self.entry, 'Expected param name to be a string'
+        )
+
+    def test_params_values_must_have_an_allowed_type(self) -> None:
+        setattr(self.entry, 'params', {'key': None})
+        self._assert_validation_error(
+            self.entry,
+            'Expected param value to be one of str, int, float, dict or list',
+        )
+
+    def test_params_with_all_allowed_value_types_pass_validation(
+        self,
+    ) -> None:
+        self.entry.params = {
+            'str_param': 'value',
+            'int_param': 3,
+            'float_param': 1.5,
+            'dict_param': {'key': 'value'},
+            'list_param': ['value'],
+        }
+        self.entry.validate()
+
+    def test_play_type_must_be_string(self) -> None:
+        setattr(self.entry, 'play_type', 123)
+        self._assert_validation_error(
+            self.entry, 'Expected play_type to be a string'
+        )
+
+    def test_play_type_must_be_allowed_choice(self) -> None:
+        self.entry.play_type = 'invalid_play_type'
+        self._assert_validation_error(
+            self.entry, 'Expected play_type to be one of'
+        )
+
+    def test_playtest_play_type_passes_validation(self) -> None:
+        self.entry.play_type = feconf.PLAY_TYPE_PLAYTEST
+        self.entry.validate()
+
+    def test_event_schema_version_must_be_int(self) -> None:
+        setattr(self.entry, 'event_schema_version', '1')
+        self._assert_validation_error(
+            self.entry, 'Expected event_schema_version to be an int'
+        )
+
+    def test_event_schema_version_must_not_be_bool(self) -> None:
+        setattr(self.entry, 'event_schema_version', True)
+        self._assert_validation_error(
+            self.entry, 'Expected event_schema_version to be an int'
+        )
+
+    def test_event_schema_version_must_be_within_bounds(self) -> None:
+        self.entry.event_schema_version = 0
+        self._assert_validation_error(
+            self.entry, 'Expected event_schema_version to be between 1 and'
+        )
+
+        self.entry.event_schema_version = (
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION + 1
+        )
+        self._assert_validation_error(
+            self.entry, 'Expected event_schema_version to be between 1 and'
+        )
+
+    def test_older_event_schema_version_passes_validation(self) -> None:
+        self.entry.event_schema_version = 1
+        self.entry.validate()

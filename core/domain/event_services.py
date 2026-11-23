@@ -262,6 +262,18 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
         """Perform in-request processing of recording exploration leave
         events.
         """
+        maybe_leave_event = stats_domain.MaybeLeaveExplorationEventLogEntry(
+            feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
+            exp_id,
+            exp_version,
+            state_name,
+            session_id,
+            time_spent,
+            params,
+            play_type,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+        maybe_leave_event.validate()
         stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             exp_id,
             exp_version,
@@ -271,6 +283,33 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
             params,
             play_type,
         )
+
+
+def get_maybe_leave_exp_event_from_model(
+    maybe_leave_event_model: (
+        stats_models.MaybeLeaveExplorationEventLogEntryModel
+    ),
+) -> stats_domain.MaybeLeaveExplorationEventLogEntry:
+    """Returns a MaybeLeaveExplorationEventLogEntry domain object from a model.
+
+    Args:
+        maybe_leave_event_model: MaybeLeaveExplorationEventLogEntryModel. The
+            storage model instance.
+
+    Returns:
+        MaybeLeaveExplorationEventLogEntry. The domain object.
+    """
+    return stats_domain.MaybeLeaveExplorationEventLogEntry(
+        maybe_leave_event_model.event_type,
+        maybe_leave_event_model.exploration_id,
+        maybe_leave_event_model.exploration_version,
+        maybe_leave_event_model.state_name,
+        maybe_leave_event_model.session_id,
+        maybe_leave_event_model.client_time_spent_in_secs,
+        maybe_leave_event_model.params,
+        maybe_leave_event_model.play_type,
+        maybe_leave_event_model.event_schema_version,
+    )
 
 
 class CompleteExplorationEventHandler(BaseEventHandler):
