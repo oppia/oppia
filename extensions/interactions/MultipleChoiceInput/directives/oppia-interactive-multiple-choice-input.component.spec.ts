@@ -390,4 +390,37 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     expect(component.submitAnswer).not.toHaveBeenCalled();
     outsideButton.remove();
   });
+
+  it('should handle Enter dispatched inside the interaction via the document listener', () => {
+    spyOn(component, 'submitAnswer');
+    const innerButton = document.createElement('button');
+    fixture.nativeElement.appendChild(innerButton);
+    const event = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    });
+
+    innerButton.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBeTrue();
+    expect(component.submitAnswer).toHaveBeenCalled();
+  });
+
+  it('should not block Enter on a button outside the interaction via the document listener', () => {
+    spyOn(component, 'submitAnswer');
+    const outsideButton = document.createElement('button');
+    document.body.appendChild(outsideButton);
+    const event = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    });
+
+    outsideButton.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBeFalse();
+    expect(component.submitAnswer).not.toHaveBeenCalled();
+    outsideButton.remove();
+  });
 });
