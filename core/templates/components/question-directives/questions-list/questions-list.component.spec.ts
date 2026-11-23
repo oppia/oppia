@@ -50,6 +50,7 @@ import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {QuestionValidationService} from 'services/question-validation.service';
 import {QuestionsListService} from 'services/questions-list.service';
 import {QuestionsListComponent} from './questions-list.component';
@@ -78,6 +79,26 @@ class MockUrlInterpolationService {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    innerWidth: window.innerWidth,
+    innerHeight: window.innerHeight,
+    document: window.document,
+    sessionStorage: window.sessionStorage,
+    location: {
+      hash: '',
+      pathname: window.location.pathname,
+      search: window.location.search,
+      href: window.location.href,
+      origin: window.location.origin,
+      protocol: window.location.protocol,
+      hostname: window.location.hostname,
+      host: window.location.host,
+      port: window.location.port,
+    },
+  };
+}
+
 describe('Questions List Component', () => {
   let component: QuestionsListComponent;
   let fixture: ComponentFixture<QuestionsListComponent>;
@@ -92,6 +113,7 @@ describe('Questions List Component', () => {
   let questionUndoRedoService: QuestionUndoRedoService;
   let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
+  let windowRef: WindowRef;
   let skill: Skill;
   let question: Question | null = null;
   let questionStateData: State | null = null;
@@ -115,6 +137,10 @@ describe('Questions List Component', () => {
         {
           provide: UrlInterpolationService,
           useClass: MockUrlInterpolationService,
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
         },
         PageContextService,
         QuestionValidationService,
@@ -141,6 +167,7 @@ describe('Questions List Component', () => {
     loggerService = TestBed.inject(LoggerService);
     pageContextService = TestBed.inject(PageContextService);
     questionValidationService = TestBed.inject(QuestionValidationService);
+    windowRef = TestBed.inject(WindowRef);
 
     question = Question.createFromBackendDict({
       id: '1',
@@ -984,6 +1011,7 @@ describe('Questions List Component', () => {
       ' opened while a question is already being created',
     () => {
       component.newQuestionIsBeingCreated = true;
+      component.questionId = 'questionId';
       spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
 
       component.openQuestionEditor();
@@ -991,6 +1019,9 @@ describe('Questions List Component', () => {
       expect(
         pageContextService.setImageSaveDestinationToLocalStorage
       ).toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location.hash).toBe(
+        '/questions#questionId'
+      );
     }
   );
 
