@@ -503,6 +503,9 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
+    feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_STORY_TEMPORARILY_UNPUBLISHED: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID
+    ),
     feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
@@ -2926,6 +2929,76 @@ def send_reminder_mail_to_notify_curriculum_admins(
                 noreply_email_address,
                 sender_name=system_email_name,
             )
+
+
+def send_mail_to_notify_curriculum_admins_about_temporarily_unpublished_story(
+    curriculum_admin_ids: List[str],
+    story_id: str,
+    story_title: str,
+    topic_name: str,
+    unpublisher_username: str,
+) -> None:
+    """Sends an email to curriculum admins to tell them that a story was
+    temporarily unpublished and should be republished within 24 hours.
+
+    Args:
+        curriculum_admin_ids: list(str). The user ids of the admins to notify.
+        story_id: str. The id of the story.
+        story_title: str. The title of the story.
+        topic_name: str. The name of the topic the story belongs to.
+        unpublisher_username: str. The username of the user who unpublished
+            the story.
+    """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+    if len(curriculum_admin_ids) == 0:
+        logging.error('There were no curriculum admins to notify.')
+        return
+
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+    story_link = '%s%s/%s' % (
+        oppia_site_url,
+        str(feconf.STORY_EDITOR_URL_PREFIX),
+        story_id,
+    )
+
+    email_subject = 'Story temporarily unpublished: %s' % story_title
+    email_body = (
+        'Dear Curriculum Admin, <br><br>'
+        'The story <a href="%s">%s</a> in the topic %s was temporarily '
+        'unpublished by %s. Please make sure it is republished within '
+        '24 hours.<br><br>'
+        'Regards,<br> Oppia Foundation'
+    ) % (story_link, story_title, topic_name, unpublisher_username)
+
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        )
+    )
+    assert isinstance(noreply_email_address, str)
+    system_email_name = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value
+        )
+    )
+    assert isinstance(system_email_name, str)
+
+    for curriculum_admin_id in curriculum_admin_ids:
+        _send_email(
+            curriculum_admin_id,
+            feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_STORY_TEMPORARILY_UNPUBLISHED,
+            email_subject,
+            email_body,
+            noreply_email_address,
+            sender_name=system_email_name,
+        )
 
 
 def send_account_deleted_email(user_id: str, user_email: str) -> None:
