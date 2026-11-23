@@ -26,7 +26,7 @@ from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.suggestion import gae_models as suggestion_models
 from core.storage.topic import gae_models as topic_models
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, TypedDict
 
 
 class ChapterStatDict(TypedDict):
@@ -315,7 +315,7 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
                     else 0.0
                 )
 
-                if accepted_count >= content_count and content_count > 0:
+                if accepted_count >= content_count > 0:
                     status = 'Completed'
                     completed_chapters += 1
                 elif sub_count > 0 or accepted_count > 0:

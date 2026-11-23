@@ -130,8 +130,7 @@
           <!-- Submission Progress Bar -->
           <div class="progress-bar-row">
             <div class="progress-track">
-              <div class="progress-fill fill-blue"
-                   [style.width.%]="tStats.submission_progress_percentage"></div>
+              <div class="progress-fill fill-blue" [style.width.%]="tStats.submission_progress_percentage"></div>
             </div>
             <span class="progress-pct">{{ tStats.submission_progress_percentage }}%</span>
           </div>
@@ -139,8 +138,7 @@
           <!-- Reviews Progress Bar (Viren requirement: clear dual tracking) -->
           <div class="progress-bar-row mt-1" *ngIf="tStats.submission_progress_percentage > 0">
             <div class="progress-track track-subtle">
-              <div class="progress-fill fill-green"
-                   [style.width.%]="tStats.progress_percentage"></div>
+              <div class="progress-fill fill-green" [style.width.%]="tStats.progress_percentage"></div>
             </div>
             <span class="progress-pct pct-green">{{ tStats.progress_percentage }}% (reviewed)</span>
           </div>
@@ -166,8 +164,7 @@
           <!-- Submission Progress Bar -->
           <div class="progress-bar-row">
             <div class="progress-track">
-              <div class="progress-fill fill-blue"
-                   [style.width.%]="qStats.submission_progress_percentage"></div>
+              <div class="progress-fill fill-blue" [style.width.%]="qStats.submission_progress_percentage"></div>
             </div>
             <span class="progress-pct">{{ qStats.submission_progress_percentage }}%</span>
           </div>
@@ -175,8 +172,7 @@
           <!-- Reviews Progress Bar -->
           <div class="progress-bar-row mt-1" *ngIf="qStats.submission_progress_percentage > 0">
             <div class="progress-track track-subtle">
-              <div class="progress-fill fill-green"
-                   [style.width.%]="qStats.progress_percentage"></div>
+              <div class="progress-fill fill-green" [style.width.%]="qStats.progress_percentage"></div>
             </div>
             <span class="progress-pct pct-green">{{ qStats.progress_percentage }}% (reviewed)</span>
           </div>

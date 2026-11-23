@@ -75,6 +75,10 @@
     "url": "http://localhost:8181/contributor-dashboard",
     "page_module": "core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.module.ts"
   },
+  "contributor-dashboard-stats": {
+    "url": "http://localhost:8181/contributor-dashboard-stats",
+    "page_module": "core/templates/pages/contributor-dashboard-stats-page/contributor-dashboard-stats-page.module.ts"
+  },
   "blog-admin": {
     "url": "http://localhost:8181/blog-admin",
     "page_module": "core/templates/pages/blog-admin-page/blog-admin-page.module.ts"

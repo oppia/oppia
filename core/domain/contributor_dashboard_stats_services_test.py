@@ -49,8 +49,8 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
         self.rights = topic_models.TopicRightsModel(
             id=self.topic_id, topic_is_published=True
         )
-        super(topic_models.base_models.VersionedModel, self.rights).put()
-        super(topic_models.base_models.VersionedModel, self.topic).put()
+        super(topic_models.TopicRightsModel, self.rights).put()
+        super(topic_models.TopicModel, self.topic).put()
 
         self.exp_opp = opportunity_models.ExplorationOpportunitySummaryModel(
             id='exp_1',
@@ -119,7 +119,7 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(q_stats['target_questions_count'], 20)
         self.assertEqual(q_stats['skills_with_sufficient_questions_count'], 1)
         self.assertEqual(q_stats['total_questions_submitted'], 17)
-        # 12 is capped at 10 for skill_1 + 5 for skill_2 = 15/20 = 75.0%
+        # 12 is capped at 10 for skill_1 + 5 for skill_2 = 15/20 = 75.0%.
         self.assertEqual(q_stats['progress_percentage'], 75.0)
         self.assertEqual(len(q_stats['skills']), 2)
 
