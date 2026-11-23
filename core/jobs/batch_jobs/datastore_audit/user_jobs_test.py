@@ -20,8 +20,7 @@ from __future__ import annotations
 
 from core.domain import exp_domain, exp_services, user_domain_errors
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs.datastore_audit import user_jobs
-from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
+from core.jobs.batch_jobs.datastore_audit import base_validation_jobs, user_jobs
 from core.jobs.types import (
     base_validation_errors,
     model_property,
