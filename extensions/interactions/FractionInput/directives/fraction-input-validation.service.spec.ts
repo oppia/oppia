@@ -43,6 +43,7 @@ describe('FractionInputValidationService', () => {
     equivalentToHalfAndSimplestFormRule: Rule,
     equivalentToHalfRule: Rule,
     equivalentToOneAndHalfAndSimplestFormRule: Rule,
+    equivalentToOneAndHalfRule: Rule,
     equivalentToThreeByTwoAndSimplestFormRule: Rule,
     equivalentToThreeByTwoRule: Rule,
     equivalentToOneAndSimplestFormRule: Rule,
@@ -229,6 +230,16 @@ describe('FractionInputValidationService', () => {
         rule_type: 'IsEquivalentToAndInSimplestForm',
         inputs: {
           f: createFractionDict(false, 0, 3, 2),
+        },
+      },
+      'FractionInput'
+    );
+
+    equivalentToOneAndHalfRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          f: createFractionDict(false, 1, 1, 2),
         },
       },
       'FractionInput'
@@ -719,6 +730,91 @@ describe('FractionInputValidationService', () => {
         goodDefaultOutcome
       );
       expect(warnings).toEqual([]);
+    }
+  );
+
+  it(
+    'should catch equivalent and in simplest form followed by equivalent ' +
+      'as redundant if only that representation can be submitted',
+    () => {
+      customizationArgs.requireSimplestForm.value = true;
+      var redundantWarning = {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 2 from Oppia response 1 will never be ' +
+          'matched because it is made redundant by answer 1 from ' +
+          'Oppia response 1',
+      };
+
+      // Without an integer part, 3/2 cannot be written as 1 1/2.
+      customizationArgs.allowNonzeroIntegerPart.value = false;
+      answerGroups[0].rules = [
+        equivalentToThreeByTwoAndSimplestFormRule,
+        equivalentToThreeByTwoRule,
+      ];
+      expect(
+        validatorService.getAllWarnings(
+          currentState,
+          customizationArgs,
+          answerGroups,
+          goodDefaultOutcome
+        )
+      ).toEqual([redundantWarning]);
+
+      // Without improper fractions, 1 1/2 cannot be written as 3/2.
+      customizationArgs.allowNonzeroIntegerPart.value = true;
+      customizationArgs.allowImproperFraction.value = false;
+      answerGroups[0].rules = [
+        equivalentToOneAndHalfAndSimplestFormRule,
+        equivalentToOneAndHalfRule,
+      ];
+      expect(
+        validatorService.getAllWarnings(
+          currentState,
+          customizationArgs,
+          answerGroups,
+          goodDefaultOutcome
+        )
+      ).toEqual([redundantWarning]);
+    }
+  );
+
+  it(
+    'should not catch equivalent and in simplest form followed by ' +
+      'equivalent as redundant if the earlier form cannot be submitted',
+    () => {
+      customizationArgs.requireSimplestForm.value = true;
+
+      // Learners must enter 3/2, which only the later rule matches.
+      customizationArgs.allowNonzeroIntegerPart.value = false;
+      answerGroups[0].rules = [
+        equivalentToOneAndHalfAndSimplestFormRule,
+        equivalentToOneAndHalfRule,
+      ];
+      expect(
+        validatorService.getAllWarnings(
+          currentState,
+          customizationArgs,
+          answerGroups,
+          goodDefaultOutcome
+        )
+      ).toEqual([]);
+
+      // Learners must enter 1 1/2, which only the later rule matches.
+      customizationArgs.allowNonzeroIntegerPart.value = true;
+      customizationArgs.allowImproperFraction.value = false;
+      answerGroups[0].rules = [
+        equivalentToThreeByTwoAndSimplestFormRule,
+        equivalentToThreeByTwoRule,
+      ];
+      expect(
+        validatorService.getAllWarnings(
+          currentState,
+          customizationArgs,
+          answerGroups,
+          goodDefaultOutcome
+        )
+      ).toEqual([]);
     }
   );
 

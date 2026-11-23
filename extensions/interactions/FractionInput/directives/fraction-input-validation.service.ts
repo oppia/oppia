@@ -166,14 +166,26 @@ export class FractionInputValidationService {
           );
         }
         // The only other rule type with a single-value range is
-        // IsEquivalentTo. Only a value below 1 has a single simplest form
-        // representation (any other value can be written as both a mixed
-        // number and an improper fraction), so that later rule is only
-        // unreachable if that is the only form learners can submit.
+        // IsEquivalentTo, which matches every representation learners can
+        // submit for the value. It is only unreachable if the earlier rule's
+        // simplest form is the only one: answers must be in simplest form,
+        // that form must itself be allowed, and the value must not be
+        // writable as both a mixed number and an improper fraction (only
+        // values of 1 or more can be, and only if both are allowed).
+        const earlierFormIsAllowed =
+          (allowImproperFraction ||
+            !earlierSimplestForm.isImproperFraction()) &&
+          (allowNonzeroIntegerPart ||
+            !earlierSimplestForm.hasNonzeroIntegerPart());
+        const valueHasMixedAndImproperForms =
+          allowImproperFraction &&
+          allowNonzeroIntegerPart &&
+          (earlierSimplestForm.hasNonzeroIntegerPart() ||
+            earlierSimplestForm.isImproperFraction());
         return (
           shouldBeInSimplestForm &&
-          !earlierSimplestForm.hasNonzeroIntegerPart() &&
-          !earlierSimplestForm.isImproperFraction()
+          earlierFormIsAllowed &&
+          !valueHasMixedAndImproperForms
         );
       }
       return true;
