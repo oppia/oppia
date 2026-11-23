@@ -24,7 +24,6 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
-    contributor_dashboard_stats_services,
     exp_domain,
     exp_fetchers,
     feature_flag_services,
@@ -1778,26 +1777,6 @@ class ContributorAllStatsSummariesHandler(
             )
 
         self.render_json(response)
-
-
-class ContributorDashboardStatsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Provides aggregated contributor dashboard statistics for all topics and
-    languages.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests."""
-        stats = (
-            contributor_dashboard_stats_services.get_contributor_dashboard_stats()
-        )
-        self.render_json(stats)
 
 
 def _get_client_side_stats(

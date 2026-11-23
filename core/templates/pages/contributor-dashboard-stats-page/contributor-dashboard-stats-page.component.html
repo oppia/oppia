@@ -51,7 +51,9 @@
     <div class="oppia-stats-filter-card">
       <div class="filter-group" *ngIf="activeTab === 'translations'">
         <label class="filter-label">Target Language:</label>
-        <select class="form-control filter-select" [(ngModel)]="selectedLanguageCode">
+        <select class="form-control filter-select"
+                [ngModel]="selectedLanguageCode"
+                (ngModelChange)="onLanguageChange($event)">
           <option *ngFor="let lang of supportedLanguages" [value]="lang.language_code">
             {{ lang.language_name }}
           </option>
@@ -63,7 +65,8 @@
         <input type="text"
                class="form-control filter-input"
                placeholder="All Topics"
-               [(ngModel)]="searchQuery">
+               [(ngModel)]="searchQuery"
+               (input)="onSearchChange()">
       </div>
 
       <div class="filter-group">
@@ -72,7 +75,7 @@
                 [ngModel]="activeFilter"
                 (ngModelChange)="setFilter($event)">
           <option value="all">All Statuses</option>
-          <option value="near-complete">Near Complete (>=70%)</option>
+          <option value="near-complete">Near Completion</option>
           <option value="needs-review">Needs Reviewers</option>
           <option value="needs-contributor">Needs Submissions</option>
           <option value="completed">Completed</option>
@@ -112,16 +115,12 @@
       <div class="topic-progress-card" *ngFor="let topic of getActionableTopics()">
         <div class="topic-card-header">
           <span class="topic-card-title">{{ topic.topic_name }}</span>
-          <span class="topic-badge"
-                [ngClass]="{
-                  'badge-stalled': topic.is_stalled,
-                  'badge-needs-review': getTopicSubmissionPct(topic) > getTopicReviewPct(topic) && !topic.is_stalled,
-                  'badge-near-complete': getTopicSubmissionPct(topic) >= 70 && !topic.is_stalled,
-                  'badge-in-progress': getTopicSubmissionPct(topic) < 70 && !topic.is_stalled
-                }">
-            <span *ngIf="topic.is_stalled">Stalled</span>
-            <span *ngIf="!topic.is_stalled && getTopicSubmissionPct(topic) > getTopicReviewPct(topic)">Needs Reviewers</span>
-            <span *ngIf="!topic.is_stalled && getTopicSubmissionPct(topic) <= getTopicReviewPct(topic)">In Progress</span>
+          <span class="topic-badge" [ngClass]="'badge-' + getTopicStatus(topic)">
+            <span *ngIf="getTopicStatus(topic) === 'stalled'">Stalled</span>
+            <span *ngIf="getTopicStatus(topic) === 'needs-review'">Needs Reviewers</span>
+            <span *ngIf="getTopicStatus(topic) === 'in-progress'">In Progress</span>
+            <span *ngIf="getTopicStatus(topic) === 'not-started'">Not Started</span>
+            <span *ngIf="getTopicStatus(topic) === 'completed'">Completed</span>
           </span>
         </div>
 
@@ -148,29 +147,51 @@
 
           <!-- Metadata line matching prototype -->
           <div class="topic-meta-line">
-            <span>Lessons Completed: <strong>{{ tStats.completed_chapters_count }} / {{ tStats.total_chapters_count }}</strong></span>
+            <span>Lessons: <strong>{{ tStats.completed_chapters_count }} Completed · {{ tStats.in_progress_chapters_count }} In Progress</strong></span>
             <span class="meta-separator">•</span>
             <span>Cards Translated: <strong>{{ tStats.submitted_cards_count }} / {{ tStats.total_cards_count }}</strong></span>
             <span class="meta-separator">•</span>
             <span>Reviews Done: <strong>{{ tStats.translated_cards_count }} / {{ tStats.total_cards_count }}</strong></span>
+            <span class="meta-separator">•</span>
+            <span [ngClass]="{'stalled-text': topic.is_stalled}">
+              Last activity: <strong>{{ topic.last_progress_date }}</strong>
+              <span *ngIf="topic.is_stalled" class="stalled-tag">(Inactive >30d)</span>
+            </span>
           </div>
         </div>
 
         <!-- Practice Questions View -->
         <div *ngIf="activeTab === 'questions' && topic.question_stats as qStats"
              class="progress-section">
+          <!-- Submission Progress Bar -->
           <div class="progress-bar-row">
             <div class="progress-track">
               <div class="progress-fill fill-blue"
+                   [style.width.%]="qStats.submission_progress_percentage"></div>
+            </div>
+            <span class="progress-pct">{{ qStats.submission_progress_percentage }}%</span>
+          </div>
+
+          <!-- Reviews Progress Bar -->
+          <div class="progress-bar-row mt-1" *ngIf="qStats.submission_progress_percentage > 0">
+            <div class="progress-track track-subtle">
+              <div class="progress-fill fill-green"
                    [style.width.%]="qStats.progress_percentage"></div>
             </div>
-            <span class="progress-pct">{{ qStats.progress_percentage }}%</span>
+            <span class="progress-pct pct-green">{{ qStats.progress_percentage }}% (reviewed)</span>
           </div>
 
           <div class="topic-meta-line">
-            <span>Questions Created: <strong>{{ qStats.total_questions_submitted }}</strong></span>
+            <span>Skills: <strong>{{ qStats.completed_skills_count }} Completed · {{ qStats.in_progress_skills_count }} In Progress</strong></span>
             <span class="meta-separator">•</span>
-            <span>Skills Completed (10+ Qs): <strong>{{ qStats.completed_skills_count }} / {{ qStats.total_skills_count }}</strong></span>
+            <span>Questions Created: <strong>{{ qStats.total_questions_submitted }} / {{ qStats.target_questions_count }}</strong></span>
+            <span class="meta-separator">•</span>
+            <span>Reviews Done: <strong>{{ qStats.total_questions_reviewed }} / {{ qStats.target_questions_count }}</strong></span>
+            <span class="meta-separator">•</span>
+            <span [ngClass]="{'stalled-text': topic.is_stalled}">
+              Last activity: <strong>{{ topic.last_progress_date }}</strong>
+              <span *ngIf="topic.is_stalled" class="stalled-tag">(Inactive >30d)</span>
+            </span>
           </div>
         </div>
 
@@ -222,6 +243,7 @@
                 <tr>
                   <th>Skill Description</th>
                   <th>Questions Added</th>
+                  <th>Reviewed</th>
                   <th>Required Target</th>
                   <th>Status</th>
                 </tr>
@@ -230,10 +252,17 @@
                 <tr *ngFor="let skill of expQStats.skills">
                   <td>{{ skill.skill_description }}</td>
                   <td>{{ skill.submitted_questions_count }}</td>
+                  <td>{{ skill.reviewed_questions_count }}</td>
                   <td>{{ skill.target_questions_count }}</td>
                   <td>
-                    <span class="badge" [ngClass]="skill.status === 'Completed' ? 'bg-success' : 'bg-primary'">
-                      {{ skill.status === 'Completed' ? 'Satisfied' : (skill.target_questions_count - skill.submitted_questions_count) + ' needed' }}
+                    <span class="badge"
+                          [ngClass]="{
+                            'bg-success': skill.status === 'Completed',
+                            'bg-warning text-dark': skill.status === 'In-Progress' && skill.submitted_questions_count > skill.reviewed_questions_count,
+                            'bg-primary': skill.status === 'In-Progress' && skill.submitted_questions_count <= skill.reviewed_questions_count,
+                            'bg-secondary': skill.status === 'Not Started'
+                          }">
+                      {{ skill.status === 'Completed' ? 'Satisfied' : (skill.submitted_questions_count > skill.reviewed_questions_count && skill.submitted_questions_count >= skill.target_questions_count ? 'Needs Review' : (skill.target_questions_count - skill.submitted_questions_count) + ' needed') }}
                     </span>
                   </td>
                 </tr>

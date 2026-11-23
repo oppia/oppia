@@ -7094,6 +7094,7 @@ export default {
     },
     "CONTRIBUTOR_DASHBOARD_STATS": {
       "ROUTE": "contributor-dashboard-stats",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Contributor Dashboard Stats",
       "META": [
         {

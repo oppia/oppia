@@ -255,6 +255,11 @@
   color: #175cd3;
 }
 
+.badge-not-started {
+  background-color: #f2f4f7;
+  color: #475467;
+}
+
 .badge-needs-review {
   background-color: #fffaeb;
   color: #b54708;
@@ -273,6 +278,17 @@
 .badge-completed {
   background-color: #ecfdf3;
   color: #027a48;
+}
+
+.stalled-text {
+  color: #b42318;
+}
+
+.stalled-tag {
+  color: #d92d20;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 4px;
 }
 
 /* Progress Section */

@@ -19,13 +19,14 @@
 from __future__ import annotations
 
 import datetime
-from typing import Dict, List, Optional, TypedDict
 
 from core import feconf
 from core.constants import constants
 from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.suggestion import gae_models as suggestion_models
 from core.storage.topic import gae_models as topic_models
+
+from typing import Dict, List, Optional, TypedDict
 
 
 class ChapterStatDict(TypedDict):
@@ -158,7 +159,7 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
     Returns:
         ContributorDashboardStatsDict. All topic, language, and question stats.
     """
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 
     # 1. Fetch published topic IDs.
     published_topic_ids = set()
@@ -183,16 +184,17 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
         code = lang['id']
         name = lang['description']
         lang_name_by_code[code] = name
-        supported_languages_list.append({
-            'language_code': code,
-            'language_name': name
-        })
+        supported_languages_list.append(
+            {'language_code': code, 'language_name': name}
+        )
 
     # 3. Retrieve all exploration opportunities and group by topic.
     all_exp_opps = list(
         opportunity_models.ExplorationOpportunitySummaryModel.get_all()
     )
-    exp_opps_by_topic: Dict[str, List[opportunity_models.ExplorationOpportunitySummaryModel]] = {}
+    exp_opps_by_topic: Dict[
+        str, List[opportunity_models.ExplorationOpportunitySummaryModel]
+    ] = {}
     for opp in all_exp_opps:
         if opp.topic_id in published_topic_ids:
             exp_opps_by_topic.setdefault(opp.topic_id, []).append(opp)
@@ -202,19 +204,33 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
     in_review_questions_by_skill: Dict[str, int] = {}
 
     try:
-        all_suggestions = list(suggestion_models.GeneralSuggestionModel.get_all())
+        all_suggestions = list(
+            suggestion_models.GeneralSuggestionModel.get_all()
+        )
         for sug in all_suggestions:
-            if sug.status == feconf.STATUS_IN_REVIEW:
-                if sug.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+            if sug.status == suggestion_models.STATUS_IN_REVIEW:
+                if (
+                    sug.suggestion_type
+                    == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                ):
                     exp_id = sug.target_id
-                    lang_code = sug.change_cmd.get('language_code') if hasattr(sug, 'change_cmd') and isinstance(sug.change_cmd, dict) else getattr(sug, 'language_code', '')
+                    lang_code = (
+                        sug.change_cmd.get('language_code')
+                        if hasattr(sug, 'change_cmd')
+                        and isinstance(sug.change_cmd, dict)
+                        else getattr(sug, 'language_code', '')
+                    )
                     if exp_id and lang_code:
-                        in_review_trans_by_exp_lang.setdefault(exp_id, {}).setdefault(lang_code, 0)
+                        in_review_trans_by_exp_lang.setdefault(
+                            exp_id, {}
+                        ).setdefault(lang_code, 0)
                         in_review_trans_by_exp_lang[exp_id][lang_code] += 1
                 elif sug.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
                     skill_id = getattr(sug, 'target_id', '')
                     if skill_id:
-                        in_review_questions_by_skill[skill_id] = in_review_questions_by_skill.get(skill_id, 0) + 1
+                        in_review_questions_by_skill[skill_id] = (
+                            in_review_questions_by_skill.get(skill_id, 0) + 1
+                        )
     except Exception:
         # Gracefully handle suggestion model absences in test fixtures.
         pass
@@ -237,7 +253,7 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
             'not_started_topics': 0,
             'total_translated_cards': 0,
             'total_submitted_cards': 0,
-            'total_cards': 0
+            'total_cards': 0,
         }
 
     for topic_id, topic in published_topics_by_id.items():
@@ -247,9 +263,17 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
         topic_cards_count = sum(opp.content_count for opp in opps)
         total_cards_overall += topic_cards_count
 
-        topic_last_updated = topic.last_updated if hasattr(topic, 'last_updated') and topic.last_updated else now
+        topic_last_updated = (
+            topic.last_updated
+            if hasattr(topic, 'last_updated') and topic.last_updated
+            else now
+        )
         for opp in opps:
-            if hasattr(opp, 'last_updated') and opp.last_updated and opp.last_updated > topic_last_updated:
+            if (
+                hasattr(opp, 'last_updated')
+                and opp.last_updated
+                and opp.last_updated > topic_last_updated
+            ):
                 topic_last_updated = opp.last_updated
 
         time_since_progress = now - topic_last_updated
@@ -257,7 +281,9 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
         last_progress_date_str = topic_last_updated.strftime('%Y-%m-%d')
 
         # Compute translation stats by language for this topic.
-        translation_stats_by_lang: Dict[str, TranslationTopicLanguageStatDict] = {}
+        translation_stats_by_lang: Dict[
+            str, TranslationTopicLanguageStatDict
+        ] = {}
         for lang_code, lang_name in lang_name_by_code.items():
             completed_chapters = 0
             in_progress_chapters = 0
@@ -270,14 +296,24 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
                 content_count = opp.content_count
                 trans_counts = opp.translation_counts or {}
                 accepted_count = trans_counts.get(lang_code, 0)
-                in_review_count = in_review_trans_by_exp_lang.get(opp.id, {}).get(lang_code, 0)
+                in_review_count = in_review_trans_by_exp_lang.get(
+                    opp.id, {}
+                ).get(lang_code, 0)
                 sub_count = min(content_count, accepted_count + in_review_count)
 
                 translated_cards += accepted_count
                 submitted_cards += sub_count
 
-                sub_pct = round((sub_count / content_count * 100.0), 1) if content_count > 0 else 0.0
-                rev_pct = round((accepted_count / content_count * 100.0), 1) if content_count > 0 else 0.0
+                sub_pct = (
+                    round((sub_count / content_count * 100.0), 1)
+                    if content_count > 0
+                    else 0.0
+                )
+                rev_pct = (
+                    round((accepted_count / content_count * 100.0), 1)
+                    if content_count > 0
+                    else 0.0
+                )
 
                 if accepted_count >= content_count and content_count > 0:
                     status = 'Completed'
@@ -289,21 +325,38 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
                     status = 'Not Started'
                     unstarted_chapters += 1
 
-                ch_updated = opp.last_updated if hasattr(opp, 'last_updated') and opp.last_updated else topic_last_updated
-                chapter_stats.append({
-                    'chapter_title': opp.chapter_title,
-                    'content_count': content_count,
-                    'submitted_count': sub_count,
-                    'reviewed_count': accepted_count,
-                    'submission_percentage': sub_pct,
-                    'review_percentage': rev_pct,
-                    'status': status,
-                    'last_activity_date': ch_updated.strftime('%Y-%m-%d')
-                })
+                ch_updated = (
+                    opp.last_updated
+                    if hasattr(opp, 'last_updated') and opp.last_updated
+                    else topic_last_updated
+                )
+                chapter_stats.append(
+                    {
+                        'chapter_title': opp.chapter_title,
+                        'content_count': content_count,
+                        'submitted_count': sub_count,
+                        'reviewed_count': accepted_count,
+                        'submission_percentage': sub_pct,
+                        'review_percentage': rev_pct,
+                        'status': status,
+                        'last_activity_date': ch_updated.strftime('%Y-%m-%d'),
+                    }
+                )
 
-            topic_rev_pct = round((translated_cards / topic_cards_count * 100.0), 1) if topic_cards_count > 0 else 0.0
-            topic_sub_pct = round((submitted_cards / topic_cards_count * 100.0), 1) if topic_cards_count > 0 else 0.0
-            is_topic_completed = (completed_chapters == total_chapters_count and total_chapters_count > 0)
+            topic_rev_pct = (
+                round((translated_cards / topic_cards_count * 100.0), 1)
+                if topic_cards_count > 0
+                else 0.0
+            )
+            topic_sub_pct = (
+                round((submitted_cards / topic_cards_count * 100.0), 1)
+                if topic_cards_count > 0
+                else 0.0
+            )
+            is_topic_completed = (
+                completed_chapters == total_chapters_count
+                and total_chapters_count > 0
+            )
 
             translation_stats_by_lang[lang_code] = {
                 'language_code': lang_code,
@@ -318,7 +371,7 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
                 'progress_percentage': topic_rev_pct,
                 'submission_progress_percentage': topic_sub_pct,
                 'is_topic_completed': is_topic_completed,
-                'chapters': chapter_stats
+                'chapters': chapter_stats,
             }
 
             # Update language totals.
@@ -335,12 +388,18 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
 
         # Compute question stats for this topic.
         topic_skill_ids = getattr(topic, 'uncategorized_skill_ids', [])
-        topic_skills = [skills_by_id[s_id] for s_id in topic_skill_ids if s_id in skills_by_id]
+        topic_skills = [
+            skills_by_id[s_id]
+            for s_id in topic_skill_ids
+            if s_id in skills_by_id
+        ]
         topic_skills_count = len(topic_skills)
         total_skills_overall += topic_skills_count
 
         total_questions_submitted = 0
         total_questions_reviewed = 0
+        capped_questions_submitted = 0
+        capped_questions_reviewed = 0
         target_questions_count = topic_skills_count * MIN_QUESTIONS_PER_SKILL
         completed_skills = 0
         in_progress_skills = 0
@@ -356,8 +415,22 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
             total_questions_submitted += sub_questions
             total_questions_overall += rev_questions
 
-            sub_pct = round(min(100.0, (sub_questions / MIN_QUESTIONS_PER_SKILL) * 100.0), 1)
-            rev_pct = round(min(100.0, (rev_questions / MIN_QUESTIONS_PER_SKILL) * 100.0), 1)
+            # Cap each skill's contribution at MIN_QUESTIONS_PER_SKILL so that
+            # excess questions in one skill do not falsely inflate the topic's overall
+            # completion percentage.
+            capped_questions_reviewed += min(
+                rev_questions, MIN_QUESTIONS_PER_SKILL
+            )
+            capped_questions_submitted += min(
+                sub_questions, MIN_QUESTIONS_PER_SKILL
+            )
+
+            sub_pct = round(
+                min(100.0, (sub_questions / MIN_QUESTIONS_PER_SKILL) * 100.0), 1
+            )
+            rev_pct = round(
+                min(100.0, (rev_questions / MIN_QUESTIONS_PER_SKILL) * 100.0), 1
+            )
 
             if rev_questions >= MIN_QUESTIONS_PER_SKILL:
                 status = 'Completed'
@@ -369,22 +442,42 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
                 status = 'Not Started'
                 unstarted_skills += 1
 
-            s_updated = skill.last_updated if hasattr(skill, 'last_updated') and skill.last_updated else topic_last_updated
-            skill_stats_list.append({
-                'skill_id': skill.id,
-                'skill_description': skill.skill_description,
-                'submitted_questions_count': sub_questions,
-                'reviewed_questions_count': rev_questions,
-                'target_questions_count': MIN_QUESTIONS_PER_SKILL,
-                'submission_percentage': sub_pct,
-                'review_percentage': rev_pct,
-                'status': status,
-                'last_activity_date': s_updated.strftime('%Y-%m-%d')
-            })
+            s_updated = (
+                skill.last_updated
+                if hasattr(skill, 'last_updated') and skill.last_updated
+                else topic_last_updated
+            )
+            skill_stats_list.append(
+                {
+                    'skill_id': skill.id,
+                    'skill_description': skill.skill_description,
+                    'submitted_questions_count': sub_questions,
+                    'reviewed_questions_count': rev_questions,
+                    'target_questions_count': MIN_QUESTIONS_PER_SKILL,
+                    'submission_percentage': sub_pct,
+                    'review_percentage': rev_pct,
+                    'status': status,
+                    'last_activity_date': s_updated.strftime('%Y-%m-%d'),
+                }
+            )
 
-        q_rev_pct = round((total_questions_reviewed / target_questions_count * 100.0), 1) if target_questions_count > 0 else 0.0
-        q_sub_pct = round((total_questions_submitted / target_questions_count * 100.0), 1) if target_questions_count > 0 else 0.0
-        is_q_completed = (completed_skills == topic_skills_count and topic_skills_count > 0)
+        q_rev_pct = (
+            round(
+                (capped_questions_reviewed / target_questions_count * 100.0), 1
+            )
+            if target_questions_count > 0
+            else 0.0
+        )
+        q_sub_pct = (
+            round(
+                (capped_questions_submitted / target_questions_count * 100.0), 1
+            )
+            if target_questions_count > 0
+            else 0.0
+        )
+        is_q_completed = (
+            completed_skills == topic_skills_count and topic_skills_count > 0
+        )
 
         question_stats: QuestionTopicStatDict = {
             'total_skills_count': topic_skills_count,
@@ -398,27 +491,29 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
             'progress_percentage': q_rev_pct,
             'submission_progress_percentage': q_sub_pct,
             'is_topic_completed': is_q_completed,
-            'skills': skill_stats_list
+            'skills': skill_stats_list,
         }
 
-        topic_stats_list.append({
-            'topic_id': topic_id,
-            'topic_name': topic.name,
-            'total_chapters_count': total_chapters_count,
-            'total_cards_count': topic_cards_count,
-            'question_stats': question_stats,
-            'translation_stats_by_language': translation_stats_by_lang,
-            'last_progress_date': last_progress_date_str,
-            'is_stalled': is_stalled
-        })
+        topic_stats_list.append(
+            {
+                'topic_id': topic_id,
+                'topic_name': topic.name,
+                'total_chapters_count': total_chapters_count,
+                'total_cards_count': topic_cards_count,
+                'question_stats': question_stats,
+                'translation_stats_by_language': translation_stats_by_lang,
+                'last_progress_date': last_progress_date_str,
+                'is_stalled': is_stalled,
+            }
+        )
 
     # Sort topics near-complete first by default (highest non-100% completion first).
     topic_stats_list.sort(
         key=lambda t: (
             t['question_stats']['progress_percentage'] < 100.0,
-            t['question_stats']['progress_percentage']
+            t['question_stats']['progress_percentage'],
         ),
-        reverse=True
+        reverse=True,
     )
 
     # 6. Aggregate language-level overall stats.
@@ -431,44 +526,69 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
         tr_cards = data['total_translated_cards']
         sub_cards = data['total_submitted_cards']
         rev_pct = round((tr_cards / t_cards * 100.0), 1) if t_cards > 0 else 0.0
-        sub_pct = round((sub_cards / t_cards * 100.0), 1) if t_cards > 0 else 0.0
+        sub_pct = (
+            round((sub_cards / t_cards * 100.0), 1) if t_cards > 0 else 0.0
+        )
 
-        language_stats_list.append({
-            'language_code': lang_code,
-            'language_name': lang_name,
-            'completed_topics_count': data['completed_topics'],
-            'in_progress_topics_count': data['in_progress_topics'],
-            'not_started_topics_count': data['not_started_topics'],
-            'total_topics_count': total_topics_count,
-            'total_translated_cards': tr_cards,
-            'total_submitted_cards': sub_cards,
-            'total_cards': t_cards,
-            'overall_progress_percentage': rev_pct,
-            'overall_submission_percentage': sub_pct
-        })
+        language_stats_list.append(
+            {
+                'language_code': lang_code,
+                'language_name': lang_name,
+                'completed_topics_count': data['completed_topics'],
+                'in_progress_topics_count': data['in_progress_topics'],
+                'not_started_topics_count': data['not_started_topics'],
+                'total_topics_count': total_topics_count,
+                'total_translated_cards': tr_cards,
+                'total_submitted_cards': sub_cards,
+                'total_cards': t_cards,
+                'overall_progress_percentage': rev_pct,
+                'overall_submission_percentage': sub_pct,
+            }
+        )
 
     # Sort languages by progress descending.
-    language_stats_list.sort(key=lambda l: l['overall_progress_percentage'], reverse=True)
+    language_stats_list.sort(
+        key=lambda l: l['overall_progress_percentage'], reverse=True
+    )
 
     # 7. Compute Summary KPI stats.
     fully_translated_count = sum(
-        1 for t in topic_stats_list
-        if any(ts['is_topic_completed'] for ts in t['translation_stats_by_language'].values())
+        1
+        for t in topic_stats_list
+        if any(
+            ts['is_topic_completed']
+            for ts in t['translation_stats_by_language'].values()
+        )
     )
     near_completion_count = sum(
-        1 for t in topic_stats_list
-        if (70.0 <= t['question_stats']['progress_percentage'] < 100.0) or
-        any(70.0 <= ts['progress_percentage'] < 100.0 for ts in t['translation_stats_by_language'].values())
+        1
+        for t in topic_stats_list
+        if (70.0 <= t['question_stats']['progress_percentage'] < 100.0)
+        or any(
+            70.0 <= ts['progress_percentage'] < 100.0
+            for ts in t['translation_stats_by_language'].values()
+        )
     )
     needs_review_count = sum(
-        1 for t in topic_stats_list
-        if (t['question_stats']['submission_progress_percentage'] > t['question_stats']['progress_percentage']) or
-        any(ts['submission_progress_percentage'] > ts['progress_percentage'] for ts in t['translation_stats_by_language'].values())
+        1
+        for t in topic_stats_list
+        if (
+            t['question_stats']['submission_progress_percentage']
+            > t['question_stats']['progress_percentage']
+        )
+        or any(
+            ts['submission_progress_percentage'] > ts['progress_percentage']
+            for ts in t['translation_stats_by_language'].values()
+        )
     )
     needs_contributor_count = sum(
-        1 for t in topic_stats_list
-        if (t['question_stats']['submission_progress_percentage'] < 70.0) or
-        any(ts['submission_progress_percentage'] < 70.0 for ts in t['translation_stats_by_language'].values())
+        1
+        for t in topic_stats_list
+        if (t['question_stats']['submission_progress_percentage'] < 70.0)
+        or any(
+            ts['submission_progress_percentage'] < 70.0
+            for ts in t['translation_stats_by_language'].values()
+        )
     )
 
     summary_stats: SummaryStatsDict = {
@@ -480,7 +600,7 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
         'fully_translated_topics_count': fully_translated_count,
         'near_completion_topics_count': near_completion_count,
         'needs_review_count': needs_review_count,
-        'needs_contributor_count': needs_contributor_count
+        'needs_contributor_count': needs_contributor_count,
     }
 
     topic_names = [t['topic_name'] for t in topic_stats_list]
@@ -490,5 +610,5 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
         'language_stats': language_stats_list,
         'summary_stats': summary_stats,
         'supported_languages': supported_languages_list,
-        'topic_names': topic_names
+        'topic_names': topic_names,
     }

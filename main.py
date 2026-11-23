@@ -37,6 +37,7 @@ from core.controllers import (
     concept_card_viewer,
     contributor_dashboard,
     contributor_dashboard_admin,
+    contributor_dashboard_stats,
     creator_dashboard,
     cron,
     custom_landing_pages,
@@ -446,8 +447,12 @@ URLS = [
         contributor_dashboard.ContributorStatsSummariesHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_STATS_URL,
+        contributor_dashboard_stats.ContributorDashboardStatsPageHandler,
+    ),
+    get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_STATS_DATA_URL,
-        contributor_dashboard.ContributorDashboardStatsHandler,
+        contributor_dashboard_stats.ContributorDashboardStatsDataHandler,
     ),
     get_redirect_route(
         r'%s/<username>' % feconf.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL,

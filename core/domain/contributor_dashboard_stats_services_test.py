@@ -36,6 +36,7 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
             canonical_name='algebra',
             url_fragment='algebra',
             description='Learn algebra fundamentals.',
+            language_code='en',
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=2,
@@ -43,15 +44,13 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
             canonical_story_references=[],
             additional_story_references=[],
             uncategorized_skill_ids=['skill_1', 'skill_2'],
-            page_title_fragment_for_web='algebra'
+            page_title_fragment_for_web='algebra',
         )
-        self.topic.put()
-
         self.rights = topic_models.TopicRightsModel(
-            id=self.topic_id,
-            topic_is_published=True
+            id=self.topic_id, topic_is_published=True
         )
-        self.rights.put()
+        super(topic_models.base_models.VersionedModel, self.rights).put()
+        super(topic_models.base_models.VersionedModel, self.topic).put()
 
         self.exp_opp = opportunity_models.ExplorationOpportunitySummaryModel(
             id='exp_1',
@@ -64,26 +63,30 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 15},
             language_codes_with_assigned_voice_artists=[],
-            language_codes_needing_voice_artists=[]
+            language_codes_needing_voice_artists=[],
         )
         self.exp_opp.put()
 
         self.skill_opp_1 = opportunity_models.SkillOpportunityModel(
             id='skill_1',
             skill_description='Solving Linear Equations',
-            question_count=12
+            question_count=12,
         )
         self.skill_opp_1.put()
 
         self.skill_opp_2 = opportunity_models.SkillOpportunityModel(
             id='skill_2',
             skill_description='Quadratic Formula',
-            question_count=5
+            question_count=5,
         )
         self.skill_opp_2.put()
 
-    def test_get_contributor_dashboard_stats_returns_expected_structure(self) -> None:
-        stats = contributor_dashboard_stats_services.get_contributor_dashboard_stats()
+    def test_get_contributor_dashboard_stats_returns_expected_structure(
+        self,
+    ) -> None:
+        stats = (
+            contributor_dashboard_stats_services.get_contributor_dashboard_stats()
+        )
 
         self.assertIn('topic_stats', stats)
         self.assertIn('language_stats', stats)
@@ -106,13 +109,18 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(hi_stats['progress_percentage'], 75.0)
         self.assertEqual(hi_stats['in_progress_chapters_count'], 1)
         self.assertEqual(len(hi_stats['chapters']), 1)
-        self.assertEqual(hi_stats['chapters'][0]['chapter_title'], 'Chapter 1: Equations')
+        self.assertEqual(
+            hi_stats['chapters'][0]['chapter_title'], 'Chapter 1: Equations'
+        )
 
         # Verify practice question metrics.
         q_stats = topic_stat['question_stats']
         self.assertEqual(q_stats['total_skills_count'], 2)
         self.assertEqual(q_stats['target_questions_count'], 20)
         self.assertEqual(q_stats['skills_with_sufficient_questions_count'], 1)
+        self.assertEqual(q_stats['total_questions_submitted'], 17)
+        # 12 is capped at 10 for skill_1 + 5 for skill_2 = 15/20 = 75.0%
+        self.assertEqual(q_stats['progress_percentage'], 75.0)
         self.assertEqual(len(q_stats['skills']), 2)
 
         # Verify summary stats.

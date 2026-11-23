@@ -93,11 +93,50 @@ export class ContributorDashboardStatsPageComponent implements OnInit {
   }
 
   setActiveTab(tab: ActiveTab): void {
-    this.activeTab = tab;
+    if (this.activeTab !== tab) {
+      this.activeTab = tab;
+      this.activeFilter = 'all';
+      this.collapseAllDropdownsAndDetails();
+    }
+  }
+
+  onLanguageChange(newLang: string): void {
+    this.selectedLanguageCode = newLang;
+    this.collapseAllDropdownsAndDetails();
   }
 
   setFilter(filter: FilterStatus): void {
     this.activeFilter = filter;
+    this.collapseAllDropdownsAndDetails();
+  }
+
+  onSearchChange(): void {
+    this.collapseAllDropdownsAndDetails();
+  }
+
+  collapseAllDropdownsAndDetails(): void {
+    this.expandedTopicIds.clear();
+    this.showCompletedAccordion = false;
+  }
+
+  getTopicStatus(
+    topic: TopicStat
+  ): 'completed' | 'stalled' | 'needs-review' | 'in-progress' | 'not-started' {
+    if (this.isTopicComplete(topic)) {
+      return 'completed';
+    }
+    const subPct = this.getTopicSubmissionPct(topic);
+    const revPct = this.getTopicReviewPct(topic);
+    if (subPct === 0 && revPct === 0) {
+      return 'not-started';
+    }
+    if (topic.is_stalled) {
+      return 'stalled';
+    }
+    if (subPct > revPct) {
+      return 'needs-review';
+    }
+    return 'in-progress';
   }
 
   toggleTopicDetails(topicId: string): void {
@@ -129,7 +168,9 @@ export class ContributorDashboardStatsPageComponent implements OnInit {
     if (!topic || !topic.translation_stats_by_language) {
       return null;
     }
-    return topic.translation_stats_by_language[this.selectedLanguageCode] || null;
+    return (
+      topic.translation_stats_by_language[this.selectedLanguageCode] || null
+    );
   }
 
   // Filters topics based on active tab, search query, and filter status.
@@ -146,7 +187,9 @@ export class ContributorDashboardStatsPageComponent implements OnInit {
       const stats = this.getTranslationStatsForTopic(topic);
       return stats ? stats.is_topic_completed : false;
     } else {
-      return topic.question_stats ? topic.question_stats.is_topic_completed : false;
+      return topic.question_stats
+        ? topic.question_stats.is_topic_completed
+        : false;
     }
   }
 
@@ -224,7 +267,9 @@ export class ContributorDashboardStatsPageComponent implements OnInit {
       const stats = this.getTranslationStatsForTopic(topic);
       return stats ? stats.progress_percentage : 0;
     } else {
-      return topic.question_stats ? topic.question_stats.progress_percentage : 0;
+      return topic.question_stats
+        ? topic.question_stats.progress_percentage
+        : 0;
     }
   }
 }
