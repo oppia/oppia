@@ -242,6 +242,20 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Navigates directly to the editor for an exploration.
+   * @param explorationId - The exploration ID.
+   */
+  async navigateToExplorationEditor(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('Cannot navigate to editor: explorationId is null');
+    }
+    await this.goto(`${baseUrl}/create/${explorationId}`);
+    showMessage('Navigation to exploration editor is successful.');
+  }
+
+  /**
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {

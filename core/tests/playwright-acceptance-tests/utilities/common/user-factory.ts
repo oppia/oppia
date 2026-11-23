@@ -18,7 +18,7 @@
  * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
 
-import {Browser} from '@playwright/test';
+import {Browser, devices} from '@playwright/test';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
@@ -26,6 +26,7 @@ import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
 import {LoggedOutUser, LoggedOutUserFactory} from '../user/logged-out-user';
 import {LoggedInUser, LoggedInUserFactory} from '../user/logged-in-user';
 import {VoiceoverAdmin, VoiceoverAdminFactory} from '../user/voiceover-admin';
+import {VoiceoverSubmitterFactory} from '../user/voiceover-submitter';
 import {
   ExplorationEditor,
   ExplorationEditorFactory,
@@ -43,6 +44,7 @@ const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
   'button.e2e-test-oppia-cookie-banner-accept-button';
 const isMobile = process.env.MOBILE === 'true';
+const deviceProfile = isMobile ? devices['Pixel 7'] : devices['Desktop Chrome'];
 const specName = process.env.SPEC_NAME;
 const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptance/${isMobile ? 'mobile' : 'desktop'}-${specName}/`;
 
@@ -55,6 +57,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -205,6 +208,17 @@ export class UserFactory {
             args as string
           );
           break;
+        case ROLES.VOICEOVER_SUBMITTER:
+          if (typeof args !== 'string') {
+            throw new Error(
+              'Exploration ID is required to assign a voiceover submitter.'
+            );
+          }
+          await superAdminInstance.addVoiceoverArtistToExplorationWithID(
+            args,
+            user.username
+          );
+          break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -242,6 +256,7 @@ export class UserFactory {
     args?: string | string[]
   ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     const context = await browser.newContext({
+      ...deviceProfile,
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
       },
@@ -280,6 +295,7 @@ export class UserFactory {
     browser: Browser
   ): Promise<LoggedInUser & LoggedOutUser> {
     const context = await browser.newContext({
+      ...deviceProfile,
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
       },
@@ -336,6 +352,7 @@ export class UserFactory {
     browser: Browser
   ): Promise<LoggedOutUser> {
     const context = await browser.newContext({
+      ...deviceProfile,
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
       },
