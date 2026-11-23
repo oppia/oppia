@@ -2918,11 +2918,7 @@ export class ExplorationEditor extends BaseUser {
    * Navigate to feedback tab.
    */
   async navigateToFeedbackTab(): Promise<void> {
-    const goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
-    if (goToFeedbackButton) {
-      await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
-      await this.waitForNetworkIdle();
-    } else if (this.isViewportAtMobileWidth()) {
+    if (this.isViewportAtMobileWidth()) {
       const mobileNavbarElement = await this.getElementInParent(
         mobileNavbarOptions
       ).catch(() => null);
@@ -2990,34 +2986,25 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to dismiss the feedback prompt modal if it is present.
+   * Function to dismiss the feedback prompt modal and stay in editor.
    */
-  async dismissFeedbackPromptModalIfPresent(): Promise<void> {
-    try {
-      await this.page.waitForSelector(stayInEditorButtonSelector, {
-        visible: true,
-        timeout: 2500,
-      });
-      await this.clickOnElementWithSelector(stayInEditorButtonSelector);
-      await this.expectElementToBeVisible(stayInEditorButtonSelector, false);
-    } catch {
-      // Modal is not present, continue.
-    }
+  async dismissFeedbackPromptModal(): Promise<void> {
+    await this.page.waitForSelector(stayInEditorButtonSelector, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(stayInEditorButtonSelector);
+    await this.waitForNetworkIdle();
   }
+
   /**
-   * Function to accept the feedback prompt modal if it is present.
+   * Function to accept the feedback prompt modal and navigate to feedback tab.
    */
-  async acceptFeedbackPromptModalIfPresent(): Promise<void> {
-    try {
-      await this.page.waitForSelector(goToFeedbackButtonSelector, {
-        visible: true,
-        timeout: 2500,
-      });
-      await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
-      await this.expectElementToBeVisible(goToFeedbackButtonSelector, false);
-    } catch {
-      // Modal is not present, continue.
-    }
+  async acceptFeedbackPromptModal(): Promise<void> {
+    await this.page.waitForSelector(goToFeedbackButtonSelector, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
+    await this.waitForNetworkIdle();
   }
 
   /**

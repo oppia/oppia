@@ -184,7 +184,7 @@ describe('Logged-in User', function () {
     await explorationEditor.openExplorationInExplorationEditor(
       'What are the Place Values'
     );
-    await explorationEditor.navigateToFeedbackTab();
+    await explorationEditor.acceptFeedbackPromptModal();
 
     await explorationEditor.expectScreenshotToMatch(
       'explorationEditorFeedbackTab',
@@ -242,7 +242,7 @@ describe('Logged-in User', function () {
     await explorationEditor.openExplorationInExplorationEditor(
       'What are the Place Values'
     );
-    await explorationEditor.navigateToFeedbackTab();
+    await explorationEditor.acceptFeedbackPromptModal();
     await explorationEditor.clickOnFeedbackListEntryWithDescription(
       'This Lesson seems too short, can we make it longer?'
     );

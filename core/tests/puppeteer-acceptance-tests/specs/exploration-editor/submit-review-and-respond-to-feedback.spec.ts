@@ -111,8 +111,8 @@ describe('Exploration Editor', function () {
         'Feedback Test'
       );
 
-      // Go to the feedback tab and verify the count of feedback items.
-      await explorationEditor.navigateToFeedbackTab();
+      // Go to the feedback tab via prompt modal and verify the count of feedback items.
+      await explorationEditor.acceptFeedbackPromptModal();
       await explorationEditor.expectNoOfSuggestionsToBe(3);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -180,7 +180,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.openExplorationInExplorationEditor(
         'Feedback Test'
       );
-      await explorationEditor.navigateToFeedbackTab();
+      await explorationEditor.acceptFeedbackPromptModal();
 
       // Change status of the second feedback thread to "fixed".
       await explorationEditor.viewFeedbackThread(2);
