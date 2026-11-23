@@ -177,6 +177,32 @@ const addStudyGuideSectionModalSaveButton =
 const studyGuideSectionTileSelector = (sectionIndex: number): string =>
   `.e2e-test-study-guide-section-${sectionIndex}`;
 
+// Skill editor selectors.
+const createSkillButton = '.e2e-test-create-skill-button-circle';
+const createSkillMobileButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
+const addMisconceptionButton = '.e2e-test-add-misconception-modal-button';
+const misconceptionCardHeader = '.e2e-test-oppia-misconception-card-header';
+const misconceptionNameField = '.e2e-test-misconception-name-field';
+const optionalMisconceptionToggle = '.e2e-test-misconception-optional-check';
+const saveMisconceptionButton = '.e2e-test-confirm-add-misconception-button';
+const saveOrPublishSkillButton = '.e2e-test-save-or-publish-skill';
+const mobileNavigationContainer = '.e2e-test-mobile-navigation-bar-container';
+const mobileSkillNavToggle =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
+const mobileDiscardChangesButton = '.e2e-test-mobile-discard-changes-direct';
+const toggleRubricsDropdown = '.e2e-test-toggle-rubrics-dropdown';
+const rubricDifficultySelect = '.e2e-test-select-rubric-difficulty';
+const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
+const togglePrerequisiteSkillsDropdown =
+  '.e2e-test-toggle-prereq-skills-dropdown';
+const addPrerequisiteSkillButton =
+  '.e2e-test-add-prerequisite-skill-in-skill-editor-button';
+const skillNameSearchInput = '.e2e-test-skill-name-input';
+const skillSelectionItem = '.e2e-test-skill-selection-item';
+const confirmSkillSelectionButton = '.e2e-test-confirm-skill-selection-button';
+
 export class TopicManager extends BaseUser {
   /**
    * Create a basic algebra question in the skill editor page.
@@ -1211,6 +1237,152 @@ export class TopicManager extends BaseUser {
       console.error(error instanceof Error ? error.stack : error);
       throw error;
     }
+  }
+
+  /**
+   * Creates a new skill from the skills tab of the dashboard.
+   */
+  async createSkillFromSkillsDashboard(
+    skillName: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    const createButton = this.isViewportAtMobileWidth()
+      ? createSkillMobileButton
+      : createSkillButton;
+    await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
+    await this.clickOnElementWithSelector(skillsTab);
+    await this.expectElementToBeVisible(createButton);
+    await this.clickOnElementWithSelector(createButton);
+    await this.fillSkillInfoAndSubmit(skillName, reviewMaterial);
+  }
+
+  /**
+   * Adds a misconception to the skill currently open in the skill editor.
+   */
+  async addMisconception(
+    misconceptionName: string,
+    notes: string,
+    feedback: string,
+    optional: boolean = false
+  ): Promise<void> {
+    // On mobile, the misconceptions card is collapsed by default.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(addMisconceptionButton, true, 5000))
+    ) {
+      await this.clickOnElementWithSelector(misconceptionCardHeader);
+    }
+    await this.clickOnElementWithSelector(addMisconceptionButton);
+    await this.typeInInputField(misconceptionNameField, misconceptionName);
+    // The modal has two RTEs: the first for notes, the second for feedback.
+    const rteElements = await this.page.$$(richTextAreaField);
+    await this.typeInInputField(rteElements[0], notes);
+    await this.typeInInputField(rteElements[1], feedback);
+    if (optional) {
+      await this.clickOnElementWithSelector(optionalMisconceptionToggle);
+    }
+    await this.clickOnElementWithSelector(saveMisconceptionButton);
+    await this.expectElementToBeVisible(saveMisconceptionButton, false);
+  }
+
+  /**
+   * Opens the skill editor's mobile navigation menu if it isn't open.
+   */
+  private async openSkillEditorMobileNavigation(): Promise<void> {
+    if (!(await this.isElementVisible(mobileNavigationContainer, true, 5000))) {
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+    }
+  }
+
+  /**
+   * Checks whether the skill editor has unsaved changes that can be saved.
+   */
+  async expectSaveChangesInSkillEditorToBe(
+    status: 'enabled' | 'disabled'
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeClickable(
+        saveOrPublishSkillButton,
+        status === 'enabled'
+      );
+      return;
+    }
+    await this.openSkillEditorMobileNavigation();
+    // On mobile, the visible button reads exactly 'Discard Changes' only when
+    // there is nothing to save; otherwise it also shows the change count.
+    const discardButton = this.page
+      .locator(mobileDiscardChangesButton)
+      .filter({visible: true});
+    if (status === 'enabled') {
+      await expect(discardButton).not.toHaveText('Discard Changes');
+    } else {
+      await expect(discardButton).toHaveText('Discard Changes');
+    }
+  }
+
+  /**
+   * Saves the pending skill editor changes with the given commit message.
+   */
+  async publishUpdatedSkill(commitMessage: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openSkillEditorMobileNavigation();
+      // The skill nav menu is rendered twice, but only one copy is visible.
+      const saveButton = this.page
+        .locator(mobileSaveSkillButton)
+        .filter({visible: true});
+      // The dropdown stays open after a save, so only open it if needed.
+      if ((await saveButton.count()) === 0) {
+        await this.page
+          .locator(mobileSkillNavToggle)
+          .filter({visible: true})
+          .click();
+      }
+      await saveButton.click();
+    } else {
+      await this.clickOnElementWithSelector(saveOrPublishSkillButton);
+    }
+    await this.typeInInputField(saveChangesMessageInput, commitMessage);
+    await this.expectElementToBeVisible(
+      `${closeSaveModalButton}:not([disabled])`
+    );
+    await this.clickOnElementWithSelector(closeSaveModalButton);
+    await this.expectToastMessage('Changes Saved.');
+  }
+
+  /**
+   * Adds an explanation to the rubric of the given difficulty.
+   */
+  async updateRubric(
+    difficulty: 'Easy' | 'Medium' | 'Hard',
+    explanation: string
+  ): Promise<void> {
+    const difficultyOptionValues = {Easy: '0', Medium: '1', Hard: '2'};
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(toggleRubricsDropdown);
+    }
+    await this.select(
+      rubricDifficultySelect,
+      difficultyOptionValues[difficulty]
+    );
+    await this.clickOnElementWithText('+ ADD EXPLANATION FOR DIFFICULTY');
+    await this.typeInInputField(richTextAreaField, explanation);
+    await this.clickOnElementWithSelector(saveRubricExplanationButton);
+    await this.expectElementToBeVisible(saveRubricExplanationButton, false);
+  }
+
+  /**
+   * Adds a prerequisite skill to the skill open in the skill editor.
+   */
+  async addPrerequisiteSkillInSkillEditor(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(togglePrerequisiteSkillsDropdown);
+    }
+    await this.clickOnElementWithSelector(addPrerequisiteSkillButton);
+    await this.typeInInputField(skillNameSearchInput, skillName);
+    await this.clickOnElementWithSelectorAndText(skillSelectionItem, skillName);
+    await this.clickOnElementWithSelector(confirmSkillSelectionButton);
+    await this.expectElementToBeVisible(confirmSkillSelectionButton, false);
+    showMessage(`Added prerequisite skill: ${skillName}`);
   }
 }
 export let TopicManagerFactory = (page: Page): TopicManager => {

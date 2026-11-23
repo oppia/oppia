@@ -19,6 +19,7 @@
  * TM.SE Edit and republish the skill.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -27,14 +28,18 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Topic Manager', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Topic Manager', function () {
   let topicManager: TopicManager;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(750000);
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_adm@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
@@ -46,7 +51,8 @@ describe('Topic Manager', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',
       'Addition',
-      'Addition'
+      'Addition',
+      true
     );
     await curriculumAdmin.addStoryToTopic(
       'The Broken Calculator',
@@ -78,18 +84,19 @@ describe('Topic Manager', function () {
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
+      browser,
       [ROLES.TOPIC_MANAGER],
       'Arithmetic Operations'
     );
-  }, 750000);
+  });
 
-  it('should be able to edit and republish the skill', async function () {
+  test('should be able to edit and republish the skill', async function () {
     // Add worked example to the skill.
     await topicManager.openSkillEditor('Subtraction');
     // TODO(#23231): Add worked example and save.
     // Also, uncomment the below line.
     // await this.expectSaveChangesInSkillEditorToBe('enabled');
-    await topicManager.expectScreenshotToMatch('skillEditor', __dirname);
+    await topicManager.expectScreenshotToMatch('skillEditor');
 
     // Add a misconception to the skill.
     // TODO(#23231): Uncomment the below line, once the issue is fixed.
@@ -113,7 +120,7 @@ describe('Topic Manager', function () {
     await topicManager.expectSaveChangesInSkillEditorToBe('enabled');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
