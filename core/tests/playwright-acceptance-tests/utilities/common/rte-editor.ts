@@ -203,4 +203,33 @@ export class RTEEditor {
     await this.user.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.user.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
+
+  /**
+   * Changes the paragraph format of the current block in CKEditor.
+   * @param {'heading' | 'normal'} format - The format to apply.
+   */
+  async changeFormatTo(format: 'heading' | 'normal'): Promise<void> {
+    const formatLabels: Record<string, string> = {
+      heading: 'Heading',
+      normal: 'Normal',
+    };
+    const label = formatLabels[format];
+    const comboArrow = 'a.cke_combo_button[title="Paragraph Format"]';
+
+    // Open the Format combo box.
+    await this.user.expectElementToBeVisible(comboArrow);
+    await this.user.clickOnElementWithSelector(comboArrow);
+
+    // Wait for the dropdown panel to appear.
+    await this.user.expectElementToBeVisible('.cke_panel');
+
+    // Click on the option using its text inside the panel's iframe.
+    const optionLocator = this.user.page
+      .frameLocator('.cke_panel_frame')
+      .locator(`a:has-text("${label}")`)
+      .first();
+
+    await optionLocator.waitFor({state: 'visible'});
+    await optionLocator.click();
+  }
 }
