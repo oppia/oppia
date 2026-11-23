@@ -408,6 +408,7 @@ describe('Translation Modal Component', () => {
   it('should set validation errors and disable save when translation has missing custom tags', () => {
     spyOn(component, 'ngOnInit').and.stub();
     spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
+    spyOn(component, 'computePanelOverflowState').and.stub();
     component.activeDataFormat = 'html';
     component.loadingData = false;
     component.textToTranslate =
@@ -436,6 +437,7 @@ describe('Translation Modal Component', () => {
   it('should clear validation errors and enable save after translated custom tags are added', () => {
     spyOn(component, 'ngOnInit').and.stub();
     spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
+    spyOn(component, 'computePanelOverflowState').and.stub();
     component.activeDataFormat = 'html';
     component.loadingData = false;
     component.textToTranslate =
