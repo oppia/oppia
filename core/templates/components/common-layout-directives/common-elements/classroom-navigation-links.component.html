@@ -18,27 +18,25 @@
              }"
         >
           <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
-            <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
+            <a class="classroom-item e2e-mobile-test-classroom-link"
+               [href]="'/learn/' + classroom.url_fragment"
+               (click)="registerClassroomCardClickEvent(classroom.name)">
               <div class="classroom-text-container">
-                <a class="classroom-name e2e-mobile-test-classroom-link"
-                   [href]="'/learn/' + classroom.url_fragment"
-                   *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                  >
+                <span class="classroom-name"
+                      *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)">
                   {{ classroom.name }}
-                </a>
-                <a class="classroom-name e2e-mobile-test-classroom-link"
-                   [href]="'/learn/' + classroom.url_fragment"
-                   *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                  >
+                </span>
+                <span class="classroom-name"
+                      *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)">
                   {{ getClassroomNameTranslationkey(classroom.name) | translate }}
-                </a>
+                </span>
                 <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroom.name } }}</p>
               </div>
               <div class="classroom-thumbnail">
                 <img alt="Classroom thumbnail image"
                      [src]="getClassroomThumbnail(classroom.classroom_id, classroom.thumbnail_filename)">
               </div>
-            </div>
+            </a>
           </div>
         </div>
       </div>

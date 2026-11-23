@@ -222,6 +222,21 @@ describe('ClassroomNavigationLinksComponent', () => {
     ).toHaveBeenCalled();
   });
 
+  it('should make the entire classroom card an anchor', fakeAsync(() => {
+    classroomBackendApiService.getAllClassroomsSummaryAsync.and.returnValue(
+      Promise.resolve(dummyClassroomSummaries)
+    );
+
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+
+    const classroomCard = fixture.nativeElement.querySelector('.classroom-item');
+    expect(classroomCard.tagName).toBe('A');
+    expect(classroomCard.getAttribute('href')).toBe('/learn/math');
+    expect(classroomCard.querySelector('a')).toBeNull();
+  }));
+
   it('should not load classroom summaries if currentUrl is signup', fakeAsync(() => {
     const windowRef = TestBed.inject(WindowRef) as WindowRef;
     windowRef.nativeWindow.location.pathname = '/signup';
