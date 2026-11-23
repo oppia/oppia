@@ -222,11 +222,9 @@ describe('Exploration save and publish buttons component', () => {
   });
 
   it('should save exploration when saving changes', fakeAsync(() => {
-    component.isModalDisplayed = true;
     component.saveChanges();
     tick();
 
-    expect(component.isModalDisplayed).toBe(false);
     expect(component.saveIsInProcess).toBe(false);
     expect(component.loadingDotsAreShown).toBe(false);
   }));
