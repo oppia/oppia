@@ -792,6 +792,7 @@ def _save_story(
     commit_message: str,
     change_list: List[story_domain.StoryChange],
     story_is_published: bool,
+    validate_explorations: bool = True,
 ) -> None:
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
@@ -803,6 +804,8 @@ def _save_story(
         commit_message: str. The commit message.
         change_list: list(StoryChange). List of changes applied to a story.
         story_is_published: bool. Whether the supplied story is published.
+        validate_explorations: bool. Whether to validate the explorations
+            linked to a published story.
 
     Raises:
         ValidationError. An invalid exploration was referenced in the
@@ -824,7 +827,7 @@ def _save_story(
         corresponding_topic.get_all_skill_ids(), story.story_contents
     )
 
-    if story_is_published:
+    if story_is_published and validate_explorations:
         exp_ids = []
         for node in story.story_contents.nodes:
             assert node.exploration_id is not None
@@ -905,6 +908,7 @@ def update_story(
     story_id: str,
     change_list: List[story_domain.StoryChange],
     commit_message: str,
+    validate_explorations: bool = True,
 ) -> None:
     """Updates a story. Commits changes.
 
@@ -919,6 +923,8 @@ def update_story(
             produce the resulting story.
         commit_message: str. A description of changes made to the
             story.
+        validate_explorations: bool. Whether to validate the explorations
+            linked to the story if it is published.
 
     Raises:
         ValueError. Expected a commit message but received None.
@@ -959,7 +965,12 @@ def update_story(
             'Story Url Fragment is not unique across the site.'
         )
     _save_story(
-        committer_id, new_story, commit_message, change_list, story_is_published
+        committer_id,
+        new_story,
+        commit_message,
+        change_list,
+        story_is_published,
+        validate_explorations=validate_explorations,
     )
     create_story_summary(new_story.id)
     if story_is_published:

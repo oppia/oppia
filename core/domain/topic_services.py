@@ -2036,6 +2036,7 @@ def update_story_and_topic_summary(
     change_list: List[story_domain.StoryChange],
     commit_message: str,
     topic_id: str,
+    validate_explorations: bool = True,
 ) -> None:
     """Updates a story. Commits changes. Then generates a new
     topic summary.
@@ -2049,9 +2050,15 @@ def update_story_and_topic_summary(
         commit_message: str. A description of changes made to the
             story.
         topic_id: str. The id of the topic to which the story is belongs.
+        validate_explorations: bool. Whether to validate the explorations
+            linked to the story if it is published.
     """
     story_services.update_story(
-        committer_id, story_id, change_list, commit_message
+        committer_id,
+        story_id,
+        change_list,
+        commit_message,
+        validate_explorations=validate_explorations,
     )
     # Generate new TopicSummary after a Story has been updated to
     # make sure the TopicSummaryTile displays the correct number

@@ -32,6 +32,8 @@ from core.domain import (
     skill_domain,
     skill_fetchers,
     state_domain,
+    story_domain,
+    story_fetchers,
     suggestion_services,
     taskqueue_services,
     topic_domain,
@@ -763,6 +765,113 @@ def replace_prerequisite_skill_id_from_all_skills(
         )
 
 
+def _replace_skill_id(
+    skill_ids: List[str], old_skill_id: str, new_skill_id: Optional[str]
+) -> List[str]:
+    """Returns the skill IDs with the old skill ID replaced by the new one, or
+    removed if there is no new skill ID. The new skill ID is not repeated if
+    it is already in the list.
+
+    Args:
+        skill_ids: list(str). The skill IDs.
+        old_skill_id: str. The ID of the skill to be replaced or removed.
+        new_skill_id: str|None. The ID of the skill that replaces the old
+            skill, or None if the old skill should only be removed.
+
+    Returns:
+        list(str). The updated skill IDs.
+    """
+    updated_skill_ids: List[str] = []
+    for skill_id in skill_ids:
+        updated_skill_id = (
+            new_skill_id if skill_id == old_skill_id else skill_id
+        )
+        if updated_skill_id is not None and (
+            updated_skill_id not in updated_skill_ids
+        ):
+            updated_skill_ids.append(updated_skill_id)
+    return updated_skill_ids
+
+
+def update_skill_id_in_all_stories(
+    committer_id: str, old_skill_id: str, new_skill_id: Optional[str] = None
+) -> None:
+    """Replaces the old skill ID with the new one in the acquired and
+    prerequisite skill lists of all story nodes. If no new skill ID is given,
+    the old skill ID is just removed.
+
+    Args:
+        committer_id: str. The ID of the user performing the action.
+        old_skill_id: str. The ID of the skill to be replaced or removed.
+        new_skill_id: str|None. The ID of the skill that replaces the old
+            skill, or None if the old skill should only be removed.
+    """
+    for topic in topic_fetchers.get_all_topics():
+        story_ids = [
+            reference.story_id for reference in topic.get_all_story_references()
+        ]
+        for story in story_fetchers.get_stories_by_ids(story_ids, strict=True):
+            change_list: List[story_domain.StoryChange] = []
+            for node in story.story_contents.nodes:
+                if (
+                    old_skill_id not in node.acquired_skill_ids
+                    and old_skill_id not in node.prerequisite_skill_ids
+                ):
+                    continue
+                new_acquired_skill_ids = _replace_skill_id(
+                    node.acquired_skill_ids, old_skill_id, new_skill_id
+                )
+                # A node can't have the same skill as both a prerequisite and
+                # an acquired skill, so the acquired skills are dropped from
+                # the prerequisites.
+                new_prerequisite_skill_ids = [
+                    skill_id
+                    for skill_id in _replace_skill_id(
+                        node.prerequisite_skill_ids, old_skill_id, new_skill_id
+                    )
+                    if skill_id not in new_acquired_skill_ids
+                ]
+                change_list.extend(
+                    [
+                        story_domain.StoryChange(
+                            {
+                                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                                'property_name': (
+                                    story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                                ),
+                                'node_id': node.id,
+                                'old_value': node.acquired_skill_ids,
+                                'new_value': new_acquired_skill_ids,
+                            }
+                        ),
+                        story_domain.StoryChange(
+                            {
+                                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                                'property_name': (
+                                    story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
+                                ),
+                                'node_id': node.id,
+                                'old_value': node.prerequisite_skill_ids,
+                                'new_value': new_prerequisite_skill_ids,
+                            }
+                        ),
+                    ]
+                )
+            if change_list:
+                topic_services.update_story_and_topic_summary(
+                    committer_id,
+                    story.id,
+                    change_list,
+                    'Updated skill id %s in the story nodes.' % old_skill_id,
+                    topic.id,
+                    # Only the skill IDs of the nodes change here, so the
+                    # explorations are not validated again. Otherwise an
+                    # existing problem in a linked exploration would stop
+                    # the skill from being merged or deleted.
+                    validate_explorations=False,
+                )
+
+
 @overload
 def get_skill_summary_by_id(skill_id: str) -> skill_domain.SkillSummary: ...
 
@@ -1305,6 +1414,7 @@ def delete_skill(
             one.
     """
     remove_prerequisite_skill_id_from_all_skills(committer_id, skill_id)
+    update_skill_id_in_all_stories(committer_id, skill_id)
     skill_models.SkillModel.delete_multi(
         [skill_id], committer_id, '', force_deletion=force_deletion
     )

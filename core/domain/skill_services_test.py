@@ -27,6 +27,9 @@ from core.domain import (
     skill_fetchers,
     skill_services,
     state_domain,
+    story_domain,
+    story_fetchers,
+    story_services,
     suggestion_services,
     topic_domain,
     topic_fetchers,
@@ -37,7 +40,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Union
+from typing import Dict, Final, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -867,6 +870,207 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         # skills have this prerequisite.
         skill_services.replace_prerequisite_skill_id_from_all_skills(
             self.USER_ID, 'non_existent_skill_id', 'some_new_skill_id'
+        )
+
+    def _save_story_with_skills_in_nodes(self) -> str:
+        """Saves a topic with a story that has two nodes. Node 1 acquires
+        SKILL_ID and SKILL_ID2, and node 2 has SKILL_ID as a prerequisite and
+        acquires SKILL_ID3.
+
+        Returns:
+            str. The ID of the story.
+        """
+        topic_id = topic_fetchers.get_new_topic_id()
+        story_id = story_services.get_new_story_id()
+        self.save_new_topic(topic_id, self.USER_ID)
+        self.save_new_story(story_id, self.USER_ID, topic_id)
+        topic_services.add_canonical_story(self.USER_ID, topic_id, story_id)
+        change_list: List[story_domain.StoryChange] = []
+        nodes: List[Tuple[str, List[str], List[str]]] = [
+            ('node_1', [], [self.SKILL_ID, self.SKILL_ID2]),
+            ('node_2', [self.SKILL_ID], [self.SKILL_ID3]),
+        ]
+        for node_id, prerequisite_skill_ids, acquired_skill_ids in nodes:
+            change_list.extend(
+                [
+                    story_domain.StoryChange(
+                        {
+                            'cmd': story_domain.CMD_ADD_STORY_NODE,
+                            'node_id': node_id,
+                            'title': 'Chapter %s' % node_id,
+                        }
+                    ),
+                    story_domain.StoryChange(
+                        {
+                            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                            'property_name': (
+                                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                            ),
+                            'node_id': node_id,
+                            'old_value': None,
+                            'new_value': 'exp_%s' % node_id,
+                        }
+                    ),
+                    story_domain.StoryChange(
+                        {
+                            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                            'property_name': (
+                                story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
+                            ),
+                            'node_id': node_id,
+                            # Here we use cast because mypy expects List[str]
+                            # but [] is List[<nothing>].
+                            'old_value': cast(List[str], []),
+                            'new_value': prerequisite_skill_ids,
+                        }
+                    ),
+                    story_domain.StoryChange(
+                        {
+                            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                            'property_name': (
+                                story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                            ),
+                            'node_id': node_id,
+                            # Here we use cast because mypy expects List[str]
+                            # but [] is List[<nothing>].
+                            'old_value': cast(List[str], []),
+                            'new_value': acquired_skill_ids,
+                        }
+                    ),
+                ]
+            )
+        story_services.update_story(
+            self.USER_ID, story_id, change_list, 'Added story nodes.'
+        )
+        return story_id
+
+    def _get_node_skill_ids(
+        self, story_id: str
+    ) -> List[Tuple[List[str], List[str]]]:
+        """Returns the prerequisite and acquired skill IDs of each node in
+        the story.
+
+        Args:
+            story_id: str. The ID of the story.
+
+        Returns:
+            list(tuple(list(str), list(str))). The prerequisite and acquired
+            skill IDs of each node.
+        """
+        story = story_fetchers.get_story_by_id(story_id)
+        return [
+            (node.prerequisite_skill_ids, node.acquired_skill_ids)
+            for node in story.story_contents.nodes
+        ]
+
+    def test_update_skill_id_in_all_stories_replaces_old_skill_id(
+        self,
+    ) -> None:
+        story_id = self._save_story_with_skills_in_nodes()
+
+        skill_services.update_skill_id_in_all_stories(
+            self.USER_ID, self.SKILL_ID, 'new_skill_id'
+        )
+
+        self.assertEqual(
+            self._get_node_skill_ids(story_id),
+            [
+                ([], ['new_skill_id', self.SKILL_ID2]),
+                (['new_skill_id'], [self.SKILL_ID3]),
+            ],
+        )
+
+    def test_update_skill_id_in_all_stories_without_new_id_removes_old_id(
+        self,
+    ) -> None:
+        story_id = self._save_story_with_skills_in_nodes()
+
+        skill_services.update_skill_id_in_all_stories(
+            self.USER_ID, self.SKILL_ID
+        )
+
+        self.assertEqual(
+            self._get_node_skill_ids(story_id),
+            [([], [self.SKILL_ID2]), ([], [self.SKILL_ID3])],
+        )
+
+    def test_update_skill_id_in_all_stories_does_not_repeat_new_skill_id(
+        self,
+    ) -> None:
+        story_id = self._save_story_with_skills_in_nodes()
+
+        skill_services.update_skill_id_in_all_stories(
+            self.USER_ID, self.SKILL_ID, self.SKILL_ID2
+        )
+
+        self.assertEqual(
+            self._get_node_skill_ids(story_id),
+            [([], [self.SKILL_ID2]), ([self.SKILL_ID2], [self.SKILL_ID3])],
+        )
+
+    def test_update_skill_id_with_new_id_acquired_in_node_drops_prerequisite(
+        self,
+    ) -> None:
+        story_id = self._save_story_with_skills_in_nodes()
+
+        skill_services.update_skill_id_in_all_stories(
+            self.USER_ID, self.SKILL_ID, self.SKILL_ID3
+        )
+
+        self.assertEqual(
+            self._get_node_skill_ids(story_id),
+            [([], [self.SKILL_ID3, self.SKILL_ID2]), ([], [self.SKILL_ID3])],
+        )
+
+    def test_update_skill_id_in_all_stories_with_unused_id_changes_nothing(
+        self,
+    ) -> None:
+        story_id = self._save_story_with_skills_in_nodes()
+        story_version = story_fetchers.get_story_by_id(story_id).version
+
+        skill_services.update_skill_id_in_all_stories(
+            self.USER_ID, 'unused_skill_id', 'new_skill_id'
+        )
+
+        self.assertEqual(
+            story_fetchers.get_story_by_id(story_id).version, story_version
+        )
+
+    def test_update_skill_id_in_published_story_does_not_validate_explorations(
+        self,
+    ) -> None:
+        story_id = self._save_story_with_skills_in_nodes()
+        story_is_published_swap = self.swap_to_always_return(
+            story_services, 'is_story_published_and_present_in_topic', True
+        )
+        validate_explorations_swap = self.swap_with_checks(
+            story_services,
+            'validate_explorations_for_story',
+            lambda *args: [],
+            called=False,
+        )
+
+        with story_is_published_swap, validate_explorations_swap:
+            skill_services.update_skill_id_in_all_stories(
+                self.USER_ID, self.SKILL_ID, 'new_skill_id'
+            )
+
+        self.assertEqual(
+            self._get_node_skill_ids(story_id),
+            [
+                ([], ['new_skill_id', self.SKILL_ID2]),
+                (['new_skill_id'], [self.SKILL_ID3]),
+            ],
+        )
+
+    def test_delete_skill_removes_it_from_all_stories(self) -> None:
+        story_id = self._save_story_with_skills_in_nodes()
+
+        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
+
+        self.assertEqual(
+            self._get_node_skill_ids(story_id),
+            [([], [self.SKILL_ID2]), ([], [self.SKILL_ID3])],
         )
 
     def test_successfully_replace_skill_id_in_all_topics(self) -> None:
