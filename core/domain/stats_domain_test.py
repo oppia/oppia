@@ -3017,3 +3017,213 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.learner_answer_info, 'Expected created_on to be a datetime'
         )
+
+
+class CompleteExplorationEventLogEntryDomainUnitTests(
+    test_utils.GenericTestBase
+):
+    """Tests for CompleteExplorationEventLogEntry domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.event_entry = stats_domain.CompleteExplorationEventLogEntry(
+            event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+            exploration_id='exp_id_1',
+            exploration_version=1,
+            state_name='Introduction',
+            session_id='session_id_1',
+            client_time_spent_in_secs=12.5,
+            params={'param1': 'value1'},
+            play_type=feconf.PLAY_TYPE_NORMAL,
+            event_schema_version=1,
+        )
+
+    def test_to_dict(self) -> None:
+        expected_dict: stats_domain.CompleteExplorationEventLogEntryDict = {
+
+            'event_type' : feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+            'exploration_id': 'exp_id_1',
+            'exploration_version': 1,
+            'state_name': 'Introduction',
+            'session_id': 'session_id_1',
+            'client_time_spent_in_secs': 12.5,
+            'params': {'param1': 'value1'},
+            'play_type': feconf.PLAY_TYPE_NORMAL,
+            'event_schema_version': 1,
+        }
+        self.assertEqual(self.event_entry.to_dict(), expected_dict)
+
+    def test_valid_complete_exploration_event_log_entry(self) -> None:
+        self.event_entry.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because we plan to remove
+        # the general ignore on MyPy checks in the future and at that point
+        # the test should be updated with proper types.
+    def test_invalid_event_type_raises_error(self) -> None:
+        self.event_entry.event_type = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected event_type to be a str, received 123',
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.event_type = 'invalid_event_type'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected event_type to be %s, received %s'
+                % (feconf.EVENT_TYPE_COMPLETE_EXPLORATION, 'invalid_event_type')
+        ):
+            self.event_entry.validate()
+
+    def test_invalid_exploration_id_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are assigning an invalid type for testing.
+        self.event_entry.exploration_id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected exploration_id to be a str, received 123',
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.exploration_id = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected exploration_id to be non-empty'
+        ):
+            self.event_entry.validate()
+
+    def test_invalid_exploration_version_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are assigning an invalid type for testing.
+        self.event_entry.exploration_version = '1'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected exploration_version to be an int, received 1',
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.exploration_version = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected exploration_version to be an int, received True',
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.exploration_version = 0
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected exploration_version to be >= 1, received 0',
+        ):
+            self.event_entry.validate()
+
+    def test_invalid_state_name_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are assigning an invalid type for testing.
+        self.event_entry.state_name = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected state_name to be a str, received 123',
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.state_name = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected state_name to be non-empty'
+        ):
+            self.event_entry.validate()
+
+    def test_invalid_session_id_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are assigning an invalid type for testing.
+        self.event_entry.session_id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected session_id to be a str, received 123',
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.session_id = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected session_id to be non-empty'
+        ):
+            self.event_entry.validate()
+
+    def test_invalid_client_time_spent_in_secs_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are assigning an invalid type for testing.
+        self.event_entry.client_time_spent_in_secs = '12.5'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected client_time_spent_in_secs to be a float, received <class \'str\'>'
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.client_time_spent_in_secs = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected client_time_spent_in_secs to be a float, '
+            'received <class \'bool\'>',
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.client_time_spent_in_secs = -1.0
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected client_time_spent_in_secs to be >= 0, received -1.0',
+        ):
+            self.event_entry.validate()
+
+    def test_invalid_params_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are assigning an invalid type for testing.
+        self.event_entry.params = 'not_a_dict'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected params to be a dict, received not_a_dict',
+        ):
+            self.event_entry.validate()
+
+        # Here we use MyPy ignore because we are assigning an invalid type for testing.
+        self.event_entry.params = {123: 'value1'}  # type: ignore[dict-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected params keys and values to be strings'
+        ):
+            self.event_entry.validate()
+
+    def test_invalid_play_type_raises_error(self) -> None:
+        self.event_entry.play_type = 'invalid_play_type'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected play_type to be one of .*, received invalid_play_type',
+        ):
+            self.event_entry.validate()
+
+    def test_invalid_event_schema_version_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are assigning an invalid type for testing.
+        self.event_entry.event_schema_version = '1'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected event_schema_version to be an int, received 1',
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.event_schema_version = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected event_schema_version to be an int, received True',
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.event_schema_version = 0
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected event_schema_version to be between 1 and %s, '
+            'received 0' % feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        ):
+            self.event_entry.validate()
+
+        self.event_entry.event_schema_version = (
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION + 1
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected event_schema_version to be between 1 and %s, '
+            'received %s' % (
+                feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+                feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION + 1,
+            ),
+        ):
+            self.event_entry.validate()
