@@ -16,15 +16,17 @@
  * @fileoverview Unit tests for StoryEditorStateService.
  */
 
-// @ts-nocheck
-
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {HttpClientModule} from '@angular/common/http';
 
 import {Subscription} from 'rxjs';
 import {Story} from 'domain/story/story.model';
 import {StoryBackendDict} from 'domain/story/story.model';
-import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
+import {
+  EditableStoryBackendApiService,
+  StoryPublicationAction,
+} from 'domain/story/editable-story-backend-api.service';
+import {StoryChange} from 'domain/editor/undo_redo/change.model';
 import {StoryEditorStateService} from 'pages/story-editor-page/services/story-editor-state.service';
 import {AlertsService} from 'services/alerts.service';
 import {StoryUpdateService} from 'domain/story/story-update.service';
@@ -60,7 +62,12 @@ class MockEditableStoryBackendApiService {
     });
   }
 
-  async updateStoryAsync() {
+  async updateStoryAsync(
+    storyId: string,
+    storyVersion: number,
+    commitMessage: string,
+    changeList: StoryChange[]
+  ) {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve(this.newBackendStoryObject);
@@ -70,7 +77,10 @@ class MockEditableStoryBackendApiService {
     });
   }
 
-  async changeStoryPublicationStatusAsync() {
+  async changeStoryPublicationStatusAsync(
+    storyId: string,
+    publicationAction: StoryPublicationAction
+  ) {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve({});
@@ -324,7 +334,7 @@ describe('Story editor state service', () => {
     var expectedId = 'storyId_0';
     var expectedVersion = 1;
     var expectedCommitMessage = 'Commit message';
-    var expectedObject = {
+    var expectedObject: StoryChange = {
       property_name: 'title',
       new_value: 'New title',
       old_value: 'Story title',

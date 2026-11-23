@@ -86,6 +86,76 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Creates and publishes a topic with two subtopics that have study guides.
+   * The first subtopic has two sections (the first one with a worked
+   * example) and a skill with 10 questions, and the practice tab is enabled
+   * for it. The second subtopic ("Subtracting Numbers") has one section.
+   * This requires the "show_restructured_study_guides" feature flag.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the first subtopic.
+   * @param {string} skillName - The name of the skill for the first subtopic.
+   */
+  async createAndPublishTopicWithSubtopicsAndStudyGuides(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ): Promise<void> {
+    // Topic URL fragments are limited to 20 characters
+    // (MAX_CHARS_IN_TOPIC_URL_FRAGMENT), so "Addition and Subtraction"
+    // becomes "addition-and-subtrac".
+    const topicUrlFragment = topicName
+      .toLowerCase()
+      .replace(/ /g, '-')
+      .slice(0, 20);
+    await this.createTopic(topicName, topicUrlFragment, true);
+    await this.createSubtopicWithStudyGuideForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(/ /g, '-'),
+      'Adding With Your Fingers',
+      'One way to add is using your...',
+      topicName,
+      true
+    );
+    await this.addSubtopicStudyGuideSection(
+      'Using an Addition Table',
+      'To add two single-digit...',
+      1
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 10);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+    await this.togglePracticeTabCheckbox();
+    await this.saveTopicDraft(topicName);
+
+    await this.createSubtopicWithStudyGuideForTopic(
+      'Subtracting Numbers',
+      'subtract-nos',
+      'Common Mistakes',
+      'Some common mistakes students make are...',
+      topicName,
+      true
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic('Skill 2', topicName, false);
+    await this.assignSkillToSubtopicInTopicEditor(
+      'Skill 2',
+      'Subtracting Numbers',
+      topicName
+    );
+
+    await this.publishDraftTopic(topicName);
+    showMessage(`Topic ${topicName} with study guides is published.`);
+  }
+
+  /**
    * Function for creating a new classroom.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} urlFragment - The URL fragment for the classroom.
@@ -108,6 +178,25 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(saveNewClassroomButton);
     await this.expectElementToBeVisible(createNewClassroomModal, false);
     showMessage(`Created ${classroomName} classroom.`);
+  }
+
+  /**
+   * Function to create a topic with a linked skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} skillName - The name of the skill.
+   * @param {boolean} isFirstTopic - Whether this is the first topic being created.
+   */
+  async createTopicWithSkill(
+    topicName: string,
+    skillName: string,
+    isFirstTopic: boolean = false
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-'),
+      isFirstTopic
+    );
+    await this.createSkillForTopic(skillName, topicName, true);
   }
 
   /**

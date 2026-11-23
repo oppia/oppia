@@ -316,6 +316,21 @@ indexes:
   - name: target_id
   - name: author_id
 
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: final_reviewer_id
+  - name: language_code
+  - name: suggestion_type
+  - name: last_updated
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: final_reviewer_id
+  - name: suggestion_type
+  - name: last_updated
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer
@@ -849,3 +864,8 @@ indexes:
   - name: learner_id
   - name: created_on
     direction: desc
+
+- kind: BlogPostSummaryModel
+  properties:
+  - name: tags
+  - name: published_on

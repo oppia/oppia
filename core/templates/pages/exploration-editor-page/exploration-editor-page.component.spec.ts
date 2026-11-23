@@ -82,6 +82,7 @@ import {LostChange} from 'domain/exploration/lost-change.model';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {FeedbackStatusCountsBackendResponse} from 'domain/feedback/feedback.model';
+import {InsertScriptService} from 'services/insert-script.service';
 
 class MockNgbModalRef {
   componentInstance = {
@@ -113,6 +114,12 @@ class MockPlatformFeatureService {
       isEnabled: false,
     },
   };
+}
+
+class MockInsertScriptService {
+  loadScript(): boolean {
+    return true;
+  }
 }
 
 describe('Exploration editor page component', () => {
@@ -322,6 +329,10 @@ describe('Exploration editor page component', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef,
+        },
+        {
+          provide: InsertScriptService,
+          useClass: MockInsertScriptService,
         },
         {
           provide: PlatformFeatureService,
@@ -539,6 +550,24 @@ describe('Exploration editor page component', () => {
 
       const focusedElement = document.activeElement as HTMLElement;
       expect(focusedElement.tabIndex).toBe(-1);
+    });
+
+    it('should render the desktop editor tab as a button', () => {
+      const editorTab = fixture.nativeElement.querySelector(
+        '.e2e-test-main-tab'
+      ) as HTMLButtonElement;
+
+      expect(editorTab.tagName).toBe('BUTTON');
+      expect(editorTab.type).toBe('button');
+      expect(editorTab.hasAttribute('href')).toBe(false);
+      expect(editorTab.getAttribute('aria-label')).toBe(
+        'Exploration Editor Button'
+      );
+
+      const navigateToMainTabSpy = spyOn(rs, 'navigateToMainTab');
+      editorTab.click();
+
+      expect(navigateToMainTabSpy).toHaveBeenCalled();
     });
 
     it('should start editor tutorial when not on main page', fakeAsync(() => {
