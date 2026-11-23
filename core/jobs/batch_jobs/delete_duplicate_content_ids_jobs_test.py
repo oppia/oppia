@@ -23,6 +23,7 @@ from unittest import mock
 
 from core import feconf
 from core.domain import (
+    caching_services,
     exp_domain,
     exp_fetchers,
     exp_services,
@@ -177,8 +178,6 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
                 )
             ]
         )
-
-        from core.domain import caching_services
 
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['exp_id_3']
@@ -364,6 +363,11 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             ]
         )
 
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['exp_id']
+        )
+        with datastore_services.get_ndb_context() as ndb_context:
+            ndb_context.clear_cache()
         updated_exploration = exp_fetchers.get_exploration_by_id('exp_id')
         self.assertEqual(
             updated_exploration.states['State2'].content.content_id, 'content_2'
@@ -539,8 +543,6 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
                 )
             ]
         )
-
-        from core.domain import caching_services
 
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['exp_id_5']
