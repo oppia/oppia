@@ -378,7 +378,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
     ) -> None:
         """Test that the fix job raises an exception if ID generation times out."""
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test'
+            'exp_id_timeout', title='Test Exploration', category='Test'
         )
 
         exploration.add_states(['State2'])
@@ -393,7 +393,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         exp_services.save_new_exploration('owner_id', exploration)
 
         with datastore_services.get_ndb_context():
-            exp_model = exp_models.ExplorationModel.get('exp_id')
+            exp_model = exp_models.ExplorationModel.get('exp_id_timeout')
             exp_model.next_content_id_index = 0
             exp_model.update_timestamps()
             datastore_services.put_multi([exp_model])
