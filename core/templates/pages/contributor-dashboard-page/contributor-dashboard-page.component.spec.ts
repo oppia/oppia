@@ -293,6 +293,15 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should render enabled dashboard tabs as focusable buttons', fakeAsync(() => {
+      // The translate tab is only shown to users who can submit translations.
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve({
+          ...userContributionRights,
+          can_submit_translation_for_language_codes: ['hi'],
+        })
+      );
+      component.ngOnInit();
+      flush();
       component.tabsDetails.submitQuestionTab.enabled = true;
       spyOn(focusManagerService, 'setFocusWithoutScroll');
       fixture.detectChanges();
@@ -335,6 +344,7 @@ describe('Contributor dashboard page', () => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve({
           ...userContributionRights,
+          can_submit_translation_for_language_codes: ['hi'],
           can_suggest_questions: false,
         })
       );
