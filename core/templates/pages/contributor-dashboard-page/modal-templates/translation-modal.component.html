@@ -95,7 +95,7 @@
                  text fields were auto-translated and still need the submitter
                  to open and confirm the customization modal. -->
             <p *ngIf="rteComponentsNeedingConfirmation.length > 0" class="oppia-auto-translate-red-text">
-              Please open and confirm the translated text inside:
+              Please confirm and review the translated text inside the following components:
               <strong>{{ getUnconfirmedRteComponentLabels().join(', ') }}</strong>
             </p>
             <p [ngClass]="{'oppia-auto-translate-teal-text': isTranslationEdited(), 'oppia-auto-translate-grey-text': !isTranslationEdited()}" class="oppia-auto-translate-status-text">
