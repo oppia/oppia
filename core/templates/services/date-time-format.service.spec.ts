@@ -95,6 +95,9 @@ describe('datetimeformatter', () => {
     expect(df.getDateTimeInWords(NOW_MILLIS)).toBe(
       dayjs(new Date(NOW_MILLIS)).format('dddd, MMMM D, YYYY [at] h:mm A')
     );
+    expect(df.getDateTimeInWords(NOW_MILLIS, false)).toBe(
+      dayjs(new Date(NOW_MILLIS)).format('MMMM D, YYYY [at] h:mm A')
+    );
   });
 
   it('should provide correct date format MM/DD/YYY string', () => {
