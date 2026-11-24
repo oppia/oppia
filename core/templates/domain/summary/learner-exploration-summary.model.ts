@@ -77,7 +77,8 @@ export class LearnerExplorationSummary {
     public ratings: ExplorationRatings,
     public humanReadableContributorsSummary: HumanReadableContributorsSummary,
     public visitedCheckpointsCount: number = 0,
-    public totalCheckpointsCount: number = 0
+    public totalCheckpointsCount: number = 0,
+    public translatedMetadataFields: TranslatableExplorationMetadataField[] = []
   ) {}
 
   static createFromBackendDict(
@@ -87,6 +88,8 @@ export class LearnerExplorationSummary {
       expSummaryBacknedDict.visited_checkpoints_count ?? 0;
     const totalCheckpointsCount =
       expSummaryBacknedDict.total_checkpoints_count ?? 0;
+    const translatedMetadataFields =
+      expSummaryBacknedDict.translated_metadata_fields ?? [];
 
     return new LearnerExplorationSummary(
       expSummaryBacknedDict.category,
@@ -106,7 +109,8 @@ export class LearnerExplorationSummary {
       expSummaryBacknedDict.ratings,
       expSummaryBacknedDict.human_readable_contributors_summary,
       visitedCheckpointsCount,
-      totalCheckpointsCount
+      totalCheckpointsCount,
+      translatedMetadataFields
     );
   }
 }

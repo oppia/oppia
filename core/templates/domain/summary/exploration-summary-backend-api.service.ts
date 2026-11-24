@@ -83,6 +83,13 @@ export class ExplorationSummaryBackendApiService {
             return;
           }
 
+          if (response.summaries.some(summary => summary === null)) {
+            const summariesError =
+              'Invalid summaries fetched for explorationIds: ' + explorationIds;
+            errorCallback(summariesError);
+            return;
+          }
+
           const summaries = response.summaries.map(summary =>
             LearnerExplorationSummary.createFromBackendDict(summary)
           );

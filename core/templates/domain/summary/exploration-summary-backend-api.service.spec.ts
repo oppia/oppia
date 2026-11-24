@@ -28,6 +28,7 @@ import {CsrfTokenService} from 'services/csrf-token.service';
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
+  TranslatableExplorationMetadataField,
 } from 'domain/summary/learner-exploration-summary.model';
 
 describe('Exploration Summary Backend Api Service', () => {
@@ -133,6 +134,10 @@ describe('Exploration Summary Backend Api Service', () => {
         tags: [],
         thumbnail_bg_color: '#ffffff',
         thumbnail_icon_url: '/icon.svg',
+        translated_metadata_fields: [
+          TranslatableExplorationMetadataField.TITLE,
+          TranslatableExplorationMetadataField.OBJECTIVE,
+        ],
       },
     ];
 
@@ -160,6 +165,10 @@ describe('Exploration Summary Backend Api Service', () => {
     expect(results[0].title).toBe('Title 1');
     expect(results[0].communityOwned).toBeFalse();
     expect(results[0].humanReadableContributorsSummary).toEqual({});
+    expect(results[0].translatedMetadataFields).toEqual([
+      TranslatableExplorationMetadataField.TITLE,
+      TranslatableExplorationMetadataField.OBJECTIVE,
+    ]);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -213,6 +222,10 @@ describe('Exploration Summary Backend Api Service', () => {
         tags: [],
         thumbnail_bg_color: '#ffffff',
         thumbnail_icon_url: '/icon.svg',
+        translated_metadata_fields: [
+          TranslatableExplorationMetadataField.TITLE,
+          TranslatableExplorationMetadataField.OBJECTIVE,
+        ],
       },
     ];
 
@@ -274,6 +287,32 @@ describe('Exploration Summary Backend Api Service', () => {
       );
     })
   );
+
+  it('should use reject handler when exploration summaries contain null', fakeAsync(() => {
+    const explorationIds = ['0'];
+
+    const requestUrl =
+      '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' +
+      encodeURI(JSON.stringify(explorationIds)) +
+      '&' +
+      'include_private_explorations=false';
+
+    explorationSummaryBackendApiService
+      .loadPublicExplorationSummariesAsync(explorationIds)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({summaries: [null]});
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Invalid summaries fetched for explorationIds: ' + explorationIds
+    );
+  }));
 
   it(
     'should use reject handler when loading public exploration summaries' +
