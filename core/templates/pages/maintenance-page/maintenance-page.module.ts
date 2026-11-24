@@ -37,6 +37,7 @@ import {MaintenancePageRootComponent} from './maintenance-page-root.component';
     ]),
   ],
   declarations: [MaintenancePageComponent, MaintenancePageRootComponent],
+  exports: [MaintenancePageComponent, MaintenancePageRootComponent],
   entryComponents: [MaintenancePageComponent],
   bootstrap: [MaintenancePageComponent],
 })

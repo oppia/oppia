@@ -16,9 +16,21 @@
  * @fileoverview Lightweight Angular bootstrap for the target static pages.
  */
 
-import {Component, NgModule, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {HttpClientModule} from '@angular/common/http';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+  OnInit,
+} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {Route, RouterModule} from '@angular/router';
+import {CookieModule} from 'ngx-cookie';
+import {MaintenancePageRootComponent} from 'pages/maintenance-page/maintenance-page-root.component';
+import {MaintenancePageModule} from 'pages/maintenance-page/maintenance-page.module';
+import {TermsPageRootComponent} from 'pages/terms-page/terms-page-root.component';
+import {TermsPageModule} from 'pages/terms-page/terms-page.module';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
@@ -71,8 +83,42 @@ const routes: Route[] = [
  * The full AppModule is loaded for every other URL by the entry point.
  */
 @NgModule({
-  imports: [BrowserModule, RouterModule.forRoot(routes)],
+  imports: [
+    BrowserModule,
+    CookieModule.forRoot(),
+    HttpClientModule,
+    RouterModule.forRoot(routes),
+  ],
   declarations: [LiteRootComponent, ReloadOnUnknownRouteComponent],
   bootstrap: [LiteRootComponent],
 })
 export class LiteAppModule {}
+
+@Component({
+  selector: 'oppia-root',
+  template: '<router-outlet></router-outlet>',
+})
+export class LiteStaticRootComponent {}
+
+/**
+ * Bootstraps the target pages without the router so Angular can replace the
+ * prerendered markup in a single pass. The full app keeps using LiteAppModule.
+ */
+@NgModule({
+  imports: [
+    BrowserModule,
+    CommonModule,
+    CookieModule.forRoot(),
+    HttpClientModule,
+    MaintenancePageModule,
+    RouterModule.forRoot([
+      {path: 'terms', component: TermsPageRootComponent},
+      {path: 'maintenance', component: MaintenancePageRootComponent},
+    ]),
+    TermsPageModule,
+  ],
+  declarations: [LiteStaticRootComponent],
+  bootstrap: [LiteStaticRootComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class LiteStaticAppModule {}

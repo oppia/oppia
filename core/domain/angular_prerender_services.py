@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helpers for painting Angular page markup before the Angular bundle loads."""
+"""Helpers for painting rendered Angular markup before the bundle loads."""
 
 from __future__ import annotations
 
@@ -31,9 +31,10 @@ _TEMPLATE_DIR = os.path.join(
 
 _PRERENDER_CONFIGS: Dict[str, Dict[str, str]] = {
     '/terms': {
-        'root_component': 'oppia-terms-page-root',
-        'root_template': 'terms-page/terms-page-root.component.html',
-        'page_template': 'terms-page/terms-page.component.html',
+        # This snapshot includes the full rendered shell (navbar, breadcrumb,
+        # footer), which cannot be reconstructed by concatenating source
+        # templates because BaseContentComponent supplies most of it.
+        'prerender_template': 'terms-page/terms-page.prerender.html',
     },
     '/maintenance': {
         'root_component': 'oppia-maintenance-page-root',
@@ -54,6 +55,13 @@ _ANGULAR_ATTRIBUTE_PATTERNS = (
 def _get_prerendered_markup(path: str) -> str:
     """Returns sanitized Angular template markup for one route."""
     config = _PRERENDER_CONFIGS[path]
+    if 'prerender_template' in config:
+        template_path = os.path.join(
+            _TEMPLATE_DIR, config['prerender_template']
+        )
+        with open(template_path, 'r', encoding='utf-8') as template_file:
+            return template_file.read().strip()
+
     fragments = []
     for template_key in ('root_template', 'page_template'):
         template_path = os.path.join(_TEMPLATE_DIR, config[template_key])

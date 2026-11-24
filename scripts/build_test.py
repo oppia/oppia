@@ -656,6 +656,18 @@ class BuildTests(test_utils.GenericTestBase):
         build_using_ng_swap = self.swap_with_checks(
             build, 'build_using_ng', lambda: None, expected_args=[()]
         )
+        build_lite_angular_bundle_swap = self.swap_with_checks(
+            build,
+            'build_lite_angular_bundle',
+            lambda: None,
+            expected_args=[()],
+        )
+        defer_resources_swap = self.swap_with_checks(
+            build,
+            'defer_resources_for_lite_pages',
+            lambda: None,
+            expected_args=[()],
+        )
         modify_constants_swap = self.swap_with_checks(
             common,
             'modify_constants',
@@ -680,8 +692,12 @@ class BuildTests(test_utils.GenericTestBase):
 
         with ensure_files_exist_swap, clean_swap:
             with modify_constants_swap, build_using_ng_swap:
-                with generate_python_package_swap, sync_angular_css_hashes_swap:
-                    build.main(args=['--prod_env'])
+                with build_lite_angular_bundle_swap, defer_resources_swap:
+                    with (
+                        generate_python_package_swap,
+                        sync_angular_css_hashes_swap,
+                    ):
+                        build.main(args=['--prod_env'])
 
     def test_build_with_prod_env_generates_python_package_after_ng_build(
         self,
@@ -691,6 +707,9 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_build_using_ng() -> None:
             call_order.append('build_using_ng')
 
+        def mock_build_lite_angular_bundle() -> None:
+            call_order.append('build_lite_angular_bundle')
+
         def mock_generate_python_package() -> None:
             call_order.append('generate_python_package')
 
@@ -699,6 +718,12 @@ class BuildTests(test_utils.GenericTestBase):
         )
         build_using_ng_swap = self.swap(
             build, 'build_using_ng', mock_build_using_ng
+        )
+        build_lite_angular_bundle_swap = self.swap(
+            build, 'build_lite_angular_bundle', mock_build_lite_angular_bundle
+        )
+        defer_resources_swap = self.swap(
+            build, 'defer_resources_for_lite_pages', lambda: None
         )
         generate_python_package_swap = self.swap(
             build, 'generate_python_package', mock_generate_python_package
@@ -713,11 +738,20 @@ class BuildTests(test_utils.GenericTestBase):
 
         with ensure_files_exist_swap, clean_swap:
             with modify_constants_swap, build_using_ng_swap:
-                with generate_python_package_swap, sync_angular_css_hashes_swap:
-                    build.main(args=['--prod_env'])
+                with build_lite_angular_bundle_swap, defer_resources_swap:
+                    with (
+                        generate_python_package_swap,
+                        sync_angular_css_hashes_swap,
+                    ):
+                        build.main(args=['--prod_env'])
 
         self.assertEqual(
-            call_order, ['build_using_ng', 'generate_python_package']
+            call_order,
+            [
+                'build_using_ng',
+                'build_lite_angular_bundle',
+                'generate_python_package',
+            ],
         )
 
     def test_build_with_prod_source_maps(self) -> None:
@@ -726,6 +760,18 @@ class BuildTests(test_utils.GenericTestBase):
         )
         build_using_ng_swap = self.swap_with_checks(
             build, 'build_using_ng', lambda: None, expected_args=[()]
+        )
+        build_lite_angular_bundle_swap = self.swap_with_checks(
+            build,
+            'build_lite_angular_bundle',
+            lambda: None,
+            expected_args=[()],
+        )
+        defer_resources_swap = self.swap_with_checks(
+            build,
+            'defer_resources_for_lite_pages',
+            lambda: None,
+            expected_args=[()],
         )
         modify_constants_swap = self.swap_with_checks(
             common,
@@ -759,8 +805,12 @@ class BuildTests(test_utils.GenericTestBase):
             with modify_constants_swap:
                 with clean_swap, install_python_dev_dependencies_swap:
                     with build_using_ng_swap, install_third_party_libs_swap:
-                        with sync_angular_css_hashes_swap:
-                            build.main(args=['--prod_env', '--source_maps'])
+                        with build_lite_angular_bundle_swap:
+                            with defer_resources_swap:
+                                with sync_angular_css_hashes_swap:
+                                    build.main(
+                                        args=['--prod_env', '--source_maps']
+                                    )
 
     def test_build_with_prod_env_and_skip_ng_build(self) -> None:
         ensure_files_exist_swap = self.swap(
@@ -768,6 +818,9 @@ class BuildTests(test_utils.GenericTestBase):
         )
         build_using_ng_not_expected_swap = self.swap_with_checks(
             build, 'build_using_ng', lambda: None, called=False
+        )
+        build_lite_angular_bundle_not_expected_swap = self.swap_with_checks(
+            build, 'build_lite_angular_bundle', lambda: None, called=False
         )
         sync_angular_css_hashes_not_expected_swap = self.swap_with_checks(
             build, 'sync_angular_css_hashes', lambda: None, called=False
@@ -795,8 +848,9 @@ class BuildTests(test_utils.GenericTestBase):
             with modify_constants_swap, generate_python_package_swap:
                 with (
                     build_using_ng_not_expected_swap
-                ), sync_angular_css_hashes_not_expected_swap:
-                    build.main(args=['--prod_env', '--skip_ng_build'])
+                ), build_lite_angular_bundle_not_expected_swap:
+                    with sync_angular_css_hashes_not_expected_swap:
+                        build.main(args=['--prod_env', '--skip_ng_build'])
 
     def test_build_with_watcher(self) -> None:
         check_function_calls = {
@@ -902,6 +956,104 @@ class BuildTests(test_utils.GenericTestBase):
             ):
                 build.build_using_ng()
 
+    def test_build_lite_angular_bundle(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            old_node_options = os.environ.get('NODE_OPTIONS')
+            os.chdir(temp_dir)
+            try:
+                os.makedirs('build')
+
+                # Here we use object because subprocess.run accepts arbitrary
+                # keyword-only arguments and this mock ignores all of them.
+                def mock_run(
+                    unused_args: List[str], **unused_kwargs: object
+                ) -> None:
+                    os.makedirs(build.LITE_ANGULAR_BUNDLE_DIR)
+                    lite_html_filepath = os.path.join(
+                        build.LITE_ANGULAR_BUNDLE_DIR,
+                        'oppia-root.mainpage.html',
+                    )
+                    pathlib.Path(lite_html_filepath).touch()
+                    pathlib.Path(
+                        os.path.join(
+                            build.LITE_ANGULAR_BUNDLE_DIR,
+                            'main-es2015.abc123.js',
+                        )
+                    ).touch()
+                    pathlib.Path(
+                        os.path.join(
+                            build.LITE_ANGULAR_BUNDLE_DIR,
+                            'styles.def456.css',
+                        )
+                    ).touch()
+
+                expected_args = [
+                    (
+                        [
+                            common.NG_BIN_PATH,
+                            'build',
+                            '--prod',
+                            '--main=%s' % build.LITE_ANGULAR_ENTRYPOINT,
+                            '--output-path=%s' % build.LITE_ANGULAR_BUNDLE_DIR,
+                        ],
+                    )
+                ]
+                run_swap = self.swap_with_checks(
+                    build.subprocess,
+                    'run',
+                    mock_run,
+                    expected_args=expected_args,
+                    expected_kwargs=[{'check': True}],
+                )
+
+                with run_swap:
+                    build.build_lite_angular_bundle()
+
+                self.assertTrue(
+                    os.path.exists(
+                        os.path.join('build', 'main-es2015.abc123.js')
+                    )
+                )
+                self.assertFalse(
+                    os.path.exists(os.path.join('build', 'styles.def456.css'))
+                )
+                self.assertIn(
+                    '--max_old_space_size=%s'
+                    % build.MAX_OLD_SPACE_SIZE_FOR_NG_BUILD,
+                    os.environ['NODE_OPTIONS'],
+                )
+            finally:
+                os.chdir(old_working_dir)
+                if old_node_options is None:
+                    os.environ.pop('NODE_OPTIONS', None)
+                else:
+                    os.environ['NODE_OPTIONS'] = old_node_options
+
+    def test_build_lite_angular_bundle_without_output_fails(self) -> None:
+        # Here we use object because subprocess.run accepts arbitrary
+        # keyword-only arguments and this mock ignores all of them.
+        def mock_run(unused_args: List[str], **unused_kwargs: object) -> None:
+            pass
+
+        run_swap = self.swap(build.subprocess, 'run', mock_run)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            old_node_options = os.environ.get('NODE_OPTIONS')
+            os.chdir(temp_dir)
+            try:
+                with run_swap:
+                    with self.assertRaisesRegex(
+                        RuntimeError, 'Lite Angular build directory'
+                    ):
+                        build.build_lite_angular_bundle()
+            finally:
+                os.chdir(old_working_dir)
+                if old_node_options is None:
+                    os.environ.pop('NODE_OPTIONS', None)
+                else:
+                    os.environ['NODE_OPTIONS'] = old_node_options
+
     def test_sync_angular_css_hashes_with_missing_dist_dir_fails(
         self,
     ) -> None:
@@ -958,46 +1110,6 @@ class BuildTests(test_utils.GenericTestBase):
             finally:
                 os.chdir(old_working_dir)
 
-    def test_defer_global_stylesheets(self) -> None:
-        with tempfile.TemporaryDirectory() as temp_dir:
-            old_working_dir = os.getcwd()
-            os.chdir(temp_dir)
-            try:
-                os.makedirs('build', exist_ok=True)
-                html = (
-                    '<head><link rel="stylesheet" href="/build/styles.css">'
-                    '</head><body></body>'
-                )
-                html_filepath = os.path.join(
-                    'build', 'oppia-root.mainpage.html'
-                )
-                with open(html_filepath, 'w', encoding='utf-8') as html_file:
-                    html_file.write(html)
-
-                build.defer_global_stylesheets()
-
-                with open(html_filepath, 'r', encoding='utf-8') as html_file:
-                    updated_html = html_file.read()
-
-                self.assertIn(
-                    '<link data-oppia-global-stylesheet '
-                    'href="/build/styles.css">'
-                    '<noscript><link rel="stylesheet" '
-                    'href="/build/styles.css"></noscript>',
-                    updated_html,
-                )
-            finally:
-                os.chdir(old_working_dir)
-
-    def test_defer_global_stylesheets_without_html(self) -> None:
-        with tempfile.TemporaryDirectory() as temp_dir:
-            old_working_dir = os.getcwd()
-            os.chdir(temp_dir)
-            try:
-                build.defer_global_stylesheets()
-            finally:
-                os.chdir(old_working_dir)
-
     def test_defer_resources_for_lite_pages(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             old_working_dir = os.getcwd()
@@ -1010,16 +1122,32 @@ class BuildTests(test_utils.GenericTestBase):
                     'build', 'oppia-root.mainpage.html'
                 )
                 html = (
-                    '<head><link data-oppia-preconnect '
+                    '<head><link rel="preconnect" '
                     'href="https://fonts.example" crossorigin>'
                     '<link data-oppia-global-stylesheet '
-                    'href="/build/styles.css"><link '
-                    'data-oppia-font-stylesheet href="https://fonts.example">'
+                    'href="/build/styles.css">'
+                    '<noscript><link rel="stylesheet" '
+                    'href="/build/styles.css"></noscript>'
+                    '<link data-oppia-font-stylesheet '
+                    'href="https://fonts.example">'
                     '</head><body><script src="/build/main.js" type="module">'
                     '</script></body>'
                 )
                 with open(html_filepath, 'w', encoding='utf-8') as html_file:
                     html_file.write(html)
+
+                os.makedirs(build.LITE_ANGULAR_BUNDLE_DIR)
+                lite_html_filepath = os.path.join(
+                    build.LITE_ANGULAR_BUNDLE_DIR,
+                    'oppia-root.mainpage.html',
+                )
+                with open(
+                    lite_html_filepath, 'w', encoding='utf-8'
+                ) as lite_html_file:
+                    lite_html_file.write(
+                        '<body><script src="/build/lite.js" type="module">'
+                        '</script></body>'
+                    )
 
                 build.defer_resources_for_lite_pages()
 
@@ -1033,19 +1161,265 @@ class BuildTests(test_utils.GenericTestBase):
                     updated_html,
                 )
                 self.assertIn(
-                    'link[data-oppia-global-stylesheet], '
-                    'link[data-oppia-font-stylesheet]',
+                    '<template class="oppia-deferred-lite-angular-script">'
+                    '<script src="/build/lite.js" type="module"></script>'
+                    '</template>',
                     updated_html,
                 )
-                self.assertIn('link[data-oppia-preconnect]', updated_html)
-                self.assertIn('discardDeferredAssets', updated_html)
+                self.assertIn(
+                    '<link data-oppia-global-stylesheet '
+                    'href="/build/styles.css">',
+                    updated_html,
+                )
+                self.assertIn(
+                    '<link data-oppia-font-stylesheet '
+                    'href="https://fonts.example">',
+                    updated_html,
+                )
+                self.assertIn(
+                    '<link rel="preconnect" href="https://fonts.example" '
+                    'crossorigin>',
+                    updated_html,
+                )
+                self.assertIn('discardGlobalStylesheets', updated_html)
+                self.assertIn('restoreGlobalStylesheets', updated_html)
+                self.assertIn('loadFontStylesheet', updated_html)
+                self.assertIn(
+                    'link.setAttribute(\'data-oppia-font-stylesheet-'
+                    'disabled\', \'\');',
+                    updated_html,
+                )
+                self.assertNotIn(
+                    'link.setAttribute(\'media\', \'print\')', updated_html
+                )
                 self.assertIn('restoreAngularScripts', updated_html)
                 self.assertIn(
-                    'window.setTimeout(restoreAngularScripts, 0)',
+                    '    discardGlobalStylesheets();\n'
+                    '    window.addEventListener(\'load\', function () {',
+                    updated_html,
+                )
+                self.assertIn(
+                    'restoreAngularScripts('
+                    '\'template.oppia-deferred-lite-angular-script\')',
+                    updated_html,
+                )
+                self.assertIn('}, 300);', updated_html)
+                self.assertIn(
+                    'restoreAngularScripts(\'template.oppia-deferred-'
+                    'angular-script\')',
                     updated_html,
                 )
                 self.assertIn('(terms|maintenance)', updated_html)
                 self.assertNotIn('modulepreload', updated_html)
+            finally:
+                os.chdir(old_working_dir)
+
+    def test_make_lite_fonts_blocking(self) -> None:
+        css = (
+            '@font-face{font-display:swap;src:url(a.woff2)}'
+            '@font-face{font-display: block;src:url(b.woff2)}'
+            'body{font-display:swap}'
+        )
+        self.assertEqual(
+            # The helper is private so font rewriting stays internal to build.
+            build._make_lite_fonts_blocking(  # pylint: disable=protected-access
+                css
+            ),
+            (
+                '@font-face{font-display:block;src:url(a.woff2)}'
+                '@font-face{font-display: block;src:url(b.woff2)}'
+                'body{font-display:swap}'
+            ),
+        )
+
+    def test_purge_critical_css(self) -> None:
+        class FakeCompletedProcess:
+            """Minimal stand-in for subprocess.CompletedProcess."""
+
+            def __init__(self, returncode: int, stderr: bytes = b'') -> None:
+                self.returncode = returncode
+                self.stderr = stderr
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                os.makedirs('core/templates/pages/terms-page')
+                with open(
+                    'core/templates/pages/terms-page/'
+                    'terms-page.prerender.html',
+                    'w',
+                    encoding='utf-8',
+                ) as html_file:
+                    html_file.write('<p>Terms</p>')
+
+                configs = []
+
+                def mock_run_success(
+                    unused_args: List[str], **unused_kwargs: str
+                ) -> FakeCompletedProcess:
+                    config_filepath = unused_args[-1]
+                    with open(
+                        config_filepath, 'r', encoding='utf-8'
+                    ) as config_file:
+                        config = json.load(config_file)
+                    configs.append(config)
+                    os.makedirs(config['output'], exist_ok=True)
+                    with open(
+                        os.path.join(config['output'], 'critical.css'),
+                        'w',
+                        encoding='utf-8',
+                    ) as css_file:
+                        css_file.write('purged{color:green}')
+                    return FakeCompletedProcess(0)
+
+                def mock_run_failure(
+                    unused_args: List[str], **unused_kwargs: str
+                ) -> FakeCompletedProcess:
+                    return FakeCompletedProcess(1, b'purge failed')
+
+                def mock_run_error(
+                    unused_args: List[str], **unused_kwargs: str
+                ) -> FakeCompletedProcess:
+                    raise OSError('no npx')
+
+                with self.swap(build.subprocess, 'run', mock_run_success):
+                    self.assertEqual(
+                        # The helper is private so the build can keep the
+                        # PurgeCSS plumbing out of its public API.
+                        build._purge_critical_css(  # pylint: disable=protected-access
+                            'p{color:red}'
+                        ),
+                        'purged{color:green}',
+                    )
+                self.assertTrue(configs[0]['fontFace'])
+                self.assertTrue(configs[0]['keyframes'])
+                self.assertEqual(
+                    configs[0]['safelist'],
+                    build.LITE_CRITICAL_CSS_SAFELIST,
+                )
+                for class_name in (
+                    'oppia-lite-logo-inline',
+                    'oppia-lite-logo-margin-inline-start-zero',
+                    'oppia-lite-dropdown-left-zero',
+                    'oppia-lite-dropdown-margin-top-zero',
+                ):
+                    self.assertIn(class_name, configs[0]['safelist'])
+                self.assertIn(
+                    os.path.abspath(
+                        'core/templates/pages/terms-page/'
+                        'terms-page.prerender.html'
+                    ),
+                    configs[0]['content'],
+                )
+
+                with self.swap(build.subprocess, 'run', mock_run_failure):
+                    self.assertEqual(
+                        # The helper is private so the build can keep the
+                        # PurgeCSS plumbing out of its public API.
+                        build._purge_critical_css(  # pylint: disable=protected-access
+                            'p{color:red}'
+                        ),
+                        'p{color:red}',
+                    )
+                with self.swap(build.subprocess, 'run', mock_run_error):
+                    self.assertEqual(
+                        # The helper is private so the build can keep the
+                        # PurgeCSS plumbing out of its public API.
+                        build._purge_critical_css(  # pylint: disable=protected-access
+                            'p{color:red}'
+                        ),
+                        'p{color:red}',
+                    )
+            finally:
+                os.chdir(old_working_dir)
+
+    def test_inline_critical_css_for_lite_pages(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                build.inline_critical_css_for_lite_pages()
+
+                os.makedirs('build', exist_ok=True)
+                os.makedirs('src', exist_ok=True)
+                html_filepath = os.path.join(
+                    'build', 'oppia-root.mainpage.html'
+                )
+                html = (
+                    '<head><link rel="stylesheet" '
+                    'href="/build/vendor-styles.css">'
+                    '<link rel="stylesheet" href="/build/styles.css">'
+                    '</head><body></body>'
+                )
+                with open(html_filepath, 'w', encoding='utf-8') as html_file:
+                    html_file.write(html)
+                with open(
+                    build.LITE_SHELL_STYLES_FILEPATH, 'w', encoding='utf-8'
+                ) as styles_file:
+                    styles_file.write(
+                        '.oppia-footer[_ngcontent-lxq-c116]{color:white}'
+                    )
+                with open(
+                    'build/vendor-styles.css', 'w', encoding='utf-8'
+                ) as css_file:
+                    css_file.write(
+                        '@font-face{font-display:swap;src:url(icons.ttf)}'
+                        '.material-icons{color:red}'
+                    )
+                with open(
+                    'build/styles.css', 'w', encoding='utf-8'
+                ) as css_file:
+                    css_file.write('body{background:url("/image.png")}')
+                with open(
+                    build.LITE_FONT_SUBSETS_FILEPATH, 'w', encoding='utf-8'
+                ) as fonts_file:
+                    fonts_file.write(
+                        '@font-face{font-display:block}'
+                        '.lite-font-subset{color:blue}'
+                    )
+
+                def mock_purge_critical_css(css: str) -> str:
+                    return css
+
+                purge_swap = self.swap(
+                    build, '_purge_critical_css', mock_purge_critical_css
+                )
+                with purge_swap:
+                    build.inline_critical_css_for_lite_pages()
+
+                with open(html_filepath, 'r', encoding='utf-8') as html_file:
+                    updated_html = html_file.read()
+
+                self.assertIn(
+                    '<link data-oppia-global-stylesheet '
+                    'href="/build/vendor-styles.css">'
+                    '<noscript><link rel="stylesheet" '
+                    'href="/build/vendor-styles.css"></noscript>',
+                    updated_html,
+                )
+                self.assertIn(
+                    '<link data-oppia-global-stylesheet '
+                    'href="/build/styles.css">'
+                    '<noscript><link rel="stylesheet" '
+                    'href="/build/styles.css"></noscript>',
+                    updated_html,
+                )
+                self.assertEqual(
+                    updated_html.count(
+                        '<link rel="stylesheet" href="/build/styles.css">'
+                    ),
+                    1,
+                )
+                self.assertIn('id="oppia-lite-critical-styles"', updated_html)
+                self.assertIn(
+                    '.oppia-footer[_ngcontent-lxq-c116]{color:white}',
+                    updated_html,
+                )
+                self.assertIn('font-display:block', updated_html)
+                self.assertIn('url(/build/icons.ttf)', updated_html)
+                self.assertIn('url("/image.png")', updated_html)
+                self.assertIn('.lite-font-subset{color:blue}', updated_html)
             finally:
                 os.chdir(old_working_dir)
 

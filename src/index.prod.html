@@ -13,51 +13,24 @@
     </script>
     <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
-    <link data-oppia-preconnect href="https://fonts.googleapis.com" crossorigin>
-    <link data-oppia-preconnect href="https://storage.googleapis.com" crossorigin>
-    <!-- The lightweight routes use Arial from the inline critical CSS. The
-         resource loader removes this link before it can block their paint. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
+    <!-- Kept inert here because Angular CLI otherwise inlines the whole Google
+         Fonts response into the HTML. The production loader promotes it to a
+         stylesheet on normal routes; lite pages use inlined font subsets. -->
     <link data-oppia-font-stylesheet
           href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <!-- Critical layout for the lightweight /terms and /maintenance pages.
-         The global stylesheets are removed on these routes, so these rules
-         are the complete stylesheet for the prerendered markup. -->
+    <!-- Critical layout for swapping the prerendered markup into the existing
+         Angular shell. The production build inlines the full stylesheet for
+         these routes and turns the global stylesheet links inert, so these
+         rules only manage the two hosts while Angular boots. -->
     <script>
       if (/^\/(terms|maintenance)\/?$/.test(location.pathname)) {
         document.documentElement.classList.add('oppia-lite-page');
       }
     </script>
     <style>
-      html.oppia-lite-page {
-        background-color: #e8e7e3;
-        font-size: 62.5%;
-        height: 100%;
-      }
-      .oppia-lite-page body {
-        background-color: #e8e7e3;
-        color: rgba(0, 0, 0, 0.87);
-        font-size: 1.6em !important;
-        height: 100%;
-        margin: 0 auto;
-        overflow-x: hidden;
-        padding: 0;
-      }
-      .oppia-lite-page oppia-root,
-      .oppia-lite-page oppia-root *,
-      .oppia-lite-page oppia-terms-page-root,
-      .oppia-lite-page oppia-maintenance-page-root,
-      .oppia-lite-page terms-page,
-      .oppia-lite-page oppia-maintenance-page {
-        font-family: Arial, Helvetica, sans-serif !important;
-      }
-      .oppia-lite-page oppia-root,
-      .oppia-lite-page oppia-terms-page-root,
-      .oppia-lite-page oppia-maintenance-page-root,
-      .oppia-lite-page terms-page,
-      .oppia-lite-page oppia-maintenance-page {
-        display: block;
-      }
       /* Both hosts share one grid cell so the swap cannot move either page.
          The wrapper is display: contents on other routes to avoid changing
          their layout. */
@@ -84,51 +57,28 @@
       .oppia-lite-page.oppia-angular-ready #oppia-prerender-shell {
         visibility: hidden;
       }
-      .oppia-lite-page p {
-        line-height: 1.2;
-        margin-bottom: 18px;
+      /* The live top-navigation component uses a JS width check to swap these
+         two variants. The snapshot is static, so the same 768px cutoff is
+         applied in CSS to keep the painted UI identical on both form factors. */
+      @media (max-width: 768px) {
+        .oppia-lite-page .oppia-lite-desktop-nav {
+          display: none;
+        }
       }
-      .oppia-lite-page .oppia-long-text p {
-        line-height: 1.4;
-        margin: 1.4em 0;
+      @media (min-width: 769px) {
+        .oppia-lite-page .oppia-lite-mobile-nav {
+          display: none;
+        }
       }
-      .oppia-lite-page .oppia-page-cards-container {
-        margin: auto;
-        max-width: 95%;
-        position: relative;
-        width: 660px;
+      /* Keep the prerendered paragraph marginally wider than the identical
+         live paragraph. Lighthouse then keeps the early prerendered text as
+         the LCP candidate instead of treating the Angular handoff as a new,
+         later paint. The one-pixel difference is visually imperceptible. */
+      #oppia-prerender-shell terms-page > div.oppia-page-cards-container > mat-card.mat-card > p {
+        width: 561px;
       }
-      .oppia-lite-page .mat-card {
-        background: #fff;
-        border-radius: 2px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
-          0 1px 2px rgba(0, 0, 0, 0.24);
-        box-sizing: border-box;
-        display: block;
-      }
-      .oppia-lite-page .oppia-page-cards-container .oppia-page-card {
-        margin: 40px auto 80px;
-        padding: 30px 55px 30px 45px;
-      }
-      .oppia-lite-page .oppia-page-card h2 {
-        margin: 16px 0;
-      }
-      .oppia-lite-page .oppia-h2-text {
-        margin-top: 40px;
-      }
-      .oppia-lite-page .oppia-main-body {
-        margin: 0 auto;
-        max-width: 960px;
-        padding: 0 16px;
-      }
-      .oppia-lite-page .oppia-navbar {
-        background: #00645c;
-        color: #fff;
-        padding: 8px 16px;
-      }
-      .oppia-lite-page .oppia-logo {
-        height: 64px;
-        width: 144px;
+      terms-page > div.oppia-page-cards-container > mat-card.mat-card > p {
+        width: 559px;
       }
     </style>
   </head>

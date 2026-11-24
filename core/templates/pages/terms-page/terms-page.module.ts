@@ -16,7 +16,7 @@
  * @fileoverview Module for the terms page.
  */
 
-import {NgModule} from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {TermsPageComponent} from 'pages/terms-page/terms-page.component';
 import {TermsPageRootComponent} from './terms-page-root.component';
 import {CommonModule} from '@angular/common';
@@ -27,6 +27,10 @@ import {MatCardModule} from '@angular/material/card';
 @NgModule({
   imports: [CommonModule, MatCardModule, TermsPageRoutingModule],
   declarations: [TermsPageComponent, TermsPageRootComponent],
+  exports: [TermsPageComponent, TermsPageRootComponent],
   entryComponents: [TermsPageComponent, TermsPageRootComponent],
+  // The rendered shell is prerendered as plain HTML, so its custom elements
+  // are layout-only hosts on this route and have no Angular components.
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TermsPageModule {}

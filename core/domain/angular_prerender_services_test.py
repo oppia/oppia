@@ -22,12 +22,21 @@ from core.tests import test_utils
 
 class AngularPrerenderServicesTests(test_utils.GenericTestBase):
 
-    def test_terms_markup_is_prerendered_and_sanitized(self) -> None:
+    def test_terms_markup_includes_the_full_rendered_shell(self) -> None:
         markup = angular_prerender_services.get_prerendered_markup('/terms')
 
         self.assertIn('<oppia-terms-page-root>', markup)
-        self.assertIn('<terms-page>', markup)
+        self.assertIn('<navbar-breadcrumb>', markup)
+        self.assertIn('<oppia-top-navigation-bar', markup)
+        self.assertIn('<terms-page _nghost-lxq-c142', markup)
+        self.assertIn('<oppia-footer', markup)
         self.assertIn('Terms of Use', markup)
+        # The captured component styles are scoped with these attributes, so
+        # the snapshot and the live template must preserve them to keep the
+        # rendered shell's computed styles unchanged.
+        self.assertIn('_ngcontent-lxq-c128', markup)
+        self.assertIn('_nghost-lxq-c116', markup)
+        self.assertNotIn('ng-reflect-', markup)
         self.assertNotIn('#ourServices', markup)
         self.assertNotIn('(click)', markup)
 
