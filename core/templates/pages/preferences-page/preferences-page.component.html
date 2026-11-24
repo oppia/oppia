@@ -71,6 +71,7 @@
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
               <textarea [attr.aria-label]="'Bio. ' + ('I18N_PREFERENCES_BIO_EXPLAIN_TEXT' | translate)"
+                        [attr.dir]="'auto'"
                         class="oppia-bio-border e2e-test-user-bio oppia-autofocus"
                         formControlName="userBio"
                         rows="5"
