@@ -313,7 +313,7 @@ class AndroidPlatformParameterFilter:
     def _is_first_flavor_smaller(self, flavor_a: str, flavor_b: str) -> bool:
         """Compares two version flavors, return True if the first version is
         smaller in the following ordering:
-        'test' < 'alpha' < 'beta' < 'release'.
+        'dev' < 'alpha' < 'beta' < 'ga'.
 
         Args:
             flavor_a: str. The version flavor.
