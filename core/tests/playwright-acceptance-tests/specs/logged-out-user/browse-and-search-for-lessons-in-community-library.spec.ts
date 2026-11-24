@@ -16,27 +16,27 @@
  * @fileoverview Acceptance tests for the community library page interactions.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+test.describe.configure({mode: 'serial'});
 
-describe('Logged-out User', function () {
+test.describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor & LoggedInUser;
   let loggedOutUser: LoggedOutUser;
   let explorationId1: string | null;
   let explorationId2: string | null;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
-
-    loggedOutUser = await UserFactory.createLoggedOutUser();
+    loggedOutUser = await UserFactory.createLoggedOutUser(browser);
 
     explorationId1 =
       await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
@@ -49,33 +49,29 @@ describe('Logged-out User', function () {
         false
       );
 
-    await explorationEditor.playExploration(explorationId1);
+    await explorationEditor.playExplorationAsLoggedInUser(explorationId1);
     await explorationEditor.rateExploration(
       5,
       'Excellent advanced Algebra course',
       false
     );
 
-    await explorationEditor.playExploration(explorationId2);
+    await explorationEditor.playExplorationAsLoggedInUser(explorationId2);
     await explorationEditor.rateExploration(
       4,
       'Excellent advanced Algebra course',
       false
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it(
-    'should be able to browse for lessons and see the rating of lessons in the community library',
-    async function () {
-      await loggedOutUser.navigateToCommunityLibraryPage();
+  test('should be able to browse for lessons and see the rating of lessons in the community library', async function () {
+    await loggedOutUser.navigateToCommunityLibraryPage();
 
-      // View the ratings on an exploration once a minimum number of ratings have been submitted.
-      await loggedOutUser.expectLessonsToHaveRating(5, 'Algebra I');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // View the ratings on an exploration once a minimum number of ratings have been submitted.
+    await loggedOutUser.expectLessonsToHaveRating(5, 'Algebra I');
+  });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
