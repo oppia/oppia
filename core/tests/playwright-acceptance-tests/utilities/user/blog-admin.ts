@@ -25,6 +25,10 @@ const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const roleSelectDropdown = 'select#label-target-update-form-role-select';
 const roleUpdateUsernameInput = 'input#label-target-update-form-name';
 const updateRoleButtonSelector = 'button.oppia-blog-admin-update-role-button';
+const blogEditorUsernameInput = 'input#label-target-form-reviewer-username';
+const maximumTagLimitInput = 'input#float-input';
+const removeRoleButtonSelector =
+  'button.oppia-blog-admin-remove-blog-editor-button';
 
 export class BlogAdmin extends BaseUser {
   /**
@@ -46,6 +50,43 @@ export class BlogAdmin extends BaseUser {
     await this.clickOnElementWithSelector(updateRoleButtonSelector);
 
     await this.expectElementToBeClickable(updateRoleButtonSelector, false);
+  }
+
+  /**
+   * Removes blog editor role from a user.
+   */
+  async removeBlogEditorRoleFromUsername(username: string): Promise<void> {
+    await this.goto(blogAdminUrl);
+    await this.typeInInputField(blogEditorUsernameInput, username);
+    await this.clickOnElementWithSelector(removeRoleButtonSelector);
+
+    await this.expectElementToBeClickable(removeRoleButtonSelector, false);
+  }
+
+  /**
+   * Changes the maximum blog tags limit.
+   */
+  async setMaximumTagLimitTo(limit: number): Promise<void> {
+    await this.expectElementToBeVisible(maximumTagLimitInput);
+    await this.clearAllTextFrom(maximumTagLimitInput);
+
+    await this.typeInInputField(maximumTagLimitInput, limit.toString());
+    await this.clickOnElementWithText('Save');
+
+    await this.expectToastMessage('Data saved successfully.');
+  }
+
+  /**
+   * Checks whether the maximum tag limit equals the expected value.
+   */
+  async expectMaximumTagLimitToBe(limit: number): Promise<void> {
+    await this.expectElementToBeVisible(maximumTagLimitInput);
+
+    const tagLimit = await this.page.locator(maximumTagLimitInput).inputValue();
+
+    if (parseInt(tagLimit, 10) !== limit) {
+      throw new Error(`Maximum tag limit is not ${limit}!`);
+    }
   }
 }
 

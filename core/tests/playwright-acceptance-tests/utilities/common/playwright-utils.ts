@@ -633,16 +633,11 @@ export class BaseUser {
       );
     }
 
-    const toastMessage = await this.page.evaluate(
-      el => el.textContent?.trim() || '',
-      toastMessageElement
-    );
-
-    if (toastMessage !== expectedMessage) {
-      throw new Error(
-        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-      );
-    }
+    await expect(
+      this.page.locator(toastMessageSelector).filter({
+        hasText: expectedMessage,
+      })
+    ).toHaveText(expectedMessage);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(toastMessageSelector);
     }

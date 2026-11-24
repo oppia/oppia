@@ -533,6 +533,23 @@ export class BlogPostEditor extends BaseUser {
     }
     showMessage(`Blog post "${blogPostTitle}" is present on the blog page.`);
   }
+
+  async expectTagLimitTextToBe(tagLimit: number): Promise<void> {
+    const tagLimitTextSelector = '.e2e-test-tag-limit-text';
+    await this.expectTextContentToBe(
+      tagLimitTextSelector,
+      `Limit of ${tagLimit}`
+    );
+  }
+
+  async expectRemainingTagsLimitTextToBe(tagLimit: number): Promise<void> {
+    const remainingTagsLimitTextSelector =
+      '.e2e-test-remaining-tags-limit-text';
+    await this.expectTextContentToBe(
+      remainingTagsLimitTextSelector,
+      `${tagLimit} more tags can still be added.`
+    );
+  }
 }
 
 export const BlogPostEditorFactory = (page: Page): BlogPostEditor => {

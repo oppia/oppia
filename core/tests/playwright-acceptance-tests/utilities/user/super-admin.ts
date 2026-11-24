@@ -65,6 +65,12 @@ export class SuperAdmin extends LoggedInUser {
     await this.clickOnElementWithSelector(roleEditorButtonSelector);
     await this.clickOnElementWithSelector(addRoleButton);
     await this.clickOnElementWithSelector(rolesSelectDropdown);
+
+    await this.page.locator('.mat-option-text').first().waitFor({
+      state: 'visible',
+      timeout: 5000,
+    });
+
     const allRoleElements = await this.page.$$('.mat-option-text');
     for (let i = 0; i < allRoleElements.length; i++) {
       const roleText = await this.page.evaluate(
