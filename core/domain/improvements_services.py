@@ -198,7 +198,13 @@ def put_tasks(
             being placed into storage.
         update_last_updated_time: bool. Whether to update the last_updated field
             of the task models.
+
+    Raises:
+        ValidationError. One of the given tasks is invalid. Nothing is put in
+            that case.
     """
+    for task in tasks:
+        task.validate()
     task_models = improvements_models.ExplorationStatsTaskEntryModel.get_multi(
         [t.task_id for t in tasks]
     )
