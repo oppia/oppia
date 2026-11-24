@@ -16,14 +16,13 @@
  * @fileoverview Unit tests for SiteAnalyticsService.
  */
 
-// @ts-nocheck
-
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {DOCUMENT} from '@angular/common';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {UserService} from 'services/user.service';
+import {UserInfo} from 'domain/user/user-info.model';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 describe('Site Analytics Service', () => {
@@ -699,8 +698,8 @@ describe('Site Analytics Service', () => {
     });
 
     it('should wait for user info before sending event if login state is unresolved', fakeAsync(() => {
-      let resolveUserInfoPromise!: () => void;
-      const userInfoPromise = new Promise<void>(resolve => {
+      let resolveUserInfoPromise!: (value: UserInfo) => void;
+      const userInfoPromise = new Promise<UserInfo>(resolve => {
         resolveUserInfoPromise = resolve;
       });
 
@@ -710,14 +709,15 @@ describe('Site Analytics Service', () => {
       const delayedInitSas = new SiteAnalyticsService(
         ws,
         localStorageService,
-        userService
+        userService,
+        document
       );
 
       delayedInitSas.registerCommunityLessonStarted(explorationId);
       expect(gtagSpy).not.toHaveBeenCalled();
 
       userService.isLoggedIn.and.returnValue(true);
-      resolveUserInfoPromise();
+      resolveUserInfoPromise(UserInfo.createDefault());
       flushMicrotasks();
 
       expect(gtagSpy).toHaveBeenCalledWith(
