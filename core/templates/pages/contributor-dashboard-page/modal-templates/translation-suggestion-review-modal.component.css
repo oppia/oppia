@@ -105,6 +105,12 @@ oppia-rte-output-display oppia-noninteractive-image {
   height: 12%;
   text-align: left;
 }
+.oppia-auto-generation-note {
+  color: #555;
+  font-size: 13px;
+  font-style: italic;
+  margin-left: 4px;
+}
 .oppia-suggestion-review-exploration-change {
   margin-top: 50px;
   padding: 0 10px;

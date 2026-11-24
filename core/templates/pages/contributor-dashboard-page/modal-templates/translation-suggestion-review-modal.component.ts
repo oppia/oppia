@@ -74,6 +74,11 @@ export interface SuggestionChangeDict {
   language_code: string;
   state_name: string;
   translation_html: string;
+  // These are null or absent for translations that were typed by hand, and
+  // for suggestions made before this information was recorded.
+  was_auto_generated?: boolean | null;
+  auto_generation_provider?: string | null;
+  was_edited?: boolean | null;
 }
 
 export interface ActiveSuggestionDict {
@@ -799,6 +804,23 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   doesTranslationContainTags(): boolean {
     return /<.*>/g.test(this.translationHtml);
+  }
+
+  /**
+   * Returns a note telling the reviewer whether the translation started from
+   * an automatic translation, and whether the translator changed it.
+   *
+   * @returns The note, or an empty string if the translation was typed by
+   *   hand.
+   */
+  getAutoGenerationNote(): string {
+    const changeCmd = this.activeSuggestion.change_cmd;
+    if (changeCmd.was_auto_generated !== true) {
+      return '';
+    }
+    return changeCmd.was_edited
+      ? '(Auto-generated, edited by translator)'
+      : '(Auto-generated, not edited)';
   }
 
   getHtmlSchema(): HTMLSchema {

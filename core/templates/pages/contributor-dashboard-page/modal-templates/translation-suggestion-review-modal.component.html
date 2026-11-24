@@ -64,6 +64,10 @@
       <div [attr.dir]="'auto'"
            class="oppia-suggestion-review-panel-header-container oppia-translation-panel">
         <strong> Translation:</strong>
+        <span *ngIf="getAutoGenerationNote()"
+              class="oppia-auto-generation-note e2e-test-auto-generation-note">
+          {{ getAutoGenerationNote() }}
+        </span>
         <button class="btn btn-sm btn-secondary float-end"
                 *ngIf="!startedEditing && status === 'review' && canEditTranslation"
                 (click)="editSuggestion()"
