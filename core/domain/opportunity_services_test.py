@@ -1699,6 +1699,44 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
             'hi' in opportunity['exp_1'].incomplete_translation_language_codes
         )
 
+    def test_accepting_suggestions_does_not_duplicate_voice_artist_languages(
+        self,
+    ) -> None:
+        # Once 'hi' is fully translated, every further accepted suggestion
+        # in 'hi' reaches the code that adds it to
+        # language_codes_needing_voice_artists. It must still appear once.
+        exp = exp_fetchers.get_exploration_by_id('exp_1')
+        translated_content = translation_domain.TranslatedContent(
+            '<p>Translated Content</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            'exp_1',
+            exp.version,
+            'hi',
+            'content_0',
+            translated_content,
+        )
+
+        for _ in range(3):
+            (
+                opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+                    'exp_1', 'hi'
+                )
+            )
+            opportunity = opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['exp_1']
+            )
+            assert opportunity['exp_1'] is not None
+            self.assertEqual(
+                opportunity['exp_1'].language_codes_needing_voice_artists.count(
+                    'hi'
+                ),
+                1,
+            )
+
     def test_update_opportunity_with_updated_exploration(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)

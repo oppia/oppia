@@ -1078,9 +1078,16 @@ def update_translation_opportunity_with_accepted_suggestion(
                     exp_opportunity_summary.incomplete_translation_language_codes.remove(
                         language_code
                     )
-                exp_opportunity_summary.language_codes_needing_voice_artists.append(
+                # Guard the append the same way as the remove above: once a
+                # language is fully translated, every later accepted suggestion
+                # reaches this point again.
+                if (
                     language_code
-                )
+                    not in exp_opportunity_summary.language_codes_needing_voice_artists
+                ):
+                    exp_opportunity_summary.language_codes_needing_voice_artists.append(
+                        language_code
+                    )
 
             exp_opportunity_summary.validate()
             _save_multi_exploration_opportunity_summary(
@@ -1200,9 +1207,13 @@ def update_translation_opportunity_with_accepted_suggestion(
                 exp_opportunity_summary.incomplete_translation_language_codes.remove(
                     language_code
                 )
-            exp_opportunity_summary.language_codes_needing_voice_artists.append(
+            if (
                 language_code
-            )
+                not in exp_opportunity_summary.language_codes_needing_voice_artists
+            ):
+                exp_opportunity_summary.language_codes_needing_voice_artists.append(
+                    language_code
+                )
 
         exp_opportunity_summary.validate()
         _save_multi_exploration_opportunity_summary([exp_opportunity_summary])
