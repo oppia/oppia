@@ -1117,4 +1117,18 @@ describe('Conversation display component', () => {
       expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
     });
   });
+
+  it('should render content language selector only when in exploration preview mode', () => {
+    componentInstance.explorationIsInPreviewMode = true;
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement.querySelector('oppia-content-language-selector')
+    ).not.toBeNull();
+
+    componentInstance.explorationIsInPreviewMode = false;
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement.querySelector('oppia-content-language-selector')
+    ).toBeNull();
+  });
 });
