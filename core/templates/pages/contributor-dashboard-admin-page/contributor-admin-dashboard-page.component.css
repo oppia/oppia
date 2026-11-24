@@ -219,6 +219,15 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   margin-bottom: 50px;
 }
 
+/* The content area shrinks to fit its contents, so the configuration is given
+   the same width as the stats table on the other tabs. Otherwise, the tab bar
+   would shrink when this tab is opened. */
+.translation-configuration-content {
+  margin-top: 16px;
+  max-width: 100%;
+  width: 960px;
+}
+
 .dashboard-content-mobile {
   border: 0;
   border-radius: 0;

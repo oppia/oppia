@@ -2694,6 +2694,21 @@ describe('Translation Suggestion Review Modal Component', function () {
       });
     });
 
+    it('should allow worked examples when reviewing a skill translation', () => {
+      component.allContributions[
+        component.activeSuggestionId
+      ].suggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+
+      component.refreshActiveContributionState();
+
+      expect(component.getHtmlSchema()).toEqual({
+        type: 'html',
+        ui_config: {
+          rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        },
+      });
+    });
+
     it('should get unicode schema', () => {
       expect(component.getUnicodeSchema()).toEqual({
         type: 'unicode',
@@ -2744,6 +2759,27 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.translationHtml = translationWithoutTags;
       expect(component.doesTranslationContainTags()).toBe(false);
+    });
+
+    it('should tell the reviewer whether the translation was auto-generated', () => {
+      const changeCmd = component.activeSuggestion.change_cmd;
+
+      changeCmd.was_auto_generated = undefined;
+      expect(component.getAutoGenerationNote()).toBe('');
+
+      changeCmd.was_auto_generated = null;
+      expect(component.getAutoGenerationNote()).toBe('');
+
+      changeCmd.was_auto_generated = true;
+      changeCmd.was_edited = false;
+      expect(component.getAutoGenerationNote()).toBe(
+        '(Auto-generated, not edited)'
+      );
+
+      changeCmd.was_edited = true;
+      expect(component.getAutoGenerationNote()).toBe(
+        '(Auto-generated, edited by translator)'
+      );
     });
   });
 

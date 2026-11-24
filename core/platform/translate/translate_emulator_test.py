@@ -61,3 +61,12 @@ class TranslateEmulatorTests(test_utils.GenericTestBase):
             'en', 'hi', '<p>unknown sentence</p>'
         )
         self.assertEqual(result, '<p>Mock translation of: unknown sentence</p>')
+
+    def test_nested_paragraphs_do_not_replace_the_whole_text(self) -> None:
+        source_text = (
+            '<blockquote><div><p>15</p></div><p>Explanation</p></blockquote>'
+        )
+
+        result = self.emulator.generate_translation('en', 'hi', source_text)
+
+        self.assertEqual(result, 'Mock translation of: %s' % source_text)

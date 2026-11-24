@@ -74,6 +74,11 @@ export interface SuggestionChangeDict {
   language_code: string;
   state_name: string;
   translation_html: string;
+  // These are null or absent for translations that were typed by hand, and
+  // for suggestions made before this information was recorded.
+  was_auto_generated?: boolean | null;
+  auto_generation_provider?: string | null;
+  was_edited?: boolean | null;
 }
 
 export interface ActiveSuggestionDict {
@@ -291,6 +296,19 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
     this.activeSuggestion = this.activeContribution.suggestion;
+    // The editor removes any RTE component that is not in its set when HTML
+    // is loaded into it. Skill content can contain worked examples, so a
+    // skill translation needs the same set as the skill editor. Otherwise
+    // editing the translation would silently drop its worked examples.
+    this.HTML_SCHEMA = {
+      type: 'html',
+      ui_config: {
+        rte_component_config_id:
+          this.activeSuggestion.target_type === AppConstants.ENTITY_TYPE.SKILL
+            ? 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS'
+            : 'CURATED_LESSON_COMPONENTS',
+      },
+    };
     this.pageContextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id
@@ -786,6 +804,23 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   doesTranslationContainTags(): boolean {
     return /<.*>/g.test(this.translationHtml);
+  }
+
+  /**
+   * Returns a note telling the reviewer whether the translation started from
+   * an automatic translation, and whether the translator changed it.
+   *
+   * @returns The note, or an empty string if the translation was typed by
+   *   hand.
+   */
+  getAutoGenerationNote(): string {
+    const changeCmd = this.activeSuggestion.change_cmd;
+    if (changeCmd.was_auto_generated !== true) {
+      return '';
+    }
+    return changeCmd.was_edited
+      ? '(Auto-generated, edited by translator)'
+      : '(Auto-generated, not edited)';
   }
 
   getHtmlSchema(): HTMLSchema {
