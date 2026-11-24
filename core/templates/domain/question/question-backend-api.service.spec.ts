@@ -454,10 +454,9 @@ describe('Question backend Api service', () => {
   it('should reject if question summary conversion fails', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    spyOn(
-      QuestionSummaryForOneSkill,
-      'createFromBackendDict'
-    ).and.throwError('Error converting question summary.');
+    spyOn(QuestionSummaryForOneSkill, 'createFromBackendDict').and.throwError(
+      'Error converting question summary.'
+    );
 
     questionBackendApiService
       .fetchQuestionSummariesAsync('1')
