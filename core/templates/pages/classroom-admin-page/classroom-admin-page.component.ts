@@ -442,6 +442,8 @@ export class ClassroomAdminPageComponent implements OnInit {
           this.setTopicDependencyByTopicName(
             this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
           );
+          this.getAllTopicsToClassroomRelation();
+          this.classroomDataSaveInProgress = false;
         }
       );
   }
@@ -522,6 +524,9 @@ export class ClassroomAdminPageComponent implements OnInit {
           this.setTopicDependencyByTopicName(
             this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
           );
+          // Deleted topics were marked as not in any classroom, so load the
+          // saved list again.
+          this.getAllTopicsToClassroomRelation();
 
           this.classroomDataIsChanged = false;
           this.classroomAdminDataService.reinitializeErrorMsgs();
@@ -753,17 +758,6 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   deleteTopic(topicNameToDelete: string): void {
-    const topicIdToDelete =
-      Object.keys(this.topicIdsToTopicName).find(
-        id => this.topicIdsToTopicName[id] === topicNameToDelete
-      ) || '';
-    this.topicsToClassroomRelation.push({
-      topic_name: topicNameToDelete,
-      topic_id: topicIdToDelete,
-      classroom_name: null,
-      classroom_url_fragment: null,
-      feedback_recipient_email: null,
-    });
     let childTopicNodes = [];
     for (let topicName in this.topicNameToPrerequisiteTopicNames) {
       const prerequisites = this.topicNameToPrerequisiteTopicNames[topicName];
@@ -785,6 +779,14 @@ export class ClassroomAdminPageComponent implements OnInit {
       () => {
         const topicId = this.getTopicIdFromTopicName(topicNameToDelete);
         this.tempClassroomData.removeTopic(topicId);
+
+        // Show the topic as available again in the "Add Topic" dropdown.
+        const relation = this.topicsToClassroomRelation.find(
+          value => value.topic_id === topicId
+        );
+        if (relation) {
+          relation.classroom_name = null;
+        }
 
         delete this.topicNameToPrerequisiteTopicNames[topicNameToDelete];
         delete this.topicIdsToTopicName[topicId];
