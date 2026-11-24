@@ -119,7 +119,7 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
             role_services.get_all_actions(
                 [feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR]
             ),
-            [],
+            [role_services.ACTION_ACCESS_ANDROID_RELEASE_COORDINATOR_PAGE],
         )
         self.assertCountEqual(
             role_services.get_all_actions([feconf.ROLE_ID_RELEASE_COORDINATOR]),
