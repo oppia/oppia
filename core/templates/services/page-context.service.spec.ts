@@ -196,10 +196,10 @@ describe('PageContext service', () => {
     });
 
     it('should correctly set and retrieve the topic id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
 
       expect(ecs.getEntityId()).toBe('123');
     });
@@ -291,10 +291,10 @@ describe('PageContext service', () => {
     });
 
     it('should correctly retrieve the story id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
 
       expect(ecs.getEntityId()).toBe('123');
     });
@@ -331,10 +331,10 @@ describe('PageContext service', () => {
     });
 
     it('should correctly retrieve the skill id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
 
       expect(ecs.getEntityId()).toBe('123');
     });
@@ -367,10 +367,10 @@ describe('PageContext service', () => {
     });
 
     it('should correctly retrieve the blog post id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
-      spyOn(urlService, 'getHash').and.returnValue('');
       spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue('sample123456');
 
       expect(ecs.getEntityId()).toBe('sample123456');
@@ -426,10 +426,10 @@ describe('PageContext service', () => {
     });
 
     it('should correctly retrieve the blog post id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/blog');
-      spyOn(urlService, 'getHash').and.returnValue('');
       blogPostPageService.blogPostId = 'sample123456';
 
       expect(ecs.getEntityId()).toBe('sample123456');
@@ -601,6 +601,7 @@ describe('PageContext service', () => {
     });
 
     it('should set and get custom entity id and type', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
       expect(ecs.getEntityType()).toBeUndefined();
       ecs.setCustomEntityContext('other', '100');

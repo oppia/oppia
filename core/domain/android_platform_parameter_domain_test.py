@@ -283,6 +283,18 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_evaluate_release_candidate_version_uses_numeric_base(self) -> None:
+        context = self._create_context('0.19-rc03-alpha-9faec1d609', 'alpha')
+        min_version_filter = parameter_domain.AndroidPlatformParameterFilter(
+            'app_min_version', [['=', '0.19']]
+        )
+        max_version_filter = parameter_domain.AndroidPlatformParameterFilter(
+            'app_max_version', [['=', '0.19']]
+        )
+
+        self.assertTrue(min_version_filter.evaluate(context))
+        self.assertTrue(max_version_filter.evaluate(context))
+
     def test_reject_wrong_format_app_max_version(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
             'app_max_version', [['=', '13']]
