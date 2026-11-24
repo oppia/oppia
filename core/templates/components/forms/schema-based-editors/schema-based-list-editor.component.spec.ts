@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Schema Based List Editor Component
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   fakeAsync,
@@ -386,7 +384,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.lastElementOnBlur();
 
-    expect(component.localValue).toEqual(['item1', '']);
+    const expectedValue = ['item1', ''];
+    expect(component.localValue).toEqual(expectedValue);
   });
 
   it('should not add element on child form submission when max length is reached', () => {
@@ -396,7 +395,8 @@ describe('Schema Based List Editor Component', () => {
 
     component._onChildFormSubmit();
 
-    expect(component.localValue).toEqual(['item1']);
+    const expectedValue = ['item1'];
+    expect(component.localValue).toEqual(expectedValue);
   });
 
   it('should keep one line input false for non-unicode schema and use default add text', () => {
