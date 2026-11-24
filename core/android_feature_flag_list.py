@@ -47,11 +47,19 @@ class AndroidFeatureFlagNames(enum.Enum):
     ENABLE_NPS_SURVEY = 'android_enable_nps_survey'
     ENABLE_ONBOARDING_FLOW_V2 = 'android_enable_onboarding_flow_v2'
     ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
+    LOAD_LESSON_PROTOS_FROM_ASSETS = (
+        'android_enable_load_lesson_protos_from_assets'
+    )
+    LOAD_IMAGES_FROM_ASSETS = 'android_enable_load_images_from_assets'
+    LESSON_PROGRESS_VISUALIZATION = (
+        'android_enable_lesson_progress_visualization'
+    )
+    STUDY_GUIDES = 'android_enable_study_guides'
+    WORKED_EXAMPLES = 'android_enable_worked_examples'
 
 
 # Names of feature objects defined in FeatureNames should be added
 # to one of the following lists:
-#   - DEV_FEATURES_LIST
 #   - ALPHA_FEATURES_LIST
 #   - BETA_FEATURES_LIST
 #   - GA_FEATURES_LIST
@@ -59,29 +67,45 @@ class AndroidFeatureFlagNames(enum.Enum):
 # available to be enabled via the admin page.
 #
 # The stage of features indicates the maturity of
-# features being developed. Features are in one of the three stages: 'dev',
-# 'alpha', 'beta' or 'prod'. In general, 'dev' features are in develop and can only be
-# enabled in dev environment. 'alpha' features are completed in development but
+# features being developed. Features are in one of the three stages: 'alpha',
+# 'beta' or 'prod'. 'alpha' features are completed in development but
 # still requires further testing or approvals, which can be enabled for QA
 # testers. 'beta' and 'prod' features have been fully tested so that they can be enabled in the
 # production environment.
 
 
-# Names of features in dev stage, the corresponding feature flag instances must
-# be in dev stage otherwise it will cause a test error in the backend test.
-DEV_FEATURES_LIST: List[AndroidFeatureFlagNames] = []
-
 # Names of features in alpha stage, the corresponding feature flag instances must
 # be in alpha stage otherwise it will cause a test error in the backend test.
-ALPHA_FEATURES_LIST: List[AndroidFeatureFlagNames] = []
+ALPHA_FEATURES_LIST: List[AndroidFeatureFlagNames] = [
+    AndroidFeatureFlagNames.LEARNER_STUDY_ANALYTICS,
+    AndroidFeatureFlagNames.SPOTLIGHT_UI,
+    AndroidFeatureFlagNames.ENABLE_MULTIPLE_CLASSROOMS,
+    AndroidFeatureFlagNames.ENABLE_ONBOARDING_FLOW_V2,
+    AndroidFeatureFlagNames.LOAD_LESSON_PROTOS_FROM_ASSETS,
+    AndroidFeatureFlagNames.LOAD_IMAGES_FROM_ASSETS,
+    AndroidFeatureFlagNames.LESSON_PROGRESS_VISUALIZATION,
+    AndroidFeatureFlagNames.STUDY_GUIDES,
+    AndroidFeatureFlagNames.WORKED_EXAMPLES,
+    AndroidFeatureFlagNames.APP_AND_OS_DEPRECATION,
+]
 
 # Names of features in beta stage, the corresponding feature flag instances must
 # be in beta stage otherwise it will cause a test error in the backend test.
-BETA_FEATURES_LIST: List[AndroidFeatureFlagNames] = []
+BETA_FEATURES_LIST: List[AndroidFeatureFlagNames] = [
+    AndroidFeatureFlagNames.LOAD_LESSON_PROTOS_FROM_ASSETS,
+    AndroidFeatureFlagNames.LOAD_IMAGES_FROM_ASSETS,
+    AndroidFeatureFlagNames.APP_AND_OS_DEPRECATION,
+    AndroidFeatureFlagNames.LESSON_PROGRESS_VISUALIZATION,
+    AndroidFeatureFlagNames.STUDY_GUIDES,
+    AndroidFeatureFlagNames.WORKED_EXAMPLES,
+]
 
 # Names of features in prod stage, the corresponding feature flag instances must
 # be in prod stage otherwise it will cause a test error in the backend test.
-GA_FEATURES_LIST: List[AndroidFeatureFlagNames] = []
+GA_FEATURES_LIST: List[AndroidFeatureFlagNames] = [
+    AndroidFeatureFlagNames.LOAD_LESSON_PROTOS_FROM_ASSETS,
+    AndroidFeatureFlagNames.LOAD_IMAGES_FROM_ASSETS,
+]
 
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
@@ -137,6 +161,26 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
     ),
     AndroidFeatureFlagNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
         'Enables multiple classrooms.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.LOAD_LESSON_PROTOS_FROM_ASSETS.value: (
+        'Loads lesson protos from assets.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.LOAD_IMAGES_FROM_ASSETS.value: (
+        'Loads images from assets.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.LESSON_PROGRESS_VISUALIZATION.value: (
+        'Enables lesson progress visualization.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.STUDY_GUIDES.value: (
+        'Enables study guides.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.WORKED_EXAMPLES.value: (
+        'Enables worked examples.',
         android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
     ),
 }

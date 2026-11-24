@@ -32,8 +32,7 @@ class AndroidFeatureFlagListTest(test_utils.GenericTestBase):
         super().setUp()
 
         self.all_features_list = (
-            android_feature_flag_list.DEV_FEATURES_LIST
-            + android_feature_flag_list.ALPHA_FEATURES_LIST
+            android_feature_flag_list.ALPHA_FEATURES_LIST
             + android_feature_flag_list.BETA_FEATURES_LIST
             + android_feature_flag_list.GA_FEATURES_LIST
         )
@@ -54,16 +53,22 @@ class AndroidFeatureFlagListTest(test_utils.GenericTestBase):
             % missing_names,
         )
 
-    def test_no_duplicated_names_in_features_lists(self) -> None:
+    def test_no_duplicated_names_within_features_lists(self) -> None:
         duplicate_names = []
-        for feature in self.all_features_set:
-            if self.all_features_list.count(feature) > 1:
-                duplicate_names.append(feature.value)
+        environment_feature_lists = (
+            android_feature_flag_list.ALPHA_FEATURES_LIST,
+            android_feature_flag_list.BETA_FEATURES_LIST,
+            android_feature_flag_list.GA_FEATURES_LIST,
+        )
+        for features_list in environment_feature_lists:
+            for feature in set(features_list):
+                if features_list.count(feature) > 1:
+                    duplicate_names.append(feature.value)
         self.assertEqual(
             duplicate_names,
             [],
-            msg='Following entries appear more than once in features lists: '
-            '%s.' % duplicate_names,
+            msg='Following entries appear more than once within a features '
+            'list: %s.' % duplicate_names,
         )
 
     def test_all_android_feature_names_are_in_description_and_state_map(
@@ -107,14 +112,56 @@ class AndroidFeatureFlagListTest(test_utils.GenericTestBase):
             'android_enable_nps_survey',
             'android_enable_onboarding_flow_v2',
             'enable_multiple_classrooms',
+            'android_enable_load_lesson_protos_from_assets',
+            'android_enable_load_images_from_assets',
+            'android_enable_lesson_progress_visualization',
+            'android_enable_study_guides',
+            'android_enable_worked_examples',
         }
         actual_feature_names = {
             feature.value
             for feature in android_feature_flag_list.AndroidFeatureFlagNames
         }
 
-        self.assertEqual(len(actual_feature_names), 13)
+        self.assertEqual(len(actual_feature_names), 18)
         self.assertEqual(actual_feature_names, expected_feature_names)
+
+    def test_feature_flags_are_configured_in_the_correct_environment_stage(
+        self,
+    ) -> None:
+        self.assertEqual(
+            android_feature_flag_list.ALPHA_FEATURES_LIST,
+            [
+                android_feature_flag_list.AndroidFeatureFlagNames.LEARNER_STUDY_ANALYTICS,
+                android_feature_flag_list.AndroidFeatureFlagNames.SPOTLIGHT_UI,
+                android_feature_flag_list.AndroidFeatureFlagNames.ENABLE_MULTIPLE_CLASSROOMS,
+                android_feature_flag_list.AndroidFeatureFlagNames.ENABLE_ONBOARDING_FLOW_V2,
+                android_feature_flag_list.AndroidFeatureFlagNames.LOAD_LESSON_PROTOS_FROM_ASSETS,
+                android_feature_flag_list.AndroidFeatureFlagNames.LOAD_IMAGES_FROM_ASSETS,
+                android_feature_flag_list.AndroidFeatureFlagNames.LESSON_PROGRESS_VISUALIZATION,
+                android_feature_flag_list.AndroidFeatureFlagNames.STUDY_GUIDES,
+                android_feature_flag_list.AndroidFeatureFlagNames.WORKED_EXAMPLES,
+                android_feature_flag_list.AndroidFeatureFlagNames.APP_AND_OS_DEPRECATION,
+            ],
+        )
+        self.assertEqual(
+            android_feature_flag_list.BETA_FEATURES_LIST,
+            [
+                android_feature_flag_list.AndroidFeatureFlagNames.LOAD_LESSON_PROTOS_FROM_ASSETS,
+                android_feature_flag_list.AndroidFeatureFlagNames.LOAD_IMAGES_FROM_ASSETS,
+                android_feature_flag_list.AndroidFeatureFlagNames.APP_AND_OS_DEPRECATION,
+                android_feature_flag_list.AndroidFeatureFlagNames.LESSON_PROGRESS_VISUALIZATION,
+                android_feature_flag_list.AndroidFeatureFlagNames.STUDY_GUIDES,
+                android_feature_flag_list.AndroidFeatureFlagNames.WORKED_EXAMPLES,
+            ],
+        )
+        self.assertEqual(
+            android_feature_flag_list.GA_FEATURES_LIST,
+            [
+                android_feature_flag_list.AndroidFeatureFlagNames.LOAD_LESSON_PROTOS_FROM_ASSETS,
+                android_feature_flag_list.AndroidFeatureFlagNames.LOAD_IMAGES_FROM_ASSETS,
+            ],
+        )
 
     def test_all_feature_flags_have_descriptions_and_valid_states(self) -> None:
         invalid_feature_names: List[str] = []
