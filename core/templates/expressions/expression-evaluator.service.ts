@@ -15,7 +15,8 @@
 /**
  * @fileoverview Service for expression evaluation.
  *
- * This file defines the evaluation engine as well as the system operators. The
+ * This file defines the evaluation engine that walks the parse tree. System
+ * operators and functions are registered on `ExpressionSyntaxTreeService`. The
  * evaluator takes the output of the parser (a parse tree) as defined in
  * parser.pegjs and produces a JavaScript primitive value if successful.
  *
@@ -42,33 +43,42 @@
  * variable which has not been defined as a system variable, system function, or
  * user parameter will throw an ExprUndefinedVarError.
  *
- * All system variables, system operators, and system functions are defined in
- * the 'system' variable in this service.
+ * All system operators and functions are defined in the `system` environment
+ * on `ExpressionSyntaxTreeService` (appended when evaluating via
+ * `applyFunctionToParseTree`).
  *
- * TODO(#20339): Split the following section into two:
- * 1.  A general overview of operators (including some concrete examples)
- * 2.  A numbered sequence of steps which a new contributor should follow in
- *     order to define a new operator.
+ * ## Overview of operators and functions
  *
- * Defining new operators and functions:
- *     Operators and functions are given an array of arguments which are already
- *     all evaluated. For example, in the expression "1 + 2 * 3" the "+" plus
- *     operator receives values 1 and 6 (because "2 * 3" has already been
- *     evaluated).
+ * Operators and functions are invoked with an array of arguments that are
+ * already fully evaluated. For example, in `1 + 2 * 3`, the `+` operator
+ * receives `1` and `6` (not `1` and `2`), because `2 * 3` is evaluated first.
+ * Unary and ternary forms work the same way: each child subtree is evaluated
+ * before the operator or function runs.
  *
- *     The operators and functions should verify that the argument array has the
- *     required number of arguments. Operators and functions can coerce the
- *     input arguments to the desired typed values, or throw an exception if
- *     wrong type of argument is given. This does not prevent operators to error
- *     on wrong parameter values (e.g. getting negative number for an index).
+ * Common examples:
+ * -   Infix arithmetic: `3 - 1` passes `[3, 1]` into `-` (after evaluation).
+ * -   Functions: `abs(-5)` passes `[-5]` into `abs` after the unary `-`
+ *     sub-expression is evaluated.
  *
- *     When successful, operators and functions may return any valid JavaScript
- *     values. In general, an operator always returns the same type of value,
- *     but there are exceptions (e.g. "+" operator may return a number or a
- *     string depending on the types of the input arguments).
+ * On success, an operator or function may return any valid JavaScript value
+ * (see each entry's `eval` implementation in `expression-syntax-tree.service.ts`
+ * for concrete return types).
  *
- *     Constraints on the input arguments (number, types, and any other
- *     constraints) as well as the output value and type should be documented.
+ * ## Steps to define a new operator or function
+ *
+ * 1. Add an entry to the `system` map in `expression-syntax-tree.service.ts`
+ *    with an `eval` function that receives the evaluated argument array (and
+ *    extend `parser.pegjs` if the expression language needs new syntax).
+ * 2. Ensure the argument array has the required length; throw if the caller
+ *    passed the wrong number of arguments.
+ * 3. Coerce or validate each argument to the expected types; throw if an
+ *    argument has the wrong type. You may still validate semantic constraints
+ *    (e.g. reject a negative index) after type checks.
+ * 4. Return the computed result, or throw if the inputs are invalid for your
+ *    domain rules.
+ * 5. Document argument count, types, value constraints, and the return type
+ *    (or possible return types) in the operator or function definition so
+ *    other contributors can use it correctly.
  */
 
 import {Injectable} from '@angular/core';
