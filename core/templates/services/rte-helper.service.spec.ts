@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for RteHelperService.
  */
 
-// @ts-nocheck
-
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {RteHelperService} from './rte-helper.service';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
@@ -105,7 +103,7 @@ describe('Rte Helper Service', () => {
           {
             name: 'alt',
             description:
-              'Briefly explain this image to a visually impaired' + ' learner',
+              'Briefly explain this image to a visually impaired learner',
             schema: {
               type: 'unicode',
               validators: [
@@ -116,8 +114,7 @@ describe('Rte Helper Service', () => {
               ],
               ui_config: {
                 placeholder:
-                  'Description of Image (Example : George Handel,' +
-                  ' 18th century baroque composer)',
+                  'Description of Image (Example : George Handel, 18th century baroque composer)',
                 rows: 3,
               },
             },
@@ -139,8 +136,7 @@ describe('Rte Helper Service', () => {
           {
             name: 'url',
             description:
-              'The link URL. If no protocol is specified, HTTPS will' +
-              ' be used.',
+              'The link URL. If no protocol is specified, HTTPS will be used.',
             schema: {
               type: 'custom',
               obj_type: 'SanitizedUrl',
@@ -247,8 +243,7 @@ describe('Rte Helper Service', () => {
               {
                 title: 'Hint introduction',
                 content:
-                  'This set of tabs shows some hints. Click on the other' +
-                  ' tabs to display the relevant hints.',
+                  'This set of tabs shows some hints. Click on the other tabs to display the relevant hints.',
               },
               {
                 title: 'Hint 1',
@@ -271,9 +266,7 @@ describe('Rte Helper Service', () => {
           {
             name: 'video_id',
             description:
-              'The Youtube URL or the YouTube id for this video.' +
-              ' (The Youtube id is the 11-character string after "v=" in' +
-              ' the video URL.)',
+              'The Youtube URL or the YouTube id for this video. (The Youtube id is the 11-character string after "v=" in the video URL.)',
             schema: {
               type: 'unicode',
             },
@@ -283,8 +276,7 @@ describe('Rte Helper Service', () => {
           {
             name: 'start',
             description:
-              'Video start time in seconds: (leave at 0 to start' +
-              ' at the beginning.)',
+              'Video start time in seconds: (leave at 0 to start at the beginning.)',
             schema: {
               type: 'int',
               validators: [
@@ -300,8 +292,7 @@ describe('Rte Helper Service', () => {
           {
             name: 'end',
             description:
-              'Video end time in seconds: (leave at 0 to play until' +
-              ' the end.)',
+              'Video end time in seconds: (leave at 0 to play until the end.)',
             schema: {
               type: 'int',
               validators: [
