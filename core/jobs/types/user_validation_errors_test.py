@@ -137,3 +137,49 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
             'updated %s is greater than the time when job was run'
             % last_updated,
         )
+
+
+class StoryProgressModelIdMismatchErrorTests(
+    base_validation_errors_test.AuditErrorsTestBase
+):
+
+    def test_message(self) -> None:
+        model = user_models.StoryProgressModel(
+            id='wrong_id',
+            user_id='uid_123',
+            story_id='story_456',
+            completed_node_ids=[],
+        )
+        error = user_validation_errors.StoryProgressModelIdMismatchError(model)
+
+        self.assertEqual(
+            error.stderr,
+            'StoryProgressModelIdMismatchError in '
+            'StoryProgressModel(id="wrong_id"): id \'wrong_id\' does not match '
+            'expected id \'uid_123.story_456\'',
+        )
+
+
+class NonexistentCompletedNodeIdErrorTests(
+    base_validation_errors_test.AuditErrorsTestBase
+):
+
+    def test_message(self) -> None:
+        model = user_models.StoryProgressModel(
+            id='uid_123.story_456',
+            user_id='uid_123',
+            story_id='story_456',
+            completed_node_ids=['node_1', 'node_2'],
+        )
+        nonexistent_node_ids = ['node_1']
+        error = user_validation_errors.NonexistentCompletedNodeIdError(
+            model, nonexistent_node_ids
+        )
+
+        self.assertEqual(
+            error.stderr,
+            'NonexistentCompletedNodeIdError in '
+            'StoryProgressModel(id="uid_123.story_456"): '
+            'completed_node_ids [\'node_1\'] do not exist in corresponding '
+            'story story_456',
+        )

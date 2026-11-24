@@ -3706,15 +3706,18 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.STORY_1_ID = 'story_id'
-        self.STORY_ID_1 = 'story_id_1'
+        self.signup('owner@example.com', 'owner')
+        self.owner_id = self.get_user_id_from_email('owner@example.com')
+        self.signup('user@example.com', 'user')
+        self.USER_ID = self.get_user_id_from_email('user@example.com')
+
+        self.STORY_1_ID = 'story_id_001'
+        self.STORY_ID_1 = 'story_id_002'
         self.NODE_ID_1 = 'node_1'
         self.NODE_ID_2 = 'node_2'
         self.NODE_ID_3 = 'node_3'
         self.NODE_ID_4 = 'node_4'
-        self.USER_ID = 'user'
 
-        self.owner_id = 'owner'
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.TOPIC_ID,
@@ -3971,6 +3974,16 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             completion_model.completed_node_ids,
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3],
         )
+
+    def test_record_completed_node_in_story_context_raises_validation_error(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid node ID in completed_node_ids'
+        ):
+            story_services.record_completed_node_in_story_context(
+                self.owner_id, self.STORY_1_ID, 'invalid_node'
+            )
 
 
 class StoryContentsMigrationTests(test_utils.GenericTestBase):

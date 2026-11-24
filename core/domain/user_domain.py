@@ -23,6 +23,7 @@ import re
 
 from core import feconf, utils
 from core.constants import constants
+from core.domain import story_domain, user_domain_errors
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -1809,3 +1810,111 @@ class TranslationCoordinatorStats:
             'coordinator_ids': self.coordinator_ids,
             'coordinators_count': self.coordinators_count,
         }
+
+
+class StoryProgressDict(TypedDict):
+    """Dictionary representation of a user's progress in a story."""
+
+    user_id: str
+    story_id: str
+    completed_node_ids: List[str]
+
+
+class StoryProgress:
+    """Domain object for the progress a user has made within a story,
+    including all nodes which have been completed within the context of the story.
+    """
+
+    def __init__(
+        self,
+        user_id: str,
+        story_id: str,
+        completed_node_ids: List[str],
+    ) -> None:
+        """Constructs a StoryProgress domain object.
+
+        Args:
+            user_id: str. The unique id of the user.
+            story_id: str. The unique id of the story.
+            completed_node_ids: list(str). The list of node ids completed in the
+                story.
+        """
+        self.user_id = user_id
+        self.story_id = story_id
+        self.completed_node_ids = completed_node_ids
+
+    def to_dict(self) -> StoryProgressDict:
+        """Returns a dict representation of the StoryProgress domain object.
+
+        Returns:
+            StoryProgressDict. The dictionary representation of this object.
+        """
+        return {
+            'user_id': self.user_id,
+            'story_id': self.story_id,
+            'completed_node_ids': list(self.completed_node_ids),
+        }
+
+    @classmethod
+    def from_dict(cls, progress_dict: StoryProgressDict) -> StoryProgress:
+        """Creates a StoryProgress domain object from a dictionary.
+
+        Args:
+            progress_dict: StoryProgressDict. The dictionary data.
+
+        Returns:
+            StoryProgress. The corresponding domain object.
+        """
+        return cls(
+            progress_dict['user_id'],
+            progress_dict['story_id'],
+            list(progress_dict['completed_node_ids']),
+        )
+
+    def validate(self) -> None:
+        """Validates the properties of the StoryProgress domain object.
+
+        Raises:
+            InvalidUserIdError. The user ID is invalid.
+            InvalidStoryIdError. The story ID is invalid.
+            InvalidCompletedNodeIdsError. The completed node IDs are invalid.
+            DuplicateCompletedNodeIdsError. Duplicate node IDs found.
+        """
+        if not isinstance(self.user_id, str):
+            raise user_domain_errors.InvalidUserIdError(
+                'Expected user_id to be a string, received %s' % self.user_id
+            )
+        if not self.user_id or not utils.is_user_id_valid(
+            self.user_id, allow_system_user_id=True, allow_pseudonymous_id=False
+        ):
+            raise user_domain_errors.InvalidUserIdError(
+                'Invalid user ID: %s' % self.user_id
+            )
+
+        if not isinstance(self.story_id, str):
+            raise user_domain_errors.InvalidStoryIdError(
+                'Expected story_id to be a string, received %s' % self.story_id
+            )
+        if len(self.story_id) != constants.STORY_ID_LENGTH:
+            raise user_domain_errors.InvalidStoryIdError(
+                'Invalid story ID: %s' % self.story_id
+            )
+
+        if not isinstance(self.completed_node_ids, list):
+            raise user_domain_errors.InvalidCompletedNodeIdsError(
+                'Expected completed_node_ids to be a list, received %s'
+                % self.completed_node_ids
+            )
+
+        node_id_regex = re.compile('^%s[0-9]+$' % story_domain.NODE_ID_PREFIX)
+        seen_node_ids = set()
+        for node_id in self.completed_node_ids:
+            if not isinstance(node_id, str) or not node_id_regex.match(node_id):
+                raise user_domain_errors.InvalidCompletedNodeIdsError(
+                    'Invalid node ID in completed_node_ids: %s' % node_id
+                )
+            if node_id in seen_node_ids:
+                raise user_domain_errors.DuplicateCompletedNodeIdsError(
+                    'Duplicate node ID %s found in completed_node_ids' % node_id
+                )
+            seen_node_ids.add(node_id)
