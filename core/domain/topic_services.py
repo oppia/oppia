@@ -1437,6 +1437,24 @@ def _save_topic(
     )
     topic.version += 1
     translation_services.carry_forward_topic_translations(old_topic, topic)
+
+    old_contents = (
+        old_topic.get_translatable_contents_collection().content_id_to_translatable_content
+    )
+    new_contents = (
+        topic.get_translatable_contents_collection().content_id_to_translatable_content
+    )
+    obsolete_content_ids = {
+        content_id
+        for content_id, content in old_contents.items()
+        if content_id not in new_contents
+        or new_contents[content_id].content_value != content.content_value
+    }
+    if obsolete_content_ids:
+        suggestion_services.auto_reject_translation_suggestions_for_content_ids(
+            topic.id, obsolete_content_ids
+        )
+
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
         None,

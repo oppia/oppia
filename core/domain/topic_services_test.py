@@ -25,6 +25,7 @@ from unittest import mock
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
+    exp_domain,
     exp_services,
     feature_flag_services,
     fs_services,
@@ -58,8 +59,15 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models, topic_models
 
-opportunity_models, topic_models, story_models = models.Registry.import_models(
-    [models.Names.OPPORTUNITY, models.Names.TOPIC, models.Names.STORY]
+opportunity_models, suggestion_models, topic_models, story_models = (
+    models.Registry.import_models(
+        [
+            models.Names.OPPORTUNITY,
+            models.Names.SUGGESTION,
+            models.Names.TOPIC,
+            models.Names.STORY,
+        ]
+    )
 )
 
 
@@ -227,6 +235,60 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         ).translations
         self.assertIn(feconf.TOPIC_NAME_CONTENT_ID, translations)
         self.assertNotIn(feconf.TOPIC_DESCRIPTION_CONTENT_ID, translations)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES,
+        ]
+    )
+    def test_topic_edit_auto_rejects_pending_translation_suggestions(
+        self,
+    ) -> None:
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.TOPIC_NAME_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': topic.name,
+            'translation_html': 'Translated topic name',
+            'data_format': 'unicode',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_TOPIC,
+            topic.id,
+            topic.version,
+            self.user_id,
+            change_dict,
+            'Topic name translation',
+        )
+        self.assertEqual(
+            suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+                        'old_value': topic.name,
+                        'new_value': 'Brand New Topic Name',
+                    }
+                )
+            ],
+            'Update topic name.',
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.status, suggestion_models.STATUS_REJECTED
+        )
 
     @test_utils.enable_feature_flags(
         [

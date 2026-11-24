@@ -122,15 +122,18 @@ def add_new_translation(
     model.put()
 
 
-def carry_forward_topic_translations(
+def compute_carried_forward_topic_translations(
     old_topic: topic_domain.Topic, updated_topic: topic_domain.Topic
-) -> None:
-    """Copies topic translations to the next version, marking changed text
-    stale.
+) -> List[translation_models.EntityTranslationsModel]:
+    """Computes topic translations to carry forward to the next version,
+    marking changed text stale.
 
     Args:
         old_topic: Topic. The original topic domain object.
         updated_topic: Topic. The updated topic domain object.
+
+    Returns:
+        list(EntityTranslationsModel). The list of entity translations models.
     """
     old_contents = (
         old_topic.get_translatable_contents_collection().content_id_to_translatable_content
@@ -164,6 +167,22 @@ def carry_forward_topic_translations(
                 entity_translation.to_dict()['translations'],
             )
         )
+    return translation_models_to_save
+
+
+def carry_forward_topic_translations(
+    old_topic: topic_domain.Topic, updated_topic: topic_domain.Topic
+) -> None:
+    """Copies topic translations to the next version, marking changed text
+    stale.
+
+    Args:
+        old_topic: Topic. The original topic domain object.
+        updated_topic: Topic. The updated topic domain object.
+    """
+    translation_models_to_save = compute_carried_forward_topic_translations(
+        old_topic, updated_topic
+    )
     if translation_models_to_save:
         translation_models.EntityTranslationsModel.update_timestamps_multi(
             translation_models_to_save

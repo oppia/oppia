@@ -330,6 +330,13 @@ def create_suggestion(
                             'was submitted.'
                         )
         elif target_type == feconf.ENTITY_TYPE_TOPIC:
+            if not feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
+                author_id,
+            ):
+                raise Exception(
+                    'Topic translation suggestions are currently disabled.'
+                )
             topic = topic_fetchers.get_topic_by_id(target_id, strict=False)
             if topic is None:
                 raise utils.InvalidInputException(

@@ -874,6 +874,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             updated_suggestion.status, suggestion_models.STATUS_ACCEPTED
         )
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES
+        ]
+    )
     def test_create_and_accept_topic_name_translation_suggestion(self) -> None:
         topic = self.save_new_topic(
             'topic_translation_test',
@@ -919,6 +924,43 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(translated_content, 'Translated topic name')
 
+    def test_cannot_create_topic_translation_suggestion_when_flag_disabled(
+        self,
+    ) -> None:
+        topic = self.save_new_topic(
+            'topic_disabled_test',
+            self.author_id,
+            name='Topic name',
+            description='Topic description',
+        )
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.TOPIC_NAME_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': topic.name,
+            'translation_html': 'Translated topic name',
+            'data_format': 'unicode',
+        }
+        with self.assertRaisesRegex(
+            Exception,
+            'Topic translation suggestions are currently disabled.',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_TOPIC,
+                topic.id,
+                topic.version,
+                self.author_id,
+                change_dict,
+                'Topic name translation',
+            )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES
+        ]
+    )
     def test_rejects_topic_translation_with_outdated_source(self) -> None:
         topic = self.save_new_topic(
             'outdated_topic_translation',
@@ -949,6 +991,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'Outdated topic translation',
             )
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES
+        ]
+    )
     def test_create_topic_translation_suggestion_with_invalid_topic_id_raises(
         self,
     ) -> None:
@@ -975,6 +1022,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'Topic translation',
             )
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES
+        ]
+    )
     def test_rejects_topic_name_translation_over_character_limit(self) -> None:
         topic = self.save_new_topic(
             'long_topic_translation',
