@@ -37,6 +37,8 @@ import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
+import {AppConstants} from 'app.constants';
+import {PageContextService} from 'services/page-context.service';
 
 // Note: In Angular 11, the native @angular-devkit/build-angular:karma builder
 // still uses Webpack under the hood. We are required to have a custom main entry
@@ -68,6 +70,16 @@ getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
+
+// PageContextService keeps the current entity context and image save
+// destination in static fields that survive TestBed resets, so a value set by
+// one spec file can change the behavior of a later spec file (see #27555).
+// Reset them before every test so that each test starts from a known state.
+beforeEach(() => {
+  PageContextService.customEntityContext = null;
+  PageContextService.imageSaveDestination =
+    AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
+});
 
 // Load all spec files from core/templates and extensions.
 // When Angular CLI's --include flag is used, the SingleTestTransformLoader
