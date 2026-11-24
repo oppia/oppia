@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core.domain import contributor_dashboard_stats_services
+from core.domain import topic_domain
 from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.topic import gae_models as topic_models
 from core.tests import test_utils
@@ -49,8 +50,16 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
         self.rights = topic_models.TopicRightsModel(
             id=self.topic_id, topic_is_published=True
         )
-        super(topic_models.TopicRightsModel, self.rights).put()
-        super(topic_models.TopicModel, self.topic).put()
+        self.rights.commit(
+            'committer_id',
+            'Created new topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
+        )
+        self.topic.commit(
+            'committer_id',
+            'Created new topic',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
+        )
 
         self.exp_opp = opportunity_models.ExplorationOpportunitySummaryModel(
             id='exp_1',

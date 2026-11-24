@@ -331,6 +331,10 @@
   background-color: #12b76a;
 }
 
+.fill-full {
+  width: 100%;
+}
+
 .progress-pct {
   color: #344054;
   font-size: 14px;

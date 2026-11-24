@@ -382,6 +382,8 @@
         "core.controllers.recent_commits_test",
         "core.domain.role_services_test",
         "core.controllers.contributor_dashboard_test",
+        "core.controllers.contributor_dashboard_stats_test",
+        "core.domain.contributor_dashboard_stats_services_test",
         "core.platform.email.dev_mode_email_services_test",
         "core.jobs.types.blog_validation_errors_test",
         "core.jobs.batch_jobs.missing_translation_images_repair_jobs_test",
