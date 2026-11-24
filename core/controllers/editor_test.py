@@ -3639,7 +3639,14 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             self.assertEqual(response['displayable_language_codes'], [])
 
     def test_exploration_loaded_when_exploration_is_none(self) -> None:
+        real_data = exp_services.get_user_exploration_data(
+            self.owner_id, self.EXP_ID2, apply_draft=True
+        )
         with self.swap_to_always_return(
+            exp_services,
+            'get_user_exploration_data',
+            value=real_data,
+        ), self.swap_to_always_return(
             exp_services,
             'get_story_id_linked_to_exploration',
             value='story_id',
