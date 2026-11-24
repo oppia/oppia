@@ -92,9 +92,17 @@ export class QuestionBackendApiService {
       .toPromise()
       .then(
         response => {
-          const questionObjects = response.question_dicts.map(questionDict => {
-            return Question.createFromBackendDict(questionDict);
-          });
+          let questionObjects: Question[];
+          try {
+            questionObjects = response.question_dicts.map(questionDict => {
+              return Question.createFromBackendDict(questionDict);
+            });
+          } catch (error) {
+            errorCallback(
+              error instanceof Error ? error.message : String(error)
+            );
+            return;
+          }
           if (successCallback) {
             successCallback(questionObjects);
           }
@@ -153,13 +161,21 @@ export class QuestionBackendApiService {
       .toPromise()
       .then(
         response => {
-          const questionSummaries = response.question_summary_dicts.map(
-            summaryDict => {
-              return QuestionSummaryForOneSkill.createFromBackendDict(
-                summaryDict
-              );
-            }
-          );
+          let questionSummaries: QuestionSummaryForOneSkill[];
+          try {
+            questionSummaries = response.question_summary_dicts.map(
+              summaryDict => {
+                return QuestionSummaryForOneSkill.createFromBackendDict(
+                  summaryDict
+                );
+              }
+            );
+          } catch (error) {
+            errorCallback(
+              error instanceof Error ? error.message : String(error)
+            );
+            return;
+          }
           if (successCallback) {
             successCallback({
               questionSummaries: questionSummaries,

@@ -171,6 +171,28 @@ describe('Question backend Api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should reject if question conversion fails', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    spyOn(Question, 'createFromBackendDict').and.throwError(
+      'Error converting question.'
+    );
+
+    questionBackendApiService
+      .fetchQuestionsAsync(['1'], 1, true)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/question_player_handler?skill_ids=1&question_count=1' +
+        '&fetch_by_difficulty=true'
+    );
+    req.flush(sampleDataResults);
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error converting question.');
+  }));
+
   it(
     'should successfully fetch questions from the backend when' +
       'sortedByDifficulty is false',
@@ -427,6 +449,29 @@ describe('Question backend Api service', () => {
       more: false,
     });
     expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should reject if question summary conversion fails', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    spyOn(
+      QuestionSummaryForOneSkill,
+      'createFromBackendDict'
+    ).and.throwError('Error converting question summary.');
+
+    questionBackendApiService
+      .fetchQuestionSummariesAsync('1')
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/questions_list_handler/1?offset=0'
+    );
+    req.flush(sampleResponse);
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error converting question summary.'
+    );
   }));
 
   it('should use the rejection handler if the backend request failed', fakeAsync(() => {
