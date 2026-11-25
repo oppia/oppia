@@ -58,8 +58,6 @@ export class ImageAreaSelection {
 
     // Scroll the image into view first; a scrolled-off image has negative coordinates.
     await image.scrollIntoViewIfNeeded();
-    // Scroll the image into view first; a scrolled-off image has negative coordinates.
-    await image.scrollIntoViewIfNeeded();
     const box = await image.boundingBox();
     if (!box) {
       throw new Error('Image not found.');
@@ -107,8 +105,6 @@ export class ImageAreaSelection {
       throw new Error('Image not found.');
     }
 
-    // Scroll the image into view first; a scrolled-off image has negative coordinates.
-    await image.scrollIntoViewIfNeeded();
     // Scroll the image into view first; a scrolled-off image has negative coordinates.
     await image.scrollIntoViewIfNeeded();
     const box = await image.boundingBox();
