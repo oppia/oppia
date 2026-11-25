@@ -3730,6 +3730,11 @@ export class ExplorationEditor extends BaseUser {
       (el.textContent || '').replace(/\s+/g, ' ').trim()
     );
     if (currentRole.includes(roleName)) {
+      // The Save button is enabled by the username input's blur handler, which
+      // clicking the dropdown used to trigger as a side effect. Since the
+      // dropdown stays closed, move focus off the username so that the button
+      // becomes clickable.
+      await this.page.keyboard.press('Tab');
       return;
     }
 
