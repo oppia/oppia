@@ -833,6 +833,10 @@ URLS = [
         release_coordinator.FeatureFlagsHandler,
     ),
     get_redirect_route(
+        r'%s/<feature_flag_name>' % feconf.FEATURE_FLAG_HISTORY_URL_PREFIX,
+        release_coordinator.FeatureFlagHistoryHandler,
+    ),
+    get_redirect_route(
         r'%s' % feconf.USER_GROUPS_HANDLER_URL,
         release_coordinator.UserGroupHandler,
     ),

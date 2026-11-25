@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core.platform import models
 from core.tests import test_utils
@@ -167,3 +169,123 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)
         self.assertEqual(audit_model.old_username, self.OLD_USERNAME)
         self.assertEqual(audit_model.new_username, self.NEW_USERNAME)
+
+
+class FeatureFlagChangeAuditModelUnitTests(test_utils.GenericTestBase):
+    """Unit tests for the FeatureFlagChangeAuditModel class."""
+
+    NONEXISTENT_COMMITTER_ID: Final = 'id_x'
+    COMMITTER_ID: Final = 'committer_id'
+    FEATURE_FLAG_NAME: Final = 'feature_a'
+
+    def setUp(self) -> None:
+        """Set up audit models in datastore for use in testing."""
+        super().setUp()
+
+        self.old_config = {
+            'force_enable_for_all_users': False,
+            'rollout_percentage': 0,
+            'user_group_ids': [],
+        }
+        self.new_config = {
+            'force_enable_for_all_users': False,
+            'rollout_percentage': 20,
+            'user_group_ids': ['group_1'],
+        }
+
+        self.older_model = audit_models.FeatureFlagChangeAuditModel(
+            id='feature_a.111.1',
+            feature_flag_name=self.FEATURE_FLAG_NAME,
+            committer_id=self.COMMITTER_ID,
+            old_config=self.old_config,
+            new_config=self.new_config,
+        )
+        self.older_model.update_timestamps()
+        self.older_model.put()
+
+        self.newer_model = audit_models.FeatureFlagChangeAuditModel(
+            id='feature_a.222.2',
+            feature_flag_name=self.FEATURE_FLAG_NAME,
+            committer_id=self.COMMITTER_ID,
+            old_config=self.new_config,
+            new_config=self.old_config,
+        )
+        self.newer_model.update_timestamps()
+        self.newer_model.put()
+
+        # A change to a different flag, which should not be returned when
+        # fetching the history of feature_a.
+        other_model = audit_models.FeatureFlagChangeAuditModel(
+            id='feature_b.333.3',
+            feature_flag_name='feature_b',
+            committer_id=self.COMMITTER_ID,
+            old_config=self.old_config,
+            new_config=self.new_config,
+        )
+        other_model.update_timestamps()
+        other_model.put()
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            audit_models.FeatureFlagChangeAuditModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP,
+        )
+
+    def test_get_export_policy(self) -> None:
+        sample_dict = {
+            'feature_flag_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'committer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'old_config': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'new_config': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            audit_models.FeatureFlagChangeAuditModel.get_export_policy(),
+            sample_dict,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        model_class = audit_models.FeatureFlagChangeAuditModel
+        self.assertEqual(
+            model_class.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_has_reference_to_user_id(self) -> None:
+        model_class = audit_models.FeatureFlagChangeAuditModel
+        self.assertTrue(model_class.has_reference_to_user_id(self.COMMITTER_ID))
+        self.assertFalse(
+            model_class.has_reference_to_user_id(self.NONEXISTENT_COMMITTER_ID)
+        )
+
+    def test_get_by_feature_flag_name_returns_newest_first(self) -> None:
+        # The datastore emulator may give both models the same timestamp, so
+        # the newer one is set explicitly to make the ordering deterministic.
+        self.newer_model.created_on = self.older_model.created_on + (
+            datetime.timedelta(seconds=1)
+        )
+        self.newer_model.update_timestamps(update_last_updated_time=False)
+        self.newer_model.put()
+
+        change_models = (
+            audit_models.FeatureFlagChangeAuditModel.get_by_feature_flag_name(
+                self.FEATURE_FLAG_NAME
+            )
+        )
+
+        self.assertEqual(
+            [model.id for model in change_models],
+            [self.newer_model.id, self.older_model.id],
+        )
+
+    def test_get_by_feature_flag_name_with_no_changes_returns_empty(
+        self,
+    ) -> None:
+        self.assertEqual(
+            audit_models.FeatureFlagChangeAuditModel.get_by_feature_flag_name(
+                'feature_with_no_changes'
+            ),
+            [],
+        )

@@ -33,6 +33,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 
 import {FeaturesTabComponent} from 'pages/release-coordinator-page/features-tab/features-tab.component';
@@ -47,6 +48,7 @@ import {FeatureStage} from 'domain/platform-parameter/platform-parameter.model';
 import {FeatureFlag} from 'domain/feature-flag/feature-flag.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {HttpErrorResponse} from '@angular/common/http';
+import {FeatureFlagHistoryModalComponent} from 'pages/release-coordinator-page/modals/feature-flag-history-modal.component';
 
 let dummyFeatureStatus = false;
 const mockDummyFeatureFlagForE2ETestsStatus = (status: boolean) => {
@@ -894,6 +896,51 @@ describe('Release coordinator page feature tab', function () {
       flushMicrotasks();
 
       expect(dummyApiSpy).toHaveBeenCalled();
+    }));
+  });
+  describe('.openFeatureFlagHistoryModal', () => {
+    let ngbModal: NgbModal;
+    let componentInstance: {
+      featureFlagName?: string;
+      userGroups?: UserGroup[];
+    };
+
+    beforeEach(() => {
+      ngbModal = TestBed.inject(NgbModal);
+      componentInstance = {};
+    });
+
+    it('should open the history modal for the given flag', fakeAsync(() => {
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: componentInstance,
+        result: Promise.resolve(),
+      } as NgbModalRef);
+      tick();
+      const featureFlagVM = component.featureFlagViewModels[0];
+
+      component.openFeatureFlagHistoryModal(featureFlagVM);
+      flushMicrotasks();
+
+      expect(modalSpy).toHaveBeenCalledWith(FeatureFlagHistoryModalComponent, {
+        size: 'lg',
+      });
+      expect(componentInstance.featureFlagName).toEqual(featureFlagVM.name);
+      expect(componentInstance.userGroups).toEqual(component.allUserGroups);
+    }));
+
+    it('should not throw when the history modal is dismissed', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: componentInstance,
+        result: Promise.reject(),
+      } as NgbModalRef);
+      tick();
+
+      expect(() => {
+        component.openFeatureFlagHistoryModal(
+          component.featureFlagViewModels[0]
+        );
+        flushMicrotasks();
+      }).not.toThrow();
     }));
   });
 });

@@ -27,6 +27,10 @@ export const FeatureFlagDomainConstants = {
   // Url for the backend handler to perform actions for feature flags.
   FEATURE_FLAGS_URL: '/feature_flags',
 
+  // Url prefix for the backend handler that returns the change history of
+  // a feature flag. The feature flag name is appended to it.
+  FEATURE_FLAG_HISTORY_URL_PREFIX: '/feature_flag_history',
+
   // Action name for request to the admin handler that updates the rules
   // of feature flags.
   UPDATE_FEATURE_FLAG_ACTION: 'update_feature_flag',

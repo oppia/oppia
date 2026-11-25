@@ -208,4 +208,77 @@ describe('FeatureFlagBackendApiService', () => {
       expect(failHandler).toHaveBeenCalled();
     }));
   });
+  describe('.fetchFeatureFlagHistoryAsync', () => {
+    it('should fetch the history and convert it to camelCase', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      featureFlagBackendApiService
+        .fetchFeatureFlagHistoryAsync('feature_a')
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        FeatureFlagDomainConstants.FEATURE_FLAG_HISTORY_URL_PREFIX +
+          '/feature_a'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        feature_flag_changes: [
+          {
+            committer_username: 'coordinator',
+            old_config: {
+              force_enable_for_all_users: false,
+              rollout_percentage: 0,
+              user_group_ids: [],
+            },
+            new_config: {
+              force_enable_for_all_users: true,
+              rollout_percentage: 20,
+              user_group_ids: ['group_1'],
+            },
+            created_on_msecs: 1000,
+          },
+        ],
+      });
+
+      flushMicrotasks();
+      expect(successHandler).toHaveBeenCalledWith([
+        {
+          committerUsername: 'coordinator',
+          oldConfig: {
+            forceEnableForAllUsers: false,
+            rolloutPercentage: 0,
+            userGroupIds: [],
+          },
+          newConfig: {
+            forceEnableForAllUsers: true,
+            rolloutPercentage: 20,
+            userGroupIds: ['group_1'],
+          },
+          createdOnMsecs: 1000,
+        },
+      ]);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should reject if the request fails', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      featureFlagBackendApiService
+        .fetchFeatureFlagHistoryAsync('feature_a')
+        .then(successHandler, failHandler);
+
+      httpTestingController
+        .expectOne(
+          FeatureFlagDomainConstants.FEATURE_FLAG_HISTORY_URL_PREFIX +
+            '/feature_a'
+        )
+        .error(new ErrorEvent('Error'));
+
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }));
+  });
 });

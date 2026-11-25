@@ -251,6 +251,26 @@ class FeatureFlagConfigDict(TypedDict):
     last_updated: Optional[str]
 
 
+class FeatureFlagConfigValuesDict(TypedDict):
+    """Dictionary representing the editable values of a feature flag's
+    config. Unlike FeatureFlagConfigDict, this leaves out last_updated, since
+    it is used to record what a release coordinator changed.
+    """
+
+    force_enable_for_all_users: bool
+    rollout_percentage: int
+    user_group_ids: List[str]
+
+
+class FeatureFlagChangeDict(TypedDict):
+    """Dictionary representing a single change made to a feature flag."""
+
+    committer_id: str
+    old_config: FeatureFlagConfigValuesDict
+    new_config: FeatureFlagConfigValuesDict
+    created_on_msecs: float
+
+
 class FeatureFlagConfig:
     """The FeatureFlagConfig domain object."""
 

@@ -43,6 +43,37 @@ export interface FeatureFlagsResponse {
   userGroups: UserGroup[];
 }
 
+export interface FeatureFlagConfigValuesBackendDict {
+  force_enable_for_all_users: boolean;
+  rollout_percentage: number;
+  user_group_ids: string[];
+}
+
+export interface FeatureFlagChangeBackendDict {
+  // The username is null if the committer's account has been deleted.
+  committer_username: string | null;
+  old_config: FeatureFlagConfigValuesBackendDict;
+  new_config: FeatureFlagConfigValuesBackendDict;
+  created_on_msecs: number;
+}
+
+interface FeatureFlagHistoryBackendResponse {
+  feature_flag_changes: FeatureFlagChangeBackendDict[];
+}
+
+export interface FeatureFlagConfigValues {
+  forceEnableForAllUsers: boolean;
+  rolloutPercentage: number;
+  userGroupIds: string[];
+}
+
+export interface FeatureFlagChange {
+  committerUsername: string | null;
+  oldConfig: FeatureFlagConfigValues;
+  newConfig: FeatureFlagConfigValues;
+  createdOnMsecs: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -113,5 +144,39 @@ export class FeatureFlagBackendApiService {
         user_group_ids: userGroupIds,
       })
       .toPromise();
+  }
+
+  /**
+   * Gets the change history of a feature flag, most recent change first.
+   *
+   * @param {string} name - The name of the feature flag.
+   * @returns {Promise<FeatureFlagChange[]>} - A promise that resolves to the
+   * list of changes made to the feature flag.
+   */
+  async fetchFeatureFlagHistoryAsync(
+    name: string
+  ): Promise<FeatureFlagChange[]> {
+    const response = await this.http
+      .get<FeatureFlagHistoryBackendResponse>(
+        `${FeatureFlagDomainConstants.FEATURE_FLAG_HISTORY_URL_PREFIX}/` +
+          encodeURIComponent(name)
+      )
+      .toPromise();
+    return response.feature_flag_changes.map(change => ({
+      committerUsername: change.committer_username,
+      oldConfig: this._convertConfigValues(change.old_config),
+      newConfig: this._convertConfigValues(change.new_config),
+      createdOnMsecs: change.created_on_msecs,
+    }));
+  }
+
+  private _convertConfigValues(
+    configDict: FeatureFlagConfigValuesBackendDict
+  ): FeatureFlagConfigValues {
+    return {
+      forceEnableForAllUsers: configDict.force_enable_for_all_users,
+      rolloutPercentage: configDict.rollout_percentage,
+      userGroupIds: configDict.user_group_ids,
+    };
   }
 }

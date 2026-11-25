@@ -19,8 +19,9 @@
 from __future__ import annotations
 
 import hashlib
+import random
 
-from core import feature_flag_list
+from core import feature_flag_list, utils
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.platform import models
@@ -29,10 +30,10 @@ from typing import Dict, List, Mapping, Optional, Set
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import config_models, user_models
+    from mypy_imports import audit_models, config_models, user_models
 
-(config_models, user_models) = models.Registry.import_models(
-    [models.Names.CONFIG, models.Names.USER]
+(audit_models, config_models, user_models) = models.Registry.import_models(
+    [models.Names.AUDIT, models.Names.CONFIG, models.Names.USER]
 )
 
 
@@ -62,8 +63,10 @@ def update_feature_flag(
     force_enable_for_all_users: bool,
     rollout_percentage: int,
     user_group_ids: List[str],
+    committer_id: str,
 ) -> None:
-    """Updates the feature flag.
+    """Updates the feature flag, and records the change (if any) so that it
+    shows up in the flag's history.
 
     Args:
         feature_flag_name: str. The name of the feature flag to update.
@@ -73,6 +76,7 @@ def update_feature_flag(
             the feature will be enabled. This value is ignored if the
             force_enable_for_all_users property is set to True.
         user_group_ids: List[str]. The list of ids of UserGroupModel.
+        committer_id: str. The ID of the user making the change.
 
     Raises:
         FeatureFlagNotFoundException. Feature flag trying to update does
@@ -83,12 +87,108 @@ def update_feature_flag(
             'Unknown feature flag: %s.' % feature_flag_name
         )
 
+    # The old config is read before the update so that the change can be
+    # recorded. If the flag has never been saved, this returns the default
+    # config, which is the state the flag was effectively in.
+    old_config = registry.Registry.get_feature_flag(
+        feature_flag_name
+    ).feature_flag_config
+    old_config_dict: feature_flag_domain.FeatureFlagConfigValuesDict = {
+        'force_enable_for_all_users': old_config.force_enable_for_all_users,
+        'rollout_percentage': old_config.rollout_percentage,
+        'user_group_ids': old_config.user_group_ids,
+    }
+
     registry.Registry.update_feature_flag(
         feature_flag_name,
         force_enable_for_all_users,
         rollout_percentage,
         user_group_ids,
     )
+
+    new_config_dict: feature_flag_domain.FeatureFlagConfigValuesDict = {
+        'force_enable_for_all_users': force_enable_for_all_users,
+        'rollout_percentage': rollout_percentage,
+        'user_group_ids': user_group_ids,
+    }
+    # Saving without changing anything is not a real change, so it is not
+    # recorded. This keeps the history free of noise.
+    if old_config_dict != new_config_dict:
+        _record_feature_flag_change(
+            feature_flag_name, committer_id, old_config_dict, new_config_dict
+        )
+
+
+def _record_feature_flag_change(
+    feature_flag_name: str,
+    committer_id: str,
+    old_config: feature_flag_domain.FeatureFlagConfigValuesDict,
+    new_config: feature_flag_domain.FeatureFlagConfigValuesDict,
+) -> None:
+    """Stores a single feature flag change in the datastore.
+
+    Args:
+        feature_flag_name: str. The name of the feature flag that changed.
+        committer_id: str. The ID of the user who made the change.
+        old_config: FeatureFlagConfigValuesDict. The config before the
+            change.
+        new_config: FeatureFlagConfigValuesDict. The config after the
+            change.
+    """
+    # The random suffix avoids ID clashes if two changes to the same flag
+    # are made within the same millisecond.
+    model_id = '%s.%d.%d' % (
+        feature_flag_name,
+        utils.get_current_time_in_millisecs(),
+        random.randint(0, 1000),
+    )
+    model = audit_models.FeatureFlagChangeAuditModel(
+        id=model_id,
+        feature_flag_name=feature_flag_name,
+        committer_id=committer_id,
+        old_config=old_config,
+        new_config=new_config,
+    )
+    model.update_timestamps()
+    model.put()
+
+
+def get_feature_flag_change_history(
+    feature_flag_name: str,
+) -> List[feature_flag_domain.FeatureFlagChangeDict]:
+    """Returns all the recorded changes to a feature flag, most recent first.
+    A flag that has never been changed returns an empty list.
+
+    Args:
+        feature_flag_name: str. The name of the feature flag.
+
+    Returns:
+        list(FeatureFlagChangeDict). The changes made to the feature flag.
+
+    Raises:
+        FeatureFlagNotFoundException. The feature flag does not exist.
+    """
+    if feature_flag_name not in ALL_FEATURES_NAMES_SET:
+        raise FeatureFlagNotFoundException(
+            'Unknown feature flag: %s.' % feature_flag_name
+        )
+
+    change_models = (
+        audit_models.FeatureFlagChangeAuditModel.get_by_feature_flag_name(
+            feature_flag_name
+        )
+    )
+    return [
+        {
+            'committer_id': change_model.committer_id,
+            'old_config': change_model.old_config,
+            'new_config': change_model.new_config,
+            'created_on_msecs': utils.get_time_in_millisecs(
+                change_model.created_on
+            ),
+        }
+        for change_model in change_models
+    ]
 
 
 def _get_feature_flag_spec(name: str) -> feature_flag_domain.FeatureFlagSpec:

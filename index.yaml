@@ -131,6 +131,12 @@ indexes:
   - name: composite_entity_id
   - name: status
 
+- kind: FeatureFlagChangeAuditModel
+  properties:
+  - name: feature_flag_name
+  - name: created_on
+    direction: desc
+
 - kind: FeedbackAnalyticsRealtimeModel
   properties:
   - name: realtime_layer

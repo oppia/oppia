@@ -57,6 +57,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     """Test for the feature flag services."""
 
     LOGGED_OUT_USER_ID = None
+    COMMITTER_ID = 'committer_id'
 
     def _swap_name_to_description_feature_stage_registry(
         self,
@@ -170,13 +171,13 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with self.swap_all_feature_names_set:
             with self.swap_name_to_description_feature_stage_registry_dict:
                 feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, True, 0, []
+                    self.dev_feature_flag.name, True, 0, [], self.COMMITTER_ID
                 )
                 feature_services.update_feature_flag(
-                    self.test_feature_flag.name, True, 0, []
+                    self.test_feature_flag.name, True, 0, [], self.COMMITTER_ID
                 )
                 feature_services.update_feature_flag(
-                    self.prod_feature_flag.name, True, 0, []
+                    self.prod_feature_flag.name, True, 0, [], self.COMMITTER_ID
                 )
 
     def test_get_all_feature_flags_returns_correct_feature_flags(self) -> None:
@@ -329,7 +330,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 Exception, 'Unknown feature flag: unknown_feature'
             ):
                 feature_services.update_feature_flag(
-                    'unknown_feature', True, 0, []
+                    'unknown_feature', True, 0, [], self.COMMITTER_ID
                 )
 
     def test_get_all_feature_flag_configs_in_dev_returns_correct_values(
@@ -609,7 +610,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with swap_all_feature_names_set:
             with swap_name_to_description_feature_stage_registry_dict:
                 feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, False, 0, []
+                    self.dev_feature_flag.name, False, 0, [], self.COMMITTER_ID
                 )
                 self.assertFalse(
                     feature_services.is_feature_flag_enabled(
@@ -663,6 +664,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     False,
                     0,
                     [self.USER_GROUP_1, self.USER_GROUP_2],
+                    self.COMMITTER_ID,
                 )
                 self.assertTrue(
                     feature_services.is_feature_flag_enabled(
@@ -678,7 +680,11 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with swap_all_feature_names_set:
             with swap_name_to_description_feature_stage_registry_dict:
                 feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, False, 0, [self.USER_GROUP_2]
+                    self.dev_feature_flag.name,
+                    False,
+                    0,
+                    [self.USER_GROUP_2],
+                    self.COMMITTER_ID,
                 )
                 self.assertFalse(
                     feature_services.is_feature_flag_enabled(
@@ -704,7 +710,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:
                 feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, False, 50, []
+                    self.dev_feature_flag.name, False, 50, [], self.COMMITTER_ID
                 )
                 initial_user1_value = feature_services.is_feature_flag_enabled(
                     self.dev_feature_flag.name, user_1_id
@@ -753,7 +759,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:
                 feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, False, 5, []
+                    self.dev_feature_flag.name, False, 5, [], self.COMMITTER_ID
                 )
                 for user_id in user_ids_list:
                     feature_is_enabled = (
@@ -781,7 +787,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 )
 
                 feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, False, 10, []
+                    self.dev_feature_flag.name, False, 10, [], self.COMMITTER_ID
                 )
                 for user_id in user_ids_list:
                     feature_is_enabled = (
@@ -823,7 +829,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:
                 feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, False, 0, []
+                    self.dev_feature_flag.name, False, 0, [], self.COMMITTER_ID
                 )
                 for user_id in user_ids:
                     feature_status_for_users.append(
@@ -848,7 +854,11 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:
                 feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, False, 100, []
+                    self.dev_feature_flag.name,
+                    False,
+                    100,
+                    [],
+                    self.COMMITTER_ID,
                 )
                 for user_id in user_ids:
                     feature_status_for_users.append(
@@ -859,3 +869,103 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         for feature_status in feature_status_for_users:
             self.assertTrue(feature_status)
+
+    def test_update_feature_flag_records_change_in_history(self) -> None:
+        with self.swap_all_feature_names_set:
+            with self.swap_name_to_description_feature_stage_registry_dict:
+                feature_services.update_feature_flag(
+                    self.prod_feature_flag.name,
+                    False,
+                    50,
+                    [self.USER_GROUP_1],
+                    self.owner_id,
+                )
+                history = feature_services.get_feature_flag_change_history(
+                    self.prod_feature_flag.name
+                )
+
+        # The setUp already made one change (force-enabling the flag), so
+        # there are two changes. Both may share the same timestamp in tests,
+        # so the new change is found by its committer instead of by position.
+        # The ordering itself is tested in the audit model tests.
+        self.assertEqual(len(history), 2)
+        new_changes = [
+            change
+            for change in history
+            if change['committer_id'] == self.owner_id
+        ]
+        self.assertEqual(len(new_changes), 1)
+        self.assertEqual(
+            new_changes[0]['old_config'],
+            {
+                'force_enable_for_all_users': True,
+                'rollout_percentage': 0,
+                'user_group_ids': [],
+            },
+        )
+        self.assertEqual(
+            new_changes[0]['new_config'],
+            {
+                'force_enable_for_all_users': False,
+                'rollout_percentage': 50,
+                'user_group_ids': [self.USER_GROUP_1],
+            },
+        )
+
+    def test_first_change_records_default_config_as_old_config(self) -> None:
+        with self.swap_all_feature_names_set:
+            history = feature_services.get_feature_flag_change_history(
+                self.dev_feature_flag.name
+            )
+
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0]['committer_id'], self.COMMITTER_ID)
+        self.assertEqual(
+            history[0]['old_config'],
+            {
+                'force_enable_for_all_users': False,
+                'rollout_percentage': 0,
+                'user_group_ids': [],
+            },
+        )
+        self.assertEqual(
+            history[0]['new_config'],
+            {
+                'force_enable_for_all_users': True,
+                'rollout_percentage': 0,
+                'user_group_ids': [],
+            },
+        )
+
+    def test_update_with_same_values_does_not_record_change(self) -> None:
+        with self.swap_all_feature_names_set:
+            with self.swap_name_to_description_feature_stage_registry_dict:
+                # This matches the config set in setUp, so nothing changes.
+                feature_services.update_feature_flag(
+                    self.dev_feature_flag.name, True, 0, [], self.owner_id
+                )
+                history = feature_services.get_feature_flag_change_history(
+                    self.dev_feature_flag.name
+                )
+
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0]['committer_id'], self.COMMITTER_ID)
+
+    def test_history_of_never_changed_flag_is_empty(self) -> None:
+        swap_all_feature_names_set = self.swap(
+            feature_services,
+            'ALL_FEATURES_NAMES_SET',
+            set(self.feature_names + ['feature_d']),
+        )
+        with swap_all_feature_names_set:
+            self.assertEqual(
+                feature_services.get_feature_flag_change_history('feature_d'),
+                [],
+            )
+
+    def test_history_of_unknown_feature_flag_raises_error(self) -> None:
+        with self.assertRaisesRegex(
+            feature_services.FeatureFlagNotFoundException,
+            'Unknown feature flag: unknown_feature',
+        ):
+            feature_services.get_feature_flag_change_history('unknown_feature')

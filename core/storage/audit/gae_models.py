@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict
+from typing import Dict, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -169,4 +169,99 @@ class UsernameChangeAuditModel(base_models.BaseModel):
         return (
             cls.query(cls.committer_id == user_id).get(keys_only=True)
             is not None
+        )
+
+
+class FeatureFlagChangeAuditModel(base_models.BaseModel):
+    """Records a single change made to a feature flag's config via the
+    release coordinator page.
+
+    This is stored as a separate model (rather than as a list inside
+    FeatureFlagConfigModel) so that committer_id can be indexed. This lets
+    the wipeout checks find references to a user ID.
+
+    Instances of this class are keyed by a custom Id.
+    [feature_flag_name].[timestamp_in_millisecs].[random_number]
+    """
+
+    # The name of the feature flag that was changed.
+    feature_flag_name = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    # The ID of the user that made the change.
+    committer_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    # The config of the feature flag before the change. It is a dict with
+    # the keys force_enable_for_all_users, rollout_percentage and
+    # user_group_ids.
+    old_config = datastore_services.JsonProperty(required=True, indexed=False)
+    # The config of the feature flag after the change. It has the same
+    # structure as old_config.
+    new_config = datastore_services.JsonProperty(required=True, indexed=False)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data corresponding to a user: committer_id field,
+        but it isn't deleted because it is needed for auditing purposes.
+        """
+        return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model contains data corresponding to a user: committer_id field,
+        but it isn't exported because it is only used for auditing purposes.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user: committer_id field,
+        but it isn't exported because it is only used for auditing purposes.
+        """
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'feature_flag_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'committer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'old_config': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'new_config': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether FeatureFlagChangeAuditModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user who has changed feature flags.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return (
+            cls.query(cls.committer_id == user_id).get(keys_only=True)
+            is not None
+        )
+
+    @classmethod
+    def get_by_feature_flag_name(
+        cls, feature_flag_name: str
+    ) -> Sequence[FeatureFlagChangeAuditModel]:
+        """Returns all the changes made to the given feature flag, with the
+        most recent change first.
+
+        Args:
+            feature_flag_name: str. The name of the feature flag.
+
+        Returns:
+            list(FeatureFlagChangeAuditModel). The change records for the
+            given feature flag, sorted by created_on in descending order.
+        """
+        return (
+            cls.query(cls.feature_flag_name == feature_flag_name)
+            .order(-cls.created_on)
+            .fetch()
         )

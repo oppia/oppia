@@ -23,7 +23,7 @@ from core.controllers import acl_decorators, base
 from core.domain import caching_services, feature_flag_domain, user_services
 from core.domain import feature_flag_services as feature_services
 
-from typing import Dict, List, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class MemoryCacheHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -140,6 +140,62 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     user_group_ids: List[str]
 
 
+class FeatureFlagChangeWithUsernameDict(TypedDict):
+    """Dict representing a feature flag change, as sent to the frontend.
+    The committer's username is sent instead of their user ID.
+    """
+
+    committer_username: Optional[str]
+    old_config: feature_flag_domain.FeatureFlagConfigValuesDict
+    new_config: feature_flag_domain.FeatureFlagConfigValuesDict
+    created_on_msecs: float
+
+
+class FeatureFlagHistoryHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for fetching the change history of a single feature flag."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'feature_flag_name': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_release_coordinator_page
+    def get(self, feature_flag_name: str) -> None:
+        """Returns the changes made to the given feature flag, most recent
+        first.
+
+        Args:
+            feature_flag_name: str. The name of the feature flag.
+
+        Raises:
+            NotFoundException. The feature flag does not exist.
+        """
+        try:
+            changes = feature_services.get_feature_flag_change_history(
+                feature_flag_name
+            )
+        except feature_services.FeatureFlagNotFoundException as e:
+            raise self.NotFoundException(e)
+
+        # The username may be None if the committer's account was deleted.
+        usernames = user_services.get_usernames(
+            [change['committer_id'] for change in changes]
+        )
+        change_dicts: List[FeatureFlagChangeWithUsernameDict] = [
+            {
+                'committer_username': username,
+                'old_config': change['old_config'],
+                'new_config': change['new_config'],
+                'created_on_msecs': change['created_on_msecs'],
+            }
+            for change, username in zip(changes, usernames)
+        ]
+        self.render_json({'feature_flag_changes': change_dicts})
+
+
 class FeatureFlagsHandler(
     base.BaseHandler[FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
@@ -236,12 +292,16 @@ class FeatureFlagsHandler(
             # Ruling out the possibility of any other type for mypy
             # type checking.
             assert user_group_ids is not None
+            # The decorator only lets logged-in release coordinators through,
+            # so user_id is always set here.
+            assert self.user_id is not None
             try:
                 feature_services.update_feature_flag(
                     feature_flag_name,
                     force_enable_for_all_users,
                     rollout_percentage,
                     user_group_ids,
+                    self.user_id,
                 )
             except (
                 utils.ValidationError,

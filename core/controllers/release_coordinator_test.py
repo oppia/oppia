@@ -500,3 +500,131 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+
+class FeatureFlagHistoryHandlerTest(test_utils.GenericTestBase):
+    """Tests FeatureFlagHistoryHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME
+        )
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.add_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR,
+        )
+        self.release_coordinator_id = self.get_user_id_from_email(
+            self.RELEASE_COORDINATOR_EMAIL
+        )
+
+        self.swap_registry_dict = self.swap(
+            feature_flag_registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            {
+                FeatureNames.TEST_FEATURE_1.value: (
+                    'a feature in dev stage',
+                    FeatureStages.DEV,
+                ),
+                FeatureNames.TEST_FEATURE_2.value: (
+                    'another feature in dev stage',
+                    FeatureStages.DEV,
+                ),
+            },
+        )
+        self.swap_feature_names_set = self.swap(
+            feature_flag_services,
+            'ALL_FEATURES_NAMES_SET',
+            set(
+                [
+                    FeatureNames.TEST_FEATURE_1.value,
+                    FeatureNames.TEST_FEATURE_2.value,
+                ]
+            ),
+        )
+
+    def _get_history_url(self, feature_flag_name: str) -> str:
+        """Returns the history handler URL for the given feature flag."""
+        return '%s/%s' % (
+            feconf.FEATURE_FLAG_HISTORY_URL_PREFIX,
+            feature_flag_name,
+        )
+
+    def test_update_through_put_handler_shows_up_in_history(self) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with self.swap_registry_dict, self.swap_feature_names_set:
+            self.put_json(
+                feconf.FEATURE_FLAGS_URL,
+                {
+                    'action': 'update_feature_flag',
+                    'feature_flag_name': FeatureNames.TEST_FEATURE_1.value,
+                    'force_enable_for_all_users': False,
+                    'rollout_percentage': 30,
+                    'user_group_ids': [],
+                },
+                csrf_token=csrf_token,
+            )
+            response_dict = self.get_json(
+                self._get_history_url(FeatureNames.TEST_FEATURE_1.value)
+            )
+
+        changes = response_dict['feature_flag_changes']
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(
+            changes[0]['committer_username'],
+            self.RELEASE_COORDINATOR_USERNAME,
+        )
+        self.assertEqual(
+            changes[0]['old_config'],
+            {
+                'force_enable_for_all_users': False,
+                'rollout_percentage': 0,
+                'user_group_ids': [],
+            },
+        )
+        self.assertEqual(
+            changes[0]['new_config'],
+            {
+                'force_enable_for_all_users': False,
+                'rollout_percentage': 30,
+                'user_group_ids': [],
+            },
+        )
+        self.assertIn('created_on_msecs', changes[0])
+        self.logout()
+
+    def test_history_of_never_changed_flag_is_empty(self) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        with self.swap_registry_dict, self.swap_feature_names_set:
+            response_dict = self.get_json(
+                self._get_history_url(FeatureNames.TEST_FEATURE_2.value)
+            )
+
+        self.assertEqual(response_dict['feature_flag_changes'], [])
+        self.logout()
+
+    def test_history_of_unknown_feature_flag_returns_404(self) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        with self.swap_registry_dict, self.swap_feature_names_set:
+            self.get_json(
+                self._get_history_url('unknown_feature'),
+                expected_status_int=404,
+            )
+
+        self.logout()
+
+    def test_non_release_coordinator_cannot_access_history(self) -> None:
+        self.login(self.VIEWER_EMAIL)
+
+        with self.swap_registry_dict, self.swap_feature_names_set:
+            self.get_json(
+                self._get_history_url(FeatureNames.TEST_FEATURE_1.value),
+                expected_status_int=401,
+            )
+
+        self.logout()

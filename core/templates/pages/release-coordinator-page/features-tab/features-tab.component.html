@@ -98,6 +98,11 @@
               [disabled]="!isFeatureFlagViewModelChanged(featureFlagViewModel)">
         Clear Changes
       </button>
+      <button
+              class="btn btn-secondary e2e-test-view-feature-flag-history"
+              (click)="openFeatureFlagHistoryModal(featureFlagViewModel)">
+        View History
+      </button>
     </div>
   </div>
 </div>

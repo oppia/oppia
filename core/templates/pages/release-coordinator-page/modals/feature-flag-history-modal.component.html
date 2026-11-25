@@ -1,0 +1,39 @@
+<div class="modal-header">
+  <h3>History of {{ featureFlagName }}</h3>
+</div>
+<div class="modal-body e2e-test-feature-flag-history-modal">
+  <div *ngIf="historyIsLoading">Loading...</div>
+  <div *ngIf="!historyIsLoading && errorMessage" class="text-danger">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="!historyIsLoading && !errorMessage && historyRows.length === 0"
+       class="e2e-test-feature-flag-history-empty">
+    No changes have been recorded for this feature flag.
+  </div>
+  <table *ngIf="!historyIsLoading && !errorMessage && historyRows.length > 0"
+         class="table table-sm e2e-test-feature-flag-history-table">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Changed by</th>
+        <th>Field</th>
+        <th>Old value</th>
+        <th>New value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let row of historyRows">
+        <tr *ngFor="let fieldChange of row.fieldChanges; index as fieldIndex">
+          <td>{{ fieldIndex === 0 ? row.dateString : '' }}</td>
+          <td>{{ fieldIndex === 0 ? row.committer : '' }}</td>
+          <td>{{ fieldChange.fieldName }}</td>
+          <td>{{ fieldChange.oldValue }}</td>
+          <td>{{ fieldChange.newValue }}</td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-close-feature-flag-history" (click)="close()">Close</button>
+</div>

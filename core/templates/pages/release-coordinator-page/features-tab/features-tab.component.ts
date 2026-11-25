@@ -27,6 +27,7 @@ import {
   QueryList,
 } from '@angular/core';
 
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import {Subscription} from 'rxjs';
@@ -39,6 +40,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureFlag} from 'domain/feature-flag/feature-flag.model';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserGroup} from 'domain/release_coordinator/user-group.model';
+import {FeatureFlagHistoryModalComponent} from 'pages/release-coordinator-page/modals/feature-flag-history-modal.component';
 
 interface IntSchema {
   type: 'int';
@@ -81,8 +83,23 @@ export class FeaturesTabComponent implements OnInit {
     private apiService: FeatureFlagBackendApiService,
     private featureService: PlatformFeatureService,
     private dummyApiService: FeatureFlagDummyBackendApiService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private ngbModal: NgbModal
   ) {}
+
+  openFeatureFlagHistoryModal(featureFlagVM: FeatureFlagViewModel): void {
+    const modalRef = this.ngbModal.open(FeatureFlagHistoryModalComponent, {
+      size: 'lg',
+    });
+    modalRef.componentInstance.featureFlagName = featureFlagVM.name;
+    modalRef.componentInstance.userGroups = this.allUserGroups;
+    // The modal only shows information, so closing it needs no handling.
+    // The rejection is caught so that it isn't reported as an error.
+    modalRef.result.then(
+      () => {},
+      () => {}
+    );
+  }
 
   async reloadFeatureFlagViewModelsAsync(): Promise<void> {
     const data = await this.apiService.getFeatureFlags();
