@@ -57,8 +57,8 @@
     },
     {
       "name": "interested-volunteer/apply-to-become-a-volunteer",
-      "module": "core/tests/playwright-acceptance-tests/specs/interested-volunteer/apply-to-become-a-volunteer.spec.ts",
-      "framework": "playwright"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-volunteer/apply-to-become-a-volunteer.spec.ts",
+      "framework": "puppeteer"
     },
     {
       "name": "interested-donor/learn-about-the-organization",
@@ -277,8 +277,8 @@
     },
     {
       "name": "logged-out-user/click-all-links-on-privacy-policy-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-privacy-policy-page.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/click-all-links-on-privacy-policy-page.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/click-all-links-on-terms-page",
@@ -342,8 +342,8 @@
     },
     {
       "name": "voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-creator/create-an-exploration-with-all-interactions",

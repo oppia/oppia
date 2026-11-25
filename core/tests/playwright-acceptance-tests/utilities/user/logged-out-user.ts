@@ -30,6 +30,14 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
+const allAboutCookiesUrl = testConstants.URLs.ExternalLink.AboutCookies;
+// The Privacy Policy page links to this address, which redirects to
+// testConstants.URLs.GoogleAnalytics.PartnerPolicies.
+const googleAnalyticsPartnersLinkOnPrivacyPolicyPage =
+  'https://www.google.com/policies/privacy/partners/';
+const privacyPolicyPageLinks = '.e2e-test-privacy-page a';
+const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
@@ -303,38 +311,16 @@ const thanksForDonatingDismissButton =
   'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingModalOpen = '.modal-open';
 
-// Navbar and sidebar selectors for Donate and Volunteer.
+// Navbar and sidebar selectors for Donate.
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabDonateButton =
   'a.e2e-test-navbar-get-involved-menu-donate-button';
-const navbarGetInvolvedTabVolunteerButton =
-  'a.e2e-test-navbar-get-involved-menu-volunteer-button';
 const navbarDonateDesktopButton = 'a.e2e-test-navbar-donate-desktop-button';
 const navbarDonateMobileButton = 'a.e2e-test-navbar-donate-mobile-button';
 const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
 const mobileSidebarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
-const mobileSidebarGetInvolvedMenuVolunteerButton =
-  'a.e2e-mobile-test-sidebar-get-involved-menu-volunteer-button';
-
-// Volunteer Page selectors.
-const volunteerUrl = testConstants.URLs.Volunteer;
-const volunteerIdealistPageUrl = testConstants.URLs.VolunteerIdealistPage;
-const exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage =
-  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-top';
-const exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage =
-  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-bottom';
-const tabsSectionInVolunteerPage = '.e2e-test-volunteer-page-tabs-section';
-const tabsPreviousButtonInVolunteerPage =
-  '.e2e-test-volunteer-page-tabs-prev-btn';
-const tabsNextButtonInVolunteerPage = '.e2e-test-volunteer-page-tabs-next-btn';
-const tabsFirstVolunteerExpectationsInVolunteerPage =
-  '.e2e-test-volunteer-page-first-expectations';
-const tabsSecondVolunteerExpectationsInVolunteerPage =
-  '.e2e-test-volunteer-page-second-expectations';
-const tabsLabelsInVolunteerPage = '.mat-tab-label';
-const volunteerPageHeadingSelector = '.e2e-test-volunteer-page-headings';
 
 // Footer and Teach page navigation selectors.
 
@@ -3984,6 +3970,61 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Navigates to the Privacy Policy page.
+   */
+  async navigateToPrivacyPolicyPage(): Promise<void> {
+    await this.goto(privacyPolicyUrl);
+  }
+
+  /**
+   * Clicks the link to the Oppia home page on the Privacy Policy page and
+   * checks that it lands on the home page.
+   */
+  async clickLinkToHomePageOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickAndWaitForNavigation('https://www.oppia.org');
+    await expect(this.page).toHaveURL(homeUrl);
+  }
+
+  /**
+   * Checks that the link about managing cookies on the Privacy Policy page
+   * points to the expected page. The link is not opened, since it leads to an
+   * external site.
+   */
+  async expectCookiesLinkOnPrivacyPolicyPageToBeCorrect(): Promise<void> {
+    await this.openExternalLinkBySelectorAndText(
+      privacyPolicyPageLinks,
+      allAboutCookiesUrl,
+      allAboutCookiesUrl
+    );
+  }
+
+  /**
+   * Checks that the link about Google Analytics partner policies on the
+   * Privacy Policy page points to the expected page. The link is not opened,
+   * since it leads to an external site.
+   */
+  async expectGoogleAnalyticsLinkOnPrivacyPolicyPageToBeCorrect(): Promise<void> {
+    await this.openExternalLinkBySelectorAndText(
+      privacyPolicyPageLinks,
+      googleAnalyticsPartnersLinkOnPrivacyPolicyPage,
+      googleAnalyticsPartnersLinkOnPrivacyPolicyPage
+    );
+  }
+
+  /**
+   * Checks that the link to opt out of Google Analytics on the Privacy Policy
+   * page points to the expected page. The link is not opened, since it leads
+   * to an external site.
+   */
+  async expectGoogleAnalyticsOptOutLinkOnPrivacyPolicyPageToBeCorrect(): Promise<void> {
+    await this.openExternalLinkBySelectorAndText(
+      privacyPolicyPageLinks,
+      googleAnalyticsOptOutUrl,
+      googleAnalyticsOptOutUrl
+    );
+  }
+
+  /**
    * Navigates to the blog page via the navbar (About > Blog).
    */
   async navigateToBlogPageViaNavbar(): Promise<void> {
@@ -4131,7 +4172,6 @@ export class LoggedOutUser extends BaseUser {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
     }
   }
-
   /**
    * Simulates pressing a keyboard shortcut.
    * @param {string} shortcut - The keyboard shortcut to press.
@@ -4175,116 +4215,6 @@ export class LoggedOutUser extends BaseUser {
     await this.page.evaluate(() => {
       (document.activeElement as HTMLElement)?.blur();
     });
-  }
-
-  /**
-   * Navigates to the splash page.
-   */
-  async navigateToSplashPage(): Promise<void> {
-    await this.navigateToSplashPageAsLoggedOutUser();
-  }
-
-  /**
-   * Clicks the Volunteer button in the Get Involved menu on the navbar
-   * (or in the mobile sidebar) and checks that it opens the Volunteer page.
-   */
-  async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
-      await this.openMobileSidebar();
-      await this.clickOnElementWithSelector(
-        mobileSidebarExpandGetInvolvedMenuButton
-      );
-      await this.clickButtonToNavigateToNewPage(
-        mobileSidebarGetInvolvedMenuVolunteerButton,
-        volunteerUrl
-      );
-    } else {
-      await this.expectElementToBeVisible(navbarGetInvolvedTab);
-      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
-      await this.clickButtonToNavigateToNewPage(
-        navbarGetInvolvedTabVolunteerButton,
-        volunteerUrl
-      );
-    }
-  }
-
-  /**
-   * Function to navigate to the Volunteer page.
-   */
-  async navigateToVolunteerPage(): Promise<void> {
-    await this.goto(volunteerUrl);
-  }
-
-  /**
-   * Ensures that the heading on the Volunteer page contains the specified text.
-   *
-   * @param {string} heading - The expected heading text to be validated.
-   */
-  async expectVolunteerPageHeadingToContain(heading: string): Promise<void> {
-    await this.expectAnyElementWithSelectorToHaveTextContent(
-      volunteerPageHeadingSelector,
-      heading
-    );
-  }
-
-  /**
-   * Verifies the volunteer tabs functionality in the Volunteer page.
-   * It checks if the tabs can be toggled through tab labels on desktop and arrows on mobile.
-   */
-  async expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage(): Promise<void> {
-    await this.expectElementToBeVisible(tabsSectionInVolunteerPage);
-
-    const expectedFirstTabHeading = 'Outreach volunteer expectations';
-    const expectedSecondTabHeading = 'Software volunteer expectations';
-
-    await expect(
-      this.page.locator(tabsFirstVolunteerExpectationsInVolunteerPage)
-    ).toContainText(expectedFirstTabHeading);
-
-    // Toggle to the next tab.
-    if (!this.isViewportAtMobileWidth()) {
-      await this.page.locator(tabsLabelsInVolunteerPage).nth(1).click();
-    } else {
-      await this.clickOnElementWithSelector(tabsNextButtonInVolunteerPage);
-    }
-
-    await expect(
-      this.page.locator(tabsSecondVolunteerExpectationsInVolunteerPage)
-    ).toContainText(expectedSecondTabHeading);
-
-    // Toggle to the previous tab.
-    if (!this.isViewportAtMobileWidth()) {
-      await this.page.locator(tabsLabelsInVolunteerPage).nth(0).click();
-    } else {
-      await this.clickOnElementWithSelector(tabsPreviousButtonInVolunteerPage);
-    }
-
-    await expect(
-      this.page.locator(tabsFirstVolunteerExpectationsInVolunteerPage)
-    ).toContainText(expectedFirstTabHeading);
-  }
-
-  /**
-   * Checks that the Explore Volunteer Openings button at the top of the
-   * Volunteer page links to the Oppia Idealist page.
-   */
-  async clickExploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage(): Promise<void> {
-    await this.expectLinkToHaveHref(
-      exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage,
-      volunteerIdealistPageUrl
-    );
-  }
-
-  /**
-   * Checks that the Explore Volunteer Openings button at the bottom of the
-   * Volunteer page links to the Oppia Idealist page.
-   */
-  async clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage(): Promise<void> {
-    await this.expectLinkToHaveHref(
-      exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage,
-      volunteerIdealistPageUrl
-    );
   }
 }
 
