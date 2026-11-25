@@ -5460,24 +5460,33 @@ export class ExplorationEditor extends BaseUser {
   async expectUserToBeExplorationManager(username: string): Promise<void> {
     // Verify the username is listed in the Managers section (the definitive check per CUJ).
     await this.expectElementToBeVisible(rolesContentSelector);
-    const owners = await this.page.$$(ownersListSelector);
-    if (owners.length === 0) {
-      throw new Error('Managers list is empty or not found.');
-    }
+    try {
+      await this.page.waitForFunction(
+        (ownersSelector: string, expectedUsername: string) => {
+          const owners = Array.from(document.querySelectorAll(ownersSelector));
+          return owners.some(
+            owner => (owner.textContent ?? '').trim() === expectedUsername
+          );
+        },
+        {timeout: 30000},
+        ownersListSelector,
+        username
+      );
+    } catch {
+      const ownerUsernames = await this.page.$$eval(
+        ownersListSelector,
+        elements =>
+          elements
+            .map(element => element.textContent?.trim() || '')
+            .filter(Boolean)
+      );
 
-    const ownerUsernames = await this.page.$$eval(
-      ownersListSelector,
-      elements =>
-        elements
-          .map(element => element.textContent?.trim() || '')
-          .filter(Boolean)
-    );
-
-    if (!ownerUsernames.includes(username)) {
+      const listedManagers =
+        ownerUsernames.length > 0
+          ? ownerUsernames.join(', ')
+          : 'the managers list is empty';
       throw new Error(
-        `Expected user "${username}" to be listed as manager, but not found in: ${ownerUsernames.join(
-          ', '
-        )}`
+        `Expected user "${username}" to be listed as manager, but not found in: ${listedManagers}`
       );
     }
 
