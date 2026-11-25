@@ -39,8 +39,6 @@ export default {
     ClassroomAdmin: 'http://localhost:8181/classroom-admin',
     ClassroomsPage: 'http://localhost:8181/learn',
     CommunityLibrary: 'http://localhost:8181/community-library',
-    recentlyPublishedExplorations:
-      'http://localhost:8181/community-library/recently-published',
     Contact: 'http://localhost:8181/contact',
     ContributorDashboard: 'http://localhost:8181/contributor-dashboard',
     ContributorDashboardAdmin:
@@ -52,6 +50,8 @@ export default {
     CreatorGuidelines: 'http://localhost:8181/creator-guidelines',
     Donate: 'http://localhost:8181/donate',
     DonatePageThanksModalURL: 'http://localhost:8181/donate?thanks=',
+    DonatePageThanksModalWatchAVideoUrl:
+      'https://www.facebook.com/oppiaorg/videos/189487953721583/',
     AboutPageThanksModalURL: 'http://localhost:8181/about?thanks=',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
     ExplorationDesignTips: 'http://oppia.github.io/#/DesignTips',

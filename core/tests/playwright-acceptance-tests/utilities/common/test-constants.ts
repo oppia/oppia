@@ -39,8 +39,6 @@ export default {
     ClassroomAdmin: 'http://localhost:8181/classroom-admin',
     ClassroomsPage: 'http://localhost:8181/learn',
     CommunityLibrary: 'http://localhost:8181/community-library',
-    recentlyPublishedExplorations:
-      'http://localhost:8181/community-library/recently-published',
     Contact: 'http://localhost:8181/contact',
     ContributorDashboard: 'http://localhost:8181/contributor-dashboard',
     ContributorDashboardAdmin:
@@ -97,6 +95,8 @@ export default {
       'http://localhost:8181/topics-and-skills-dashboard',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
+    VolunteerIdealistPage:
+      'https://www.idealist.org/en/nonprofit/e436a3f9282f42439350aa6f0c335072-oppia-foundation-inc-sacramento',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     WikiPrivilegesToFirebaseAccount:
       'https://github.com/oppia/oppia/wiki/#2-add-custom-claims-to-a-firebase-account',

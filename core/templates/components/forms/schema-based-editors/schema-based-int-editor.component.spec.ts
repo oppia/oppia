@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Schema Based Int Editor Component
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
@@ -83,7 +81,7 @@ describe('Schema Based Int Editor Component', () => {
       ' on the input field',
     fakeAsync(() => {
       spyOn(focusManagerService, 'setFocusWithoutScroll');
-      expect(component.localValue).toBe(undefined);
+      expect(component.localValue).toBeUndefined();
 
       component.ngOnInit();
       tick(50);

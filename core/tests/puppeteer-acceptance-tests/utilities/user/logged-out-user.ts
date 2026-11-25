@@ -30,8 +30,6 @@ const creatorDashboardCreateModeUrl =
 const blogUrl = testConstants.URLs.Blog;
 const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
-const recentlyPublishedExplorationsPageUrl =
-  testConstants.URLs.recentlyPublishedExplorations;
 const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
@@ -66,6 +64,8 @@ const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
 const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
+const donatePageThanksModalWatchAVideoUrl =
+  testConstants.URLs.DonatePageThanksModalWatchAVideoUrl;
 const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerIdealistPageUrl = testConstants.URLs.VolunteerIdealistPage;
 const volunteerUrl = testConstants.URLs.Volunteer;
@@ -102,8 +102,6 @@ const navbarAboutTabImpactReportButton =
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabSchoolAndOrganizationsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
-const navbarGetInvolvedTabVolunteerButton =
-  'a.e2e-test-navbar-get-involved-menu-volunteer-button';
 const navbarGetInvolvedTabDonateButton =
   'a.e2e-test-navbar-get-involved-menu-donate-button';
 const navbarGetInvolvedTabContactUsButton =
@@ -164,8 +162,6 @@ const mobileSidebarExpandGetInvolvedMenuButton =
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-partnerships-button';
 const carouselSlideSelector = '[data-test="mat-card-content"]';
-const mobileSidebarGetInvolvedMenuVolunteerButton =
-  'a.e2e-mobile-test-sidebar-get-involved-menu-volunteer-button';
 const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
@@ -218,20 +214,6 @@ const readBlogPostDesktopButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-desktop-button';
 const readBlogPostMobileButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-mobile-button';
-const exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage =
-  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-top';
-const exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage =
-  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-bottom';
-const tabsSectionInVolunteerPage = '.e2e-test-volunteer-page-tabs-section';
-const tabsPreviousButtonInVolunteerPage =
-  '.e2e-test-volunteer-page-tabs-prev-btn';
-const tabsNextButtonInVolunteerPage = '.e2e-test-volunteer-page-tabs-next-btn';
-const tabsFirstVolunteerExpectationsInVolunteerPage =
-  '.e2e-test-volunteer-page-first-expectations';
-const tabsSecondVolunteerExpectationsInVolunteerPage =
-  '.e2e-test-volunteer-page-second-expectations';
-// This is an external component's selector so it is not prefixed with "e2e-test".
-const tabsLabelsInVolunteerPage = '.mat-tab-label';
 const donorBoxIframe = '.e2e-test-donate-page-iframe';
 const languageDropdown = '.e2e-test-language-dropdown';
 const featuresSectionInAboutPage = '.e2e-test-about-page-features-section';
@@ -317,6 +299,7 @@ const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
+const explorationObjectiveSelector = '.e2e-test-exp-summary-tile-objective';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
 const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
 const mobileStoryTitleSelector = '.e2e-test-mobile-story-title';
@@ -333,6 +316,7 @@ const topicNameSelector = '.e2e-test-topic-name';
 const loginPromptContainer = '.story-viewer-login-container';
 const NavbarBackButton = '.oppia-navbar-back-button';
 const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
+const mobileLessonCardSelector = '.mobile-activity-summary-card';
 const nextLessonButton = '.e2e-test-next-lesson-button';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
@@ -542,9 +526,6 @@ const donationHeadingSelector = '.e2e-test-donate-heading';
 const readyToMakeDonationSelector = '.e2e-test-ready-to-donate-title';
 const ourImpactSectionSelector = '.e2e-test-dp-our-impact-section';
 
-// Volunteer Page.
-const volunteerPageHeadingSelector = '.e2e-test-volunteer-page-headings';
-
 // Contact Us Page.
 const contactUsSubheadingSelector = '.e2e-test-contact-subheading';
 const contactUsContentCard = '.e2e-test-contact-page-content';
@@ -597,6 +578,9 @@ const backToClassroomLinkSelector = '.e2e-test-classroom-name';
 
 const storyTitleSelector = '.e2e-test-story-title';
 const lessonInfoModalHeaderSelector = '.e2e-test-lesson-info-modal-header';
+const lessonInfoModalObjectiveSelector = '.oppia-exploration-description';
+const lessonInfoModalTagsSelector = '.exploration-tags';
+const explorationHeaderSelector = '.e2e-test-exploration-header';
 const progressReminderModalHeaderSelector =
   '.e2e-test-progress-reminder-continue-text';
 const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
@@ -1435,35 +1419,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Volunteer button in the Get Involved Menu
-   * on navbar and check if it opens the Volunteer page.
-   */
-  async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileNavbarButtonSelector, {
-        visible: true,
-      });
-      await this.openMobileSidebar();
-      await this.clickOnElementWithSelector(
-        mobileSidebarExpandGetInvolvedMenuButton
-      );
-      await this.clickButtonToNavigateToNewPage(
-        mobileSidebarGetInvolvedMenuVolunteerButton,
-        volunteerUrl
-      );
-    } else {
-      await this.page.waitForSelector(navbarGetInvolvedTab, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
-      await this.clickButtonToNavigateToNewPage(
-        navbarGetInvolvedTabVolunteerButton,
-        volunteerUrl
-      );
-    }
-  }
-
-  /**
    * Function to click the Donate button in the Get Involved Menu
    * on navbar and check if it opens the Donate page.
    *
@@ -1557,10 +1512,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Watch A Video button
-   * in the Donation thanks modal on donate page and check if it opens the right page.
+   * Function to verify the Watch A Video button
+   * in the Donation thanks modal on donate page has the correct link.
    */
-  async clickWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
+  async verifyWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(watchAVideoButton);
     const buttonText = await this.page.$eval(
       watchAVideoButton,
@@ -1569,17 +1524,11 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await this.clickAndWaitForNavigation(watchAVideoButton, true);
-    await this.waitForPageToFullyLoad();
-
-    const url = this.page.url();
-    if (!url.includes(testConstants.OppiaSocials.FaceBook.Domain)) {
-      throw new Error(
-        `The Watch A Video button should open the right page,
-          but it opens ${url} instead.`
-      );
-    }
-    showMessage('The Watch A Video button opens the right page.');
+    await this.openExternalLink(
+      watchAVideoButton,
+      donatePageThanksModalWatchAVideoUrl
+    );
+    showMessage('The Watch A Video button has the right link.');
   }
 
   /**
@@ -2626,93 +2575,6 @@ export class LoggedOutUser extends BaseUser {
     await this.clickButtonToNavigateToNewPage(
       readMoreStoriesButtonInPartnershipsPage,
       blogUrl
-    );
-  }
-
-  /**
-   * Function to verify the Volunteer tabs functionality in the Volunteer page.
-   * It checks if the tabs can be toggled through tab-labels in desktop and arrows in mobile.
-   */
-  async expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage(): Promise<void> {
-    const tabsSection = await this.page.waitForSelector(
-      tabsSectionInVolunteerPage
-    );
-    if (!tabsSection) {
-      throw new Error('The tabs section is not visible in Volunteer page');
-    }
-
-    const tabLablels = await this.page.$$(tabsLabelsInVolunteerPage);
-    const expectedFirstTabHeading = 'Outreach volunteer expectations';
-    const expectedSecondTabHeading = 'Software volunteer expectations';
-
-    const firstTabHeading = await this.page.$eval(
-      tabsFirstVolunteerExpectationsInVolunteerPage,
-      el => el.textContent
-    );
-    if (!firstTabHeading?.includes(expectedFirstTabHeading)) {
-      throw new Error(
-        `Expected first tab heading to contain "${expectedFirstTabHeading}" , but got "${firstTabHeading}"`
-      );
-    }
-
-    // Toggle to the next tab.
-    if (!this.isViewportAtMobileWidth()) {
-      await tabLablels[1].click();
-    } else {
-      await this.clickOnElementWithSelector(tabsNextButtonInVolunteerPage);
-    }
-
-    const secondTabHeading = await this.page.$eval(
-      tabsSecondVolunteerExpectationsInVolunteerPage,
-      el => el.textContent
-    );
-    if (!secondTabHeading?.includes(expectedSecondTabHeading)) {
-      throw new Error(
-        `Expected second tab heading to contain "${expectedSecondTabHeading}", but got "${secondTabHeading}"`
-      );
-    }
-
-    // Toggle to the previous tab.
-    if (!this.isViewportAtMobileWidth()) {
-      await tabLablels[0].click();
-    } else {
-      await this.clickOnElementWithSelector(tabsPreviousButtonInVolunteerPage);
-    }
-
-    const firstTabAgain = await this.page.$eval(
-      tabsFirstVolunteerExpectationsInVolunteerPage,
-      el => el.textContent
-    );
-    if (!firstTabAgain?.includes(expectedFirstTabHeading)) {
-      throw new Error(
-        `Expected first tab heading to contain "${expectedFirstTabHeading}" again, but got "${firstTabHeading}"`
-      );
-    }
-  }
-
-  /**
-   * Function to click the Explore Volunteer Openings button at the top of the
-   * Volunteer page and check if it opens the Oppia Idealist page.
-   */
-  async clickExploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage(): Promise<void> {
-    await this.clickLinkButtonToNewTab(
-      exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage,
-      'Explore Volunteer Openings at the top of the Volunteer page',
-      volunteerIdealistPageUrl,
-      'Oppia Idealist page'
-    );
-  }
-
-  /**
-   * Function to click the Explore Volunteer Openings button at the bottom of the
-   * Volunteer page and check if it opens the Oppia Idealist page.
-   */
-  async clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage(): Promise<void> {
-    await this.clickLinkButtonToNewTab(
-      exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage,
-      'Explore Volunteer Openings at the bottom of the Volunteer page',
-      volunteerIdealistPageUrl,
-      'Oppia Idealist page'
     );
   }
 
@@ -4077,49 +3939,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Navigates to the top rated explorations page from the community library.
-   */
-  async navigateToTopRatedLessonsPage(): Promise<void> {
-    await this.navigateToCommunityLibraryPage();
-    await this.clickAndWaitForNavigation('Top-Rated Explorations');
-  }
-
-  /**
-   * Checks if the top rated explorations are in a specific order.
-   * @param {string[]} expectedOrder - The expected order of the top rated explorations.
-   */
-  async expectLessonsInOrder(expectedOrder: string[]): Promise<void> {
-    try {
-      await this.page.waitForSelector(explorationTitleSelector);
-      const explorationTitles = await this.page.$$(explorationTitleSelector);
-      for (let i = 0; i < explorationTitles.length; i++) {
-        const titleText = await this.page.evaluate(
-          el => el.querySelector('span > span').textContent,
-          explorationTitles[i]
-        );
-        if (titleText.trim() !== expectedOrder[i]) {
-          throw new Error(
-            `Exploration at position ${i} is "${titleText.trim()}", but expected "${expectedOrder[i]}".`
-          );
-        }
-      }
-    } catch (error) {
-      const newError = new Error(
-        `Failed to check order explorations: ${error}`
-      );
-      newError.stack = error.stack;
-      throw newError;
-    }
-  }
-
-  /**
-   * Navigates to the page recently published explorations page.
-   */
-  async navigateToRecentlyPublishedLessonsPage(): Promise<void> {
-    await this.goto(recentlyPublishedExplorationsPageUrl);
-  }
-
-  /**
    * Checks if an exploration has a specific rating.
    *
    * @param {number} expectedRating - The expected rating of the exploration.
@@ -4129,33 +3948,43 @@ export class LoggedOutUser extends BaseUser {
     expectedRating: number,
     expectedExplorationName: string
   ): Promise<void> {
+    const cardSelector = this.isViewportAtMobileWidth()
+      ? mobileLessonCardSelector
+      : lessonCardSelector;
+    const cardTitleSelector = this.isViewportAtMobileWidth()
+      ? explorationTitleSelector
+      : lessonCardTitleSelector;
     try {
-      await this.page.waitForSelector(lessonCardSelector);
-      const cards = await this.page.$$(lessonCardSelector);
+      await this.page.waitForSelector(cardSelector);
+      const cards = await this.page.$$(cardSelector);
       for (const card of cards) {
-        await card.waitForSelector(lessonCardTitleSelector);
-        const titleElement = await card.$(lessonCardTitleSelector);
+        await card.waitForSelector(cardTitleSelector);
+        const titleElement = await card.$(cardTitleSelector);
         const titleText = await this.page.evaluate(
           el => el.textContent.trim(),
           titleElement
         );
         if (titleText === expectedExplorationName) {
-          await card.waitForSelector(explorationRatingSelector);
-          const ratingElement = await card.$(explorationRatingSelector);
-          if (ratingElement) {
-            const ratingSpan = await ratingElement.$('span:nth-child(2)');
-            const ratingText = await this.page.evaluate(
-              el => el.textContent.trim(),
-              ratingSpan
-            );
-            const rating = parseFloat(ratingText);
-            if (rating !== expectedRating) {
-              throw new Error(
-                `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+          // The mobile activity summary card does not render a rating, so the
+          // rating can only be checked on the desktop card.
+          if (!this.isViewportAtMobileWidth()) {
+            await card.waitForSelector(explorationRatingSelector);
+            const ratingElement = await card.$(explorationRatingSelector);
+            if (ratingElement) {
+              const ratingSpan = await ratingElement.$('span:nth-child(2)');
+              const ratingText = await this.page.evaluate(
+                el => el.textContent.trim(),
+                ratingSpan
               );
+              const rating = parseFloat(ratingText);
+              if (rating !== expectedRating) {
+                throw new Error(
+                  `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+                );
+              }
             }
-            return;
           }
+          return;
         }
       }
       throw new Error(
@@ -7232,18 +7061,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Ensures that the heading on the Volunteer page contains the specified text.
-   *
-   * @param heading - The expected heading text to be validated.
-   */
-  async expectVolunteerPageHeadingToContain(heading: string): Promise<void> {
-    await this.expectAnyElementWithSelectorToHaveTextContent(
-      volunteerPageHeadingSelector,
-      heading
-    );
-  }
-
-  /**
    * Checks for subheading in Contact Us Page.
    * @param subheading - The expected subheading text to be found.
    */
@@ -8514,6 +8331,100 @@ export class LoggedOutUser extends BaseUser {
     if (status !== 200) {
       throw new Error(`Expected ${url} to return HTTP 200 but got ${status}`);
     }
+  }
+
+  /**
+   * Checks the title and objective shown on a lesson tile in the community
+   * library. The objective is only rendered at desktop width, so it is checked
+   * only there.
+   * @param title - The title the tile is expected to show.
+   * @param objective - The objective the tile is expected to show.
+   */
+  async expectLessonTileToShow(
+    title: string,
+    objective: string
+  ): Promise<void> {
+    await this.page.waitForSelector(lessonCardSelector);
+    const tiles = await this.page.$$(lessonCardSelector);
+
+    const titlesFound: (string | undefined)[] = [];
+    for (const tile of tiles) {
+      const tileTitle = await tile.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        explorationTitleSelector
+      );
+      titlesFound.push(tileTitle);
+      if (tileTitle !== title) {
+        continue;
+      }
+      if (this.isViewportAtMobileWidth()) {
+        showMessage(`Success: The lesson tile shows the title "${title}".`);
+        return;
+      }
+      const tileObjective = await tile.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        explorationObjectiveSelector
+      );
+      // The tile truncates the objective at 95 characters, so the rendered
+      // text is checked for the expected objective rather than against it.
+      if (!tileObjective?.includes(objective)) {
+        throw new Error(
+          `The lesson tile titled "${title}" shows the objective ` +
+            `"${tileObjective}", but "${objective}" was expected.`
+        );
+      }
+      showMessage(
+        `Success: The lesson tile shows the title "${title}" and the ` +
+          `objective "${objective}".`
+      );
+      return;
+    }
+
+    throw new Error(
+      `The lesson tile titled "${title}" was not found. Tiles found: ${titlesFound.join(', ')}`
+    );
+  }
+
+  /**
+   * Checks if the exploration title in the exploration player header matches
+   * the expected title.
+   * @param title - The expected title.
+   */
+  async expectExplorationTitleInPlayerToBe(title: string): Promise<void> {
+    await this.expectElementToBeVisible(explorationHeaderSelector);
+    await this.expectTextContentToMatch(explorationHeaderSelector, title);
+  }
+
+  /**
+   * Checks if the exploration objective in the lesson info modal matches
+   * the expected objective.
+   * @param objective - The expected objective.
+   */
+  async expectLessonInfoModalObjectiveToBe(objective: string): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoModalObjectiveSelector);
+    await this.expectTextContentToMatch(
+      lessonInfoModalObjectiveSelector,
+      objective
+    );
+  }
+
+  /**
+   * Checks if the lesson info modal tags section contains the expected text.
+   * @param tagText - The expected tags text.
+   */
+  async expectLessonInfoModalTagsToBe(tagText: string): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoModalTagsSelector);
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim().includes(value);
+      },
+      {},
+      lessonInfoModalTagsSelector,
+      tagText
+    );
   }
 }
 
