@@ -22,9 +22,9 @@ import json
 
 from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
+    html_cleaner,  # pylint: disable=invalid-import-from
     html_validation_service,
     state_domain,
     translation_domain,
@@ -1224,7 +1224,7 @@ class Skill(translation_domain.BaseTranslatableObject):
     def from_dict(
         cls,
         skill_dict: SkillDict,
-        skill_version: int = 0,
+        skill_version: int = feconf.INITIAL_ENTITY_VERSION,
         skill_created_on: Optional[datetime.datetime] = None,
         skill_last_updated: Optional[datetime.datetime] = None,
     ) -> Skill:
@@ -1308,7 +1308,7 @@ class Skill(translation_domain.BaseTranslatableObject):
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             0,
             None,
             False,
