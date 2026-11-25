@@ -660,8 +660,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.restoreExplorationIdFocus();
   }
 
-  // The button that was used (Save, Cancel or delete) is removed from the DOM
-  // afterwards, so the focus is moved to the edit button, or to the input
+  // Called when the form closes after Save or Cancel, and after delete (which
+  // keeps the form open but removes the delete button). The used button is no
+  // longer in the DOM, so the focus moves to the edit button, or to the input
   // field if it is still shown, instead of falling back to the document.
   restoreExplorationIdFocus(): void {
     this.focusManagerService.setFocus(

@@ -466,13 +466,28 @@ describe('Story node editor component', () => {
     });
 
     it('should save an emptied exploration ID on submit, so that the existing message is shown', () => {
+      spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
+      const storyUpdateSpy = spyOn(
+        storyUpdateService,
+        'setStoryNodeExplorationId'
+      );
+      const alertsSpy = spyOn(alertsService, 'addInfoMessage');
       renderChapterWithExploration('exp_1');
-      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+      const updateExplorationIdSpy = spyOn(
+        component,
+        'updateExplorationId'
+      ).and.callThrough();
       component.explorationId = '';
 
       component.submitExplorationId();
 
       expect(updateExplorationIdSpy).toHaveBeenCalledWith('');
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Please click the delete icon to remove an exploration ' +
+          'from the story.',
+        5000
+      );
+      expect(storyUpdateSpy).not.toHaveBeenCalled();
     });
 
     it('should not save an invalid exploration ID on submit', () => {
