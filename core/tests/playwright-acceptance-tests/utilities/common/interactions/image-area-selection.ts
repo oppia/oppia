@@ -20,6 +20,20 @@ import {ElementHandle, Page} from 'playwright';
 
 const imageSelector = '.e2e-test-image-interaction-image';
 
+/**
+ * Throws if any of the given values is not a valid percentage (0 to 100).
+ * @param {number[]} values - The percentage values to check.
+ */
+const validatePercentages = (...values: number[]): void => {
+  for (const value of values) {
+    if (value < 0 || value > 100) {
+      throw new Error(
+        `Percentage values must be between 0 and 100. Found: ${values.join(', ')}`
+      );
+    }
+  }
+};
+
 export class ImageAreaSelection {
   parentPage: Page;
   context: ElementHandle | Page;
@@ -47,6 +61,13 @@ export class ImageAreaSelection {
     widthInPercentage: number,
     heightInPercentage: number
   ): Promise<void> {
+    validatePercentages(
+      xInPercentage,
+      yInPercentage,
+      widthInPercentage,
+      heightInPercentage
+    );
+
     await this.context.waitForSelector(imageSelector, {
       state: 'visible',
     });
@@ -87,17 +108,7 @@ export class ImageAreaSelection {
     xInPercentage: number,
     yInPercentage: number
   ): Promise<void> {
-    // Verify if the coordinates are within the percentange range.
-    if (
-      xInPercentage < 0 ||
-      yInPercentage < 0 ||
-      xInPercentage > 100 ||
-      yInPercentage > 100
-    ) {
-      throw new Error(
-        `Point coordinates must be between 0 and 100. Found (${xInPercentage}, ${yInPercentage})`
-      );
-    }
+    validatePercentages(xInPercentage, yInPercentage);
 
     // Get image container and bounding box.
     await this.context.waitForSelector(imageSelector, {
