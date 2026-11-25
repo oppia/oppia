@@ -44,6 +44,11 @@ describe('FractionInputValidationService', () => {
     equivalentToHalfRule: Rule,
     equivalentToOneAndHalfAndSimplestFormRule: Rule,
     equivalentToOneAndHalfRule: Rule,
+    equivalentToOneByOneAndSimplestFormRule: Rule,
+    equivalentToOneByOneRule: Rule,
+    equivalentToWholeOneAndSimplestFormRule: Rule,
+    equivalentToZeroAndSimplestFormRule: Rule,
+    equivalentToZeroRule: Rule,
     equivalentToThreeByTwoAndSimplestFormRule: Rule,
     equivalentToThreeByTwoRule: Rule,
     equivalentToOneAndSimplestFormRule: Rule,
@@ -240,6 +245,56 @@ describe('FractionInputValidationService', () => {
         rule_type: 'IsEquivalentTo',
         inputs: {
           f: createFractionDict(false, 1, 1, 2),
+        },
+      },
+      'FractionInput'
+    );
+
+    equivalentToZeroAndSimplestFormRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentToAndInSimplestForm',
+        inputs: {
+          f: createFractionDict(false, 0, 0, 1),
+        },
+      },
+      'FractionInput'
+    );
+
+    equivalentToZeroRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          f: createFractionDict(false, 0, 0, 1),
+        },
+      },
+      'FractionInput'
+    );
+
+    equivalentToWholeOneAndSimplestFormRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentToAndInSimplestForm',
+        inputs: {
+          f: createFractionDict(false, 1, 0, 1),
+        },
+      },
+      'FractionInput'
+    );
+
+    equivalentToOneByOneAndSimplestFormRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentToAndInSimplestForm',
+        inputs: {
+          f: createFractionDict(false, 0, 1, 1),
+        },
+      },
+      'FractionInput'
+    );
+
+    equivalentToOneByOneRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          f: createFractionDict(false, 0, 1, 1),
         },
       },
       'FractionInput'
@@ -815,6 +870,74 @@ describe('FractionInputValidationService', () => {
           goodDefaultOutcome
         )
       ).toEqual([]);
+    }
+  );
+
+  it(
+    'should not catch equivalent and in simplest form followed by ' +
+      'equivalent as redundant if a whole number can be submitted with a ' +
+      'zero numerator',
+    () => {
+      // Answers like 0/2 and 1 0/2 pass the simplest form check, because
+      // their string form is the same as their simplest form, but they only
+      // match the later rule.
+      customizationArgs.requireSimplestForm.value = true;
+      answerGroups[0].rules = [
+        equivalentToZeroAndSimplestFormRule,
+        equivalentToZeroRule,
+      ];
+      expect(
+        validatorService.getAllWarnings(
+          currentState,
+          customizationArgs,
+          answerGroups,
+          goodDefaultOutcome
+        )
+      ).toEqual([]);
+
+      customizationArgs.allowImproperFraction.value = false;
+      answerGroups[0].rules = [
+        equivalentToWholeOneAndSimplestFormRule,
+        equivalentToOneByOneRule,
+      ];
+      expect(
+        validatorService.getAllWarnings(
+          currentState,
+          customizationArgs,
+          answerGroups,
+          goodDefaultOutcome
+        )
+      ).toEqual([]);
+    }
+  );
+
+  it(
+    'should catch equivalent and in simplest form followed by equivalent ' +
+      'as redundant if a whole number can only be written one way',
+    () => {
+      // Without an integer part, 1 can only be submitted as 1/1.
+      customizationArgs.requireSimplestForm.value = true;
+      customizationArgs.allowNonzeroIntegerPart.value = false;
+      answerGroups[0].rules = [
+        equivalentToOneByOneAndSimplestFormRule,
+        equivalentToOneByOneRule,
+      ];
+      expect(
+        validatorService.getAllWarnings(
+          currentState,
+          customizationArgs,
+          answerGroups,
+          goodDefaultOutcome
+        )
+      ).toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message:
+            'Learner answer 2 from Oppia response 1 will never be ' +
+            'matched because it is made redundant by answer 1 from ' +
+            'Oppia response 1',
+        },
+      ]);
     }
   );
 

@@ -171,7 +171,11 @@ export class FractionInputValidationService {
         // simplest form is the only one: answers must be in simplest form,
         // that form must itself be allowed, and the value must not be
         // writable as both a mixed number and an improper fraction (only
-        // values of 1 or more can be, and only if both are allowed).
+        // values of 1 or more can be, and only if both are allowed). A whole
+        // number can also be submitted with a zero numerator (e.g. 0/2 or
+        // 1 0/2), which passes the simplest form check because its string
+        // form is unchanged by simplifying, so the later rule is reachable
+        // whenever that form is allowed.
         const earlierFormIsAllowed =
           (allowImproperFraction ||
             !earlierSimplestForm.isImproperFraction()) &&
@@ -182,10 +186,14 @@ export class FractionInputValidationService {
           allowNonzeroIntegerPart &&
           (earlierSimplestForm.hasNonzeroIntegerPart() ||
             earlierSimplestForm.isImproperFraction());
+        const value = earlierSimplestForm.toFloat();
+        const valueHasZeroNumeratorForms =
+          Number.isInteger(value) && (value === 0 || allowNonzeroIntegerPart);
         return (
           shouldBeInSimplestForm &&
           earlierFormIsAllowed &&
-          !valueHasMixedAndImproperForms
+          !valueHasMixedAndImproperForms &&
+          !valueHasZeroNumeratorForms
         );
       }
       return true;
