@@ -4176,3 +4176,9 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
 .hidden-element {
   outline: 0;
 }
+
+/* The signup page's license and terms links are injected via innerHTML from
+   translation strings, so the signup component's styles cannot reach them. */
+.oppia-signup-page-container .oppia-signup-license-text a:focus {
+  outline: 2px solid rgb(23, 23, 255);
+}
