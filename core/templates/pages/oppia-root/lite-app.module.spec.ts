@@ -21,6 +21,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 
 import {
   LiteRootComponent,
+  LiteStaticRootComponent,
   ReloadOnUnknownRouteComponent,
 } from './lite-app.module';
 
@@ -30,6 +31,17 @@ describe('Lightweight Angular bootstrap', () => {
       TestBed.configureTestingModule({
         declarations: [LiteRootComponent],
       }).createComponent(LiteRootComponent);
+
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('router-outlet')).not.toBeNull();
+  });
+
+  it('should render a router outlet in the static shell', () => {
+    const fixture: ComponentFixture<LiteStaticRootComponent> =
+      TestBed.configureTestingModule({
+        declarations: [LiteStaticRootComponent],
+      }).createComponent(LiteStaticRootComponent);
 
     fixture.detectChanges();
 

@@ -693,10 +693,12 @@ def _make_lite_fonts_blocking(css: str) -> str:
     would otherwise shift the prerendered terms text after first paint.
     """
 
-    def _replace_display(match: re.Match) -> str:
+    def _replace_display(match: re.Match[str]) -> str:
         """Changes one font face's font-display declaration to block."""
-        return re.sub(
-            r'font-display:\s*swap', 'font-display:block', match.group(0)
+        return str(
+            re.sub(
+                r'font-display:\s*swap', 'font-display:block', match.group(0)
+            )
         )
 
     return re.sub(r'@font-face\{[^}]*\}', _replace_display, css)
@@ -791,7 +793,7 @@ def inline_critical_css_for_lite_pages() -> None:
         r'(?=[^>]*\bhref="(/build/[^"]+\.css)")[^>]*>'
     )
 
-    def _make_stylesheet_link_inert(match: re.Match) -> str:
+    def _make_stylesheet_link_inert(match: re.Match[str]) -> str:
         """Converts one global stylesheet link into inert markup."""
         href = match.group(1)
         return (
@@ -835,7 +837,7 @@ def inline_critical_css_for_lite_pages() -> None:
 def _rewrite_relative_css_urls(css: str) -> str:
     """Makes relative CSS URLs resolve from the document instead of the file."""
 
-    def _replace_url(match: re.Match) -> str:
+    def _replace_url(match: re.Match[str]) -> str:
         """Prefixes one relative URL with the production build directory."""
         quote = match.group(1)
         url = match.group(2)

@@ -25,6 +25,7 @@ import json
 import os
 import pathlib
 import re
+import subprocess
 import tempfile
 
 from core.tests import test_utils
@@ -1000,7 +1001,7 @@ class BuildTests(test_utils.GenericTestBase):
                     )
                 ]
                 run_swap = self.swap_with_checks(
-                    build.subprocess,
+                    subprocess,
                     'run',
                     mock_run,
                     expected_args=expected_args,
@@ -1036,7 +1037,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_run(unused_args: List[str], **unused_kwargs: object) -> None:
             pass
 
-        run_swap = self.swap(build.subprocess, 'run', mock_run)
+        run_swap = self.swap(subprocess, 'run', mock_run)
         with tempfile.TemporaryDirectory() as temp_dir:
             old_working_dir = os.getcwd()
             old_node_options = os.environ.get('NODE_OPTIONS')
@@ -1283,7 +1284,7 @@ class BuildTests(test_utils.GenericTestBase):
                 ) -> FakeCompletedProcess:
                     raise OSError('no npx')
 
-                with self.swap(build.subprocess, 'run', mock_run_success):
+                with self.swap(subprocess, 'run', mock_run_success):
                     self.assertEqual(
                         # The helper is private so the build can keep the
                         # PurgeCSS plumbing out of its public API.
@@ -1313,7 +1314,7 @@ class BuildTests(test_utils.GenericTestBase):
                     configs[0]['content'],
                 )
 
-                with self.swap(build.subprocess, 'run', mock_run_failure):
+                with self.swap(subprocess, 'run', mock_run_failure):
                     self.assertEqual(
                         # The helper is private so the build can keep the
                         # PurgeCSS plumbing out of its public API.
@@ -1322,7 +1323,7 @@ class BuildTests(test_utils.GenericTestBase):
                         ),
                         'p{color:red}',
                     )
-                with self.swap(build.subprocess, 'run', mock_run_error):
+                with self.swap(subprocess, 'run', mock_run_error):
                     self.assertEqual(
                         # The helper is private so the build can keep the
                         # PurgeCSS plumbing out of its public API.
