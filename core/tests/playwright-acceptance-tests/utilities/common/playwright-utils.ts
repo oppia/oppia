@@ -1191,8 +1191,11 @@ export class BaseUser {
         return `<${tag}${id}${classes}>${textSuffix}`;
       };
 
+      // Locator.evaluate and ElementHandle.evaluate have different
+      // overloads, so TypeScript cannot call evaluate on the union type
+      // (TS2349). The branches only narrow the type; both run the same
+      // function.
       let description: string;
-
       if (selector.constructor.name === 'Locator') {
         description = await (selector as Locator).evaluate(getDescription);
       } else {
