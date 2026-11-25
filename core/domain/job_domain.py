@@ -1,4 +1,3 @@
-# coding: utf-8
 #
 # Copyright 2026 The Oppia Authors. All Rights Reserved.
 #
@@ -23,7 +22,7 @@ import math
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -40,16 +39,16 @@ class Job:
         job_id: str,
         job_type: str,
         time_queued_msec: float,
-        time_started_msec: Optional[float],
-        time_finished_msec: Optional[float],
+        time_started_msec: float | None,
+        time_finished_msec: float | None,
         status_code: str,
         # Here we use type Any because the values in this dictionary can be of any type.
-        metadata: Optional[Dict[str, Any]],
-        output: Optional[List[str]],
-        error: Optional[str],
+        metadata: dict[str, Any] | None,
+        output: list[str] | None,
+        error: str | None,
         has_been_cleaned_up: bool,
         # Here we use type Any because the values in this dictionary can be of any type.
-        additional_job_params: Optional[Dict[str, Any]],
+        additional_job_params: dict[str, Any] | None,
     ) -> None:
         """Initializes a Job instance.
 
@@ -84,7 +83,7 @@ class Job:
         self.validate()
 
     # Here we use type Any because the values in this dictionary can be of any type.
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Returns a dict representation of the Job.
 
         Returns:
@@ -106,7 +105,7 @@ class Job:
 
     @classmethod
     # Here we use type Any because the values in this dictionary can be of any type.
-    def from_dict(cls, job_dict: Dict[str, Any]) -> Job:
+    def from_dict(cls, job_dict: dict[str, Any]) -> Job:
         """Creates a Job from its dictionary representation.
 
         Args:
@@ -158,7 +157,7 @@ class Job:
                 or any(not isinstance(key, str) for key in field_value)
             ):
                 raise utils.ValidationError(
-                    '%s must be None or a dict with string keys.' % field_name
+                    f'{field_name} must be None or a dict with string keys.'
                 )
 
         if self.status_code == job_models.STATUS_CODE_COMPLETED:
@@ -205,7 +204,7 @@ class Job:
                 or math.isnan(timestamp)
             ):
                 raise utils.ValidationError(
-                    '%s must be None or a number.' % timestamp_name
+                    f'{timestamp_name} must be None or a number.'
                 )
 
         if self.status_code in (
