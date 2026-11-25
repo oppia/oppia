@@ -857,8 +857,7 @@ export class ExplorationEditor extends BaseUser {
     heightInRows?: string,
     catchMisspellings?: boolean
   ): Promise<void> {
-    await this.page.waitForSelector(customizeInteractionBodySelector);
-
+    // The page.$$ call does not wait, so wait for the inputs to render first.
     await this.page.waitForSelector(
       `${customizeInteractionBodySelector} input`
     );
