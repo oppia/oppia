@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for schema-based editor component for custom values
  */
 
-// @ts-nocheck
-
 import {
   Component,
   EventEmitter,
@@ -118,10 +116,10 @@ describe('Schema Based Custom Editor Component', () => {
     component.localValue = null;
     component.writeValue(null);
 
-    expect(component.localValue).toEqual(null);
+    expect(component.localValue).toBeNull();
 
     component.writeValue('true');
-    expect(component.localValue).toEqual('true');
+    expect(component.localValue as string | null).toEqual('true');
   });
 
   it('should not overwrite when local value not change', () => {
