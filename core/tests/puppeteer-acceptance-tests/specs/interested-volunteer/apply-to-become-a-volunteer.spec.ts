@@ -1,4 +1,4 @@
-// Copyright 2026 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,25 +19,25 @@
  * IV.VP. Volunteer explores volunteer openings on the Oppia Idealist page
  */
 
-import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-test.describe.configure({mode: 'serial'});
-
-test.describe('Interested Volunteer', function () {
+describe('Interested Volunteer', function () {
   let interestedVolunteer: LoggedOutUser;
 
-  test.beforeAll(async function ({browser}) {
-    interestedVolunteer = await UserFactory.createLoggedOutUser(browser);
+  beforeAll(async function () {
+    interestedVolunteer = await UserFactory.createLoggedOutUser();
   });
 
-  test('should be able to explore volunteer openings on the Oppia Idealist page', async function () {
+  it('should be able to explore volunteer openings on the Oppia Idealist page', async function () {
     await interestedVolunteer.navigateToSplashPage();
 
     // Navigate to Volunteer Page.
     await interestedVolunteer.clickVolunteerButtonInGetInvolvedMenuOnNavbar();
-    await interestedVolunteer.expectScreenshotToMatch('volunteerPage');
+    await interestedVolunteer.expectScreenshotToMatch(
+      'volunteerPage',
+      __dirname
+    );
 
     // Check for various headings and sections.
     await interestedVolunteer.expectVolunteerPageHeadingToContain(
@@ -63,7 +63,7 @@ test.describe('Interested Volunteer', function () {
     await interestedVolunteer.clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage();
   });
 
-  test.afterAll(async function () {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
