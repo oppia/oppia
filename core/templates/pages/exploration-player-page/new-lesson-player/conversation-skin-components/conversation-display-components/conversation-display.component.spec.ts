@@ -1119,6 +1119,7 @@ describe('Conversation display component', () => {
   });
 
   it('should render content language selector only when in exploration preview mode', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
     componentInstance.explorationIsInPreviewMode = true;
     fixture.detectChanges();
     expect(
