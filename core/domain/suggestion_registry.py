@@ -877,6 +877,9 @@ class SuggestionTranslateContent(BaseSuggestion):
             self.target_type, self.target_id
         )
 
+        # A translation that a reviewer accepts is always stored as a manual
+        # translation, even if the translator started from an automatic
+        # translation, since it has now been checked by a human.
         translated_content = translation_domain.TranslatedContent(
             self.change_cmd.translation_html,
             translation_domain.TranslatableContentFormat(
