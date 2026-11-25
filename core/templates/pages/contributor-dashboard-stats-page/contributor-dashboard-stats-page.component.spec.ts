@@ -381,7 +381,8 @@ describe('ContributorDashboardStatsPageComponent', () => {
     const emptyTopic: TopicStat = {
       ...fractions,
       question_stats: null as unknown as TopicStat['question_stats'],
-      translation_stats_by_language: null as unknown as TopicStat['translation_stats_by_language'],
+      translation_stats_by_language:
+        null as unknown as TopicStat['translation_stats_by_language'],
     };
     expect(component.getTopicSubmissionPct(emptyTopic)).toBe(0);
     expect(component.getTopicReviewPct(emptyTopic)).toBe(0);

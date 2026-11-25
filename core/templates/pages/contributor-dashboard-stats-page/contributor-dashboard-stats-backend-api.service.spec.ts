@@ -114,8 +114,12 @@ describe('Contributor Dashboard Stats Backend Api Service', () => {
       total_topics_count: 1,
       total_chapters_count: 2,
       total_skills_count: 2,
-      total_practice_questions_count: 14,
+      total_questions_count: 14,
+      total_languages_count: 1,
       fully_translated_topics_count: 0,
+      near_completion_topics_count: 0,
+      needs_review_count: 0,
+      needs_contributor_count: 1,
     },
     supported_languages: [
       {
@@ -146,9 +150,7 @@ describe('Contributor Dashboard Stats Backend Api Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    statsApiService
-      .fetchStatsDataAsync()
-      .then(successHandler, failHandler);
+    statsApiService.fetchStatsDataAsync().then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/contributordashboardstatshandler/data'
@@ -166,9 +168,7 @@ describe('Contributor Dashboard Stats Backend Api Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    statsApiService
-      .fetchStatsDataAsync()
-      .then(successHandler, failHandler);
+    statsApiService.fetchStatsDataAsync().then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/contributordashboardstatshandler/data'

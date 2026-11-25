@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import contributor_dashboard_stats_services
-from core.domain import topic_domain
+from core.domain import contributor_dashboard_stats_services, topic_domain
 from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.topic import gae_models as topic_models
 from core.tests import test_utils
