@@ -20,8 +20,9 @@ from __future__ import annotations
 
 import re
 
+from core import android_validation_constants
 from core.constants import constants
-from core.domain import opportunity_domain
+from core.domain import opportunity_domain, opportunity_domain_errors
 from core.tests import test_utils
 
 
@@ -358,11 +359,80 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         # Object with question_count as int passes the validation check.
         self.valid_skill_opportunity.validate()
         self.valid_skill_opportunity.question_count = -5
-        self._assert_validation_error(
-            self.valid_skill_opportunity,
+        with self.assertRaisesRegex(
+            opportunity_domain_errors.InvalidQuestionCountError,
             'Expected question_count to be a non-negative integer, '
             'received -5',
-        )
+        ):
+            self.valid_skill_opportunity.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_invalid_question_count_type_fails_validation_check(self) -> None:
+        self.valid_skill_opportunity.question_count = True
+        with self.assertRaisesRegex(
+            opportunity_domain_errors.InvalidQuestionCountError,
+            'Expected question_count to be a non-negative integer, '
+            'received True',
+        ):
+            self.valid_skill_opportunity.validate()
+
+        self.valid_skill_opportunity.question_count = '5'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            opportunity_domain_errors.InvalidQuestionCountError,
+            'Expected question_count to be a non-negative integer, '
+            'received 5',
+        ):
+            self.valid_skill_opportunity.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_invalid_skill_id_fails_validation_check(self) -> None:
+        self.valid_skill_opportunity.id = ''
+        with self.assertRaisesRegex(
+            opportunity_domain_errors.InvalidSkillIdError,
+            'Expected skill_id to be a non-empty string, received \'\'',
+        ):
+            self.valid_skill_opportunity.validate()
+
+        self.valid_skill_opportunity.id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            opportunity_domain_errors.InvalidSkillIdError,
+            'Expected skill_id to be a non-empty string, received 123',
+        ):
+            self.valid_skill_opportunity.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_invalid_skill_description_fails_validation_check(self) -> None:
+        self.valid_skill_opportunity.skill_description = ''
+        with self.assertRaisesRegex(
+            opportunity_domain_errors.InvalidSkillDescriptionError,
+            'Expected skill_description to be a non-empty string, '
+            'received \'\'',
+        ):
+            self.valid_skill_opportunity.validate()
+
+        self.valid_skill_opportunity.skill_description = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            opportunity_domain_errors.InvalidSkillDescriptionError,
+            'Expected skill_description to be a non-empty string, '
+            'received 123',
+        ):
+            self.valid_skill_opportunity.validate()
+
+        max_chars = android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION
+        long_description = 'a' * (max_chars + 1)
+        self.valid_skill_opportunity.skill_description = long_description
+        with self.assertRaisesRegex(
+            opportunity_domain_errors.InvalidSkillDescriptionError,
+            'Skill description should be at most %d chars, received %s'
+            % (max_chars, long_description),
+        ):
+            self.valid_skill_opportunity.validate()
 
 
 class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
@@ -532,6 +602,8 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
         )
 
         # Reach content_count.
+        self.valid_translation_opportunity.update_translation_count('hi', 5)
+        # Updating an already-complete language keeps it out of incomplete list.
         self.valid_translation_opportunity.update_translation_count('hi', 5)
         self.assertEqual(
             self.valid_translation_opportunity.translation_counts['hi'], 5
