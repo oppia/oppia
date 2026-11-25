@@ -2042,13 +2042,9 @@ def delete_topic(
             topic_id
         )
     )
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
-        None,
-    ):
-        opportunity_services.delete_translation_opportunities(
-            {feconf.ENTITY_TYPE_TOPIC: [topic_id]}
-        )
+    opportunity_services.delete_translation_opportunities(
+        {feconf.ENTITY_TYPE_TOPIC: [topic_id]}
+    )
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,

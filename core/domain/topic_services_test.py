@@ -259,13 +259,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_TOPIC,
             topic.id,
             topic.version,
-            self.user_id,
+            self.user_id_a,
             change_dict,
             'Topic name translation',
         )
-        self.assertEqual(
-            suggestion.status, suggestion_models.STATUS_IN_REVIEW
-        )
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin,

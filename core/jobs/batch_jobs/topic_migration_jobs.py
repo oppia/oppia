@@ -274,6 +274,15 @@ class MigrateTopicJob(base_jobs.JobBase):
             sequence(BaseModel). Sequence of models which should be put into
             the datastore.
         """
+        old_topic = topic_fetchers.get_topic_from_model(topic_model)
+        new_version_topic = copy.deepcopy(migrated_topic)
+        new_version_topic.version = topic_model.version + 1
+        with datastore_services.get_ndb_context():
+            translation_models_to_put = (
+                translation_services.compute_carried_forward_topic_translations(
+                    old_topic, new_version_topic
+                )
+            )
         updated_topic_model = topic_services.populate_topic_model_fields(
             topic_model, migrated_topic
         )
@@ -289,14 +298,6 @@ class MigrateTopicJob(base_jobs.JobBase):
                 % (feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION),
                 change_dicts,
                 additional_models={'rights_model': topic_rights_model},
-            )
-            old_topic = topic_fetchers.get_topic_from_model(topic_model)
-            new_version_topic = copy.deepcopy(migrated_topic)
-            new_version_topic.version = topic_model.version + 1
-            translation_models_to_put = (
-                translation_services.compute_carried_forward_topic_translations(
-                    old_topic, new_version_topic
-                )
             )
         models_to_put_values = []
         for model in models_to_put.values():

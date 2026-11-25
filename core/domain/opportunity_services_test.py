@@ -1970,6 +1970,25 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES,
+        ]
+    )
+    def test_regenerate_opportunities_related_to_topic_recreates_topic_metadata_opportunity(
+        self,
+    ) -> None:
+        opportunity_services.regenerate_opportunities_related_to_topic(
+            'topic_id_1', delete_existing_opportunities=True
+        )
+
+        topic_model = opportunity_models.TranslationOpportunityModel.get(
+            'topic.topic_id_1', strict=False
+        )
+        assert topic_model is not None
+        self.assertEqual(topic_model.topic_ids, ['topic_id_1'])
+
+    @test_utils.enable_feature_flags(
+        [
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )

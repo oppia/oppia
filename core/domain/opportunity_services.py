@@ -2351,6 +2351,14 @@ def regenerate_opportunities_related_to_topic(
             {feconf.ENTITY_TYPE_EXPLORATION: exp_ids}, topic_ids=[topic_id]
         )
 
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
+        None,
+    ):
+        create_translation_opportunity(
+            {feconf.ENTITY_TYPE_TOPIC: [topic_id]}, topic_ids=[topic_id]
+        )
+
     return len(exploration_opportunity_summary_list)
 
 
