@@ -850,6 +850,14 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(response.content_type, 'application/json')
 
+    def test_html_and_json_routes_work_outside_maintenance_mode(self) -> None:
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            html_response = self.get_html_response('/community-library')
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(html_response.status_int, 200)
+        self.assertIn(b'<oppia-root></oppia-root>', html_response.body)
+
     def test_html_response_is_not_rejected_when_user_is_super_admin(
         self,
     ) -> None:
