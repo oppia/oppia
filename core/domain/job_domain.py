@@ -18,9 +18,18 @@
 
 from __future__ import annotations
 
+import math
+
 from core import utils
+from core.platform import models
 
 from typing import Any, Dict, List, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import job_models
+
+(job_models,) = models.Registry.import_models([models.Names.JOB])
 
 
 class Job:
@@ -130,12 +139,12 @@ class Job:
             raise utils.ValidationError('has_been_cleaned_up must be a bool.')
 
         valid_status_codes = (
-            'new',
-            'queued',
-            'started',
-            'completed',
-            'failed',
-            'canceled',
+            job_models.STATUS_CODE_NEW,
+            job_models.STATUS_CODE_QUEUED,
+            job_models.STATUS_CODE_STARTED,
+            job_models.STATUS_CODE_COMPLETED,
+            job_models.STATUS_CODE_FAILED,
+            job_models.STATUS_CODE_CANCELED,
         )
         if self.status_code not in valid_status_codes:
             raise utils.ValidationError('Invalid job status code.')
@@ -152,7 +161,7 @@ class Job:
                     '%s must be None or a dict with string keys.' % field_name
                 )
 
-        if self.status_code == 'completed':
+        if self.status_code == job_models.STATUS_CODE_COMPLETED:
             if self.output is None or not isinstance(self.output, list):
                 raise utils.ValidationError(
                     'Completed jobs must have a list output.'
@@ -164,7 +173,10 @@ class Job:
         elif self.output is not None:
             raise utils.ValidationError('Only completed jobs can have output.')
 
-        if self.status_code in ('failed', 'canceled'):
+        if self.status_code in (
+            job_models.STATUS_CODE_FAILED,
+            job_models.STATUS_CODE_CANCELED,
+        ):
             if not isinstance(self.error, str):
                 raise utils.ValidationError(
                     'Failed or canceled jobs must have an error string.'
@@ -190,12 +202,16 @@ class Job:
             if timestamp is not None and (
                 isinstance(timestamp, bool)
                 or not isinstance(timestamp, (int, float))
+                or math.isnan(timestamp)
             ):
                 raise utils.ValidationError(
                     '%s must be None or a number.' % timestamp_name
                 )
 
-        if self.status_code in ('new', 'queued'):
+        if self.status_code in (
+            job_models.STATUS_CODE_NEW,
+            job_models.STATUS_CODE_QUEUED,
+        ):
             if (
                 self.time_started_msec is not None
                 or self.time_finished_msec is not None
@@ -203,10 +219,10 @@ class Job:
                 raise utils.ValidationError(
                     'New or queued jobs cannot have start or finish times.'
                 )
-        elif self.status_code == 'started':
+        elif self.status_code == job_models.STATUS_CODE_STARTED:
             if (
                 self.time_started_msec is None
-                or not self.time_started_msec >= self.time_queued_msec
+                or self.time_started_msec < self.time_queued_msec
             ):
                 raise utils.ValidationError(
                     'Started jobs must have a start time at or after '
@@ -216,12 +232,12 @@ class Job:
                 raise utils.ValidationError(
                     'Started jobs cannot have a finish time.'
                 )
-        elif self.status_code == 'completed':
+        elif self.status_code == job_models.STATUS_CODE_COMPLETED:
             if (
                 self.time_started_msec is None
                 or self.time_finished_msec is None
-                or not self.time_started_msec >= self.time_queued_msec
-                or not self.time_finished_msec >= self.time_started_msec
+                or self.time_started_msec < self.time_queued_msec
+                or self.time_finished_msec < self.time_started_msec
             ):
                 raise utils.ValidationError(
                     'Completed jobs must have ordered start and finish times.'
