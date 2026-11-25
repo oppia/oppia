@@ -749,6 +749,21 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
     Each test case runs within a context where ENABLE_MAINTENANCE_MODE is True.
     """
 
+    class MutationOnlyHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Handles writes without defining a GET response type."""
+
+        def post(self, *args: Any) -> None:
+            """Handles POST requests."""
+            self.render_json({'unexpected': True})
+
+        def put(self, *args: Any) -> None:
+            """Handles PUT requests."""
+            self.render_json({'unexpected': True})
+
+        def delete(self, *args: Any) -> None:
+            """Handles DELETE requests."""
+            self.render_json({'unexpected': True})
+
     def setUp(self) -> None:
         super(MaintenanceModeTests, self).setUp()
         self.signup(
@@ -803,6 +818,27 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         response = self.post_json('/url_handler', {}, expected_status_int=503)
 
         self.assertEqual(response['status_code'], 503)
+
+    def test_write_only_handler_returns_json_service_unavailable(self) -> None:
+        testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mutation-only', self.MutationOnlyHandler)],
+                debug=feconf.DEBUG,
+            )
+        )
+
+        for method in ('POST', 'PUT', 'DELETE'):
+            response = testapp.request(
+                '/mutation-only', method=method, status=503
+            )
+            self.assertEqual(response.content_type, 'application/json')
+            self.assertEqual(
+                json.loads(response.body[len(feconf.XSSI_PREFIX) :]),
+                {
+                    'error': 'The site is currently under maintenance.',
+                    'status_code': 503,
+                },
+            )
 
     def test_html_head_response_redirects_to_maintenance_page(self) -> None:
         response = self.testapp.head('/community-library', status=302)
