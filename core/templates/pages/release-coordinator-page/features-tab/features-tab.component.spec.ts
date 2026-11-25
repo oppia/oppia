@@ -42,18 +42,9 @@ import {
 import {UserGroup} from 'domain/release_coordinator/user-group.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {FeatureStage} from 'domain/platform-parameter/platform-parameter.model';
-import {
-  FeatureFlag,
-  FeatureFlagBackendDict,
-} from 'domain/feature-flag/feature-flag.model';
+import {FeatureFlag} from 'domain/feature-flag/feature-flag.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {HttpErrorResponse} from '@angular/common/http';
-
-const createFeatureFlagViewModel = (backendDict: FeatureFlagBackendDict) => ({
-  ...FeatureFlag.createFromBackendDict(backendDict),
-  searchQuery: '',
-  filteredUserGroups: [],
-});
 
 let dummyFeatureStatus = false;
 const mockDummyFeatureFlagForE2ETestsStatus = (status: boolean) => {
@@ -494,7 +485,7 @@ describe('Release coordinator page feature tab', function () {
       'should return the human readable last updated string from date-time ' +
         'object string',
       () => {
-        let featureFlag = createFeatureFlagViewModel({
+        let featureFlag = FeatureFlag.createFromBackendDict({
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.PROD,
           name: 'dummy_feature_flag_for_e2e_tests',
@@ -519,7 +510,7 @@ describe('Release coordinator page feature tab', function () {
     });
 
     it('should return text for test feature stage', () => {
-      let featureFlagTestStage = createFeatureFlagViewModel({
+      let featureFlagTestStage = FeatureFlag.createFromBackendDict({
         description: 'This is a dummy feature flag.',
         feature_stage: FeatureStage.TEST,
         name: 'dummy_feature_flag_for_e2e_tests',
@@ -534,7 +525,7 @@ describe('Release coordinator page feature tab', function () {
     });
 
     it('should return text for prod feature stage', () => {
-      let featureFlagProdStage = createFeatureFlagViewModel({
+      let featureFlagProdStage = FeatureFlag.createFromBackendDict({
         description: 'This is a dummy feature flag.',
         feature_stage: FeatureStage.PROD,
         name: 'dummy_feature_flag_for_e2e_tests',
@@ -550,7 +541,7 @@ describe('Release coordinator page feature tab', function () {
   });
 
   describe('.getFeatureValidOnCurrentServer', () => {
-    let featureFlagDevStage = createFeatureFlagViewModel({
+    let featureFlagDevStage = FeatureFlag.createFromBackendDict({
       description: 'This is a dummy feature flag.',
       feature_stage: FeatureStage.DEV,
       name: 'dummy_feature_flag_for_e2e_tests',
@@ -560,7 +551,7 @@ describe('Release coordinator page feature tab', function () {
       last_updated: null,
     });
 
-    let featureFlagProdStage = createFeatureFlagViewModel({
+    let featureFlagProdStage = FeatureFlag.createFromBackendDict({
       description: 'This is a dummy feature flag.',
       feature_stage: FeatureStage.PROD,
       name: 'dummy_feature_flag_for_e2e_tests',
@@ -808,7 +799,7 @@ describe('Release coordinator page feature tab', function () {
     });
 
     it('should throw error if the feature name is not found', () => {
-      const featureFlag = createFeatureFlagViewModel({
+      const featureFlag = FeatureFlag.createFromBackendDict({
         description: 'This is a dummy feature flag.',
         feature_stage: FeatureStage.DEV,
         name: 'invalid',
@@ -827,7 +818,7 @@ describe('Release coordinator page feature tab', function () {
   describe('.validateFeatureFlagViewModel', () => {
     it('should return empty array if no issue', () => {
       const issues = component.validateFeatureFlagViewModel(
-        createFeatureFlagViewModel({
+        FeatureFlag.createFromBackendDict({
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           name: 'dummy_feature_flag_for_e2e_tests',
@@ -843,7 +834,7 @@ describe('Release coordinator page feature tab', function () {
 
     it('should return issues if rollout percentage is not between 10 and 100', () => {
       const issues = component.validateFeatureFlagViewModel(
-        createFeatureFlagViewModel({
+        FeatureFlag.createFromBackendDict({
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           name: 'dummy_feature_flag_for_e2e_tests',
