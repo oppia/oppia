@@ -237,8 +237,8 @@
     },
     {
       "name": "logged-out-user/click-all-buttons-on-teach-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-teach-page.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/click-all-buttons-on-teach-page.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-contact-us-page",
