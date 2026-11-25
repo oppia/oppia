@@ -109,6 +109,18 @@ describe('RteHelperModalComponent', () => {
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     alertsService = TestBed.inject(AlertsService);
     activeModal = TestBed.inject(NgbActiveModal);
+
+    // The save() method reads the entity context and image save destination from
+    // static fields on PageContextService. Pin them so the math save flow never
+    // depends on the Karma URL or on state left behind by another spec (see
+    // #27555). Tests that need a different value override it with their own
+    // per-test spy.
+    pageContextService.removeCustomEntityContext();
+    pageContextService.resetImageSaveDestination();
+    pageContextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.EXPLORATION,
+      'explorationId'
+    );
   });
 
   describe('when customization args has a valid youtube video', function () {
@@ -1259,6 +1271,18 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     alertsService = TestBed.inject(AlertsService);
+
+    // The save() method reads the entity context and image save destination from
+    // static fields on PageContextService. Pin them so the math save flow never
+    // depends on the Karma URL or on state left behind by another spec (see
+    // #27555). Tests that need a different value override it with their own
+    // per-test spy.
+    pageContextService.removeCustomEntityContext();
+    pageContextService.resetImageSaveDestination();
+    pageContextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.EXPLORATION,
+      'explorationId'
+    );
     fixture.detectChanges();
   });
 
