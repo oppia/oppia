@@ -63,6 +63,10 @@ export class ImageAreaSelection {
       throw new Error('Image not found.');
     }
 
+    // The start point (x, y) is a percentage of the whole image, so it is
+    // scaled against the image size (box.width / box.height).
+    // width and height are the size of the selected region, which is
+    // dragged out from that start point.
     const x = box.x + (box.width * xInPercentage) / 100;
     const y = box.y + (box.height * yInPercentage) / 100;
     const width = (box.width * widthInPercentage) / 100;
