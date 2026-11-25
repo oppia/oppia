@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * TR.CD. Review the translations.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Contributor} from '../../utilities/user/contributor';
@@ -32,7 +33,9 @@ import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 
-describe('Translation Reviewer', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Translation Reviewer', function () {
   let translationReviewer: TranslationReviewer &
     LoggedInUser &
     LoggedOutUser &
@@ -40,25 +43,28 @@ describe('Translation Reviewer', function () {
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(900000);
     translationReviewer = await UserFactory.createNewUser(
       'translatorReviewer',
       'translatorReviewer@example.com',
+      browser,
       [ROLES.TRANSLATION_REVIEWER],
       'hi'
     );
 
     translationSubmitter = await UserFactory.createNewUser(
       'translatorSubmitter',
-      'translatorSubmitter@example.com'
+      'translatorSubmitter@example.com',
+      browser
     );
     curriculumAdm = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdm@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    // Create translation opportunity.
     const explorationId =
       await curriculumAdm.createAndPublishExplorationWithCards(
         'Exploration 1',
@@ -68,7 +74,6 @@ describe('Translation Reviewer', function () {
     const explorationId2 =
       await curriculumAdm.createAndPublishExplorationWithCards('Exploration 2');
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',
@@ -78,20 +83,18 @@ describe('Translation Reviewer', function () {
       'The Picnic Problem',
       'the-picnic-problem',
       'Cutting the Pies',
-      explorationId as string,
+      explorationId,
       'Fractions'
     );
     await curriculumAdm.openStoryEditor('The Picnic Problem', 'Fractions');
     await curriculumAdm.addChapter('Trading Slices', explorationId2);
     await curriculumAdm.saveStoryDraft();
 
-    // Translate an exploration.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
 
-    // Add translations to "Cutting the Pies" in Hindi.
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
@@ -115,7 +118,6 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.typeTextForRTE('सामग्री 3');
     await translationSubmitter.clickOnElementWithText('Save and close');
 
-    // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
@@ -128,18 +130,17 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOnElementWithText('Save and close');
-  }, 900000);
+  });
 
-  it('should be able to view all pending reviews', async function () {
+  test('should be able to view all pending reviews', async function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.expectPinIconToBeVisible();
     await translationReviewer.expectScreenshotToMatch(
-      'translationReviewerReviewTab',
-      __dirname
+      'translationReviewerReviewTab'
     );
   });
 
-  it('should be able to move between review cards', async function () {
+  test('should be able to move between review cards', async function () {
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'Cutting the Pies',
       'Fractions - The Picnic Problem'
@@ -158,14 +159,12 @@ describe('Translation Reviewer', function () {
     await translationReviewer.clickOnPaginationButton('previous');
   });
 
-  it('should be able to accept the translation', async function () {
-    // Accept the translation without adding review comment.
+  test('should be able to accept the translation', async function () {
     await translationReviewer.submitTranslationReview('accept');
     await translationReviewer.expectCardContentToBeInTranslationReview(
       'सामग्री 1'
     );
 
-    // Accept the translation with adding review comment.
     await translationReviewer.submitTranslationReview(
       'accept',
       'Review comment'
@@ -174,7 +173,6 @@ describe('Translation Reviewer', function () {
       'सामग्री 2'
     );
 
-    // Accept the translation with adding review comment.
     await translationReviewer.clickOnElementWithText('Edit');
     // TODO(#23250): RTE not usable. Once the issue is fixed, uncomment the following line.
     // await translationReviewer.typeTextForRTE('Review comment');
@@ -188,11 +186,8 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  it('should be able to reject a translation', async function () {
-    // Shouldn't be able to reject a review without a comment.
+  test('should be able to reject a translation', async function () {
     await translationReviewer.expectRejectReviewButtonToBeDisabled();
-
-    // Should be able to reject a review with a comment.
     await translationReviewer.submitTranslationReview(
       'reject',
       'Some lines are not translated properly'
@@ -200,14 +195,13 @@ describe('Translation Reviewer', function () {
     await translationReviewer.expectReviewModalToBePresent(false);
   });
 
-  it('should be able to check contribution stats', async function () {
+  test('should be able to check contribution stats', async function () {
     await translationReviewer.navigateToTabInMyContributions(
       'Contribution Stats'
     );
     await translationReviewer.selectContributionTypeInContributionDashboard(
       'Translation Reviews'
     );
-
     await translationReviewer.expectContributionTableToContainRow([
       null,
       'Fractions',
@@ -216,18 +210,14 @@ describe('Translation Reviewer', function () {
       '3',
       '6',
     ]);
-
-    // Download certificate.
-    // TODO(#22743): Unable to download certificate when To date is of today
-    // and only contribution is made today.
   });
 
-  it('should be able to see the badges', async function () {
+  test('should be able to see the badges', async function () {
     await translationReviewer.navigateToTabInMyContributions('Badges');
     await translationReviewer.expectBadgesToContain('1', 'Review', 'हिन्दी');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

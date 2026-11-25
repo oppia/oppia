@@ -44,8 +44,40 @@ const selectTopicForAssignmentSelector = '.e2e-test-select-topic';
 
 const justifyContentDiv = 'div.justify-content-between';
 const userRoleDescriptionSelector = '.oppia-user-role-description';
+const addContributorUsernameInput = 'input#add-contribution-rights-user-input';
+const addContributionRightsCategorySelect =
+  'select#add-contribution-rights-category-select';
+const addContributionRightsLanguageSelect =
+  'select#add-contribution-rights-language-select';
+const addContributionRightsSubmitButton =
+  'button#add-contribution-rights-submit-button';
+const actionStatusMessageSelector = '.e2e-test-status-message';
 
 export class SuperAdmin extends LoggedInUser {
+  /**
+   * Opens the contributor dashboard admin page.
+   */
+  async navigateToContributorDashboardAdminPage(): Promise<void> {
+    await this.goto(testConstants.URLs.ContributorDashboardAdmin);
+  }
+
+  /**
+   * Grants a user translation-review rights for a language.
+   */
+  async addTranslationLanguageReviewRights(
+    username: string,
+    languageCode: string
+  ): Promise<void> {
+    await this.page.locator(addContributorUsernameInput).fill(username);
+    await this.select(addContributionRightsCategorySelect, 'translation');
+    await this.select(addContributionRightsLanguageSelect, languageCode);
+    await this.page.locator(addContributionRightsSubmitButton).click();
+    await this.expectTextContentToContain(
+      actionStatusMessageSelector,
+      'Success.'
+    );
+  }
+
   /**
    * The function to assign a role to a user.
    * @param {string} username - The username of the user to assign the role to.

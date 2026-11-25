@@ -88,6 +88,10 @@ const addQuestionButton = 'button.e2e-test-create-question-button';
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
 const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
+const storyTitleSelector = '.e2e-test-story-title';
+const storyEditorContainerSelector = '.e2e-test-story-editor';
+const mobileCollapsibleCardHeaderSelector =
+  '.oppia-mobile-collapsible-card-header';
 const addStoryButton = 'button.e2e-test-create-story-button';
 const storyTitleField = 'input.e2e-test-new-story-title-field';
 const storyUrlFragmentField =
@@ -558,6 +562,7 @@ export class TopicManager extends BaseUser {
     if (topicName) {
       await this.openTopicEditor(topicName);
     }
+
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileStoryDropdown);
     }
@@ -597,6 +602,39 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(publishStoryButton);
       await this.expectElementToBeVisible(unpublishStoryButton);
     }
+  }
+
+  /**
+   * Opens a story in the topic editor.
+   */
+  async openStoryEditor(storyName: string, topicName?: string): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
+
+    if (this.isViewportAtMobileWidth()) {
+      const storyTitles = this.page.locator(storyTitleSelector);
+      if (!(await storyTitles.first().isVisible())) {
+        await this.page
+          .locator(mobileCollapsibleCardHeaderSelector)
+          .nth(3)
+          .click();
+      }
+    }
+
+    const storyTitles = await this.page.locator(storyTitleSelector).all();
+    for (const storyTitle of storyTitles) {
+      if ((await storyTitle.textContent())?.trim() === storyName) {
+        await storyTitle.click();
+        await expect(
+          this.page.locator(storyEditorContainerSelector)
+        ).toBeVisible();
+        return;
+      }
+    }
+    throw new Error(
+      `Story with name ${storyName} not found in topic ${topicName}.`
+    );
   }
 
   /**

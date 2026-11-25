@@ -39,6 +39,12 @@ import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
 import {BlogPostEditorFactory} from '../user/blog-post-editor';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
+import {Contributor, ContributorFactory} from '../user/contributor';
+import {TranslationReviewerFactory} from '../user/translation-reviewer';
+import {
+  TranslationSubmitter,
+  TranslationSubmitterFactory,
+} from '../user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -56,6 +62,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
+  [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
   [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
 } as const;
@@ -87,7 +94,9 @@ type BasicRolesUser = LoggedOutUser &
   LoggedInUser &
   ExplorationEditor &
   CurriculumAdmin &
-  TopicManager;
+  TopicManager &
+  Contributor &
+  TranslationSubmitter;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -208,6 +217,22 @@ export class UserFactory {
             args as string
           );
           break;
+        case ROLES.TRANSLATION_REVIEWER: {
+          await superAdminInstance.navigateToContributorDashboardAdminPage();
+          const languages = typeof args === 'string' ? [args] : args;
+          if (!languages || languages.length === 0) {
+            throw new Error(
+              'At least one language is required for translation reviewer rights.'
+            );
+          }
+          for (const language of languages) {
+            await superAdminInstance.addTranslationLanguageReviewRights(
+              user.username,
+              language
+            );
+          }
+          break;
+        }
         case ROLES.VOICEOVER_SUBMITTER:
           if (typeof args !== 'string') {
             throw new Error(
@@ -269,6 +294,8 @@ export class UserFactory {
       ExplorationEditorFactory(page),
       CurriculumAdminFactory(page),
       TopicManagerFactory(page),
+      ContributorFactory(page),
+      TranslationSubmitterFactory(page),
     ]);
 
     user.username = username;

@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * TR.CD.01 Filter the translations.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Contributor} from '../../utilities/user/contributor';
@@ -32,7 +33,9 @@ import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 
-describe('Translation Reviewer', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Translation Reviewer', function () {
   let translationReviewer: TranslationReviewer &
     LoggedInUser &
     LoggedOutUser &
@@ -40,25 +43,28 @@ describe('Translation Reviewer', function () {
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(1200000);
     translationReviewer = await UserFactory.createNewUser(
       'translatorReviewer',
       'translatorReviewer@example.com',
+      browser,
       [ROLES.TRANSLATION_REVIEWER],
       ['hi', 'ak']
     );
 
     translationSubmitter = await UserFactory.createNewUser(
       'translatorSubmitter',
-      'translatorSubmitter@example.com'
+      'translatorSubmitter@example.com',
+      browser
     );
     curriculumAdm = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdm@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    // Create translation opportunity.
     const explorationId =
       await curriculumAdm.createAndPublishAMinimalExplorationWithTitle(
         'Exploration 1',
@@ -74,7 +80,6 @@ describe('Translation Reviewer', function () {
         'Exploration 3'
       );
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',
@@ -84,7 +89,7 @@ describe('Translation Reviewer', function () {
       'The Picnic Problem',
       'the-picnic-problem',
       'Cutting the Pies',
-      explorationId as string,
+      explorationId,
       'Fractions'
     );
     await curriculumAdm.openStoryEditor('The Picnic Problem', 'Fractions');
@@ -100,17 +105,14 @@ describe('Translation Reviewer', function () {
       'The Ideal Gas Law',
       'the-ideal-gas-law',
       'Chemical Reactions',
-      explorationId3 as string,
+      explorationId3,
       'States of Matter'
     );
 
-    // Translate an exploration.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
-
-    // Add translations to "Cutting the Pies" in Hindi.
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
@@ -119,7 +121,6 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.typeTextForRTE('सामग्री 0 (पाई काटना)');
     await translationSubmitter.clickOnElementWithText('Save and close');
 
-    // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
@@ -130,7 +131,6 @@ describe('Translation Reviewer', function () {
     );
     await translationSubmitter.clickOnElementWithText('Save and close');
 
-    // Add translations to "Chemical Reactions" in Hindi.
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Chemical Reactions',
@@ -138,19 +138,17 @@ describe('Translation Reviewer', function () {
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText('Save and close');
-  }, 1200000);
+  });
 
-  it('should be able to filter by topic', async function () {
+  test('should be able to filter by topic', async function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.filterContentByTopic('Fractions');
 
-    // Translation of "States of Matter" should not be present.
     await translationReviewer.expectOpportunityToBePresent(
       'Chemical Reactions',
       'States of Matter',
       false
     );
-    // Translation of "Fractions" should be present.
     await translationReviewer.expectOpportunityToBePresent(
       'Cutting the Pies',
       'Fractions',
@@ -163,16 +161,14 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  it('should be able to filter translations by language', async function () {
+  test('should be able to filter translations by language', async function () {
     await translationReviewer.selectLanguageFilter('हिन्दी (Hindi)');
 
-    // Translation in Hindi should be present.
     await translationReviewer.expectOpportunityToBePresent(
       'Cutting the Pies',
       'Fractions',
       true
     );
-    // Translation in Akan should not be present.
     await translationReviewer.expectOpportunityToBePresent(
       'Trading Slices',
       'Fractions',
@@ -180,7 +176,7 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
