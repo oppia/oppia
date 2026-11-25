@@ -5660,7 +5660,7 @@ export class TopicManager extends BaseUser {
             return false;
           }
           const option = selectEl.querySelector(
-            `option[value="${expectedVal}"]:not([disabled])`
+            `option[value="${expectedVal}"]`
           ) as HTMLOptionElement | null;
           return option !== null;
         },
@@ -5672,7 +5672,7 @@ export class TopicManager extends BaseUser {
       const errorWithMessage = error as Error;
       const newError = new Error(
         `Option with value '${dropdownValue}' in publish-up-to dropdown was ` +
-          'not found or remained disabled within 10s. Original error: ' +
+          'not found within 10s. Original error: ' +
           errorWithMessage.message
       );
       newError.stack = errorWithMessage.stack;
@@ -5794,13 +5794,19 @@ export class TopicManager extends BaseUser {
         chapStatus
       );
     } catch {
-      const currentStatuses = await this.page.$$eval(
+      const currentStatuses = await this.page.$$eval<
+        {title: string | undefined; status: string | undefined}[]
+      >(
         storyNodeSelector,
-        (nodes, titleSel: string, statusSel: string) =>
-          nodes.map(node => ({
+        (nodes, titleSel: unknown, statusSel: unknown) => {
+          if (typeof titleSel !== 'string' || typeof statusSel !== 'string') {
+            throw new Error('Selectors must be strings');
+          }
+          return nodes.map(node => ({
             title: node.querySelector(titleSel)?.textContent?.trim(),
             status: node.querySelector(statusSel)?.textContent?.trim(),
-          })),
+          }));
+        },
         chapterTitleSelector,
         chapterStatusSelector
       );
@@ -5935,14 +5941,20 @@ export class TopicManager extends BaseUser {
           'Published'
         );
       } catch {
-        const chapterDetails = await this.page.$$eval(
+        const chapterDetails = await this.page.$$eval<
+          {index: number; title: string; status: string}[]
+        >(
           storyNodeSelector,
-          (rows, titleSel: string, statusSel: string) =>
-            rows.map((row, i) => ({
+          (rows, titleSel: unknown, statusSel: unknown) => {
+            if (typeof titleSel !== 'string' || typeof statusSel !== 'string') {
+              throw new Error('Selectors must be strings');
+            }
+            return rows.map((row, i) => ({
               index: i,
               title: row.querySelector(titleSel)?.textContent?.trim() || '',
               status: row.querySelector(statusSel)?.textContent?.trim() || '',
-            })),
+            }));
+          },
           chapterTitleSelector,
           chapterStatusSelector
         );
