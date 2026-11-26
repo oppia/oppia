@@ -37,8 +37,6 @@ const createExplorationButtonSelector =
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
-const mobileSettingsBarSelector = 'li.e2e-test-mobile-settings-button';
-const basicSettingsDropdown = 'h3.e2e-test-settings-container';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
@@ -2364,7 +2362,6 @@ export class ExplorationEditor extends BaseUser {
       );
     }
   }
-
 }
 
 export const ExplorationEditorFactory = (page: Page): ExplorationEditor => {
