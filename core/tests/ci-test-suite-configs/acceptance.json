@@ -352,8 +352,8 @@
     },
     {
       "name": "exploration-creator/exploration-history",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-history.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-creator/exploration-history.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-creator/exploration-settings",
