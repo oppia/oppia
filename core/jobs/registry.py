@@ -84,6 +84,9 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     voiceover_synthesis_jobs,
     web_feedback_cleanup_jobs,
 )
+from core.jobs.batch_jobs.datastore_audit import (  # pylint: disable=unused-import
+    config_jobs,
+)
 
 from typing import List, Type
 
