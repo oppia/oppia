@@ -4172,6 +4172,7 @@ export class LoggedOutUser extends BaseUser {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
     }
   }
+
   /**
    * Simulates pressing a keyboard shortcut.
    * @param {string} shortcut - The keyboard shortcut to press.
