@@ -802,6 +802,24 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to direct learners to an already existing card for default response.
+   * @param {string} cardName - The name of the card to which learners will be directed.
+   */
+  async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
+    const isDestinationSelectorVisible = await this.page
+      .locator(destinationCardSelector)
+      .isVisible();
+    if (!isDestinationSelectorVisible) {
+      await this.expectElementToBeVisible(openOutcomeDestButton);
+      await this.clickOnElementWithSelector(openOutcomeDestButton);
+    }
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, cardName);
+    await this.clickOnElementWithSelector(saveOutcomeDestButton);
+    await this.expectElementToBeVisible(saveOutcomeDestButton, false);
+  }
+
+  /**
    * Function to dismiss translation tab welcome modal.
    */
   async dismissTranslationTabWelcomeModal(): Promise<void> {
