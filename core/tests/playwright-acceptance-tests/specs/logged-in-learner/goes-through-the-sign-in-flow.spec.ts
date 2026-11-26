@@ -26,7 +26,6 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
@@ -35,24 +34,12 @@ test.describe.configure({mode: 'serial'});
 
 test.describe('Logged In Learner', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
-  let releaseCoordinator: ReleaseCoordinator;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let explorationId: string;
 
   test.beforeAll(async function ({browser}) {
     test.setTimeout(600000);
     loggedInUser = await UserFactory.createUserForSignup(browser);
-    // Create release coordinator to enable redesigned learner dashboard.
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      browser,
-      [ROLES.RELEASE_COORDINATOR]
-    );
-    await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
-    );
-
     // Create curriculum admin to create topic, story, and chapter.
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
