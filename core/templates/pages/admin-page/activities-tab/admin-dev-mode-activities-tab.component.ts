@@ -34,6 +34,9 @@ import {Story} from 'domain/story/story.model';
   styleUrls: ['./admin-dev-mode-activities-tab.component.css'],
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
+  readonly MAX_TOTAL_DUMMY_EXPLORATIONS: number = 500;
+  // This must remain <= MAX_DUMMY_EXPLORATIONS_PER_REQ in admin.py.
+  readonly DUMMY_EXPLORATION_BATCH_SIZE: number = 25;
   @Output() setStatusMessage = new EventEmitter<string>();
   reloadingAllExplorationPossible: boolean = false;
   demoExplorationIds: string[] = [];
@@ -157,6 +160,21 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   }
 
   generateDummyExplorations(): void {
+    if (this.numDummyExpsToGenerate <= 0) {
+      this.setStatusMessage.emit('Generate count must be greater than 0.');
+      return;
+    }
+
+    if (this.numDummyExpsToGenerate > this.MAX_TOTAL_DUMMY_EXPLORATIONS) {
+      this.setStatusMessage.emit(
+        'Cannot generate more than ' +
+          `${this.MAX_TOTAL_DUMMY_EXPLORATIONS} dummy explorations at once. ` +
+          `Requested: ${this.numDummyExpsToGenerate}. ` +
+          'Please try generating explorations in smaller batches.'
+      );
+      return;
+    }
+
     // Generate dummy explorations with random title.
     if (this.numDummyExpsToPublish > this.numDummyExpsToGenerate) {
       this.setStatusMessage.emit(
@@ -164,25 +182,59 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       );
       return;
     }
+
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
-    this.adminBackendApiService
-      .generateDummyExplorationsAsync(
-        this.numDummyExpsToGenerate,
-        this.numDummyExpsToPublish
-      )
-      .then(
-        () => {
-          this.getDataAsync();
-          this.setStatusMessage.emit(
-            'Dummy explorations generated successfully.'
-          );
-        },
-        errorResponse => {
-          this.setStatusMessage.emit('Server error: ' + errorResponse);
-        }
+
+    let totalToGenerate = this.numDummyExpsToGenerate;
+    let totalToPublish = this.numDummyExpsToPublish;
+
+    let generatedSoFar = 0;
+    let publishedSoFar = 0;
+
+    const processNextBatch = (): void => {
+      if (generatedSoFar >= totalToGenerate) {
+        this.getDataAsync();
+        this.setStatusMessage.emit(
+          'Dummy explorations generated successfully.'
+        );
+        this.adminTaskManagerService.finishTask();
+        return;
+      }
+
+      let currentBatchGenerate = Math.min(
+        this.DUMMY_EXPLORATION_BATCH_SIZE,
+        totalToGenerate - generatedSoFar
       );
-    this.adminTaskManagerService.finishTask();
+      let currentBatchPublish = Math.max(
+        0,
+        Math.min(currentBatchGenerate, totalToPublish - publishedSoFar)
+      );
+
+      this.setStatusMessage.emit(
+        `Processing... (${generatedSoFar}/${totalToGenerate} generated)`
+      );
+
+      this.adminBackendApiService
+        .generateDummyExplorationsAsync(
+          currentBatchGenerate,
+          currentBatchPublish
+        )
+        .then(
+          () => {
+            generatedSoFar += currentBatchGenerate;
+            publishedSoFar += currentBatchPublish;
+            processNextBatch();
+          },
+          errorResponse => {
+            this.getDataAsync();
+            this.setStatusMessage.emit('Server error: ' + errorResponse);
+            this.adminTaskManagerService.finishTask();
+          }
+        );
+    };
+
+    processNextBatch();
   }
 
   generateDummyTranslationOpportunities(): void {
