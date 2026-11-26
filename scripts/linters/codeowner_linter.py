@@ -61,6 +61,7 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/domain/html*.py',
     '/core/domain/html_translation_services*.py',
     '/core/domain/rights_manager*.py',
+    '/core/domain/role_domain*.py',
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',
     '/LICENSE',
