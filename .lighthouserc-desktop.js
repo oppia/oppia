@@ -727,7 +727,7 @@ module.exports = {
         },
         {
           matchingUrlPattern:
-            '^http://localhost:8181/learn/staging/dummy-topic-one/test/arc/.+$',
+            '^http://localhost:8181/learn/staging/dummy-topic-one/test/module/.+$',
           pagePerfThresholds: {
             fcp: 5550,
             speedIndex: 6150,

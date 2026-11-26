@@ -33,8 +33,9 @@ from typing import Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import user_models
+    from mypy_imports import config_models, user_models
 
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
@@ -280,6 +281,79 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     ],
                     expected_feature_flags_dict,
                 )
+
+    def test_load_feature_flags_from_storage_uses_legacy_name(self) -> None:
+        # The setUp method creates the new-name row for every test feature, so
+        # remove it to simulate a deployment that only has the legacy row.
+        new_name_model = config_models.FeatureFlagConfigModel.get_by_id(
+            FeatureNames.FEATURE_A.value
+        )
+        assert new_name_model is not None
+        new_name_model.delete()
+        config_models.FeatureFlagConfigModel.create(
+            'legacy_feature_a', True, 30, [self.USER_GROUP_1]
+        )
+        swap_legacy_names = self.swap(
+            feature_services,
+            'FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME',
+            {FeatureNames.FEATURE_A.value: 'legacy_feature_a'},
+        )
+
+        with self.swap_name_to_description_feature_stage_dict, (
+            swap_legacy_names
+        ):
+            feature_flags = feature_services.load_feature_flags_from_storage(
+                [FeatureNames.FEATURE_A.value]
+            )
+
+        feature_flag = feature_flags[FeatureNames.FEATURE_A.value]
+        self.assertIsNotNone(feature_flag)
+        assert feature_flag is not None
+        # The feature is returned under the current name even though its
+        # persisted configuration is stored under the legacy name.
+        self.assertEqual(feature_flag.name, FeatureNames.FEATURE_A.value)
+        self.assertTrue(
+            feature_flag.feature_flag_config.force_enable_for_all_users
+        )
+        self.assertEqual(
+            feature_flag.feature_flag_config.rollout_percentage, 30
+        )
+        self.assertEqual(
+            feature_flag.feature_flag_config.user_group_ids,
+            [self.USER_GROUP_1],
+        )
+
+    def test_load_feature_flags_from_storage_prefers_new_name(self) -> None:
+        config_models.FeatureFlagConfigModel.create(
+            'legacy_feature_a', True, 30, [self.USER_GROUP_1]
+        )
+        config_models.FeatureFlagConfigModel.create(
+            FeatureNames.FEATURE_A.value, False, 5, [self.USER_GROUP_2]
+        )
+        swap_legacy_names = self.swap(
+            feature_services,
+            'FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME',
+            {FeatureNames.FEATURE_A.value: 'legacy_feature_a'},
+        )
+
+        with self.swap_name_to_description_feature_stage_dict, (
+            swap_legacy_names
+        ):
+            feature_flags = feature_services.load_feature_flags_from_storage(
+                [FeatureNames.FEATURE_A.value]
+            )
+
+        feature_flag = feature_flags[FeatureNames.FEATURE_A.value]
+        self.assertIsNotNone(feature_flag)
+        assert feature_flag is not None
+        self.assertFalse(
+            feature_flag.feature_flag_config.force_enable_for_all_users
+        )
+        self.assertEqual(feature_flag.feature_flag_config.rollout_percentage, 5)
+        self.assertEqual(
+            feature_flag.feature_flag_config.user_group_ids,
+            [self.USER_GROUP_2],
+        )
 
     def test_get_all_features_dicts_raises_error_when_feature_not_present(
         self,

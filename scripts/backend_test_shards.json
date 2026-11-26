@@ -339,6 +339,7 @@
         "core.controllers.voice_artist_test",
         "core.jobs.batch_jobs.skill_migration_jobs_test",
         "core.jobs.batch_jobs.story_migration_jobs_test",
+        "core.jobs.batch_jobs.story_module_migration_jobs_test",
         "core.jobs.batch_jobs.email_deletion_jobs_test",
         "core.jobs.batch_jobs.topic_migration_jobs_test",
         "core.jobs.batch_jobs.blog_author_details_migration_jobs_test",

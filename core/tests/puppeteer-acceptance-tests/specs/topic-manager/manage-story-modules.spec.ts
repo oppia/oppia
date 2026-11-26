@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1mDDP9joYRWjYExWghmPcqV4RTut6BOMqqUHOkxL_npI/edit?tab=t.4t336fwwj9ly
  *
- * TM.SA Manage story adventures in the story editor.
+ * TM.SA Manage story modules in the story editor.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -49,7 +49,7 @@ describe('Topic Manager', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlag('story_editor_modules');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     for (let i = 0; i < 11; i++) {
@@ -61,27 +61,27 @@ describe('Topic Manager', function () {
     }
 
     await curriculumAdmin.createAndPublishTopic(
-      'Adventure Topic',
-      'adventure-topic',
-      'Adventure Topic'
+      'Module Topic',
+      'module-topic',
+      'Module Topic'
     );
     await curriculumAdmin.createAndPublishClassroom(
       'Maths',
       'maths',
-      'Adventure Topic'
+      'Module Topic'
     );
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      'Adventure Topic'
+      'Module Topic'
     );
 
     await curriculumAdmin.addStoryToTopic(
-      'The Adventure Story',
-      'the-adventure-story',
-      'Adventure Topic'
+      'The Module Story',
+      'the-module-story',
+      'Module Topic'
     );
 
     for (let i = 0; i < CHAPTER_TITLES.length; i++) {
@@ -96,25 +96,22 @@ describe('Topic Manager', function () {
   }, 2700000);
 
   it(
-    'should create a new adventure from existing chapters',
+    'should create a new module from existing chapters',
     async function () {
-      await topicManager.openStoryEditor(
-        'The Adventure Story',
-        'Adventure Topic'
-      );
+      await topicManager.openStoryEditor('The Module Story', 'Module Topic');
 
-      await topicManager.expectAllChaptersInSingleAdventure(CHAPTER_TITLES);
+      await topicManager.expectAllChaptersInSingleModule(CHAPTER_TITLES);
 
       await topicManager.scrollToTopOfPage();
 
       await topicManager.expectScreenshotToMatch(
-        'storyEditorAllChaptersInSingleAdventure',
+        'storyEditorAllChaptersInSingleModule',
         __dirname
       );
 
-      await topicManager.splitIntoAdventure('Chapter 3');
-      await topicManager.expectAdventureCount(2);
-      await topicManager.expectAdventureHeaderToBeVisible('Module 2');
+      await topicManager.splitIntoModule('Chapter 3');
+      await topicManager.expectModuleCount(2);
+      await topicManager.expectModuleHeaderToBeVisible('Module 2');
 
       await topicManager.scrollToTopOfPage();
 
@@ -129,21 +126,21 @@ describe('Topic Manager', function () {
   );
 
   it(
-    'should edit an adventure metadata',
+    'should edit an module metadata',
     async function () {
-      await topicManager.fillEditAdventureModal(
+      await topicManager.fillEditModuleModal(
         'Part Two',
         'The second part of the story'
       );
 
       await topicManager.expectScreenshotToMatch(
-        'storyEditorEditAdventureModal',
+        'storyEditorEditModuleModal',
         __dirname
       );
 
-      await topicManager.saveEditAdventureModal();
+      await topicManager.saveEditModuleModal();
 
-      await topicManager.expectAdventureToHave(
+      await topicManager.expectModuleToHave(
         'Part Two',
         'The second part of the story'
       );
@@ -151,18 +148,15 @@ describe('Topic Manager', function () {
       await topicManager.scrollToTopOfPage();
 
       await topicManager.expectScreenshotToMatch(
-        'storyEditorAfterEditingAdventureMetadata',
+        'storyEditorAfterEditingModuleMetadata',
         __dirname
       );
 
       await topicManager.saveStoryDraft();
 
-      await topicManager.openStoryEditor(
-        'The Adventure Story',
-        'Adventure Topic'
-      );
+      await topicManager.openStoryEditor('The Module Story', 'Module Topic');
 
-      await topicManager.expectAdventureToHave(
+      await topicManager.expectModuleToHave(
         'Part Two',
         'The second part of the story'
       );
@@ -171,23 +165,23 @@ describe('Topic Manager', function () {
   );
 
   it(
-    'should remove an adventure boundary',
+    'should remove an module boundary',
     async function () {
-      await topicManager.removeAdventureBoundary();
-      await topicManager.expectAdventureCount(1);
+      await topicManager.removeModuleBoundary();
+      await topicManager.expectModuleCount(1);
 
-      await topicManager.splitIntoAdventure('Chapter 7');
-      await topicManager.expectAdventureCount(2);
+      await topicManager.splitIntoModule('Chapter 7');
+      await topicManager.expectModuleCount(2);
 
-      await topicManager.removeAdventureBoundary();
-      await topicManager.expectAdventureCount(1);
+      await topicManager.removeModuleBoundary();
+      await topicManager.expectModuleCount(1);
 
       await topicManager.closeStoryEditorMobileNavbarOptions();
 
       await topicManager.scrollToTopOfPage();
 
       await topicManager.expectScreenshotToMatch(
-        'storyEditorAfterRemovingAdventureBoundary',
+        'storyEditorAfterRemovingModuleBoundary',
         __dirname
       );
     },
@@ -195,19 +189,16 @@ describe('Topic Manager', function () {
   );
 
   it(
-    'should save changes in the story with adventure groupings',
+    'should save changes in the story with module groupings',
     async function () {
-      await topicManager.splitIntoAdventure('Chapter 7');
-      await topicManager.expectAdventureCount(2);
+      await topicManager.splitIntoModule('Chapter 7');
+      await topicManager.expectModuleCount(2);
 
       await topicManager.saveStoryDraft();
 
-      await topicManager.openStoryEditor(
-        'The Adventure Story',
-        'Adventure Topic'
-      );
+      await topicManager.openStoryEditor('The Module Story', 'Module Topic');
 
-      await topicManager.expectAdventureCount(2);
+      await topicManager.expectModuleCount(2);
 
       await topicManager.expectScreenshotToMatch(
         'storyEditorAfterReloadPersistedGroupings',

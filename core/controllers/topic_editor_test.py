@@ -262,11 +262,11 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         ]
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_4'
-        story.story_contents.add_arc(
-            story_domain.Arc(
-                'arc_1',
-                'Adventure 1',
-                'First adventure',
+        story.story_contents.add_module(
+            story_domain.Module(
+                'module_1',
+                'Module 1',
+                'First module',
                 ['node_1', 'node_2', 'node_3'],
             )
         )
@@ -375,12 +375,12 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
                 canonical_story_summary_dict['overdue_chapters_count'], 1
             )
             self.assertEqual(
-                canonical_story_summary_dict['arcs'],
+                canonical_story_summary_dict['modules'],
                 [
                     {
-                        'id': 'arc_1',
-                        'title': 'Adventure 1',
-                        'description': 'First adventure',
+                        'id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1', 'node_2', 'node_3'],
                     }
                 ],
@@ -478,11 +478,11 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         ]
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_3'
-        story.story_contents.add_arc(
-            story_domain.Arc(
-                'arc_1',
-                'Adventure 1',
-                'First adventure',
+        story.story_contents.add_module(
+            story_domain.Module(
+                'module_1',
+                'Module 1',
+                'First module',
                 ['node_1', 'node_2'],
             )
         )

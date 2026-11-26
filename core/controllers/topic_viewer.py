@@ -59,7 +59,7 @@ class StoryResponseDict(TypedDict, total=False):
     story_is_published: bool
     completed_node_titles: List[str]
     all_node_dicts: List[StoryNodeResponseDict]
-    arcs: List[story_domain.ArcDict]
+    modules: List[story_domain.ModuleDict]
 
 
 class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -103,9 +103,11 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for additional_story_id in additional_story_ids
         ]
 
-        are_story_arcs_enabled = feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.STORY_EDITOR_ARCS.value,
-            None,
+        are_story_modules_enabled = (
+            feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.STORY_EDITOR_MODULES.value,
+                None,
+            )
         )
 
         canonical_story_dicts: List[StoryResponseDict] = []
@@ -149,10 +151,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [],
             }
-            if are_story_arcs_enabled:
+            if are_story_modules_enabled:
                 story = story_fetchers.get_story_by_id(story_summary.id)
-                canonical_story_dict['arcs'] = [
-                    arc.to_dict() for arc in story.story_contents.arcs
+                canonical_story_dict['modules'] = [
+                    module.to_dict() for module in story.story_contents.modules
                 ]
             canonical_story_dicts.append(canonical_story_dict)
             canonical_story_nodes.append(filtered_nodes)
@@ -185,10 +187,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [],
             }
-            if are_story_arcs_enabled:
+            if are_story_modules_enabled:
                 story = story_fetchers.get_story_by_id(story_summary.id)
-                additional_story_dict['arcs'] = [
-                    arc.to_dict() for arc in story.story_contents.arcs
+                additional_story_dict['modules'] = [
+                    module.to_dict() for module in story.story_contents.modules
                 ]
             additional_story_dicts.append(additional_story_dict)
 

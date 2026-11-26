@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditArcModalComponent.
+ * @fileoverview Unit tests for EditModuleModalComponent.
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {EditArcModalComponent} from './edit-arc-modal.component';
+import {EditModuleModalComponent} from './edit-module-modal.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockActiveModal {
@@ -39,9 +39,9 @@ class MockBottomSheetRef {
   }
 }
 
-describe('Edit Arc Modal Component', () => {
-  let fixture: ComponentFixture<EditArcModalComponent>;
-  let component: EditArcModalComponent;
+describe('Edit Module Modal Component', () => {
+  let fixture: ComponentFixture<EditModuleModalComponent>;
+  let component: EditModuleModalComponent;
   let ngbActiveModal: NgbActiveModal;
   let bottomSheetRef: MatBottomSheetRef;
 
@@ -49,7 +49,7 @@ describe('Edit Arc Modal Component', () => {
     beforeEach(() => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
-        declarations: [EditArcModalComponent, MockTranslatePipe],
+        declarations: [EditModuleModalComponent, MockTranslatePipe],
         providers: [
           {
             provide: NgbActiveModal,
@@ -58,16 +58,16 @@ describe('Edit Arc Modal Component', () => {
         ],
         schemas: [NO_ERRORS_SCHEMA],
       });
-      fixture = TestBed.createComponent(EditArcModalComponent);
+      fixture = TestBed.createComponent(EditModuleModalComponent);
       component = fixture.componentInstance;
       ngbActiveModal = TestBed.inject(NgbActiveModal);
-      component.arcTitle = 'Module 2';
-      component.arcDescription = 'Basics of fractions';
+      component.moduleTitle = 'Module 2';
+      component.moduleDescription = 'Basics of fractions';
     });
 
     it('should initialize fields from inputs', () => {
-      expect(component.arcTitle).toBe('Module 2');
-      expect(component.arcDescription).toBe('Basics of fractions');
+      expect(component.moduleTitle).toBe('Module 2');
+      expect(component.moduleDescription).toBe('Basics of fractions');
     });
 
     it('should dismiss modal on cancel', () => {
@@ -80,7 +80,7 @@ describe('Edit Arc Modal Component', () => {
 
     it('should show error when title is empty', () => {
       const closeSpy = spyOn(ngbActiveModal, 'close');
-      component.arcTitle = '   ';
+      component.moduleTitle = '   ';
 
       component.save();
 
@@ -90,8 +90,8 @@ describe('Edit Arc Modal Component', () => {
 
     it('should close modal with trimmed values', () => {
       const closeSpy = spyOn(ngbActiveModal, 'close');
-      component.arcTitle = '  Module 3  ';
-      component.arcDescription = '  Intro to decimals  ';
+      component.moduleTitle = '  Module 3  ';
+      component.moduleDescription = '  Intro to decimals  ';
 
       component.save();
 
@@ -106,7 +106,7 @@ describe('Edit Arc Modal Component', () => {
     beforeEach(() => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
-        declarations: [EditArcModalComponent, MockTranslatePipe],
+        declarations: [EditModuleModalComponent, MockTranslatePipe],
         providers: [
           {
             provide: MatBottomSheetRef,
@@ -115,11 +115,11 @@ describe('Edit Arc Modal Component', () => {
         ],
         schemas: [NO_ERRORS_SCHEMA],
       });
-      fixture = TestBed.createComponent(EditArcModalComponent);
+      fixture = TestBed.createComponent(EditModuleModalComponent);
       component = fixture.componentInstance;
       bottomSheetRef = TestBed.inject(MatBottomSheetRef);
-      component.arcTitle = 'Module 2';
-      component.arcDescription = 'Basics of fractions';
+      component.moduleTitle = 'Module 2';
+      component.moduleDescription = 'Basics of fractions';
     });
 
     it('should dismiss bottom sheet on cancel', () => {
@@ -132,7 +132,7 @@ describe('Edit Arc Modal Component', () => {
 
     it('should show error when title is empty in bottom sheet', () => {
       const dismissSpy = spyOn(bottomSheetRef, 'dismiss');
-      component.arcTitle = '   ';
+      component.moduleTitle = '   ';
 
       component.save();
 
@@ -142,8 +142,8 @@ describe('Edit Arc Modal Component', () => {
 
     it('should dismiss bottom sheet with trimmed values on save', () => {
       const dismissSpy = spyOn(bottomSheetRef, 'dismiss');
-      component.arcTitle = '  Module 3  ';
-      component.arcDescription = '  Intro to decimals  ';
+      component.moduleTitle = '  Module 3  ';
+      component.moduleDescription = '  Intro to decimals  ';
 
       component.save();
 
