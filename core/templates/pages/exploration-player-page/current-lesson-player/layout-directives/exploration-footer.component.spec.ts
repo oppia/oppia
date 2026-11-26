@@ -656,7 +656,7 @@ describe('ExplorationFooterComponent', () => {
       spyOn(
         learnerViewInfoBackendApiService,
         'fetchLearnerInfoAsync'
-      ).and.returnValue(Promise.reject());
+      ).and.callFake(() => Promise.reject());
       spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
         3
       );
@@ -1129,7 +1129,7 @@ describe('ExplorationFooterComponent', () => {
       spyOn(
         learnerViewInfoBackendApiService,
         'fetchLearnerInfoAsync'
-      ).and.returnValue(Promise.reject());
+      ).and.callFake(() => Promise.reject());
       spyOn(loggerService, 'error');
 
       component.showInformationCard();
