@@ -202,3 +202,21 @@ mat-icon.unpin-icon {
     display: block;
   }
 }
+
+.oppia-update-needed-badge {
+  background-color: #f39c12;
+  border-radius: 4px;
+  color: #000;
+  font-size: 0.85em;
+  margin-left: 10px;
+  padding: 2px 6px;
+}
+
+.oppia-new-translation-badge {
+  background-color: #2ecc71;
+  border-radius: 4px;
+  color: #000;
+  font-size: 0.85em;
+  margin-left: 10px;
+  padding: 2px 6px;
+}

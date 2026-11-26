@@ -61,6 +61,7 @@ describe('TranslateTextService', () => {
       content_type: 'content',
       interaction_id: null,
       rule_type: null,
+      status: 'new',
     };
   };
 
@@ -267,6 +268,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
 
       const expectedTextAndAvailability2 = {
@@ -278,6 +280,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
 
       const expectedTextAndAvailability1 = {
@@ -289,6 +292,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
 
       const expectedTextAndPreviousAvailability1 = {
@@ -300,6 +304,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
 
       textAndAvailability = translateTextService.getTextToTranslate();
@@ -333,6 +338,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
       const sampleStateWiseContentMapping = {
         stateName1: {contentId1: getTranslatableItem('text1')},
@@ -364,6 +370,7 @@ describe('TranslateTextService', () => {
         contentType: undefined,
         interactionId: undefined,
         ruleType: undefined,
+        translationStatus: undefined,
       };
       const sampleStateWiseContentMapping = {
         stateName1: {contentId1: getTranslatableItem('')},
@@ -433,6 +440,7 @@ describe('TranslateTextService', () => {
             content_format: 'html',
             content_value: 'text1',
             state_name: 'stateName1',
+            status: 'new',
           },
         ],
         version: '2',
@@ -447,6 +455,9 @@ describe('TranslateTextService', () => {
       flushMicrotasks();
 
       expect(translateTextService.stateAndContent[0].contentText).toBe('text1');
+      expect(translateTextService.stateAndContent[0].translationStatus).toBe(
+        'new'
+      );
     }));
   });
 
