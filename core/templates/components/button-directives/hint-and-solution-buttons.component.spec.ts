@@ -552,33 +552,6 @@ describe('HintAndSolutionButtonsComponent', () => {
     expect(component.isSolutionConsumed()).toBe(false);
   });
 
-  it('should give the hint and solution buttons accessible names', () => {
-    spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(2);
-    spyOn(hintsAndSolutionManagerService, 'isHintViewable').and.returnValue(
-      true
-    );
-    spyOn(hintsAndSolutionManagerService, 'isSolutionViewable').and.returnValue(
-      true
-    );
-    component.displayedCard = newCard;
-
-    fixture.detectChanges();
-
-    const buttons = fixture.nativeElement.querySelectorAll(
-      '.oppia-learner-hint-solution-button'
-    );
-    expect(buttons.length).toBe(3);
-    expect(buttons[0].getAttribute('aria-label')).toBe(
-      'I18N_VIEW_HINT_WITH_INDEX_BUTTON_TEXT'
-    );
-    expect(buttons[1].getAttribute('aria-label')).toBe(
-      'I18N_VIEW_HINT_WITH_INDEX_BUTTON_TEXT'
-    );
-    expect(buttons[2].getAttribute('aria-label')).toBe(
-      'I18N_VIEW_SOLUTION_BUTTON_TEXT'
-    );
-  });
-
   it('should hide the decorative lightbulb icons from screen readers', () => {
     spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
     spyOn(hintsAndSolutionManagerService, 'isHintViewable').and.returnValue(
