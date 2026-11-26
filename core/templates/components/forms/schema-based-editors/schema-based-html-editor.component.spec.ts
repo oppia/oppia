@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Schema Based Html Editor Component
  */
 
-// @ts-nocheck
-
 import {
   FormControl,
   FormsModule,

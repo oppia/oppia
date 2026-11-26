@@ -16,8 +16,6 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -29,6 +27,7 @@ import {CsrfTokenService} from 'services/csrf-token.service';
 import {
   PreferencesBackendDict,
   UserBackendApiService,
+  UserContributionRightsDataBackendDict,
 } from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
@@ -152,11 +151,13 @@ describe('User Backend Api Service', () => {
   }));
 
   it('should return user contribution rights data', fakeAsync(() => {
-    const sampleUserContributionRightsDict = {
-      translation: ['hi'],
-      voiceover: [],
-      question: true,
-    };
+    const sampleUserContributionRightsDict: UserContributionRightsDataBackendDict =
+      {
+        can_review_translation_for_language_codes: ['hi'],
+        can_review_voiceover_for_language_codes: [],
+        can_review_questions: true,
+        can_suggest_questions: true,
+      };
 
     userBackendApiService
       .getUserContributionRightsDataAsync()
