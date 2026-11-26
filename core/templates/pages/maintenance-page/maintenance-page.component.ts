@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {DocumentAttributeCustomizationService} from 'services/contextual/document-attribute-customization.service';
 
 @Component({
@@ -29,8 +28,7 @@ export class MaintenancePageComponent implements OnInit {
   currentLang: string = 'en';
 
   constructor(
-    private documentAttributeCustomizationService: DocumentAttributeCustomizationService,
-    private urlInterpolationService: UrlInterpolationService
+    private documentAttributeCustomizationService: DocumentAttributeCustomizationService
   ) {}
 
   ngOnInit(): void {
@@ -39,9 +37,5 @@ export class MaintenancePageComponent implements OnInit {
       'lang',
       this.currentLang
     );
-  }
-
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }

@@ -21,6 +21,7 @@ import {FormControl, FormsModule} from '@angular/forms';
 import {
   ComponentFixture,
   fakeAsync,
+  flushMicrotasks,
   TestBed,
   tick,
   waitForAsync,
@@ -107,7 +108,9 @@ describe('Schema Based Unicode Editor', () => {
       },
     } as unknown as CodeMirror.Editor;
     spyOn(cm, 'replaceSelection');
+    spyOn(component, 'loadCodeMirrorLibrary').and.resolveTo();
     component.ngOnInit();
+    flushMicrotasks();
 
     component.registerOnTouched(null);
     let mockFunction = function (value: string) {
@@ -138,7 +141,9 @@ describe('Schema Based Unicode Editor', () => {
       'onSchemaBasedFormsShown'
     ).and.returnValue(onSchemaBasedFormsShownEmitter);
 
+    spyOn(component, 'loadCodeMirrorLibrary').and.resolveTo();
     component.ngOnInit();
+    flushMicrotasks();
     tick(200);
 
     expect(component.codemirrorStatus).toBeTrue();
@@ -148,6 +153,12 @@ describe('Schema Based Unicode Editor', () => {
 
     expect(component.codemirrorStatus).toBeFalse();
   }));
+
+  it('should load the codemirror library on demand', async () => {
+    await component.loadCodeMirrorLibrary();
+
+    expect(window.CodeMirror).toBeDefined();
+  });
 
   it('should get empty object on validating', () => {
     expect(component.validate(new FormControl(1))).toEqual(null);

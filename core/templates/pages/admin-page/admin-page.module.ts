@@ -22,7 +22,6 @@ import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {ToastrModule} from 'ngx-toastr';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {TopicManagerRoleEditorModalComponent} from './roles-tab/topic-manager-role-editor-modal.component';
 import {TranslationCoordinatorRoleEditorModalComponent} from './roles-tab/translation-coordinator-role-editor-modal.component';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
@@ -38,11 +37,36 @@ import {AdminMiscTabComponent} from './misc-tab/admin-misc-tab.component';
 import {AdminRolesTabComponent} from './roles-tab/admin-roles-tab.component';
 import {AdminPageComponent} from './admin-page.component';
 
+import {BaseModule} from 'base-components/base.module';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatListModule} from '@angular/material/list';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSelectModule} from '@angular/material/select';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatListModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    BaseModule,
     CommonModule,
     FormsModule,
-    SharedComponentsModule,
     SharedFormsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

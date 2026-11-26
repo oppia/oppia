@@ -14,6 +14,11 @@
 
 /**
  * @fileoverview Module for Angular Material.
+ *
+ * This barrel is retained solely for unit-test setup (many legacy specs import
+ * it via TestBed.configureTestingModule). Production modules must import only
+ * the specific @angular/material/* modules they need so that the bundle can be
+ * tree-shaken and split by route.
  */
 
 import {NgModule} from '@angular/core';

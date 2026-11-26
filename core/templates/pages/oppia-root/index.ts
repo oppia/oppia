@@ -17,17 +17,28 @@
  */
 
 import 'pages/common-imports';
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {AppConstants} from 'app.constants';
 import {enableProdMode} from '@angular/core';
-import {AppModule} from './app.module';
 import {LoggerService} from 'services/contextual/logger.service';
+import {shouldUseLiteAppModule} from './bootstrap-module';
 
 if (!AppConstants.DEV_MODE) {
   enableProdMode();
 }
 
 const loggerService = new LoggerService();
-platformBrowserDynamic()
-  .bootstrapModule(AppModule)
+
+// Match the production entry point: the two target pages use the lightweight
+// Angular module, while every other page uses the full application module.
+import('@angular/platform-browser-dynamic')
+  .then(({platformBrowserDynamic}) => {
+    if (shouldUseLiteAppModule(window.location.pathname)) {
+      return import('./lite-app.module').then(({LiteAppModule}) =>
+        platformBrowserDynamic().bootstrapModule(LiteAppModule)
+      );
+    }
+    return import('./app.module').then(({AppModule}) =>
+      platformBrowserDynamic().bootstrapModule(AppModule)
+    );
+  })
   .catch(err => loggerService.error(err));

@@ -575,24 +575,47 @@ def set_lighthouse_url_environment_variables(
 
 
 @contextlib.contextmanager
-def managed_lighthouse_appserver(server_mode: str) -> Iterator[None]:
+def managed_lighthouse_appserver(
+    server_mode: str, compress_responses: bool = False
+) -> Iterator[None]:
     """Starts the appserver for Lighthouse setup or checks.
 
     Args:
         server_mode: str. The appserver mode to start.
+        compress_responses: bool. Whether to put a gzip proxy in front of the
+            appserver. The proxy is needed for the checks because the App
+            Engine development server does not implement the compression that
+            the production Google Front End applies to text responses. The
+            appserver moves to the next port so that the proxy can listen on
+            the port that the Lighthouse URLs already use.
 
     Yields:
         None. Yields control while the appserver is running.
     """
     env = os.environ.copy()
     env['PIP_NO_DEPS'] = 'True'
-    with servers.managed_dev_appserver(
-        APP_YAML_FILENAMES[server_mode],
-        port=GOOGLE_APP_ENGINE_PORT,
-        log_level='critical',
-        skip_sdk_update_check=True,
-        env=env,
-    ):
+    appserver_port = (
+        GOOGLE_APP_ENGINE_PORT + 1
+        if compress_responses
+        else GOOGLE_APP_ENGINE_PORT
+    )
+    with contextlib.ExitStack() as stack:
+        stack.enter_context(
+            servers.managed_dev_appserver(
+                APP_YAML_FILENAMES[server_mode],
+                port=appserver_port,
+                log_level='critical',
+                skip_sdk_update_check=True,
+                env=env,
+            )
+        )
+        if compress_responses:
+            stack.enter_context(
+                servers.managed_gzip_proxy(
+                    upstream_port=appserver_port,
+                    port=GOOGLE_APP_ENGINE_PORT,
+                )
+            )
         yield
 
 
@@ -650,7 +673,9 @@ def main(args: Optional[List[str]] = None) -> None:
         os.environ['LIGHTHOUSE_SKIP_LOGIN'] = (
             '1' if parsed_args.shard == 1 else '0'
         )
-        with managed_lighthouse_appserver(SERVER_MODE_PROD):
+        with managed_lighthouse_appserver(
+            SERVER_MODE_PROD, compress_responses=True
+        ):
             run_lighthouse_checks()
 
 

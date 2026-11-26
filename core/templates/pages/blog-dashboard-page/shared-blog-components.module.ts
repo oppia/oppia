@@ -13,66 +13,78 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the shared blog-dashboard components.
+ * @fileoverview Module for the blog dashboard editing components. The
+ * display-only blog components live in BlogDisplayComponentsModule so that
+ * blog display pages do not load the blog post editor (and its schema-based
+ * form editors, which pull in CKEditor and CodeMirror).
  */
 
 import {NgModule} from '@angular/core';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {SharedComponentsModule} from 'components/shared-component.module';
-
 import {BlogPostActionConfirmationModalComponent} from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
-import {BlogCardComponent} from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import {BlogDashboardTileComponent} from 'pages/blog-dashboard-page/blog-dashboard-tile/blog-dashboard-tile.component';
-import {BlogDashboardNavbarBreadcrumbComponent} from 'pages/blog-dashboard-page/navbar/navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component';
 import {BlogPostEditorComponent} from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
 import {UploadBlogPostThumbnailModalComponent} from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
 import {BlogCardPreviewModalComponent} from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 import {UploadBlogPostThumbnailComponent} from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
-import {BlogPostEditorNavbarPreLogoActionComponent} from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
+import {BlogDisplayComponentsModule} from 'pages/blog-dashboard-page/blog-display-components.module';
 import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {ImageReceiverModule} from 'components/forms/custom-forms-directives/image-receiver.module';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatIconModule} from '@angular/material/icon';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
+    BlogDisplayComponentsModule,
     CommonModule,
-    SharedComponentsModule,
-    MatTabsModule,
-    MatMenuModule,
+    FormsModule,
+    ImageReceiverModule,
+    MatButtonModule,
+    MatCardModule,
+    MatDividerModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
     MatButtonToggleModule,
+    MatMenuModule,
+    MatTabsModule,
+    RichTextComponentsModule,
+    SharedFormsModule,
+    TranslateModule,
   ],
   declarations: [
-    BlogDashboardNavbarBreadcrumbComponent,
-    BlogCardComponent,
     BlogDashboardTileComponent,
     BlogPostEditorComponent,
     BlogPostActionConfirmationModalComponent,
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent,
   ],
   entryComponents: [
-    BlogDashboardNavbarBreadcrumbComponent,
-    BlogCardComponent,
     BlogDashboardTileComponent,
     BlogPostEditorComponent,
     BlogPostActionConfirmationModalComponent,
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent,
   ],
   exports: [
-    BlogDashboardNavbarBreadcrumbComponent,
-    BlogCardComponent,
     BlogDashboardTileComponent,
     BlogPostEditorComponent,
     BlogPostActionConfirmationModalComponent,
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent,
   ],
 })
 export class SharedBlogComponentsModule {}

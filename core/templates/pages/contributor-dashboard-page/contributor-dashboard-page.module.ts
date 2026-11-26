@@ -19,7 +19,6 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
@@ -49,12 +48,39 @@ import {ContributorDashboardPageRootComponent} from './contributor-dashboard-pag
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {RteHelperService} from 'services/rte-helper.service';
 
+import {BaseModule} from 'base-components/base.module';
+import {LazyLoadingModule} from 'components/shared_parts/lazy-loading.module';
+import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
+import {QuestionSuggestionEditorModalModule} from 'components/shared_parts/question-suggestion-editor-modal.module';
+import {QuestionSuggestionReviewModalModule} from 'components/shared_parts/question-suggestion-review-modal.module';
+import {QuestionsOpportunitiesSelectDifficultyModalModule} from 'components/shared_parts/questions-opportunities-select-difficulty-modal.module';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {TranslateModule} from '@ngx-translate/core';
+import {TranslationModalModule} from 'components/shared_parts/translation-modal.module';
+import {UndoSnackbarModule} from 'components/shared_parts/undo-snackbar.module';
 @NgModule({
   imports: [
+    UndoSnackbarModule,
+    TranslationModalModule,
+    TranslateModule,
+    StringUtilityPipesModule,
+    RteHelperModalModule,
+    RichTextComponentsModule,
+    QuestionsOpportunitiesSelectDifficultyModalModule,
+    QuestionSuggestionReviewModalModule,
+    QuestionSuggestionEditorModalModule,
+    NgbPopoverModule,
+    MatButtonModule,
+    MatCardModule,
+    LazyLoadingModule,
+    BaseModule,
     CommonModule,
     FormsModule,
     InteractionExtensionsModule,
-    SharedComponentsModule,
     NgbModalModule,
     NgbTooltipModule,
     SharedFormsModule,

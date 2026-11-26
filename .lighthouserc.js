@@ -18,6 +18,17 @@
 
 const baseConfig = require('./.lighthouserc-base.js');
 
+// Lighthouse's "Slow 4G" preset, matching mobileSlow4G in
+// node_modules/lighthouse/core/config/constants.js.
+const MOBILE_THROTTLING = {
+  rttMs: 150,
+  throughputKbps: 1638.4,
+  requestLatencyMs: 562.5,
+  downloadThroughputKbps: 1474.56,
+  uploadThroughputKbps: 675,
+  cpuSlowdownMultiplier: 4,
+};
+
 module.exports = {
   ci: {
     collect: {
@@ -26,6 +37,7 @@ module.exports = {
       puppeteerLaunchOptions: baseConfig['puppeteerLaunchOptions'],
       url: baseConfig['urls'],
       settings: {
+        throttling: MOBILE_THROTTLING,
         onlyCategories: [
           'performance',
           'accessibility',
@@ -391,16 +403,17 @@ module.exports = {
         },
         {
           matchingUrlPattern: 'http://[^/]+/terms$',
+          // The lite app shell paints this page from prerendered markup.
           pagePerfThresholds: {
-            fcp: 24300,
-            speedIndex: 24300,
-            lcp: 51000,
-            tbt: 1020,
-            cls: 0.15,
+            fcp: 2500,
+            speedIndex: 3000,
+            lcp: 3500,
+            tbt: 500,
+            cls: 0.1,
           },
           accessibilityMinScore: 0.95,
           overrides: {
-            'categories:performance': ['error', {minScore: 0}],
+            'categories:performance': ['error', {minScore: 0.9}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
           },
         },
@@ -866,14 +879,18 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://localhost:8181/maintenance$',
+          // The lite app shell paints this page from prerendered markup.
           pagePerfThresholds: {
-            fcp: 31000,
-            speedIndex: 31000,
-            lcp: 60000,
-            tbt: 4800,
-            cls: 1.5,
+            fcp: 2500,
+            speedIndex: 3000,
+            lcp: 5000,
+            tbt: 500,
+            cls: 0.1,
           },
           accessibilityMinScore: 0.9,
+          overrides: {
+            'categories:performance': ['error', {minScore: 0.9}],
+          },
         },
         {
           matchingUrlPattern: '^http://localhost:8181/lesson/.+$',
@@ -942,7 +959,7 @@ module.exports = {
             speedIndex: 30675,
             lcp: 97110,
             tbt: 3870,
-            cls: 0.2,
+            cls: 0.15,
           },
           accessibilityMinScore: 0.95,
           overrides: {

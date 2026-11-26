@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'terms-page',
@@ -25,8 +24,6 @@ import {AppConstants} from 'app.constants';
   styleUrls: ['./terms-page.component.css'],
 })
 export class TermsPageComponent {
-  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
-
   scrollTo(el: HTMLElement): void {
     el.scrollIntoView({behavior: 'smooth'});
   }

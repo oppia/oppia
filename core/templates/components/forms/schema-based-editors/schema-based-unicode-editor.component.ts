@@ -16,7 +16,6 @@
  * @fileoverview Component for a schema-based editor for unicode strings.
  */
 
-import 'third-party-imports/codemirror.import';
 import {
   Component,
   EventEmitter,
@@ -34,8 +33,7 @@ import {
   Validator,
 } from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
-import CodeMirror from 'codemirror';
-import 'components/code-mirror/codemirror.component';
+import type CodeMirror from 'codemirror';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {Subscription} from 'rxjs';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
@@ -91,6 +89,7 @@ export class SchemaBasedUnicodeEditor
   onChange: (value: string) => void = () => {};
   directiveSubscriptions = new Subscription();
   codemirrorStatus: boolean = false;
+  codemirrorLibraryLoaded: boolean = false;
   codemirrorOptions: {
     extraKeys: {Tab: (cm: CodeMirror.Editor) => void};
     indentWithTabs: boolean;
@@ -138,6 +137,12 @@ export class SchemaBasedUnicodeEditor
     });
   }
 
+  // Loads the CodeMirror library on demand so that it is not pulled into the
+  // shared chunk of pages that never render a code editor.
+  async loadCodeMirrorLibrary(): Promise<void> {
+    await import('third-party-imports/codemirror.import');
+  }
+
   writeValue(value: string): void {
     this.localValue = value;
   }
@@ -155,10 +160,6 @@ export class SchemaBasedUnicodeEditor
   ngOnInit(): void {
     if (this.uiConfig && this.uiConfig.coding_mode) {
       this.lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR);
-      // Flag that is flipped each time the codemirror view is
-      // shown. (The codemirror instance needs to be refreshed
-      // every time it is unhidden.)
-      this.codemirrorStatus = false;
       var CODING_MODE_NONE = 'none';
 
       if (this.disabled) {
@@ -172,22 +173,32 @@ export class SchemaBasedUnicodeEditor
         this.codemirrorOptions.mode = this.uiConfig.coding_mode;
       }
 
-      setTimeout(() => {
-        this.codemirrorStatus = !this.codemirrorStatus;
-      }, 200);
+      // Load the CodeMirror library on demand so that it is not pulled
+      // into the shared chunk of pages that never render a code editor.
+      this.loadCodeMirrorLibrary().then(() => {
+        // Flag that is flipped each time the codemirror view is
+        // shown. (The codemirror instance needs to be refreshed
+        // every time it is unhidden.)
+        this.codemirrorStatus = false;
+        this.codemirrorLibraryLoaded = true;
 
-      // When the form view is opened, flip the status flag. The
-      // timeout seems to be needed for the line numbers etc. to display
-      // properly.
-      this.directiveSubscriptions.add(
-        this.stateCustomizationArgsService.onSchemaBasedFormsShown.subscribe(
-          () => {
-            setTimeout(() => {
-              this.codemirrorStatus = !this.codemirrorStatus;
-            }, 200);
-          }
-        )
-      );
+        setTimeout(() => {
+          this.codemirrorStatus = !this.codemirrorStatus;
+        }, 200);
+
+        // When the form view is opened, flip the status flag. The
+        // timeout seems to be needed for the line numbers etc. to display
+        // properly.
+        this.directiveSubscriptions.add(
+          this.stateCustomizationArgsService.onSchemaBasedFormsShown.subscribe(
+            () => {
+              setTimeout(() => {
+                this.codemirrorStatus = !this.codemirrorStatus;
+              }, 200);
+            }
+          )
+        );
+      });
     }
     this.focusManagerService.setFocus(this.labelForFocusTarget);
   }

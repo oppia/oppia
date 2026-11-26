@@ -20,7 +20,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {FeedbackEmptyStateComponent} from './feedback-empty-state/feedback-empty-state.component';
 import {FeedbackFilterBarComponent} from './feedback-filter-bar/feedback-filter-bar.component';
 import {FeedbackTableComponent} from './feedback-table/feedback-table.component';
@@ -28,8 +27,9 @@ import {FeedbackChipComponent} from './feedback-status-chip/feedback-chip.compon
 import {FeedbackDetailPageComponent} from './feedback-detail-page/feedback-detail-page.component';
 import {FeedbackDetailSectionComponent} from './feedback-detail-page/feedback-detail-section/feedback-detail-section.component';
 
+import {BaseModule} from 'base-components/base.module';
 @NgModule({
-  imports: [CommonModule, FormsModule, SharedComponentsModule],
+  imports: [BaseModule, CommonModule, FormsModule],
   declarations: [
     FeedbackEmptyStateComponent,
     FeedbackFilterBarComponent,

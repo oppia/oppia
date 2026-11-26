@@ -1,6 +1,32 @@
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+/* This file vendors Bootstrap and Font Awesome styles verbatim, so their
+   original font stacks and property order are intentionally preserved. */
+/* stylelint-disable font-family-no-missing-generic-family-keyword, order/properties-alphabetical-order */
 @import 'bootstrap/dist/css/bootstrap.css';
 @import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 @import '@fortawesome/fontawesome-free/css/brands.min.css';
 @import '@fortawesome/fontawesome-free/css/regular.min.css';
 @import '@fortawesome/fontawesome-free/css/solid.min.css';
+
+/* Vendored from https://fonts.googleapis.com/icon?family=Material+Icons so the
+   stylesheet does not add a render-blocking cross-origin request. It must stay
+   after the imports above because CSS requires @import to come first. */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/materialicons/v145/flUhRq6tzZclQEJ-Vdg-IuiaDsNZ.ttf) format('truetype');
+}
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}

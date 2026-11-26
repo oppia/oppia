@@ -17,7 +17,6 @@
  */
 
 import {RouterModule} from '@angular/router';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {CollectionHistoryTabComponent} from 'pages/collection-editor-page/history-tab/collection-history-tab.component';
 import {CollectionNodeEditorComponent} from './editor-tab/collection-node-editor.component';
 import {CollectionSettingsTabComponent} from 'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
@@ -38,9 +37,30 @@ import {CollectionEditorPageAuthGuard} from './collection-editor-page-auth.guard
 import {CollectionEditorPageRootComponent} from './collection-editor-page-root.component';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
+import {CommonModule} from '@angular/common';
+import {DirectivesModule} from 'directives/directives.module';
+import {FilteredChoicesFieldModule} from 'components/shared_parts/filtered-choices-field.module';
+import {MatCardModule} from '@angular/material/card';
+import {MultiSelectionFieldModule} from 'components/shared_parts/multi-selection-field.module';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    MultiSelectionFieldModule,
+    MatCardModule,
+    FilteredChoicesFieldModule,
+    DirectivesModule,
+    CommonModule,
+    CommonElementsModule,
+    BaseModule,
     FormsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

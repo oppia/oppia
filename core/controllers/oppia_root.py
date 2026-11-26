@@ -16,10 +16,12 @@
 
 from __future__ import annotations
 
-from core.controllers import acl_decorators, base
-from core.domain import feature_flag_services
+import urllib.parse
 
-from typing import Dict
+from core.controllers import acl_decorators, base
+from core.domain import angular_prerender_services, feature_flag_services
+
+from typing import Any, Dict
 
 
 class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -46,8 +48,16 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 self.user_id
             )
         )
-        render_values: Dict[str, Dict[str, bool]] = {
-            'OPPIA_FEATURE_FLAGS': feature_flag_dict
+        # Here we use type Any because the values dict contains both a feature
+        # flag mapping and a prerendered HTML string, so a single specific type
+        # cannot describe every value.
+        render_values: Dict[str, Any] = {
+            'OPPIA_FEATURE_FLAGS': feature_flag_dict,
+            'OPPIA_PRERENDERED_CONTENT': (
+                angular_prerender_services.get_prerendered_markup(
+                    urllib.parse.urlsplit(url).path
+                )
+            ),
         }
 
         if 'explore' in url or 'embed' in url:

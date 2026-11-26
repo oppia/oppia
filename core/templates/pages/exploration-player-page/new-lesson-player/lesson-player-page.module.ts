@@ -19,10 +19,10 @@
 import {NgModule} from '@angular/core';
 import {NgbModalModule, NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {CommonModule} from '@angular/common';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {MatButtonModule} from '@angular/material/button';
-import {MaterialModule} from 'modules/material.module';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {NewLessonPlayerPageComponent} from './lesson-player-page.component';
 import {NewLessonPlayerPageRoutingModule} from './lesson-player-page-routing.module';
 import {NewLessonPlayerPageRootComponent} from './lesson-player-page-root.component';
@@ -45,17 +45,57 @@ import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversat
 import {NewProgressReminderModalComponent} from './conversation-skin-components/lesson-player-footer/new-progress-reminder-modal.component';
 import {ConversationFlowService} from '../services/conversation-flow.service';
 
+import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
+import {BaseModule} from 'base-components/base.module';
+import {DisplayHintModalModule} from 'components/shared_parts/display-hint-modal.module';
+import {DisplayNewHintModalModule} from 'components/shared_parts/display-new-hint-modal.module';
+import {DisplayNewSolutionInterstitialModalModule} from 'components/shared_parts/display-new-solution-interstitial-modal.module';
+import {DisplayNewSolutionModalModule} from 'components/shared_parts/display-new-solution-modal.module';
+import {DisplaySolutionInterstitialModalModule} from 'components/shared_parts/display-solution-interstitial-modal.module';
+import {DisplaySolutionModalModule} from 'components/shared_parts/display-solution-modal.module';
+import {KeyboardShortcutHelpModalModule} from 'components/shared_parts/keyboard-shortcut-help-modal.module';
+import {TakeBreakModalModule} from 'components/shared_parts/take-break-modal.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {FormsModule} from '@angular/forms';
+import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {OnScreenKeyboardModule} from 'components/shared_parts/on-screen-keyboard.module';
+import {PlayerHeaderModule} from 'components/shared_parts/player-header.module';
+import {ShareLessonModalModule} from 'components/shared_parts/share-lesson-modal.module';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    TakeBreakModalModule,
+    StringUtilityPipesModule,
+    SharedFormsModule,
+    ShareLessonModalModule,
+    PlayerHeaderModule,
+    OnScreenKeyboardModule,
+    NgbTooltipModule,
+    NewConversationSkinModule,
+    KeyboardShortcutHelpModalModule,
+    FormsModule,
+    DisplaySolutionModalModule,
+    DisplaySolutionInterstitialModalModule,
+    DisplayNewSolutionModalModule,
+    DisplayNewSolutionInterstitialModalModule,
+    DisplayNewHintModalModule,
+    DisplayHintModalModule,
+    DirectivesModule,
+    BaseModule,
+    AttributionGuideModule,
     CommonModule,
     NewLessonPlayerPageRoutingModule,
     InteractionExtensionsModule,
     MatButtonModule,
     MatBottomSheetModule,
     NgbModalModule,
-    MaterialModule,
+    MatProgressBarModule,
+    MatTooltipModule,
     NgbPopoverModule,
-    SharedComponentsModule,
     ToastrModule,
     MatBottomSheetModule,
     ToastrModule.forRoot(toastrConfig),

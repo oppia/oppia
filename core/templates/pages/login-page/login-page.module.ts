@@ -24,14 +24,19 @@ import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {LoginPageComponent} from 'pages/login-page/login-page.component';
 import {LoginPageRootComponent} from './login-page-root.component';
 import {CommonModule} from '@angular/common';
 import {LoginPageRoutingModule} from './login-page-routing.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {MatSelectModule} from '@angular/material/select';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    MatSelectModule,
+    BaseModule,
     CommonModule,
     MatAutocompleteModule,
     MatCardModule,
@@ -39,7 +44,6 @@ import {LoginPageRoutingModule} from './login-page-routing.module';
     MatInputModule,
     MatFormFieldModule,
     ReactiveFormsModule,
-    SharedComponentsModule,
     LoginPageRoutingModule,
   ],
   declarations: [LoginPageComponent, LoginPageRootComponent],

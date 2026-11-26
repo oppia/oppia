@@ -17,12 +17,25 @@
  */
 
 import 'pages/common-imports';
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {enableProdMode} from '@angular/core';
-import {AppModule} from 'pages/oppia-root/app.module';
+import {platformBrowser} from '@angular/platform-browser';
+import {shouldUseLiteAppModule} from 'pages/oppia-root/bootstrap-module';
 
 enableProdMode();
 
-platformBrowserDynamic()
-  .bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+// Angular's production build is AoT-compiled, so the JIT compiler in
+// platform-browser-dynamic is unnecessary here. The full root module is kept
+// in a separate chunk because only non-target pages need it.
+const platform = platformBrowser();
+
+if (shouldUseLiteAppModule(window.location.pathname)) {
+  // eslint-disable-next-line capitalized-comments
+  import(/* webpackChunkName: "lite-app" */ 'pages/oppia-root/lite-app.module')
+    .then(({LiteAppModule}) => platform.bootstrapModule(LiteAppModule))
+    .catch(err => console.error(err));
+} else {
+  // eslint-disable-next-line capitalized-comments
+  import(/* webpackChunkName: "full-app" */ 'pages/oppia-root/app.module')
+    .then(({AppModule}) => platform.bootstrapModule(AppModule))
+    .catch(err => console.error(err));
+}

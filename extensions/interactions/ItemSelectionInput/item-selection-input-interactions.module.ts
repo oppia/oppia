@@ -19,7 +19,7 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {FormsModule} from '@angular/forms';
 import {InteractiveItemSelectionInputComponent} from './directives/oppia-interactive-item-selection-input.component';
 import {ShortResponseItemSelectionInputComponent} from './directives/oppia-short-response-item-selection-input.component';
@@ -32,7 +32,7 @@ import {RichTextComponentsModule} from '../../rich_text_components/rich-text-com
     CommonModule,
     DynamicContentModule,
     FormsModule,
-    MaterialModule,
+    MatCheckboxModule,
     RichTextComponentsModule,
     TranslateModule,
   ],

@@ -17,12 +17,11 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {InfiniteScrollModule} from 'ngx-infinite-scroll';
 import {FormsModule} from '@angular/forms';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslateModule} from '@ngx-translate/core';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbPaginationModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {BlogHomePageRootComponent} from './blog-home-page-root.component';
 import {BlogHomePageComponent} from './blog-home-page.component';
@@ -30,21 +29,26 @@ import {CommonModule} from '@angular/common';
 import {BlogHomePageRoutingModule} from './blog-home-page-routing.module';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
-import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-components.module';
+import {BlogDisplayComponentsModule} from 'pages/blog-dashboard-page/blog-display-components.module';
 import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
+import {BaseModule} from 'base-components/base.module';
+import {MatCardModule} from '@angular/material/card';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 @NgModule({
   imports: [
+    MatCardModule,
+    MatProgressSpinnerModule,
+    BaseModule,
     CommonModule,
-    SharedComponentsModule,
     InfiniteScrollModule,
     BlogHomePageRoutingModule,
     FormsModule,
-    NgbModule,
+    NgbPaginationModule,
     StringUtilityPipesModule,
     TranslateModule,
     ReactiveFormsModule,
-    SharedBlogComponentsModule,
+    BlogDisplayComponentsModule,
     Error404PageModule,
     CampaignBannerModule,
   ],

@@ -17,21 +17,22 @@
  */
 
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
-import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {TranslateModule} from '@ngx-translate/core';
-
-import {AppConstants} from 'app.constants';
 import {PageHeadService} from 'services/page-head.service';
-import {MaintenancePageRootComponent} from './maintenance-page-root.component';
+
+import {
+  MAINTENANCE_PAGE_META,
+  MAINTENANCE_PAGE_TITLE,
+  MaintenancePageRootComponent,
+} from './maintenance-page-root.component';
 
 describe('MaintenancePageRootComponent', () => {
   let fixture: ComponentFixture<MaintenancePageRootComponent>;
   let component: MaintenancePageRootComponent;
+  let pageHeadService: PageHeadService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot(), HttpClientTestingModule],
       declarations: [MaintenancePageRootComponent],
       providers: [PageHeadService],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -39,14 +40,34 @@ describe('MaintenancePageRootComponent', () => {
 
     fixture = TestBed.createComponent(MaintenancePageRootComponent);
     component = fixture.componentInstance;
+    pageHeadService = TestBed.inject(PageHeadService);
   });
 
   it('should have the title and meta tags set', () => {
-    expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MAINTENANCE.TITLE
+    expect(MAINTENANCE_PAGE_TITLE).toEqual('Oppia Maintenance Page');
+    expect(MAINTENANCE_PAGE_META.length).toEqual(2);
+  });
+
+  afterEach(() => {
+    document.documentElement.classList.remove('oppia-angular-ready');
+  });
+
+  it('should set the static title and meta tags', () => {
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
+    component.ngOnInit();
+
+    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
+      MAINTENANCE_PAGE_TITLE,
+      MAINTENANCE_PAGE_META
     );
-    expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MAINTENANCE.META
-    );
+  });
+
+  it('should reveal the live page after the view is initialized', () => {
+    component.ngAfterViewInit();
+
+    expect(
+      document.documentElement.classList.contains('oppia-angular-ready')
+    ).toBeTrue();
   });
 });

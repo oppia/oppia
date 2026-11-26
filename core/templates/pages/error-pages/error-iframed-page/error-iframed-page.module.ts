@@ -17,15 +17,22 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ErrorIframedPageRootComponent} from './error-iframed-root.component';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {RouterModule} from '@angular/router';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {MatCardModule} from '@angular/material/card';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    BaseModule,
+    BackgroundBannerModule,
+    MatCardModule,
+    TranslateModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

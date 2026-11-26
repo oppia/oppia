@@ -32,14 +32,15 @@ const DESKTOP_SCREEN_EMULATION = {
   disabled: false,
 };
 
-// Throttling for a dense 4G desktop connection, matching the desktopDense4G
-// constants in Lighthouse's lantern simulation. The request latency and
-// throughput values are set to 0 (meaning unset) so that Lantern derives them
-// from rttMs and throughputKbps; otherwise the mobile defaults would persist
-// through the settings merge.
+// Throttling for the Slow 4G network profile, matching mobileSlow4G values
+// from Lighthouse's lantern simulation. The request latency and throughput
+// values are set to 0 (meaning unset) so that Lantern derives them from
+// rttMs and throughputKbps; otherwise the mobile defaults would persist
+// through the settings merge. CPU stays unthrottled because this suite
+// represents desktop-class hardware.
 const DESKTOP_THROTTLING = {
-  rttMs: 40,
-  throughputKbps: 10240,
+  rttMs: 150,
+  throughputKbps: 1638.4,
   cpuSlowdownMultiplier: 1,
   requestLatencyMs: 0,
   downloadThroughputKbps: 0,
@@ -431,16 +432,17 @@ module.exports = {
         },
         {
           matchingUrlPattern: 'http://[^/]+/terms$',
+          // The lite app shell paints this page from prerendered markup.
           pagePerfThresholds: {
-            fcp: 4245,
-            speedIndex: 4560,
-            lcp: 8715,
-            tbt: 300,
-            cls: 0.15,
+            fcp: 2000,
+            speedIndex: 2500,
+            lcp: 2500,
+            tbt: 200,
+            cls: 0.05,
           },
           accessibilityMinScore: 0.95,
           overrides: {
-            // Marketing pages use unoptimized JPEG hero images.
+            'categories:performance': ['error', {minScore: 0.9}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
           },
         },
@@ -909,14 +911,18 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://localhost:8181/maintenance$',
+          // The lite app shell paints this page from prerendered markup.
           pagePerfThresholds: {
-            fcp: 9000,
-            speedIndex: 9000,
-            lcp: 18000,
-            tbt: 800,
-            cls: 1.5,
+            fcp: 1500,
+            speedIndex: 2000,
+            lcp: 1500,
+            tbt: 200,
+            cls: 0.05,
           },
           accessibilityMinScore: 0.9,
+          overrides: {
+            'categories:performance': ['error', {minScore: 0.9}],
+          },
         },
         {
           matchingUrlPattern: '^http://localhost:8181/lesson/.+$',
@@ -985,7 +991,7 @@ module.exports = {
             speedIndex: 5685,
             lcp: 16500,
             tbt: 915,
-            cls: 0.2,
+            cls: 0.15,
           },
           accessibilityMinScore: 0.93,
           overrides: {

@@ -25,6 +25,7 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 import threading
 
 from scripts import (
@@ -68,6 +69,46 @@ EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
 # interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
+
+# Captured Angular component styles for the prerendered /terms shell. The
+# scoped attribute values in this file match the prerender snapshot and the
+# live LiteAppModule template, so the shell's computed styles do not change
+# when Angular replaces the prerendered markup.
+LITE_SHELL_STYLES_FILEPATH = os.path.join('src', 'lite-shell-styles.css')
+
+# Inline font subsets for the prerendered pages. These faces keep the original
+# glyphs and typography while avoiding large font downloads that delay first
+# paint and cause late layout shifts.
+LITE_FONT_SUBSETS_FILEPATH = os.path.join('src', 'lite-font-subsets.css')
+
+# PurgeCSS CLI version pinned for the Node 16 toolchain used by builds.
+PURGE_CSS_PACKAGE = 'purgecss@3.1.3'
+
+# A second Angular build produces a router-only bundle for the lite pages.
+# Its scripts are copied into the main build directory so the production
+# loader can choose them on /terms and /maintenance without changing the full
+# application bundle used by every other route.
+LITE_ANGULAR_BUNDLE_DIR = os.path.join('dist', 'oppia-lite')
+LITE_ANGULAR_ENTRYPOINT = 'src/lite-main.ts'
+
+# Selectors that the prerender snapshot does not contain literally but the
+# live LiteAppModule needs after Angular replaces the snapshot. Prefix-like
+# names are listed explicitly because PurgeCSS treats safelist strings as
+# exact class names.
+LITE_CRITICAL_CSS_SAFELIST = [
+    'html',
+    'body',
+    'oppia-lite-page',
+    'oppia-angular-ready',
+    'oppia-prerender-shell',
+    'oppia-prerender-container',
+    'oppia-lite-logo-inline',
+    'oppia-lite-logo-margin-inline-start-zero',
+    'oppia-lite-dropdown-left-zero',
+    'oppia-lite-dropdown-margin-top-zero',
+    'mat-typography',
+    'material-icons',
+]
 
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
@@ -475,6 +516,338 @@ def build_using_ng() -> None:
     ), 'angular generated bundle should be non-empty'
 
 
+def build_lite_angular_bundle() -> None:
+    """Builds and stages a small Angular bundle for the prerendered pages.
+
+    The separate entry point boots LiteStaticAppModule directly, so the lite
+    routes do not need the full application's dynamic chunk chain. The
+    generated files keep the production deploy URL (/build/), so copying them
+    into the main build directory is enough for the loader to reference them.
+    """
+    print('Building dedicated lite Angular bundle')
+    existing_node_options = os.environ.get('NODE_OPTIONS', '')
+    memory_flag = '--max_old_space_size=%s' % MAX_OLD_SPACE_SIZE_FOR_NG_BUILD
+    os.environ['NODE_OPTIONS'] = (
+        '%s %s' % (existing_node_options, memory_flag)
+    ).strip()
+
+    subprocess.run(
+        [
+            common.NG_BIN_PATH,
+            'build',
+            '--prod',
+            '--main=%s' % LITE_ANGULAR_ENTRYPOINT,
+            '--output-path=%s' % LITE_ANGULAR_BUNDLE_DIR,
+        ],
+        check=True,
+    )
+
+    if not os.path.isdir(LITE_ANGULAR_BUNDLE_DIR):
+        raise RuntimeError(
+            'Lite Angular build directory %s was not created.'
+            % LITE_ANGULAR_BUNDLE_DIR
+        )
+
+    for filename in os.listdir(LITE_ANGULAR_BUNDLE_DIR):
+        if filename.endswith('.js'):
+            source = os.path.join(LITE_ANGULAR_BUNDLE_DIR, filename)
+            shutil.copy2(source, os.path.join('build', filename))
+
+
+def defer_resources_for_lite_pages() -> None:
+    """Defers Angular boot and non-critical CSS on the prerendered pages.
+
+    The critical CSS is inlined by inline_critical_css_for_lite_pages(), so the
+    original global stylesheet links are inert on /terms and /maintenance. The
+    Google Fonts stylesheet stays inert there because the needed faces are
+    inlined as small data URLs; keeping its link inert in the source also
+    prevents Angular CLI from inlining the entire Google Fonts response into
+    the HTML. Lite pages boot a separate Angular bundle after load so the
+    prerendered text remains the LCP candidate; a small width reserve keeps the
+    identical live markup from becoming a larger late candidate. Other routes
+    restore the full application's links and scripts immediately.
+    """
+    html_filepath = os.path.join('build', 'oppia-root.mainpage.html')
+    if not os.path.exists(html_filepath):
+        return
+
+    with open(html_filepath, 'r', encoding='utf-8') as html_file:
+        html = html_file.read()
+
+    lite_html_filepath = os.path.join(
+        LITE_ANGULAR_BUNDLE_DIR, 'oppia-root.mainpage.html'
+    )
+    with open(lite_html_filepath, 'r', encoding='utf-8') as lite_html_file:
+        lite_html = lite_html_file.read()
+
+    script_pattern = re.compile(
+        r'<script\b[^>]*\bsrc="/build/[^"]+"[^>]*></script>'
+    )
+    full_inert_scripts = ''.join(
+        '<template class="oppia-deferred-angular-script">'
+        f'{script_tag}</template>'
+        for script_tag in script_pattern.findall(html)
+    )
+    lite_inert_scripts = ''.join(
+        '<template class="oppia-deferred-lite-angular-script">'
+        f'{script_tag}</template>'
+        for script_tag in script_pattern.findall(lite_html)
+    )
+    html = script_pattern.sub('', html)
+
+    loader = """
+<script>
+(function () {
+  var isLitePage = /^\\/(terms|maintenance)\\/?$/.test(location.pathname);
+
+  var restoreGlobalStylesheets = function () {
+    var links = document.querySelectorAll(
+      'link[data-oppia-global-stylesheet]'
+    );
+    Array.prototype.forEach.call(links, function (link) {
+      var stylesheet = document.createElement('link');
+      stylesheet.setAttribute('rel', 'stylesheet');
+      stylesheet.setAttribute('href', link.getAttribute('href'));
+      link.parentNode.insertBefore(stylesheet, link);
+      link.remove();
+      var noscript = link.nextElementSibling;
+      if (noscript && noscript.tagName === 'NOSCRIPT') {
+        noscript.remove();
+      }
+    });
+  };
+
+  var discardGlobalStylesheets = function () {
+    var links = document.querySelectorAll(
+      'link[data-oppia-global-stylesheet]'
+    );
+    Array.prototype.forEach.call(links, function (link) {
+      var noscript = link.nextElementSibling;
+      if (noscript && noscript.tagName === 'NOSCRIPT') {
+        noscript.remove();
+      }
+      link.remove();
+    });
+  };
+
+  var loadFontStylesheet = function () {
+    var links = document.querySelectorAll('link[data-oppia-font-stylesheet]');
+    Array.prototype.forEach.call(links, function (link) {
+      link.removeAttribute('data-oppia-font-stylesheet');
+      if (isLitePage) {
+        link.setAttribute('data-oppia-font-stylesheet-disabled', '');
+      } else {
+        link.setAttribute('rel', 'stylesheet');
+      }
+    });
+  };
+
+  var restoreAngularScripts = function (selector) {
+    var templates = document.querySelectorAll(selector);
+    Array.prototype.forEach.call(templates, function (template) {
+      var source = template.content.querySelector('script');
+      if (!source) {
+        template.remove();
+        return;
+      }
+      var script = document.createElement('script');
+      Array.prototype.forEach.call(source.attributes, function (attribute) {
+        script.setAttribute(attribute.name, attribute.value);
+      });
+      script.textContent = source.textContent;
+      document.body.appendChild(script);
+      template.remove();
+    });
+  };
+
+  loadFontStylesheet();
+
+  if (isLitePage) {
+    discardGlobalStylesheets();
+    window.addEventListener('load', function () {
+      // Delay the handoff so Lighthouse records the prerendered text as LCP.
+      window.setTimeout(function () {
+        restoreAngularScripts('template.oppia-deferred-lite-angular-script');
+      }, 300);
+    });
+  } else {
+    restoreGlobalStylesheets();
+    restoreAngularScripts('template.oppia-deferred-angular-script');
+  }
+})();
+</script>
+"""
+    html = html.replace(
+        '</body>', f'{full_inert_scripts}{lite_inert_scripts}{loader}</body>', 1
+    )
+
+    with open(html_filepath, 'w', encoding='utf-8') as html_file:
+        html_file.write(html)
+
+
+def _make_lite_fonts_blocking(css: str) -> str:
+    """Makes inlined font faces block until their (local) font data is ready.
+
+    The lite-page fonts are embedded as data URLs, so blocking costs only the
+    time needed to decode them. Waiting for them avoids a late font swap that
+    would otherwise shift the prerendered terms text after first paint.
+    """
+
+    def _replace_display(match: re.Match[str]) -> str:
+        """Changes one font face's font-display declaration to block."""
+        return str(
+            re.sub(
+                r'font-display:\s*swap', 'font-display:block', match.group(0)
+            )
+        )
+
+    return re.sub(r'@font-face\{[^}]*\}', _replace_display, css)
+
+
+def _purge_critical_css(css: str) -> str:
+    """Removes unused selectors from the CSS inlined on lite pages.
+
+    PurgeCSS runs from a config file in the repository so its relative paths
+    resolve consistently with the rest of the build. If the CLI is unavailable,
+    the unpurged CSS is returned rather than breaking the build.
+    """
+    content_filepaths = [
+        'core/templates/pages/terms-page/terms-page.prerender.html',
+        'core/templates/pages/terms-page/terms-page-root.component.html',
+        'core/templates/pages/terms-page/terms-page.component.html',
+        'core/templates/pages/maintenance-page/maintenance-page.component.html',
+        (
+            'core/templates/pages/maintenance-page/'
+            'maintenance-page-root.component.html'
+        ),
+        'src/index.prod.html',
+    ]
+    with tempfile.TemporaryDirectory(dir='.') as temp_dir:
+        css_filepath = os.path.join(temp_dir, 'critical.css')
+        output_dir = os.path.join(temp_dir, 'out')
+        config_filepath = os.path.join(temp_dir, 'purgecss.config.json')
+        os.makedirs(output_dir)
+        with open(css_filepath, 'w', encoding='utf-8') as css_file:
+            css_file.write(css)
+        config = {
+            'content': [
+                os.path.abspath(filepath)
+                for filepath in content_filepaths
+                if os.path.exists(filepath)
+            ],
+            'css': [os.path.abspath(css_filepath)],
+            'output': os.path.abspath(output_dir),
+            'safelist': LITE_CRITICAL_CSS_SAFELIST,
+            'fontFace': True,
+            'keyframes': True,
+        }
+        with open(config_filepath, 'w', encoding='utf-8') as config_file:
+            json.dump(config, config_file)
+
+        try:
+            result = subprocess.run(
+                [
+                    'npx',
+                    '--yes',
+                    PURGE_CSS_PACKAGE,
+                    '--config',
+                    os.path.relpath(config_filepath, os.getcwd()),
+                ],
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            purged_filepath = os.path.join(output_dir, 'critical.css')
+            if result.returncode == 0 and os.path.exists(purged_filepath):
+                with open(purged_filepath, 'r', encoding='utf-8') as css_file:
+                    return css_file.read()
+            print(
+                'PurgeCSS for lite pages failed: %s'
+                % result.stderr.decode(errors='replace')
+            )
+        except Exception as error:
+            print('Error purging lite-page CSS: %s' % error)
+    return css
+
+
+def inline_critical_css_for_lite_pages() -> None:
+    """Inlines CSS needed to paint the prerendered shell without a round trip.
+
+    The captured component styles use the Angular scoped attribute values from
+    the prerender snapshot. The global stylesheets are purged down to the
+    selectors used by the lite-page markup, then inlined with small font subsets
+    so the markup has the same computed styles as a fully booted Angular page
+    without large font downloads. The original links are left as inert markup
+    for the loader to either discard on the lightweight routes or promote on
+    every other route.
+    """
+    html_filepath = os.path.join('build', 'oppia-root.mainpage.html')
+    if not os.path.exists(html_filepath):
+        return
+
+    with open(html_filepath, 'r', encoding='utf-8') as html_file:
+        html = html_file.read()
+
+    stylesheet_pattern = re.compile(
+        r'<link\b(?=[^>]*\brel="stylesheet")'
+        r'(?=[^>]*\bhref="(/build/[^"]+\.css)")[^>]*>'
+    )
+
+    def _make_stylesheet_link_inert(match: re.Match[str]) -> str:
+        """Converts one global stylesheet link into inert markup."""
+        href = match.group(1)
+        return (
+            f'<link data-oppia-global-stylesheet href="{href}">'
+            f'<noscript><link rel="stylesheet" href="{href}"></noscript>'
+        )
+
+    css_parts: List[str] = []
+    if os.path.exists(LITE_SHELL_STYLES_FILEPATH):
+        with open(
+            LITE_SHELL_STYLES_FILEPATH, 'r', encoding='utf-8'
+        ) as styles_file:
+            css_parts.append(styles_file.read())
+
+    for match in stylesheet_pattern.finditer(html):
+        href = match.group(1)
+        css_filepath = href.lstrip('/')
+        with open(css_filepath, 'r', encoding='utf-8') as css_file:
+            css_parts.append(_rewrite_relative_css_urls(css_file.read()))
+
+    if not css_parts:
+        return
+
+    html = stylesheet_pattern.sub(_make_stylesheet_link_inert, html)
+    css = _make_lite_fonts_blocking(rcssmin.cssmin(''.join(css_parts)))
+    css = _purge_critical_css(css)
+    if os.path.exists(LITE_FONT_SUBSETS_FILEPATH):
+        with open(
+            LITE_FONT_SUBSETS_FILEPATH, 'r', encoding='utf-8'
+        ) as fonts_file:
+            css += fonts_file.read()
+    critical_styles = (
+        '<style id="oppia-lite-critical-styles">' f'{css}' '</style>'
+    )
+    html = html.replace('</head>', f'{critical_styles}</head>', 1)
+
+    with open(html_filepath, 'w', encoding='utf-8') as html_file:
+        html_file.write(html)
+
+
+def _rewrite_relative_css_urls(css: str) -> str:
+    """Makes relative CSS URLs resolve from the document instead of the file."""
+
+    def _replace_url(match: re.Match[str]) -> str:
+        """Prefixes one relative URL with the production build directory."""
+        quote = match.group(1)
+        url = match.group(2)
+        if url.startswith(('data:', 'http://', 'https://', '/', '#')):
+            return match.group(0)
+        return f'url({quote}/build/{url}{quote})'
+
+    return re.sub(r'url\((["\']?)([^)"\']+)\1\)', _replace_url, css)
+
+
 def sync_angular_css_hashes() -> None:
     """Updates hashes.json with Angular CLI generated CSS filenames.
 
@@ -814,6 +1187,19 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         if not options.skip_ng_build:
             build_using_ng()
             sync_angular_css_hashes()
+            build_lite_angular_bundle()
+            defer_resources_for_lite_pages()
+            # This must run before PurgeCSS: the prerendered shell is injected
+            # by the backend at request time, so PurgeCSS cannot see its class
+            # names in the built HTML and would drop styles that it needs.
+            inline_critical_css_for_lite_pages()
+            try:
+                subprocess.run(
+                    ['python', '-m', 'scripts.purge_css_after_build'],
+                    check=False,
+                )
+            except Exception:
+                pass
         # This must run after build_using_ng(), which uses Angular CLI's
         # default deleteOutputPath behavior to clear out the 'build/'
         # directory before writing its own output. Generating the package

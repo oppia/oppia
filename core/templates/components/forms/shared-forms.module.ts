@@ -22,7 +22,8 @@ import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgbTooltipModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSliderModule} from '@angular/material/slider';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {TranslateModule} from '@ngx-translate/core';
 import {CustomFormsComponentsModule} from './custom-forms-directives/custom-form-components.module';
@@ -56,7 +57,8 @@ import {MarkTranslationsAsNeedingUpdateModalComponent} from './forms-templates/m
     DynamicContentModule,
     FormsModule,
     MatInputModule,
-    MaterialModule,
+    MatFormFieldModule,
+    MatSliderModule,
     NgbTooltipModule,
     NgbModalModule,
     ReactiveFormsModule,

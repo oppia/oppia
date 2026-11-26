@@ -2554,6 +2554,21 @@ div#ng-curtain {
   height: 40px;
   margin-top: 8px;
 }
+/* These classes replace inline styles in the captured /terms markup. They are
+   snapshot-only, so !important preserves the cascade of the original styles. */
+.oppia-lite-logo-inline {
+  margin-inline-start: 0 !important;
+  width: 90px !important;
+}
+.oppia-lite-logo-margin-inline-start-zero {
+  margin-inline-start: 0 !important;
+}
+.oppia-lite-dropdown-left-zero {
+  left: 0 !important;
+}
+.oppia-lite-dropdown-margin-top-zero {
+  margin-top: 0 !important;
+}
 .oppia-logo-small {
   margin-left: 6px;
 }

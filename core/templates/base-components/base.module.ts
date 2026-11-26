@@ -21,7 +21,6 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CookieModule} from 'ngx-cookie';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {DirectivesModule} from 'directives/directives.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
@@ -31,6 +30,7 @@ import {I18nModule} from 'i18n/i18n.module';
 import {CreateActivityButtonComponent} from 'components/button-directives/create-activity-button.component';
 import {SocialButtonsComponent} from 'components/button-directives/social-buttons.component';
 import {AlertMessageComponent} from 'components/common-layout-directives/common-elements/alert-message.component';
+import {ErrorModalComponent} from 'components/common-layout-directives/common-elements/error-modal.component';
 import {PromoBarComponent} from 'components/common-layout-directives/common-elements/promo-bar.component';
 import {SideNavigationBarComponent} from 'components/common-layout-directives/navigation-bars/side-navigation-bar.component';
 import {TopNavigationBarComponent} from 'components/common-layout-directives/navigation-bars/top-navigation-bar.component';
@@ -40,6 +40,9 @@ import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal
 import {WarningsAndAlertsComponent} from './warnings-and-alerts.component';
 import {ClassroomNavigationLinksComponent} from 'components/common-layout-directives/common-elements/classroom-navigation-links.component';
 import {LanguageBannerComponent} from 'components/language-banner/language-banner.component';
+import {CreateActivityModalModule} from 'components/shared_parts/create-activity-modal.module';
+import {KeyboardShortcutHelpModalModule} from 'components/shared_parts/keyboard-shortcut-help-modal.module';
+import {UploadActivityModalModule} from 'components/shared_parts/upload-activity-modal.module';
 
 // Directives.
 import {
@@ -52,7 +55,7 @@ import {
 
 // Miscellaneous.
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
-import {NgBootstrapModule} from 'modules/ng-boostrap.module';
+import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
 import {FeedbackModalComponent} from './feedback-modal.component';
 import {ImageReceiverModule} from 'components/forms/custom-forms-directives/image-receiver.module';
@@ -62,14 +65,16 @@ import {RouterModule} from '@angular/router';
 
 @NgModule({
   imports: [
+    UploadActivityModalModule,
+    KeyboardShortcutHelpModalModule,
+    CreateActivityModalModule,
     CommonModule,
     CookieModule.forChild(),
     DirectivesModule,
     I18nModule,
     FormsModule,
     ReactiveFormsModule,
-    NgbModule,
-    NgBootstrapModule,
+    NgbDropdownModule,
     RouterModule,
     SharedPipesModule,
     MatIconModule,
@@ -98,6 +103,7 @@ import {RouterModule} from '@angular/router';
     ClassroomNavigationLinksComponent,
     LanguageBannerComponent,
     FeedbackModalComponent,
+    ErrorModalComponent,
   ],
 
   entryComponents: [
@@ -116,6 +122,7 @@ import {RouterModule} from '@angular/router';
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
     FeedbackModalComponent,
+    ErrorModalComponent,
   ],
 
   exports: [
@@ -145,6 +152,7 @@ import {RouterModule} from '@angular/router';
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
     FeedbackModalComponent,
+    ErrorModalComponent,
   ],
 })
 export class BaseModule {}

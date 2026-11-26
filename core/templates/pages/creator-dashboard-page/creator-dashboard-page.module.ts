@@ -25,25 +25,28 @@ import {TranslateModule} from '@ngx-translate/core';
 
 import {BackgroundBannerModule} from '../../components/common-layout-directives/common-elements/background-banner.module';
 import {BaseModule} from '../../base-components/base.module';
-import {SharedComponentsModule} from '../../components/shared-component.module';
 import {StringUtilityPipesModule} from '../../filters/string-utility-filters/string-utility-pipes.module';
-import {MaterialModule} from '../../modules/material.module';
-import {NgBootstrapModule} from '../../modules/ng-boostrap.module';
+import {MatCardModule} from '@angular/material/card';
+import {NgbPopoverModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {toastrConfig} from '../../pages/oppia-root/app.module';
 
 import {CreatorDashboardPageComponent} from './creator-dashboard-page.component';
 import {CreatorDashboardPageRootComponent} from './creator-dashboard-page-root.component';
 
+import {CollectionSummaryTileModule} from 'components/shared_parts/collection-summary-tile.module';
+import {SharingLinksModule} from 'components/shared_parts/sharing-links.module';
 @NgModule({
   imports: [
+    SharingLinksModule,
+    CollectionSummaryTileModule,
     CommonModule,
     FormsModule,
     BaseModule,
     BackgroundBannerModule,
-    SharedComponentsModule,
     StringUtilityPipesModule,
-    MaterialModule,
-    NgBootstrapModule,
+    MatCardModule,
+    NgbPopoverModule,
+    NgbTooltipModule,
     ToastrModule.forRoot(toastrConfig),
     TranslateModule,
     RouterModule.forChild([

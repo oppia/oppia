@@ -21,7 +21,6 @@ import {RouterModule} from '@angular/router';
 
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatMenuModule} from '@angular/material/menu';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 import {StateParamChangesEditorComponent} from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import {DeleteStateSkillModalComponent} from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
@@ -85,7 +84,11 @@ import {StateVersionHistoryComponent} from './editor-tab/state-version-history/s
 import {ExplorationEditorPageRootComponent} from './exploration-editor-page-root.component';
 import {CommonModule} from '@angular/common';
 import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.guard';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
@@ -175,9 +178,134 @@ import {VersionHistoryService} from './services/version-history.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
+import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
+import {AudioFileUploaderModule} from 'components/shared_parts/audio-file-uploader.module';
+import {BaseModule} from 'base-components/base.module';
+import {CodeMirrorModule} from 'components/code-mirror/codemirror.module';
+import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
+import {CompletionGraphModule} from 'components/shared_parts/completion-graph.module';
+import {ConfirmDeleteStateModalModule} from 'components/shared_parts/confirm-delete-state-modal.module';
+import {ConfirmDiscardChangesModalModule} from 'components/shared_parts/confirm-discard-changes-modal.module';
+import {ConversationSkinModule} from 'components/shared_parts/conversation-skin.module';
+import {DisplayHintModalModule} from 'components/shared_parts/display-hint-modal.module';
+import {DisplayNewHintModalModule} from 'components/shared_parts/display-new-hint-modal.module';
+import {DisplayNewSolutionInterstitialModalModule} from 'components/shared_parts/display-new-solution-interstitial-modal.module';
+import {DisplayNewSolutionModalModule} from 'components/shared_parts/display-new-solution-modal.module';
+import {DisplaySolutionInterstitialModalModule} from 'components/shared_parts/display-solution-interstitial-modal.module';
+import {DisplaySolutionModalModule} from 'components/shared_parts/display-solution-modal.module';
+import {EditorReloadingModalModule} from 'components/shared_parts/editor-reloading-modal.module';
+import {ExplorationMetadataModalModule} from 'components/shared_parts/exploration-metadata-modal.module';
+import {ExplorationModifyTranslationsModalModule} from 'components/shared_parts/exploration-modify-translations-modal.module';
+import {ExplorationPublishModalModule} from 'components/shared_parts/exploration-publish-modal.module';
+import {ExplorationSaveModalModule} from 'components/shared_parts/exploration-save-modal.module';
+import {LostChangesModalModule} from 'components/shared_parts/lost-changes-modal.module';
+import {OppiaVisualizationClickHexbinsDirectiveModule} from 'components/shared_parts/oppia-visualization-click-hexbins-directive.module';
+import {OppiaVisualizationEnumeratedFrequencyTableDirectiveModule} from 'components/shared_parts/oppia-visualization-enumerated-frequency-table-directive.module';
+import {OppiaVisualizationFrequencyTableDirectiveModule} from 'components/shared_parts/oppia-visualization-frequency-table-directive.module';
+import {PostPublishModalModule} from 'components/shared_parts/post-publish-modal.module';
+import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
+import {SaveValidationFailModalModule} from 'components/shared_parts/save-validation-fail-modal.module';
+import {SaveVersionMismatchModalModule} from 'components/shared_parts/save-version-mismatch-modal.module';
+import {TrainingDataEditorPanelModalModule} from 'components/shared_parts/training-data-editor-panel-modal.module';
+import {TrainingModalModule} from 'components/shared_parts/training-modal.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
+import {ExplorationFooterModule} from 'components/shared_parts/exploration-footer.module';
+import {ExplorationObjectiveEditorModule} from 'components/shared_parts/exploration-objective-editor.module';
+import {ExplorationTitleEditorModule} from 'components/shared_parts/exploration-title-editor.module';
+import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
+import {OnScreenKeyboardModule} from 'components/shared_parts/on-screen-keyboard.module';
+import {OppiaVisualizationSortedTilesModule} from 'components/shared_parts/oppia-visualization-sorted-tiles.module';
+import {PreviewSummaryTileModalModule} from 'components/shared_parts/preview-summary-tile-modal.module';
+import {ProfileLinkTextModule} from 'components/shared_parts/profile-link-text.module';
+import {ResponseHeaderModule} from 'components/shared_parts/response-header.module';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {DynamicComponentModule} from 'value_generators/templates/dynamic-component.module';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
+import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
+import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import {StateEditorModule} from 'components/shared_parts/state-editor.module';
+import {StateGraphVisualizationModule} from 'components/shared_parts/state-graph-visualization.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {ThreadTableModule} from 'components/shared_parts/thread-table.module';
+import {TranslateModule} from '@ngx-translate/core';
+import {VersionDiffVisualizationModule} from 'components/shared_parts/version-diff-visualization.module';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
+    VersionDiffVisualizationModule,
+    TranslateModule,
+    TrainingModalModule,
+    TrainingDataEditorPanelModalModule,
+    ThreadTableModule,
+    StringUtilityPipesModule,
+    StateGraphVisualizationModule,
+    StateEditorModule,
+    SharedPipesModule,
+    SharedFormsModule,
+    SaveVersionMismatchModalModule,
+    SaveValidationFailModalModule,
+    RteHelperModalModule,
+    RichTextComponentsModule,
+    DynamicComponentModule,
+    ResponseHeaderModule,
+    ProfileLinkTextModule,
+    PreviewSummaryTileModalModule,
+    PostPublishModalModule,
+    OppiaVisualizationSortedTilesModule,
+    OppiaVisualizationFrequencyTableDirectiveModule,
+    OppiaVisualizationEnumeratedFrequencyTableDirectiveModule,
+    OppiaVisualizationClickHexbinsDirectiveModule,
+    OnScreenKeyboardModule,
+    NewConversationSkinModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatTooltipModule,
+    NgxMatSelectSearchModule,
+    LostChangesModalModule,
+    ExplorationTitleEditorModule,
+    ExplorationSaveModalModule,
+    ExplorationPublishModalModule,
+    ExplorationObjectiveEditorModule,
+    ExplorationModifyTranslationsModalModule,
+    ExplorationMetadataModalModule,
+    ExplorationFooterModule,
+    EditorReloadingModalModule,
+    DynamicContentModule,
+    DisplaySolutionModalModule,
+    DisplaySolutionInterstitialModalModule,
+    DisplayNewSolutionModalModule,
+    DisplayNewSolutionInterstitialModalModule,
+    DisplayNewHintModalModule,
+    DisplayHintModalModule,
+    DirectivesModule,
+    ConversationSkinModule,
+    ConfirmDiscardChangesModalModule,
+    ConfirmDeleteStateModalModule,
+    CompletionGraphModule,
+    CommonElementsModule,
+    CodeMirrorModule,
+    BaseModule,
+    AudioFileUploaderModule,
+    AttributionGuideModule,
     CommonModule,
     RouterModule.forChild([
       {
@@ -186,14 +314,15 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
         canActivate: [ExplorationEditorPageAuthGuard],
       },
     ]),
-    NgbModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
     InteractionExtensionsModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
     MatMenuModule,
     FormsModule,
     MatPaginatorModule,
-    SharedComponentsModule,
     FeedbackSharedModule,
     ExplorationPlayerViewerCommonModule,
     OppiaCkEditorCopyToolBarModule,
@@ -356,6 +485,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     InternetConnectivityService,
     LanguageUtilService,
     LocalStorageService,
+    ParameterizeRuleDescriptionPipe,
     ParameterMetadataService,
     PlatformFeatureService,
     PopulateRuleContentIdsService,
@@ -383,6 +513,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     TranslationLanguageService,
     TranslationStatusService,
     TranslationTabActiveModeService,
+    TruncateInputBasedOnInteractionAnswerTypePipe,
     UrlInterpolationService,
     UserEmailPreferencesService,
     UserExplorationPermissionsService,
@@ -392,6 +523,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     VersionHistoryService,
     VoiceoverBackendApiService,
     WindowDimensionsService,
+    WrapTextWithEllipsisPipe,
   ],
 })
 export class ExplorationEditorPageModule {}

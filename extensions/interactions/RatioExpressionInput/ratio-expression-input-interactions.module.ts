@@ -22,10 +22,10 @@ import {FormsModule} from '@angular/forms';
 import {InteractiveRatioExpressionInputComponent} from './directives/oppia-interactive-ratio-expression-input.component';
 import {ResponseRatioExpressionInputComponent} from './directives/oppia-response-ratio-expression-input.component';
 import {ShortResponseRatioExpressionInputComponent} from './directives/oppia-short-response-ratio-expression-input.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
-
+import {DirectivesModule} from 'directives/directives.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
-  imports: [CommonModule, FormsModule, SharedComponentsModule],
+  imports: [TranslateModule, DirectivesModule, CommonModule, FormsModule],
   declarations: [
     InteractiveRatioExpressionInputComponent,
     ResponseRatioExpressionInputComponent,

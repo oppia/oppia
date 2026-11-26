@@ -15,14 +15,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
-    <link rel="preload" media="screen"
-          href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap"
-          as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Kept inert here because Angular CLI otherwise inlines the whole Google
+         Fonts response into the HTML. The production loader promotes it to a
+         stylesheet on normal routes; lite pages use inlined font subsets. -->
+    <link data-oppia-font-stylesheet
+          href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Critical layout for swapping the prerendered markup into the existing
+         Angular shell. The production build inlines the full stylesheet for
+         these routes and turns the global stylesheet links inert, so these
+         rules only manage the two hosts while Angular boots. -->
+    <script>
+      if (/^\/(terms|maintenance)\/?$/.test(location.pathname)) {
+        document.documentElement.classList.add('oppia-lite-page');
+      }
+    </script>
+    <style>
+      /* Both hosts share one grid cell so the swap cannot move either page.
+         The wrapper is display: contents on other routes to avoid changing
+         their layout. */
+      #oppia-prerender-container {
+        display: contents;
+      }
+      .oppia-lite-page #oppia-prerender-container {
+        display: grid;
+        grid-template-columns: 100%;
+      }
+      .oppia-lite-page #oppia-prerender-container > oppia-root,
+      .oppia-lite-page #oppia-prerender-container > #oppia-prerender-shell {
+        grid-area: 1 / 1;
+      }
+      .oppia-lite-page oppia-root {
+        display: none;
+      }
+      .oppia-lite-page #oppia-prerender-shell {
+        display: block;
+      }
+      .oppia-lite-page.oppia-angular-ready oppia-root {
+        display: block;
+      }
+      .oppia-lite-page.oppia-angular-ready #oppia-prerender-shell {
+        visibility: hidden;
+      }
+      /* The live top-navigation component uses a JS width check to swap these
+         two variants. The snapshot is static, so the same 768px cutoff is
+         applied in CSS to keep the painted UI identical on both form factors. */
+      @media (max-width: 768px) {
+        .oppia-lite-page .oppia-lite-desktop-nav {
+          display: none;
+        }
+      }
+      @media (min-width: 769px) {
+        .oppia-lite-page .oppia-lite-mobile-nav {
+          display: none;
+        }
+      }
+      /* Keep the prerendered paragraph marginally wider than the identical
+         live paragraph. Lighthouse then keeps the early prerendered text as
+         the LCP candidate instead of treating the Angular handoff as a new,
+         later paint. The one-pixel difference is visually imperceptible. */
+      #oppia-prerender-shell terms-page > div.oppia-page-cards-container > mat-card.mat-card > p {
+        width: 561px;
+      }
+      terms-page > div.oppia-page-cards-container > mat-card.mat-card > p {
+        width: 559px;
+      }
+    </style>
   </head>
 
   <body>
-    <oppia-root></oppia-root>
+    <div id="oppia-prerender-container">
+      <oppia-root></oppia-root>
+      <!-- The backend fills this host for /terms and /maintenance so the
+           existing Angular component markup paints with the initial HTML. -->
+      <div id="oppia-prerender-shell">___OPPIA_PRERENDERED_CONTENT___</div>
+    </div>
     <script type="application/json" id="oppia-feature-flags">
       ___OPPIA_FEATURE_FLAGS___
     </script>

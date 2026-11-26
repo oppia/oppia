@@ -22,7 +22,6 @@ import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {NgbTooltipModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
-import {MaterialModule} from 'modules/material.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {TranslateModule} from '@ngx-translate/core';
 import {RouterModule} from '@angular/router';
@@ -31,7 +30,6 @@ import {ImageReceiverModule} from './image-receiver.module';
 @NgModule({
   imports: [
     CommonModule,
-    MaterialModule,
     DynamicContentModule,
     RouterModule,
     NgbTooltipModule,

@@ -18,17 +18,21 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateOfferingSharedModule} from 'components/certificate-assessment-offering-helper/certificate-offering-shared.module';
 
 import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-page.component';
 import {EditCertificateOfferingPageRootComponent} from './edit-certificate-offering-page-root.component';
 import {EditCertificateOfferingPageRoutingModule} from './edit-certificate-offering-page-routing.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {RouterModule} from '@angular/router';
 @NgModule({
   imports: [
+    RouterModule,
+    MatProgressSpinnerModule,
+    BaseModule,
     CommonModule,
-    SharedComponentsModule,
     CertificateOfferingSharedModule,
     EditCertificateOfferingPageRoutingModule,
   ],

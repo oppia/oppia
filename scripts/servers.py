@@ -28,7 +28,7 @@ import sys
 import threading
 
 from core import feconf
-from scripts import common
+from scripts import common, lighthouse_gzip_proxy
 
 import psutil
 from typing import (
@@ -231,6 +231,41 @@ def managed_dev_appserver(
         )
         common.wait_for_port_to_be_in_use(port)
         yield proc
+
+
+@contextlib.contextmanager
+def managed_gzip_proxy(
+    upstream_port: int, port: int, host: str = '127.0.0.1'
+) -> Iterator[None]:
+    """Returns a context manager for a gzip proxy in front of a local server.
+
+    The App Engine development server does not compress responses, while the
+    production Google Front End does. The proxy lets the Lighthouse checks
+    measure compressed response sizes that match production.
+
+    Args:
+        upstream_port: int. The port of the server whose responses should be
+            proxied and compressed.
+        port: int. The port the proxy should listen on.
+        host: str. The host the proxy should bind to.
+
+    Yields:
+        None. Yields control while the proxy is running.
+    """
+    proxy_server = lighthouse_gzip_proxy.create_server(
+        port=port, upstream_port=upstream_port, host=host
+    )
+    proxy_thread = threading.Thread(
+        target=proxy_server.serve_forever, daemon=True
+    )
+    proxy_thread.start()
+    try:
+        common.wait_for_port_to_be_in_use(port)
+        yield
+    finally:
+        proxy_server.shutdown()
+        proxy_server.server_close()
+        proxy_thread.join()
 
 
 @contextlib.contextmanager
