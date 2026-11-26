@@ -61,10 +61,8 @@ import {CurrentEngineService} from './current-engine.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {LearnerParamsService} from './learner-params.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {
-  ExplorationSummaryBackendApiService,
-  ExplorationSummaryDict,
-} from '../../../domain/summary/exploration-summary-backend-api.service';
+import {ExplorationSummaryBackendApiService} from '../../../domain/summary/exploration-summary-backend-api.service';
+import {LearnerExplorationSummary} from '../../../domain/summary/learner-exploration-summary.model';
 import {
   AnswerClassificationService,
   InteractionRulesService,
@@ -1074,9 +1072,32 @@ describe('Conversation flow service', () => {
       explorationSummaryBackendApiService,
       'loadPublicExplorationSummariesAsync'
     ).and.returnValue(
-      Promise.resolve({
-        summaries: [{} as ExplorationSummaryDict],
-      })
+      Promise.resolve([
+        LearnerExplorationSummary.createFromBackendDict({
+          activity_type: 'exploration',
+          category: 'Test Category',
+          community_owned: false,
+          human_readable_contributors_summary: {},
+          id: 'refresher_exp_id',
+          language_code: 'en',
+          last_updated_msec: 0,
+          created_on_msec: 0,
+          num_views: 0,
+          objective: 'Test Objective',
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+          },
+          status: 'public',
+          tags: [],
+          thumbnail_bg_color: '#ffffff',
+          thumbnail_icon_url: '/icon.svg',
+          title: 'Refresher Exploration',
+        }),
+      ])
     );
     spyOn(
       refresherExplorationConfirmationModalService,

@@ -25,6 +25,11 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
+import {
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryBackendDict,
+  TranslatableExplorationMetadataField,
+} from 'domain/summary/learner-exploration-summary.model';
 
 describe('Exploration Summary Backend Api Service', () => {
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
@@ -105,12 +110,34 @@ describe('Exploration Summary Backend Api Service', () => {
 
   it('should load public exploration summaries from backend', fakeAsync(() => {
     const explorationIds = ['0', '1', '2'];
-    const sampleResults = [
+    const sampleResults: LearnerExplorationSummaryBackendDict[] = [
       {
         title: 'Title 1',
         category: 'Category 1',
         status: 'public',
         language_code: 'en',
+        activity_type: 'exploration',
+        community_owned: false,
+        human_readable_contributors_summary: {},
+        id: '0',
+        last_updated_msec: 1000,
+        created_on_msec: 500,
+        num_views: 10,
+        objective: 'Objective 1',
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        tags: [],
+        thumbnail_bg_color: '#ffffff',
+        thumbnail_icon_url: '/icon.svg',
+        translated_metadata_fields: [
+          TranslatableExplorationMetadataField.TITLE,
+          TranslatableExplorationMetadataField.OBJECTIVE,
+        ],
       },
     ];
 
@@ -127,28 +154,78 @@ describe('Exploration Summary Backend Api Service', () => {
 
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleResults);
+    req.flush({summaries: sampleResults});
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleResults);
+    const results = successHandler.calls.mostRecent()
+      .args[0] as LearnerExplorationSummary[];
+    expect(results.length).toBe(1);
+    expect(results[0] instanceof LearnerExplorationSummary).toBeTrue();
+    expect(results[0].title).toBe('Title 1');
+    expect(results[0].communityOwned).toBeFalse();
+    expect(results[0].humanReadableContributorsSummary).toEqual({});
+    expect(results[0].translatedMetadataFields).toEqual([
+      TranslatableExplorationMetadataField.TITLE,
+      TranslatableExplorationMetadataField.OBJECTIVE,
+    ]);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
   it('should load public and private exploration summaries from backend', fakeAsync(() => {
     const explorationIds = ['0', '1', '2'];
-    const sampleResults = [
+    const sampleResults: LearnerExplorationSummaryBackendDict[] = [
       {
         title: 'Title 1',
         category: 'Category 1',
         status: 'public',
         language_code: 'en',
+        activity_type: 'exploration',
+        community_owned: false,
+        human_readable_contributors_summary: {},
+        id: '0',
+        last_updated_msec: 1000,
+        created_on_msec: 500,
+        num_views: 10,
+        objective: 'Objective 1',
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        tags: [],
+        thumbnail_bg_color: '#ffffff',
+        thumbnail_icon_url: '/icon.svg',
       },
       {
         title: 'Title 2',
         category: 'Category 2',
         status: 'private',
         language_code: 'en',
+        activity_type: 'exploration',
+        community_owned: false,
+        human_readable_contributors_summary: {},
+        id: '1',
+        last_updated_msec: 2000,
+        created_on_msec: 1000,
+        num_views: 20,
+        objective: 'Objective 2',
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        tags: [],
+        thumbnail_bg_color: '#ffffff',
+        thumbnail_icon_url: '/icon.svg',
+        translated_metadata_fields: [
+          TranslatableExplorationMetadataField.TITLE,
+          TranslatableExplorationMetadataField.OBJECTIVE,
+        ],
       },
     ];
 
@@ -165,11 +242,19 @@ describe('Exploration Summary Backend Api Service', () => {
 
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleResults);
+    req.flush({summaries: sampleResults});
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleResults);
+    const results = successHandler.calls.mostRecent()
+      .args[0] as LearnerExplorationSummary[];
+    expect(results.length).toBe(2);
+    expect(results[0] instanceof LearnerExplorationSummary).toBeTrue();
+    expect(results[0].title).toBe('Title 1');
+    expect(results[0].communityOwned).toBeFalse();
+    expect(results[1] instanceof LearnerExplorationSummary).toBeTrue();
+    expect(results[1].title).toBe('Title 2');
+    expect(results[1].communityOwned).toBeFalse();
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -202,6 +287,32 @@ describe('Exploration Summary Backend Api Service', () => {
       );
     })
   );
+
+  it('should use reject handler when exploration summaries contain null', fakeAsync(() => {
+    const explorationIds = ['0'];
+
+    const requestUrl =
+      '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' +
+      encodeURI(JSON.stringify(explorationIds)) +
+      '&' +
+      'include_private_explorations=false';
+
+    explorationSummaryBackendApiService
+      .loadPublicExplorationSummariesAsync(explorationIds)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({summaries: [null]});
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Invalid summaries fetched for explorationIds: ' + explorationIds
+    );
+  }));
 
   it(
     'should use reject handler when loading public exploration summaries' +

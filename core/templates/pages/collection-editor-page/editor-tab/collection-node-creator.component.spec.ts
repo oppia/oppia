@@ -29,6 +29,7 @@ import {ExplorationCreationBackendApiService} from 'components/entity-creation-s
 import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
 import {Collection} from 'domain/collection/collection.model';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -112,33 +113,34 @@ describe('Collection node creator component', () => {
       explorationSummaryBackendApiService,
       'loadPublicAndPrivateExplorationSummariesAsync'
     ).and.returnValue(
-      Promise.resolve({
-        summaries: [
-          {
-            activity_type: 'exploration',
-            category: '',
-            community_owned: true,
-            human_readable_contributors_summary: {},
-            id: expId,
-            language_code: '',
-            last_updated_msec: 0,
-            num_views: 1,
-            objective: '',
-            ratings: {
-              1: 0,
-              2: 0,
-              3: 0,
-              4: 0,
-              5: 0,
-            },
-            status: '',
-            tags: [],
-            thumbnail_bg_color: '',
-            thumbnail_icon_url: '',
-            title: '',
+      Promise.resolve([
+        LearnerExplorationSummary.createFromBackendDict({
+          activity_type: 'exploration',
+          category: '',
+          community_owned: true,
+          human_readable_contributors_summary: {},
+          id: expId,
+          language_code: '',
+          last_updated_msec: 0,
+          created_on_msec: 0,
+          num_views: 1,
+          objective: '',
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
           },
-        ],
-      })
+          status: '',
+          tags: [],
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+          title: '',
+          visited_checkpoints_count: 2,
+          total_checkpoints_count: 5,
+        }),
+      ])
     );
     spyOn(collectionLinearizerService, 'appendCollectionNode');
     spyOn(
@@ -147,7 +149,18 @@ describe('Collection node creator component', () => {
     ).and.returnValue(false);
     componentInstance.addExplorationToCollection(expId);
     tick();
-    expect(collectionLinearizerService.appendCollectionNode).toHaveBeenCalled();
+    expect(
+      collectionLinearizerService.appendCollectionNode
+    ).toHaveBeenCalledWith(
+      componentInstance.collection,
+      expId,
+      jasmine.objectContaining({
+        community_owned: true,
+        id: expId,
+        visited_checkpoints_count: 2,
+        total_checkpoints_count: 5,
+      })
+    );
   }));
 
   it(
@@ -206,11 +219,7 @@ describe('Collection node creator component', () => {
     spyOn(
       explorationSummaryBackendApiService,
       'loadPublicAndPrivateExplorationSummariesAsync'
-    ).and.returnValue(
-      Promise.resolve({
-        summaries: [],
-      })
-    );
+    ).and.returnValue(Promise.resolve([]));
     spyOn(collectionLinearizerService, 'appendCollectionNode');
     spyOn(
       componentInstance.collection,

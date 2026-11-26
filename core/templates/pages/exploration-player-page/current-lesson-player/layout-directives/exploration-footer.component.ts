@@ -125,11 +125,10 @@ export class ExplorationFooterComponent {
       ) {
         this.explorationSummaryBackendApiService
           .loadPublicAndPrivateExplorationSummariesAsync([this.explorationId])
-          .then(responseObject => {
-            let summaries = responseObject.summaries;
+          .then(summaries => {
             if (summaries.length > 0) {
               let contributorSummary =
-                summaries[0].human_readable_contributors_summary;
+                summaries[0].humanReadableContributorsSummary;
               this.contributorNames = Object.keys(contributorSummary).sort(
                 (contributorUsername1, contributorUsername2) => {
                   let commitsOfContributor1 =
