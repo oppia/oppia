@@ -120,8 +120,14 @@ export class ImageAreaSelection {
       throw new Error('Image not found.');
     }
 
-    // Scroll the image into view first; a scrolled-off image has negative coordinates.
-    await image.scrollIntoViewIfNeeded();
+    // Scroll so the target point is in the middle of the viewport. On a
+    // small viewport a tall image is only partly visible, so a point near
+    // its top edge can be off screen even after scrollIntoViewIfNeeded().
+    await image.evaluate((el, yPercent) => {
+      const rect = el.getBoundingClientRect();
+      const targetY = rect.top + (rect.height * yPercent) / 100;
+      window.scrollBy(0, targetY - window.innerHeight / 2);
+    }, yInPercentage);
     const box = await image.boundingBox();
     if (!box) {
       throw new Error('Image not found.');
