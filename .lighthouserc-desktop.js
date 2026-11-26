@@ -826,7 +826,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://localhost:8181/create-learner-group$',
@@ -837,7 +837,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.87,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://localhost:8181/edit-learner-group/.+$',
@@ -848,7 +848,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://localhost:8181/learner-group/.+$',
@@ -859,7 +859,13 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.87,
+          accessibilityMinScore: 1,
+          overrides: {
+            // The learner group viewer page logs a 404 for the group
+            // access-validation request in this environment, so console
+            // errors are expected.
+            'errors-in-console': ['error', {minScore: 0}],
+          },
         },
         {
           matchingUrlPattern:
@@ -871,7 +877,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.88,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern:
@@ -883,7 +889,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://localhost:8181/error/[^/]+$',
@@ -894,7 +900,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://localhost:8181/error/iframed$',
@@ -905,7 +911,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://localhost:8181/maintenance$',
@@ -916,7 +922,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://localhost:8181/lesson/.+$',

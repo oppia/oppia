@@ -334,7 +334,8 @@
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button e2e-test-language-dropdown langbtn"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-                [ngClass]="{'oppia-language-dropdown-button-embedded': pageIsIframed}">
+                [ngClass]="{'oppia-language-dropdown-button-embedded': pageIsIframed}"
+                aria-label="Language Selector">
           <i class="fas fa-globe language-icon langi"></i>
           <span class="mobile-view-language-code lngcd" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
           <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
@@ -550,7 +551,8 @@
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info sinin">
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button e2e-mobile-test-login sinin"
-                (click)="onLoginButtonClicked()">
+                (click)="onLoginButtonClicked()"
+                aria-label="Sign In">
           <span [innerHTML]="'I18N_TOPNAV_SIGN_IN' | translate"></span>
         </button>
       </div>

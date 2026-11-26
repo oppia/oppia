@@ -31,3 +31,7 @@ html, body {
 .oppia-main-page-container {
   margin: 0 auto;
 }
+
+.oppia-main-error-card a {
+  text-decoration: underline;
+}

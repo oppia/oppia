@@ -128,6 +128,10 @@
   color: #27635c;
 }
 
+.oppia-create-learner-group .oppia-learner-group-progressbar li.incomplete .title {
+  color: #616161;
+}
+
 .oppia-create-learner-group .oppia-create-learner-group-tab-container {
   background-color: #fff;
   border-radius: 4px;
@@ -184,7 +188,7 @@
 }
 
 .oppia-create-learner-group .add-syllabus-items-message {
-  color: #757575;
+  color: #525252;
   font-size: 14px;
 }
 
