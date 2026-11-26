@@ -59,6 +59,7 @@ import {UserInfo} from '../../../../../domain/user/user-info.model';
 import {VoiceoverPlayerService} from '../../../services/voiceover-player.service';
 import {ConversationFlowService} from '../../../services/conversation-flow.service';
 import {ChapterProgressService} from '../../../services/chapter-progress.service';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 
 class MockWindowRef {
   nativeWindow = {
@@ -142,7 +143,7 @@ describe('Conversation display component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, NoopAnimationsModule],
       declarations: [ConversationDisplayComponent, MockTranslatePipe],
       providers: [
         AudioBarStatusService,
@@ -1119,6 +1120,7 @@ describe('Conversation display component', () => {
   });
 
   it('should render content language selector only when in exploration preview mode', () => {
+    spyOn(componentInstance, 'ngOnInit');
     componentInstance.displayedCard = mockDisplayedCard;
     componentInstance.explorationIsInPreviewMode = true;
     fixture.detectChanges();
