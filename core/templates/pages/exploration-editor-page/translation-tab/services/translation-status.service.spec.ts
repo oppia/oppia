@@ -18,6 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationStatusService} from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
@@ -71,6 +72,7 @@ describe('Translation status service', () => {
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
   let NO_ASSETS_AVAILABLE_COLOR = '#D14836';
+  let PLACEHOLDER_STATUS_COLOR = '#CCCCCC';
   let statesWithAudioDict: StateObjectsBackendDict = {};
 
   beforeEach(() => {
@@ -111,6 +113,7 @@ describe('Translation status service', () => {
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
+    TestBed.inject(ExplorationLanguageCodeService).init('en');
     let currentIndex = 9;
     generateContentIdService.init(
       () => currentIndex++,
@@ -830,6 +833,133 @@ describe('Translation status service', () => {
       true
     );
   });
+
+  it(
+    'should only count translated content as requiring voiceovers in a' +
+      ' non-original language',
+    () => {
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      tss.refresh();
+
+      expect(tss.getExplorationContentRequiredCount()).toBe(1);
+    }
+  );
+
+  it(
+    'should use a gray status color for untranslated content in' +
+      ' voiceover mode',
+    () => {
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      stateEditorService.setActiveStateName('First');
+      tss.refresh();
+
+      expect(tss.getActiveStateContentIdStatusColor('content_0')).toBe(
+        PLACEHOLDER_STATUS_COLOR
+      );
+    }
+  );
+
+  it(
+    'should color tabs and the state graph to match untranslated' +
+      ' voiceover cards',
+    () => {
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      stateEditorService.setActiveStateName('First');
+      tss.refresh();
+
+      // The content_0 card has no Hindi translation, so the content tab
+      // matches the gray placeholder card.
+      expect(tss.getActiveStateComponentStatusColor('content')).toBe(
+        PLACEHOLDER_STATUS_COLOR
+      );
+      // The feedback_3 card has a Hindi translation and a voiceover,
+      // while feedback_2 does not, so the tab is yellow.
+      // The fixture still uses English en-US voiceovers for that
+      // remaining feedback item.
+      expect(tss.getActiveStateComponentStatusColor('feedback')).toBe(
+        FEW_ASSETS_AVAILABLE_COLOR
+      );
+      expect(tss.getActiveStateComponentNeedsUpdateStatus('feedback')).toBe(
+        false
+      );
+      expect(tss.stateWiseStatusColor.First).toBe(FEW_ASSETS_AVAILABLE_COLOR);
+      // Second has no Hindi translations, so the graph matches its gray
+      // placeholder cards.
+      expect(tss.stateWiseStatusColor.Second).toBe(PLACEHOLDER_STATUS_COLOR);
+      // First has no hints, so the hints tab has nothing to color.
+      expect(tss.getActiveStateComponentStatusColor('hint')).toBe(
+        ALL_ASSETS_AVAILABLE_COLOR
+      );
+    }
+  );
+
+  it(
+    'should mark translated content without a voiceover as missing on' +
+      ' the state graph',
+    () => {
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      stateEditorService.setActiveStateName('First');
+      let entityVoiceovers =
+        entityVoiceoversService.getActiveEntityVoiceovers();
+      entityVoiceovers.removeVoiceover('feedback_3');
+      entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+      tss.refresh();
+
+      expect(tss.getActiveStateContentIdStatusColor('feedback_3')).toBe(
+        NO_ASSETS_AVAILABLE_COLOR
+      );
+      expect(tss.stateWiseStatusColor.First).toBe(FEW_ASSETS_AVAILABLE_COLOR);
+      expect(tss.getStateGraphColorInVoiceoverMode([], [])).toBe(
+        ALL_ASSETS_AVAILABLE_COLOR
+      );
+    }
+  );
+
+  it(
+    'should treat an empty exploration language as the original language' +
+      ' for voiceover counts',
+    () => {
+      TestBed.inject(ExplorationLanguageCodeService).init('');
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      tss.refresh();
+
+      // Same required count as original-language voiceover mode for this
+      // fixture: First (content + 2 feedbacks), Second (content), and
+      // Third (content).
+      expect(tss.getExplorationContentRequiredCount()).toBe(5);
+    }
+  );
+
+  it(
+    'should exclude empty written translations from the voiceover required' +
+      ' count',
+    () => {
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
+        EntityTranslation.createFromBackendDict({
+          entity_id: 'exp_id',
+          entity_type: 'exploration',
+          entity_version: 5,
+          language_code: 'hi',
+          translations: {
+            feedback_3: {
+              content_format: 'html',
+              content_value: '',
+              needs_update: false,
+            },
+          },
+        });
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      tss.refresh();
+
+      expect(tss.getExplorationContentRequiredCount()).toBe(0);
+    }
+  );
 });
 
 describe('Translation status service - initialization', () => {
