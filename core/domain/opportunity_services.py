@@ -422,6 +422,26 @@ def get_translation_opportunities_by_entity_ids(
     return opportunities
 
 
+def get_translation_opportunity_targets_by_topic_id(
+    topic_id: str,
+) -> Set[Tuple[str, str]]:
+    """Returns the entity types and IDs of a topic's translation opportunities.
+
+    Args:
+        topic_id: str. The ID of the topic.
+
+    Returns:
+        set(tuple(str, str)). Pairs of entity type and entity ID linked to the
+        topic, including entities whose translations are complete.
+    """
+    return {
+        (model.entity_type, model.entity_id)
+        for model in opportunity_models.TranslationOpportunityModel.get_by_topic(
+            topic_id
+        )
+    }
+
+
 def compute_translation_opportunity_models_with_updated_entity(
     entity_type: str,
     entity_id: str,

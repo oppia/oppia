@@ -4609,6 +4609,148 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             response['target_id_to_opportunity_dict'][self.SKILL_ID], None
         )
 
+    def test_submitted_translations_are_filtered_by_language(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        matching_response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'language_code': 'hi',
+            },
+        )
+        self.assertEqual(len(matching_response['suggestions']), 1)
+
+        filtered_response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'language_code': 'fr',
+            },
+        )
+        self.assertEqual(len(filtered_response['suggestions']), 0)
+
+        self.logout()
+
+    def test_submitted_translations_are_filtered_by_topic(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.EXP_ID,
+            topic_id=self.TOPIC_ID,
+            topic_name='topic',
+            story_id=self.STORY_ID,
+            story_title='A story',
+            chapter_title='Node1',
+            content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[],
+        ).put()
+
+        matching_response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'topic',
+            },
+        )
+        self.assertEqual(len(matching_response['suggestions']), 1)
+
+        all_topics_response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': constants.TOPIC_SENTINEL_NAME_ALL,
+            },
+        )
+        self.assertEqual(len(all_topics_response['suggestions']), 1)
+
+        self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'not-a-real-topic',
+            },
+            expected_status_int=400,
+        )
+
+        self.logout()
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_submitted_translations_are_filtered_by_topic_with_new_models(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        explanation = skill.skill_contents.explanation
+        skill_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            self.SKILL_ID,
+            skill.version,
+            self.author_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                'content_id': explanation.content_id,
+                'language_code': 'hi',
+                'content_html': explanation.html,
+                'translation_html': '<p>Skill explanation in Hindi</p>',
+                'data_format': 'html',
+            },
+            'Adds a skill translation',
+        )
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_SKILL,
+            entity_id=self.SKILL_ID,
+            topic_ids=[self.TOPIC_ID],
+            content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_ID,
+            topic_ids=[],
+            content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+
+        url = '/getsubmittedsuggestions/all/translate_content'
+        params = {
+            'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+            'offset': 0,
+            'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            'language_code': 'hi',
+        }
+        unfiltered_response = self.get_json(url, params)
+        self.assertEqual(len(unfiltered_response['suggestions']), 2)
+
+        filtered_response = self.get_json(
+            url, {**params, 'topic_name': 'topic'}
+        )
+        self.assertEqual(
+            [s['suggestion_id'] for s in filtered_response['suggestions']],
+            [skill_suggestion.suggestion_id],
+        )
+        self.assertEqual(filtered_response['next_offset'], 2)
+
 
 class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ReviewableSuggestionsHandler."""
