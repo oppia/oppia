@@ -31,9 +31,7 @@ if MYPY:  # pragma: no cover
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 FeatureNames = feature_flag_list.FeatureNames
-FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
-    feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
-)
+FEATURE_FLAG_NAME_TO_SPEC = feature_flag_list.FEATURE_FLAG_NAME_TO_SPEC
 
 
 class Registry:
@@ -55,15 +53,9 @@ class Registry:
         feature_flag_config_from_storage = (
             cls.load_feature_flag_config_from_storage(name)
         )
-        feature_flag_spec_values = (
-            FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name)
-        )
+        feature_flag_spec = FEATURE_FLAG_NAME_TO_SPEC.get(name)
 
-        if feature_flag_spec_values is not None:
-            feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
-                feature_flag_spec_values[0], feature_flag_spec_values[1]
-            )
-        else:
+        if feature_flag_spec is None:
             raise Exception('Feature flag not found: %s.' % name)
 
         if feature_flag_config_from_storage is not None:

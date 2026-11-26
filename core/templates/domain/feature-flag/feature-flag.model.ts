@@ -30,6 +30,7 @@ export interface FeatureFlagBackendDict {
   rollout_percentage: number;
   user_group_ids: string[];
   last_updated: string | null;
+  developer_notes?: string | null;
 }
 
 /**
@@ -46,6 +47,7 @@ export class FeatureFlag {
   rolloutPercentage: number;
   userGroupIds: string[];
   lastUpdated: string | null;
+  readonly developerNotes: string | null;
 
   constructor(
     name: string,
@@ -54,7 +56,8 @@ export class FeatureFlag {
     forceEnableForAllUsers: boolean,
     rolloutPercentage: number,
     userGroupIds: string[],
-    lastUpdated: string | null
+    lastUpdated: string | null,
+    developerNotes: string | null = null
   ) {
     this.name = name;
     this.description = description;
@@ -63,6 +66,7 @@ export class FeatureFlag {
     this.rolloutPercentage = rolloutPercentage;
     this.userGroupIds = userGroupIds;
     this.lastUpdated = lastUpdated;
+    this.developerNotes = developerNotes;
   }
 
   static createFromBackendDict(
@@ -75,7 +79,8 @@ export class FeatureFlag {
       backendDict.force_enable_for_all_users,
       backendDict.rollout_percentage,
       backendDict.user_group_ids,
-      backendDict.last_updated
+      backendDict.last_updated,
+      backendDict.developer_notes ?? null
     );
   }
 }

@@ -101,7 +101,8 @@
   overflow-wrap: break-word;
 }
 
-.oppia-features .oppia-description-content {
+.oppia-features .oppia-description-content,
+.oppia-features .oppia-developer-notes-content {
   overflow-wrap: anywhere;
 }
 

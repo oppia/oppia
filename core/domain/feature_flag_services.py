@@ -46,9 +46,7 @@ ALL_FEATURES_NAMES_SET: Set[str] = set(
     feature.value for feature in ALL_FEATURE_FLAGS
 )
 
-FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
-    feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
-)
+FEATURE_FLAG_NAME_TO_SPEC = feature_flag_list.FEATURE_FLAG_NAME_TO_SPEC
 
 
 class FeatureFlagNotFoundException(Exception):
@@ -102,13 +100,11 @@ def _get_feature_flag_spec(name: str) -> feature_flag_domain.FeatureFlagSpec:
     Raises:
         Exception. Feature flag does not exists.
     """
-    if name not in FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE:
+    feature_flag_spec = FEATURE_FLAG_NAME_TO_SPEC.get(name)
+    if feature_flag_spec is None:
         raise Exception('Feature flag not found: %s.' % name)
 
-    return feature_flag_domain.FeatureFlagSpec(
-        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][0],
-        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][1],
-    )
+    return feature_flag_spec
 
 
 def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
