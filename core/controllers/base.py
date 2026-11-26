@@ -411,7 +411,10 @@ class BaseHandler(
                 '%s_HANDLER_ERROR_RETURN_TYPE' % method,
                 feconf.HANDLER_TYPE_JSON,
             )
-            if return_type == feconf.HANDLER_TYPE_JSON:
+            if return_type in (
+                feconf.HANDLER_TYPE_JSON,
+                feconf.HANDLER_TYPE_DOWNLOADABLE,
+            ):
                 self.error(503)
                 self.render_json(
                     {

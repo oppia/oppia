@@ -764,6 +764,15 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             """Handles DELETE requests."""
             self.render_json({'unexpected': True})
 
+    class DownloadableHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Handles downloads with JSON error responses."""
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
+
+        def get(self, *args: Any) -> None:
+            """Handles GET requests."""
+            self.render_json({'unexpected': True})
+
     def setUp(self) -> None:
         super(MaintenanceModeTests, self).setUp()
         self.signup(
@@ -840,6 +849,27 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
                 },
             )
 
+    def test_downloadable_handler_returns_json_service_unavailable(
+        self,
+    ) -> None:
+        testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/download', self.DownloadableHandler)],
+                debug=feconf.DEBUG,
+            )
+        )
+
+        response = testapp.get('/download', status=503)
+
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(
+            json.loads(response.body[len(feconf.XSSI_PREFIX) :]),
+            {
+                'error': 'The site is currently under maintenance.',
+                'status_code': 503,
+            },
+        )
+
     def test_html_head_response_redirects_to_maintenance_page(self) -> None:
         response = self.testapp.head('/community-library', status=302)
 
@@ -849,6 +879,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         response = self.testapp.head('/url_handler?current_url=/', status=503)
 
         self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.body, b'')
 
     def test_html_and_json_routes_work_outside_maintenance_mode(self) -> None:
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
