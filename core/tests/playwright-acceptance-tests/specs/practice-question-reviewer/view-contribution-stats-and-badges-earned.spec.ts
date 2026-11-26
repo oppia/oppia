@@ -23,7 +23,6 @@ import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Contributor} from '../../utilities/user/contributor';
-import {ContributorAdmin} from '../../utilities/user/contributor-admin';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
@@ -41,7 +40,7 @@ test.describe('Practice Question Reviewer Stats & Badges', function () {
     ExplorationEditor &
     LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
-  let questionAdmin: QuestionAdmin & ContributorAdmin;
+  let questionAdmin: QuestionAdmin;
 
   test.beforeAll(async function ({browser}) {
     test.setTimeout(900000);
@@ -192,7 +191,7 @@ test.describe('Practice Question Reviewer Stats & Badges', function () {
 
   test('should be able to check badges earned', async function () {
     await questionReviewer.navigateToTabInMyContributions('Badges');
-    await questionReviewer.selectBadgeType('Question');
+    await questionReviewer.selectBadgeTypeInMobileView('Question');
     await questionReviewer.expectBadgesToContain('1', 'Review');
     await questionReviewer.expectBadgesToContain('1', 'Correction');
   });

@@ -96,8 +96,6 @@ const subscribedCreatorSelector = '.e2e-test-subscription-name';
 const accountDeletionButtonInDeleteAccountPage =
   '.e2e-test-delete-my-account-button';
 const preferencesContainerSelector = '.e2e-test-preferences-container';
-const contributorDashboardContainerSelector =
-  '.e2e-test-oppia-contributor-home';
 const preferencesMenuLink = '.e2e-test-preferences-link';
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
@@ -111,6 +109,10 @@ const filledRatingStarSelector = '.fas.fa-star';
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
 const profileDropdown = '.e2e-test-profile-dropdown';
+const contributorDashboardMenuLink =
+  '.e2e-test-contributor-dashboard-menu-link';
+const contributorDashboardContainerSelector =
+  '.e2e-test-oppia-contributor-home';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
 const progressTabSectionInLearnerDashboard =
@@ -210,8 +212,6 @@ const closeModalButton = '.e2e-test-close-modal-btn';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
-const contributorDashboardMenuLinkSelector =
-  '.e2e-test-contributor-dashboard-menu-link';
 const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
 const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 
@@ -1239,19 +1239,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the Contributor Dashboard using the profile dropdown menu.
-   */
-  async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
-    await this.expectElementToBeVisible(profileDropdown);
-    await this.clickOnElementWithSelector(profileDropdown);
-
-    await this.expectElementToBeVisible(contributorDashboardMenuLinkSelector);
-    await this.clickOnElementWithSelector(contributorDashboardMenuLinkSelector);
-
-    await this.expectElementToBeVisible(contributorDashboardContainerSelector);
-  }
-
-  /**
    * Navigates to the Moderator page.
    * @param {boolean} verifyUrl - Whether to verify the URL after navigation. Defaults to true.
    */
@@ -1260,6 +1247,25 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     const navigationUtils = new NavigationUtils(this);
     await navigationUtils.navigateToModeratorPage(verifyUrl);
+  }
+
+  /**
+   * Navigates to the Contributor Dashboard using the profile dropdown menu.
+   */
+  async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.expectElementToBeVisible(contributorDashboardMenuLink);
+    // The link always triggers a full page load (even if the user is already
+    // on the contributor dashboard), so we wait for the new page to load
+    // before checking its contents.
+    await Promise.all([
+      this.page.waitForEvent('load'),
+      this.clickOnElementWithSelector(contributorDashboardMenuLink),
+    ]);
+
+    await this.expectElementToBeVisible(contributorDashboardContainerSelector);
   }
 
   /**
