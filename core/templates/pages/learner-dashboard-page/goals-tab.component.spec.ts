@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for for GoalsTabComponent.
  */
 
-// @ts-nocheck
 
 import {
   waitForAsync,
@@ -557,7 +556,7 @@ describe('Goals tab Component', () => {
     const removeActivityModalAsyncSpy = spyOn(
       learnerDashboardActivityBackendApiService,
       'removeActivityModalAsync'
-    ).and.returnValue(Promise.resolve(true));
+    ).and.returnValue(Promise.resolve());
 
     component.openModal();
 
@@ -582,7 +581,7 @@ describe('Goals tab Component', () => {
     const removeActivityModalAsyncSpy = spyOn(
       learnerDashboardActivityBackendApiService,
       'removeActivityModalAsync'
-    ).and.returnValue(Promise.resolve(true));
+    ).and.returnValue(Promise.resolve());
 
     component.removeGoal('sample_topic_2', 'Topic Name 2');
     await fixture.whenStable();

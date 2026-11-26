@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for learner dashboard parge.
  */
 
-// @ts-nocheck
 
 import {
   LearnerExplorationSummary,
@@ -69,6 +68,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {PageTitleService} from 'services/page-title.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UserInfo} from 'domain/user/user-info.model';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
   FeedbackStatus,
@@ -684,7 +684,7 @@ describe('Learner dashboard page', () => {
         ' initialization and get data from backend',
       fakeAsync(() => {
         spyOn(userService, 'getUserInfoAsync').and.callFake(async () => {
-          return Promise.resolve(userInfo);
+          return userInfo as UserInfo;
         });
         component.ngOnInit();
         flush();
@@ -733,7 +733,7 @@ describe('Learner dashboard page', () => {
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
       const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
       spyOn(userService, 'getUserInfoAsync').and.callFake(async () => {
-        return Promise.resolve(userInfo);
+        return userInfo as UserInfo;
       });
 
       component.ngOnInit();
@@ -805,7 +805,7 @@ describe('Learner dashboard page', () => {
         LearnerGroupsAreEnabled: {
           isEnabled: true,
         },
-      });
+      } as FeatureStatusChecker);
     });
     it('should correctly get subtopic masteries', fakeAsync(() => {
       let subtopic = {
@@ -1033,7 +1033,7 @@ describe('Learner dashboard page', () => {
         LearnerGroupsAreEnabled: {
           isEnabled: true,
         },
-      });
+      } as FeatureStatusChecker);
 
       (urlService.getUrlParams as jasmine.Spy).and.returnValue({
         active_tab: 'my-suggestions',
@@ -1129,7 +1129,7 @@ describe('Learner dashboard page', () => {
       ]);
 
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(userInfo)
+        Promise.resolve(userInfo as UserInfo)
       );
     }));
 
@@ -1167,6 +1167,13 @@ describe('Learner dashboard page', () => {
         untrackedTopics: {},
         allTopicsList: [],
         learntToPartiallyLearntTopics: [],
+        completedToIncompleteStories: [],
+        numberOfNonexistentTopicsAndStories: new NonExistentTopicsAndStories(
+          0,
+          0,
+          0,
+          0
+        ),
       });
 
       const fetchExplorationsSpy = spyOn(
@@ -1459,7 +1466,7 @@ describe('Learner dashboard page', () => {
         LearnerGroupsAreEnabled: {
           isEnabled: true,
         },
-      });
+      } as FeatureStatusChecker);
 
       component.setActiveSection(
         'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
@@ -1485,7 +1492,7 @@ describe('Learner dashboard page', () => {
         LearnerGroupsAreEnabled: {
           isEnabled: true,
         },
-      });
+      } as FeatureStatusChecker);
 
       component.setActiveSection(
         'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION'
@@ -1511,7 +1518,7 @@ describe('Learner dashboard page', () => {
         LearnerGroupsAreEnabled: {
           isEnabled: true,
         },
-      });
+      } as FeatureStatusChecker);
 
       component.activeSection =
         component.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME;
@@ -1539,7 +1546,7 @@ describe('Learner dashboard page', () => {
         LearnerGroupsAreEnabled: {
           isEnabled: true,
         },
-      });
+      } as FeatureStatusChecker);
 
       component.activeSection =
         component.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME;

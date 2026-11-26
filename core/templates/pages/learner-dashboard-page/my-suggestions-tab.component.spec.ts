@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// @ts-nocheck
 /**
  * @fileoverview Unit tests for My Suggestions tab in learner dashboard.
  */
@@ -237,12 +236,13 @@ describe('My Suggestions Tab Component', () => {
 
     component.openFollowUpModal();
 
-    expect(bottomSheetSpy).toHaveBeenCalledWith(
-      AddAFollowUpNoteModalComponent,
-      {
-        data: {detailFeedback: null},
-      }
+    expect(bottomSheetSpy).toHaveBeenCalled();
+    expect(bottomSheetSpy.calls.mostRecent().args[0] as object).toBe(
+      AddAFollowUpNoteModalComponent as object
     );
+    expect(bottomSheetSpy.calls.mostRecent().args[1]).toEqual({
+      data: {detailFeedback: null},
+    });
     expect(ngbModalSpy).not.toHaveBeenCalled();
   });
 

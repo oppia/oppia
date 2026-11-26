@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for MyCertificatesTabComponent.
  */
 
-// @ts-nocheck
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -92,13 +91,13 @@ describe('MyCertificatesTabComponent', () => {
           diagnosticTestIsEnabled: false,
           thumbnailData: {
             filename: '',
-            sizeInBytes: 0,
-            bgColor: '',
+            size_in_bytes: 0,
+            bg_color: '',
           },
           bannerData: {
             filename: '',
-            sizeInBytes: 0,
-            bgColor: '',
+            size_in_bytes: 0,
+            bg_color: '',
           },
         },
       })

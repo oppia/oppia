@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for SkillCardComponent
  */
 
-// @ts-nocheck
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
@@ -40,8 +39,8 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockQuestionBackendApiService {
-  async fetchTotalQuestionCountForSkillIdsAsync() {
-    return Promise.resolve(1);
+  async fetchTotalQuestionCountForSkillIdsAsync(skillIds: string[]) {
+    return Promise.resolve(skillIds.length);
   }
 }
 
