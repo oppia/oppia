@@ -915,7 +915,9 @@ class VersionedModel(BaseModel):
     # version number starts at 1 when the model instance is first created.
     # All data in this instance represents the version at HEAD; data about the
     # previous versions is stored in the snapshot models.
-    version = datastore_services.IntegerProperty(default=0)
+    version = datastore_services.IntegerProperty(
+        default=feconf.INITIAL_ENTITY_VERSION
+    )
 
     def _require_not_marked_deleted(self) -> None:
         """Checks whether the model instance is deleted."""

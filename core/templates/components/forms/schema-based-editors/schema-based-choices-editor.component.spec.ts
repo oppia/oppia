@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Schema Based Choices Editor Component
  */
 
-// @ts-nocheck
-
 import {
   FormControl,
   FormsModule,
@@ -60,7 +58,7 @@ describe('Schema Based Choices Editor Component', () => {
     expect(component).toBeDefined();
     expect(component.validate(new FormControl(1))).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
-    expect(component.onChange('true')).toEqual('true');
+    expect<string | void>(component.onChange('true')).toEqual('true');
   }));
 
   it('should get empty object on validating', () => {
