@@ -73,6 +73,26 @@ class JobServicesTests(test_utils.GenericTestBase):
         assert saved_updated_job is not None
         self.assertEqual(saved_updated_job.to_dict(), updated_job.to_dict())
 
+    def test_save_job_rejects_invalid_status_code(self) -> None:
+        job = job_domain.Job(
+            job_id='job_id',
+            job_type='job_type',
+            time_queued_msec=1.0,
+            time_started_msec=None,
+            time_finished_msec=3.0,
+            status_code='unknown',
+            metadata=None,
+            output=None,
+            error=None,
+            has_been_cleaned_up=False,
+            additional_job_params=None,
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid job status code.'
+        ):
+            job_services.save_job(job)
+
     def test_get_job_by_id_returns_none_for_unknown_id(self) -> None:
         self.assertIsNone(job_services.get_job_by_id('unknown_job_id'))
 

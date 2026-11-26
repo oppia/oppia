@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
 from core.domain import job_domain
 from core.platform import models
 
@@ -127,12 +128,34 @@ def mark_outdated_jobs_as_deleted(
     datastore_services.put_multi(outdated_job_models)
 
 
+def _validate_job_status_code(status_code: str) -> None:
+    """Validates that a job status code is one of the known values.
+
+    Args:
+        status_code: str. The status code to validate.
+
+    Raises:
+        utils.ValidationError: If the status code is not recognized.
+    """
+    valid_status_codes = (
+        job_models.STATUS_CODE_NEW,
+        job_models.STATUS_CODE_QUEUED,
+        job_models.STATUS_CODE_STARTED,
+        job_models.STATUS_CODE_COMPLETED,
+        job_models.STATUS_CODE_FAILED,
+        job_models.STATUS_CODE_CANCELED,
+    )
+    if status_code not in valid_status_codes:
+        raise utils.ValidationError('Invalid job status code.')
+
+
 def save_job(job: job_domain.Job) -> None:
     """Saves a job to storage.
 
     Args:
         job: Job. The job to save.
     """
+    _validate_job_status_code(job.status_code)
     job.validate()
     job_model = job_models.JobModel.get(job.job_id, strict=False)
     if job_model is None:

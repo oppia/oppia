@@ -20,15 +20,8 @@ from __future__ import annotations
 import math
 
 from core import utils
-from core.platform import models
 
 from typing import Any
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import job_models
-
-(job_models,) = models.Registry.import_models([models.Names.JOB])
 
 
 class Job:
@@ -137,16 +130,8 @@ class Job:
         if not isinstance(self.has_been_cleaned_up, bool):
             raise utils.ValidationError('has_been_cleaned_up must be a bool.')
 
-        valid_status_codes = (
-            job_models.STATUS_CODE_NEW,
-            job_models.STATUS_CODE_QUEUED,
-            job_models.STATUS_CODE_STARTED,
-            job_models.STATUS_CODE_COMPLETED,
-            job_models.STATUS_CODE_FAILED,
-            job_models.STATUS_CODE_CANCELED,
-        )
-        if self.status_code not in valid_status_codes:
-            raise utils.ValidationError('Invalid job status code.')
+        if not isinstance(self.status_code, str):
+            raise utils.ValidationError('Job status code must be a string.')
 
         for field_name, field_value in (
             ('metadata', self.metadata),
@@ -160,7 +145,7 @@ class Job:
                     f'{field_name} must be None or a dict with string keys.'
                 )
 
-        if self.status_code == job_models.STATUS_CODE_COMPLETED:
+        if self.status_code == 'completed':
             if self.output is None or not isinstance(self.output, list):
                 raise utils.ValidationError(
                     'Completed jobs must have a list output.'
@@ -172,10 +157,7 @@ class Job:
         elif self.output is not None:
             raise utils.ValidationError('Only completed jobs can have output.')
 
-        if self.status_code in (
-            job_models.STATUS_CODE_FAILED,
-            job_models.STATUS_CODE_CANCELED,
-        ):
+        if self.status_code in ('failed', 'canceled'):
             if not isinstance(self.error, str):
                 raise utils.ValidationError(
                     'Failed or canceled jobs must have an error string.'
@@ -207,10 +189,7 @@ class Job:
                     f'{timestamp_name} must be None or a number.'
                 )
 
-        if self.status_code in (
-            job_models.STATUS_CODE_NEW,
-            job_models.STATUS_CODE_QUEUED,
-        ):
+        if self.status_code in ('new', 'queued'):
             if (
                 self.time_started_msec is not None
                 or self.time_finished_msec is not None
@@ -218,7 +197,7 @@ class Job:
                 raise utils.ValidationError(
                     'New or queued jobs cannot have start or finish times.'
                 )
-        elif self.status_code == job_models.STATUS_CODE_STARTED:
+        elif self.status_code == 'started':
             if (
                 self.time_started_msec is None
                 or self.time_started_msec < self.time_queued_msec
@@ -231,7 +210,7 @@ class Job:
                 raise utils.ValidationError(
                     'Started jobs cannot have a finish time.'
                 )
-        elif self.status_code == job_models.STATUS_CODE_COMPLETED:
+        elif self.status_code == 'completed':
             if (
                 self.time_started_msec is None
                 or self.time_finished_msec is None

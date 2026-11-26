@@ -111,6 +111,7 @@ class JobTests(test_utils.GenericTestBase):
             ('job_type', ''),
             ('job_type', 1),
             ('has_been_cleaned_up', 'false'),
+            ('status_code', 1),
         ]
         for field_name, value in invalid_fields:
             with self.subTest(field=field_name, value=value):
@@ -118,13 +119,6 @@ class JobTests(test_utils.GenericTestBase):
                 job_dict[field_name] = value
                 with self.assertRaisesRegex(utils.ValidationError, '.*'):
                     job_domain.Job.from_dict(job_dict)
-
-    def test_validate_rejects_invalid_status_code(self) -> None:
-        job_dict = self._get_valid_job_dict()
-        job_dict['status_code'] = 'unknown'
-
-        with self.assertRaisesRegex(utils.ValidationError, '.*'):
-            job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_invalid_json_fields(self) -> None:
         invalid_fields = [
