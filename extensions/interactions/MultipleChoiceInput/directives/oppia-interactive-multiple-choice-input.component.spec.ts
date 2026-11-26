@@ -349,4 +349,78 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       currentInteractionService.showNoResponseError
     ).not.toHaveBeenCalled();
   });
+
+  it('should submit the answer when Enter is pressed inside the interaction', () => {
+    spyOn(component, 'submitAnswer');
+    const innerElement = document.createElement('button');
+    fixture.nativeElement.appendChild(innerElement);
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+    Object.defineProperty(event, 'target', {value: innerElement});
+    spyOn(event, 'preventDefault');
+
+    component.handleEnterKey(event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(component.submitAnswer).toHaveBeenCalled();
+  });
+
+  it('should submit the answer when Enter is pressed with focus on the body', () => {
+    spyOn(component, 'submitAnswer');
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+    Object.defineProperty(event, 'target', {value: document.body});
+    spyOn(event, 'preventDefault');
+
+    component.handleEnterKey(event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(component.submitAnswer).toHaveBeenCalled();
+  });
+
+  it('should not handle Enter pressed on an element outside the interaction', () => {
+    spyOn(component, 'submitAnswer');
+    const outsideButton = document.createElement('button');
+    document.body.appendChild(outsideButton);
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+    Object.defineProperty(event, 'target', {value: outsideButton});
+    spyOn(event, 'preventDefault');
+
+    component.handleEnterKey(event);
+
+    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(component.submitAnswer).not.toHaveBeenCalled();
+    outsideButton.remove();
+  });
+
+  it('should handle Enter dispatched inside the interaction via the document listener', () => {
+    spyOn(component, 'submitAnswer');
+    const innerButton = document.createElement('button');
+    fixture.nativeElement.appendChild(innerButton);
+    const event = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    });
+
+    innerButton.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBeTrue();
+    expect(component.submitAnswer).toHaveBeenCalled();
+  });
+
+  it('should not block Enter on a button outside the interaction via the document listener', () => {
+    spyOn(component, 'submitAnswer');
+    const outsideButton = document.createElement('button');
+    document.body.appendChild(outsideButton);
+    const event = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    });
+
+    outsideButton.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBeFalse();
+    expect(component.submitAnswer).not.toHaveBeenCalled();
+    outsideButton.remove();
+  });
 });

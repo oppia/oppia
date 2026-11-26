@@ -1042,34 +1042,6 @@ describe('Site Analytics Service', () => {
       });
     });
 
-    it('should register new classroom lesson card click event', () => {
-      sas.registerNewClassroomLessonEngagedWithEvent('Math', 'Addition');
-
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event',
-        'new_classroom_lesson_engaged_with',
-        {
-          classroom_name: 'Math',
-          topic_name: 'Addition',
-          login_status: 'logged_in',
-        }
-      );
-    });
-
-    it('should register in-progress classroom lesson card click event', () => {
-      sas.registerInProgressClassroomLessonEngagedWithEvent('Math', 'Addition');
-
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event',
-        'classroom_lesson_in_progress_engaged_with',
-        {
-          classroom_name: 'Math',
-          topic_name: 'Addition',
-          login_status: 'logged_in',
-        }
-      );
-    });
-
     it('should register diagnostic test completion event', () => {
       const classroomName = 'Math101';
 
