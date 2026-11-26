@@ -20,8 +20,8 @@ import {Page} from '@playwright/test';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
+import {NavigationUtils} from '../common/navigation-utils';
 
-const baseURL = testConstants.URLs.BaseURL;
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 const classroomBannerImage = testConstants.data.classroomBannerImage;
@@ -220,12 +220,8 @@ export class CurriculumAdmin extends TopicManager {
   async navigateToExplorationEditor(
     explorationId: string | null
   ): Promise<void> {
-    if (!explorationId) {
-      throw new Error('Cannot navigate to editor: explorationId is null');
-    }
-    const editorUrl = `${baseURL}/create/${explorationId}`;
-    await this.goto(editorUrl);
-    showMessage('Navigation to exploration editor is successful.');
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.navigateToExplorationEditor(explorationId);
   }
 
   /**
