@@ -360,12 +360,9 @@
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
           <a href="/delete-account"
-             [attr.aria-label]="('I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate) + ('I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO' | translate)"
-             class="preferences-page-tab-focus">
-            <button tabindex="-1" type="button" class="btn btn-danger e2e-test-delete-account-button">
-              {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
-            </button>
-          </a>
+   class="btn btn-danger preferences-page-tab-focus e2e-test-delete-account-button">
+  {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
+</a>
           <span class="form-text d-block oppia-form-text">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO' | translate }}
           </span>
@@ -373,24 +370,16 @@
       </div>
 
       <hr>
-
       <div role="form" class="mb-3 row">
         <label class="col-lg-4 col-md-4 col-sm-4 text-capitalize form-label" tabindex="0">
           {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
           <a href="/export-account-handler"
-             tabindex="0"
-             [attr.aria-label]="('I18N_PREFERENCES_EXPORT_ACCOUNT' | translate) + ('I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate)"
-             class="preferences-page-tab-focus">
-            <button type="button"
-                    class="btn btn-primary e2e-test-export-account-button"
-                    title="Export account"
-                    tabindex="-1"
-                    (click)="handleExportDataClick()">
-                    {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
-            </button>
-          </a>
+   class="btn btn-primary preferences-page-tab-focus e2e-test-export-account-button"
+   (click)="handleExportDataClick()">
+  {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
+</a>
           <span class="form-text d-block oppia-form-text">
             {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate }}
           </span>
