@@ -597,32 +597,12 @@ export class PracticeQuestionSubmitter extends Contributor {
       await this.clickOnElementWithSelector(openOutcomeDestButton);
       // Wait for Angular's updateOptionNames() to asynchronously populate
       // the dropdown options before attempting selection.
-      await this.page.waitForFunction(
-        (selector: string, targetName: string) => {
-          const select = document.querySelector(
-            selector
-          ) as HTMLSelectElement | null;
-          return (
-            select !== null &&
-            Array.from(select.options).some(
-              option =>
-                option.value === targetName || option.text.trim() === targetName
-            )
-          );
-        },
-        {},
+      await this.waitForDropdownOptionToAppear(
         destinationSelectorDropdown,
         directToCard
       );
       await this.page.select(destinationSelectorDropdown, directToCard);
-      await this.page.waitForFunction(
-        (selector: string, expectedVal: string) => {
-          const select = document.querySelector(
-            selector
-          ) as HTMLSelectElement | null;
-          return select !== null && select.value === expectedVal;
-        },
-        {},
+      await this.waitForDropdownSelectedValue(
         destinationSelectorDropdown,
         directToCard
       );
@@ -634,20 +614,9 @@ export class PracticeQuestionSubmitter extends Contributor {
       await this.clickOnElementWithSelector(outcomeDestWhenStuckSelector);
       // Wait for Angular's updateOptionNames() to asynchronously populate
       // the dropdown options before attempting selection.
-      await this.page.waitForFunction(
-        (selector: string) => {
-          const select = document.querySelector(
-            selector
-          ) as HTMLSelectElement | null;
-          return (
-            select !== null &&
-            Array.from(select.options).some(
-              option => option.text.trim() === 'A New Card Called...'
-            )
-          );
-        },
-        {},
-        destinationWhenStuckSelectorDropdown
+      await this.waitForDropdownOptionToAppear(
+        destinationWhenStuckSelectorDropdown,
+        'A New Card Called...'
       );
 
       const newCardOptionValue = await this.page.$eval(
@@ -672,14 +641,7 @@ export class PracticeQuestionSubmitter extends Contributor {
       );
 
       // Verify that the selection succeeded and wait for the new-card input to be visible.
-      await this.page.waitForFunction(
-        (selector: string, expectedVal: string) => {
-          const select = document.querySelector(
-            selector
-          ) as HTMLSelectElement | null;
-          return select !== null && select.value === expectedVal;
-        },
-        {},
+      await this.waitForDropdownSelectedValue(
         destinationWhenStuckSelectorDropdown,
         newCardOptionValue
       );
