@@ -8,7 +8,8 @@
               [class.expanded]="sidebarIsExpanded">
         <div [class.expanded-sidebar-label]="sidebarIsExpanded">
           <i class="fa fa-lg"
-             [ngClass]="sidebarIsExpanded ? 'fa-chevron-right lesson-player-sidebar-chevron' : 'fa-chevron-left'"></i>
+             [ngClass]="sidebarIsExpanded ? 'fa-chevron-right lesson-player-sidebar-chevron' : 'fa-chevron-left'">
+          </i>
           {{ 'I18N_LESSON_PLAYER_SIDEBAR' | translate }}
         </div>
       </button>
