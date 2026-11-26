@@ -270,7 +270,6 @@ def get_entity(line: str) -> tuple[str, str] | None:
             5,
         ),
         '/edit-learner-group/': ('learner_group_id', 4),
-        '/learner-group/': ('learner_group_id', 4),
     }
     for url_pattern, (
         entity_name,

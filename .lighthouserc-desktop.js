@@ -860,12 +860,6 @@ module.exports = {
             cls: 1.5,
           },
           accessibilityMinScore: 1,
-          overrides: {
-            // The learner group viewer page logs a 404 for the group
-            // access-validation request in this environment, so console
-            // errors are expected.
-            'errors-in-console': ['error', {minScore: 0}],
-          },
         },
         {
           matchingUrlPattern:

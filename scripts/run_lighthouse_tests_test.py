@@ -293,12 +293,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             ),
             ('learner_group_id', 'abc123'),
         )
-        self.assertEqual(
-            run_lighthouse_tests.get_entity(
-                'http://localhost:8181/learner-group/abc123'
-            ),
-            ('learner_group_id', 'abc123'),
-        )
 
     def test_get_entity_strips_hash_fragment(self) -> None:
         # Editor URLs are captured from page.url(), which the Angular router
