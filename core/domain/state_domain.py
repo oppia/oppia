@@ -170,12 +170,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection()
         )
 
-        if self.outcome is not None:
-            (
-                translatable_contents_collection.add_fields_from_translatable_object(
-                    self.outcome
-                )
-            )
+        translatable_contents_collection.add_fields_from_translatable_object(
+            self.outcome
+        )
         # TODO(#16256): Instead of hardcoding interactions name here,
         # Interaction can have a flag indicating whether the rule_specs can have
         # translations.
@@ -1284,7 +1281,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         ub_inclusive=True,
                     )
 
-                elif rule_spec.rule_type == 'IsInclusivelyBetween':
+                else:
+                    assert rule_spec.rule_type == 'IsInclusivelyBetween'
                     rule_value_a = float(rule_spec.inputs['a'])
                     rule_value_b = float(rule_spec.inputs['b'])
                     if rule_value_a >= rule_value_b and strict:
@@ -2159,24 +2157,21 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # customization_args_dict here indicates a dict that maps customization
         # argument names to a customization argument dict, the dict
         # representation of InteractionCustomizationArg.
-        customization_args_dict = {}
-        if self.id:
-            for ca_name in self.customization_args:
-                try:
-                    customization_args_dict[ca_name] = self.customization_args[
-                        ca_name
-                    ].to_customization_arg_dict()
-                except AttributeError as e:
-                    raise utils.ValidationError(
-                        'Expected customization arg value to be a '
-                        'InteractionCustomizationArg domain object, '
-                        'received %s' % self.customization_args[ca_name]
-                    ) from e
-
-        # Here, we are asserting that interaction_id is never going to be None,
-        # Because this is a private method and before calling this method we are
-        # already checking if interaction_id exists or not.
+        # The caller has already validated the interaction ID.
         assert self.id is not None
+        customization_args_dict = {}
+        for ca_name in self.customization_args:
+            try:
+                customization_args_dict[ca_name] = self.customization_args[
+                    ca_name
+                ].to_customization_arg_dict()
+            except AttributeError as e:
+                raise utils.ValidationError(
+                    'Expected customization arg value to be a '
+                    'InteractionCustomizationArg domain object, '
+                    'received %s' % self.customization_args[ca_name]
+                ) from e
+
         interaction = interaction_registry.Registry.get_interaction_by_id(
             self.id
         )
