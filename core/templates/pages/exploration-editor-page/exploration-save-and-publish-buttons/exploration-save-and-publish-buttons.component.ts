@@ -91,7 +91,9 @@ export class ExplorationSaveAndPublishButtonsComponent
 
     const MIN_CHANGES_DISPLAY_PROMPT = 50;
 
-    if (
+    if (countChanges < MIN_CHANGES_DISPLAY_PROMPT) {
+      this.isModalDisplayed = false;
+    } else if (
       countChanges >= MIN_CHANGES_DISPLAY_PROMPT &&
       !this.isModalDisplayed &&
       !this.saveIsInProcess
