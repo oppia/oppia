@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Schema Based Bool Editor Component
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   FormControl,
@@ -60,7 +58,7 @@ describe('Schema Based Bool Editor Component', () => {
     expect(component).toBeDefined();
     expect(component.validate(new FormControl(false))).toEqual(null);
     expect(component.onChange).toEqual(mockFunction);
-    expect(component.onChange(true)).toEqual(true);
+    expect<boolean | void>(component.onChange(true)).toEqual(true);
   }));
 
   it('should return errors for invalid value type', () => {
