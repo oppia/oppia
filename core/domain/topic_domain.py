@@ -31,8 +31,12 @@ from core.constants import constants
 # functions in Topic class. This import should be removed
 # once the schema migration functions are moved outside the
 # domain file.
-from core.domain import fs_services  # pylint: disable=invalid-import-from
-from core.domain import change_domain, study_guide_domain, subtopic_page_domain
+from core.domain import (  # pylint: disable=invalid-import-from
+    change_domain,
+    fs_services,
+    study_guide_domain,
+    subtopic_page_domain,
+)
 
 from typing import Dict, Final, List, Literal, Optional, TypedDict
 
@@ -1232,7 +1236,7 @@ class Topic:
     def from_dict(
         cls,
         topic_dict: TopicDict,
-        topic_version: int = 0,
+        topic_version: int = feconf.INITIAL_ENTITY_VERSION,
         topic_created_on: Optional[datetime.datetime] = None,
         topic_last_updated: Optional[datetime.datetime] = None,
     ) -> Topic:
@@ -1804,7 +1808,7 @@ class Topic:
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             1,
             constants.DEFAULT_LANGUAGE_CODE,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             '',
             False,

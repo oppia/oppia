@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for SpeechSynthesisChunkerService.
  */
 
-// @ts-nocheck
-
 import {TestBed, fakeAsync, flush} from '@angular/core/testing';
 
 import {SpeechSynthesisChunkerService} from 'services/speech-synthesis-chunker.service';
@@ -153,18 +151,66 @@ describe('Speech Synthesis Chunker Service', () => {
 
   describe('speak', function () {
     const MockSpeechSynthesisUtteranceConstructor = SpeechSynthesisUtterance;
-    const mockSpeechSynthesisUtteran = {
-      speak: () => {},
-      onend: () => {},
-      addEventListener: function (_: string, cb: () => void) {
-        this.onend = cb;
-      },
-    };
+    class MockSpeechSynthesisUtterance implements SpeechSynthesisUtterance {
+      lang: string = '';
+      pitch: number = 1;
+      rate: number = 1;
+      text: string = '';
+      voice: SpeechSynthesisVoice | null = null;
+      volume: number = 1;
+      onboundary:
+        | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void)
+        | null = null;
+
+      onend:
+        | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void)
+        | null = null;
+
+      onerror:
+        | ((
+            this: SpeechSynthesisUtterance,
+            ev: SpeechSynthesisErrorEvent
+          ) => void)
+        | null = null;
+
+      onmark:
+        | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void)
+        | null = null;
+
+      onpause:
+        | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void)
+        | null = null;
+
+      onresume:
+        | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void)
+        | null = null;
+
+      onstart:
+        | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void)
+        | null = null;
+
+      addEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject
+      ): void {
+        if (type === 'end' && typeof listener === 'function') {
+          this.onend = listener as (
+            this: SpeechSynthesisUtterance,
+            ev: SpeechSynthesisEvent
+          ) => void;
+        }
+      }
+
+      removeEventListener(): void {}
+      dispatchEvent(): boolean {
+        return true;
+      }
+    }
 
     beforeEach(() => {
       spyOn(window, 'SpeechSynthesisUtterance').and.returnValues(
-        Object.assign({}, mockSpeechSynthesisUtteran),
-        Object.assign({}, mockSpeechSynthesisUtteran)
+        new MockSpeechSynthesisUtterance(),
+        new MockSpeechSynthesisUtterance()
       );
     });
 

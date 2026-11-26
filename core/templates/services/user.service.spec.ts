@@ -16,8 +16,6 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -34,6 +32,7 @@ import {UrlService} from './contextual/url.service';
 import {
   PreferencesBackendDict,
   UserBackendApiService,
+  UserContributionRightsDataBackendDict,
 } from './user-backend-api.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -378,11 +377,13 @@ describe('User Api Service', () => {
     }));
 
     it('should return user contribution rights data', fakeAsync(() => {
-      const sampleUserContributionRightsDict = {
-        translation: ['hi'],
-        voiceover: [],
-        question: true,
-      };
+      const sampleUserContributionRightsDict: UserContributionRightsDataBackendDict =
+        {
+          can_review_translation_for_language_codes: ['hi'],
+          can_review_voiceover_for_language_codes: [],
+          can_review_questions: true,
+          can_suggest_questions: true,
+        };
 
       userService
         .getUserContributionRightsDataAsync()
@@ -401,11 +402,13 @@ describe('User Api Service', () => {
     }));
 
     it('should not fetch user contribution rights if it is was fetched before', fakeAsync(() => {
-      const sampleUserContributionRightsDict = {
-        translation: ['hi'],
-        voiceover: [],
-        question: true,
-      };
+      const sampleUserContributionRightsDict: UserContributionRightsDataBackendDict =
+        {
+          can_review_translation_for_language_codes: ['hi'],
+          can_review_voiceover_for_language_codes: [],
+          can_review_questions: true,
+          can_suggest_questions: true,
+        };
 
       userService
         .getUserContributionRightsDataAsync()
