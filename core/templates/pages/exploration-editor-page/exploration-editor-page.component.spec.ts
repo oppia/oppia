@@ -501,6 +501,136 @@ describe('Exploration editor page component', () => {
       component.ngOnDestroy();
     });
 
+    it('should create the preview only after required services initialize', fakeAsync(() => {
+      flushMicrotasks();
+      let finishFeatureFetch!: (features: ExplorationFeatures) => void;
+      const featuresRequest = new Promise<ExplorationFeatures>(resolve => {
+        finishFeatureFetch = resolve;
+      });
+      efbas.fetchExplorationFeaturesAsync.and.returnValue(featuresRequest);
+      spyOn(component, 'getActiveTabName').and.returnValue('preview');
+      component.explorationEditorPageHasInitialized = true;
+      fixture.detectChanges();
+      const previousPreview =
+        fixture.nativeElement.querySelector('oppia-preview-tab');
+      expect(previousPreview).not.toBeNull();
+
+      component.initExplorationPage();
+      fixture.detectChanges();
+
+      expect(component.explorationEditorPageHasInitialized).toBe(false);
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).toBeNull();
+
+      flushMicrotasks();
+      fixture.detectChanges();
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).toBeNull();
+
+      finishFeatureFetch({
+        explorationIsCurated: false,
+        alwaysAskLearnersForAnswerDetails: false,
+      } as ExplorationFeatures);
+      flushMicrotasks();
+      fixture.detectChanges();
+      expect(component.explorationEditorPageHasInitialized).toBe(true);
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).not.toBeNull();
+      expect(fixture.nativeElement.querySelector('oppia-preview-tab')).not.toBe(
+        previousPreview
+      );
+
+      rs.navigateToMainTab(null);
+      discardPeriodicTasks();
+    }));
+
+    it('should show the preview while improvements are loading', fakeAsync(() => {
+      flushMicrotasks();
+      let finishImprovements!: () => void;
+      const improvementsRequest = new Promise<void>(resolve => {
+        finishImprovements = resolve;
+      });
+      eis.initAsync.and.returnValue(improvementsRequest);
+      spyOn(component, 'getActiveTabName').and.returnValue('preview');
+
+      component.initExplorationPage();
+      flushMicrotasks();
+      fixture.detectChanges();
+
+      expect(component.explorationEditorPageHasInitialized).toBe(true);
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).not.toBeNull();
+
+      finishImprovements();
+      flushMicrotasks();
+      rs.navigateToMainTab(null);
+      discardPeriodicTasks();
+    }));
+
+    it('should keep the preview available if improvements fail to load', fakeAsync(() => {
+      flushMicrotasks();
+      spyOn(as, 'addWarning');
+      eis.initAsync.and.returnValue(
+        Promise.reject(new Error('Improvements unavailable.'))
+      );
+      spyOn(component, 'getActiveTabName').and.returnValue('preview');
+
+      component.initExplorationPage();
+      flushMicrotasks();
+      fixture.detectChanges();
+
+      expect(component.explorationEditorPageHasInitialized).toBe(true);
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).not.toBeNull();
+      expect(as.addWarning).toHaveBeenCalledWith(
+        'Unable to load exploration improvements.'
+      );
+
+      rs.navigateToMainTab(null);
+      discardPeriodicTasks();
+    }));
+
+    it('should leave the improvements tab disabled when its check fails', fakeAsync(() => {
+      flushMicrotasks();
+      spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
+        Promise.reject(new Error('Improvements unavailable.'))
+      );
+
+      component.ngOnInit();
+      flushMicrotasks();
+
+      expect(component.improvementsTabIsEnabled).toBe(false);
+      discardPeriodicTasks();
+    }));
+
+    it('should use the initial state when preview opens with an invalid active state', fakeAsync(() => {
+      const stateEditorService = TestBed.inject(StateEditorService);
+      stateEditorService.setActiveStateName('missing-state');
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(true);
+      spyOn(component, 'getActiveTabName').and.returnValue('preview');
+
+      component.initExplorationPage();
+      fixture.detectChanges();
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).toBeNull();
+
+      flushMicrotasks();
+      fixture.detectChanges();
+      expect(stateEditorService.getActiveStateName()).toBe('Introduction');
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).not.toBeNull();
+
+      rs.navigateToMainTab(null);
+      discardPeriodicTasks();
+    }));
+
     it('should start editor tutorial when on main page', fakeAsync(() => {
       explorationData.version = 1;
       tds.countOfOpenFeedbackThreads = 2;

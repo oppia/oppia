@@ -237,19 +237,14 @@ describe('Preview Tab Component', () => {
     spyOn(explorationEngineService, 'initSettingsFromEditor').and.stub();
 
     explorationInitStateNameService.savedMemento = 'state';
-    explorationParamChangesService.savedMemento = null;
   });
 
-  it('should initialize controller properties after its initialization', fakeAsync(() => {
+  it('should use the shared services initialized by the editor', fakeAsync(() => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('state');
     spyOn(explorationParamChangesService, 'init').and.stub();
     spyOn(explorationStatesService, 'init').and.stub();
     spyOn(explorationInitStateNameService, 'init').and.stub();
     spyOn(graphDataService, 'recompute').and.stub();
-    // This throws "Type 'null' is not assignable to type 'State'."
-    // We need to suppress this error because of the need to test validations.
-    // @ts-ignore
-    spyOn(explorationStatesService, 'getState').and.returnValue(null);
     spyOn(component, 'getManualParamChanges').and.returnValue(
       Promise.resolve([])
     );
@@ -267,22 +262,17 @@ describe('Preview Tab Component', () => {
     // Get data from exploration data service.
     expect(component.isExplorationPopulated).toBe(false);
     expect(component.previewWarning).toBe('');
+    expect(explorationParamChangesService.init).not.toHaveBeenCalled();
+    expect(explorationStatesService.init).not.toHaveBeenCalled();
+    expect(explorationInitStateNameService.init).not.toHaveBeenCalled();
+    expect(graphDataService.recompute).not.toHaveBeenCalled();
 
     component.ngOnDestroy();
   }));
 
-  it('should initialize controller properties after its initialization', fakeAsync(() => {
+  it('should warn when the preview starts from a different state', fakeAsync(() => {
     explorationInitStateNameService.savedMemento = 'state2';
-    explorationParamChangesService.savedMemento = null;
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('state');
-    spyOn(explorationParamChangesService, 'init').and.stub();
-    spyOn(explorationStatesService, 'init').and.stub();
-    spyOn(explorationInitStateNameService, 'init').and.stub();
-    spyOn(graphDataService, 'recompute').and.stub();
-    // This throws "Type 'null' is not assignable to type 'State'."
-    // We need to suppress this error because of the need to test validations.
-    // @ts-ignore
-    spyOn(explorationStatesService, 'getState').and.returnValue(null);
     spyOn(component, 'getManualParamChanges').and.returnValue(
       Promise.resolve([])
     );

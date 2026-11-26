@@ -222,6 +222,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   // Initializes the exploration page using data from the backend.
   // Called on page load.
   initExplorationPage(): Promise<void> {
+    this.explorationEditorPageHasInitialized = false;
     this.editabilityService.lockExploration(true);
     this.modifyTranslationsFeatureFlagIsEnabled =
       this.platformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled;
@@ -460,12 +461,21 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
       // TODO(#13352): Initialize StateTopAnswersStatsService and register
       // relevant callbacks.
-      await this.explorationImprovementsService.initAsync();
-      await this.explorationImprovementsService.flushUpdatedTasksToBackend();
+      // The preview only depends on the shared exploration services above.
+      // Improvements may fail to load without preventing the preview from
+      // opening.
+      this.explorationEditorPageHasInitialized = true;
+      try {
+        await this.explorationImprovementsService.initAsync();
+        await this.explorationImprovementsService.flushUpdatedTasksToBackend();
+      } catch {
+        this.alertsService.addWarning(
+          'Unable to load exploration improvements.'
+        );
+      }
 
       this.explorationWarningsService.updateWarnings();
       this.stateEditorRefreshService.onRefreshStateEditor.emit();
-      this.explorationEditorPageHasInitialized = true;
     });
   }
 
@@ -821,9 +831,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
     Promise.resolve(
       this.explorationImprovementsService.isImprovementsTabEnabledAsync()
-    ).then(improvementsTabIsEnabledResponse => {
-      this.improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
-    });
+    ).then(
+      improvementsTabIsEnabledResponse => {
+        this.improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
+      },
+      () => {
+        this.improvementsTabIsEnabled = false;
+      }
+    );
   }
 
   isImprovementsTabEnabled(): boolean {
