@@ -22,6 +22,8 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {
   ContributorDashboardStatsBackendApiService,
   ContributorDashboardStatsData,
+  LanguageOverallStat,
+  SupportedLanguage,
   TopicStat,
 } from './contributor-dashboard-stats-backend-api.service';
 import {ContributorDashboardStatsPageComponent} from './contributor-dashboard-stats-page.component';
@@ -256,6 +258,59 @@ describe('ContributorDashboardStatsPageComponent', () => {
     expect(component.getSelectedLanguageName()).toBe('Hindi');
   });
 
+  it('should handle API failure gracefully in loadStatsData', async () => {
+    (statsApiService.fetchStatsDataAsync as jasmine.Spy).and.returnValue(
+      Promise.reject(new Error('Network error'))
+    );
+    await component.loadStatsData();
+    expect(component.isLoading).toBeFalse();
+    expect(component.topicStats).toEqual([]);
+    expect(component.supportedLanguages).toEqual([]);
+  });
+
+  it('should fallback to first language when Hindi is not available', async () => {
+    const dataWithoutHindi: ContributorDashboardStatsData = {
+      ...mockStatsData,
+      supported_languages: [{language_code: 'es', language_name: 'Spanish'}],
+    };
+    (statsApiService.fetchStatsDataAsync as jasmine.Spy).and.returnValue(
+      Promise.resolve(dataWithoutHindi)
+    );
+    await component.loadStatsData();
+    expect(component.selectedLanguageCode).toBe('es');
+  });
+
+  it('should handle empty supported languages in loadStatsData', async () => {
+    const dataWithoutLanguages: ContributorDashboardStatsData = {
+      ...mockStatsData,
+      supported_languages: [],
+    };
+    (statsApiService.fetchStatsDataAsync as jasmine.Spy).and.returnValue(
+      Promise.resolve(dataWithoutLanguages)
+    );
+    component.selectedLanguageCode = '';
+    await component.loadStatsData();
+    expect(component.selectedLanguageCode).toBe('');
+  });
+
+  it('should handle null or undefined fields in API response', async () => {
+    const minimalData = {
+      topic_stats: null as unknown as TopicStat[],
+      language_stats: null as unknown as LanguageOverallStat[],
+      summary_stats: null,
+      supported_languages: null as unknown as SupportedLanguage[],
+      topic_names: [],
+    } as unknown as ContributorDashboardStatsData;
+    (statsApiService.fetchStatsDataAsync as jasmine.Spy).and.returnValue(
+      Promise.resolve(minimalData)
+    );
+    await component.loadStatsData();
+    expect(component.topicStats).toEqual([]);
+    expect(component.languageStats).toEqual([]);
+    expect(component.summaryStats).toBeNull();
+    expect(component.supportedLanguages).toEqual([]);
+  });
+
   it('should toggle active tab and reset filters and collapse states', () => {
     component.expandedTopicIds.add('fractions_topic');
     component.showCompletedAccordion = true;
@@ -269,6 +324,11 @@ describe('ContributorDashboardStatsPageComponent', () => {
 
     component.setActiveTab('translations');
     expect(component.activeTab).toBe('translations');
+
+    // Setting same tab should not reset filters.
+    component.activeFilter = 'near-complete';
+    component.setActiveTab('translations');
+    expect(component.activeFilter).toBe('near-complete');
   });
 
   it('should handle language change and search input changes', () => {
@@ -308,16 +368,16 @@ describe('ContributorDashboardStatsPageComponent', () => {
     const stalled = component.topicStats[2];
     const unstarted = component.topicStats[3];
 
-    // Completed
+    // Completed.
     expect(component.getTopicStatus(addition)).toBe('completed');
-    // Needs review (subPct 90 > revPct 80)
+    // Needs review (subPct 90 > revPct 80).
     expect(component.getTopicStatus(fractions)).toBe('needs-review');
-    // Stalled
+    // Stalled.
     expect(component.getTopicStatus(stalled)).toBe('stalled');
-    // Not started
+    // Not started.
     expect(component.getTopicStatus(unstarted)).toBe('not-started');
 
-    // In-progress test where sub == rev and not stalled
+    // In-progress test where sub == rev and not stalled.
     const inProgressTopic: TopicStat = {
       ...stalled,
       is_stalled: false,
@@ -328,41 +388,84 @@ describe('ContributorDashboardStatsPageComponent', () => {
   it('should filter and sort topics correctly across all filter chips', async () => {
     await component.ngOnInit();
 
-    // Default 'all'
+    // Default 'all'.
     let actionable = component.getActionableTopics();
     expect(actionable.length).toBe(3);
     let completed = component.getCompletedTopics();
     expect(completed.length).toBe(1);
     expect(completed[0].topic_id).toBe('addition_topic');
 
-    // Filter 'near-complete'
+    // Filter 'near-complete'.
     component.setFilter('near-complete');
     actionable = component.getActionableTopics();
     expect(actionable.length).toBe(1);
     expect(actionable[0].topic_id).toBe('fractions_topic');
 
-    // Filter 'needs-review'
+    // Filter 'needs-review'.
     component.setFilter('needs-review');
     actionable = component.getActionableTopics();
     expect(actionable.length).toBe(1);
     expect(actionable[0].topic_id).toBe('fractions_topic');
 
-    // Filter 'needs-contributor'
+    // Filter 'needs-contributor'.
     component.setFilter('needs-contributor');
     actionable = component.getActionableTopics();
     expect(actionable.length).toBe(2);
 
-    // Filter 'completed'
+    // Filter 'completed'.
     component.setFilter('completed');
     completed = component.getCompletedTopics();
     expect(completed.length).toBe(1);
 
-    // Search query filter
+    // Search query filter.
     component.setFilter('all');
     component.searchQuery = 'stalled';
     actionable = component.getActionableTopics();
     expect(actionable.length).toBe(1);
     expect(actionable[0].topic_id).toBe('stalled_topic');
+  });
+
+  it('should correctly sort topics across near-complete comparisons', async () => {
+    await component.ngOnInit();
+    const topicA: TopicStat = {
+      ...component.topicStats[2],
+      topic_id: 'topic_a',
+      topic_name: 'Topic A',
+    };
+    const topicB: TopicStat = {
+      ...component.topicStats[0],
+      topic_id: 'topic_b',
+      topic_name: 'Topic B',
+      translation_stats_by_language: {
+        hi: {
+          ...component.topicStats[0].translation_stats_by_language.hi,
+          submission_progress_percentage: 85.0,
+          progress_percentage: 50.0,
+        },
+      },
+    };
+    component.topicStats = [topicA, topicB];
+    component.setFilter('all');
+    const actionable = component.getActionableTopics();
+    expect(actionable[0].topic_id).toBe('topic_b');
+    expect(actionable[1].topic_id).toBe('topic_a');
+  });
+
+  it('should match near-complete filter when review percentage is near complete', async () => {
+    await component.ngOnInit();
+    const topicWithHighReview: TopicStat = {
+      ...component.topicStats[2],
+      translation_stats_by_language: {
+        hi: {
+          ...component.topicStats[2].translation_stats_by_language.hi,
+          submission_progress_percentage: 50.0,
+          progress_percentage: 85.0,
+        },
+      },
+    };
+    component.topicStats = [topicWithHighReview];
+    component.setFilter('near-complete');
+    expect(component.getActionableTopics().length).toBe(1);
   });
 
   it('should correctly evaluate topic completion and stats in questions tab', async () => {
@@ -387,6 +490,18 @@ describe('ContributorDashboardStatsPageComponent', () => {
     expect(component.getTopicSubmissionPct(emptyTopic)).toBe(0);
     expect(component.getTopicReviewPct(emptyTopic)).toBe(0);
     expect(component.getTranslationStatsForTopic(emptyTopic)).toBeNull();
+    expect(component.isTopicComplete(emptyTopic)).toBeFalse();
+  });
+
+  it('should handle missing language or null topic when checking translation stats', () => {
+    component.activeTab = 'translations';
+    component.selectedLanguageCode = 'non_existent';
+    const fractions = component.topicStats[0];
+    if (fractions) {
+      expect(component.isTopicComplete(fractions)).toBeFalse();
+    }
+    const nullTopic = null as unknown as TopicStat;
+    expect(component.getTranslationStatsForTopic(nullTopic)).toBeNull();
   });
 
   it('should fallback to language_code when language name is missing', async () => {
