@@ -155,7 +155,7 @@ export class InteractiveMathEquationInput implements OnInit {
 
     this.currentInteractionService.registerCurrentInteraction(
       this.submitAnswer.bind(this),
-      () => this.value !== '' && this.isCurrentAnswerValid()
+      () => this.value.trim() !== '' && this.isCurrentAnswerValid()
     );
   }
 }

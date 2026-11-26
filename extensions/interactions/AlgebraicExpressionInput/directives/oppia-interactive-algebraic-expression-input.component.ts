@@ -153,7 +153,7 @@ export class AlgebraicExpressionInputInteractionComponent
 
     this.currentInteractionService.registerCurrentInteraction(
       this.submitAnswer.bind(this),
-      () => this.value !== '' && this.isCurrentAnswerValid()
+      () => this.value.trim() !== '' && this.isCurrentAnswerValid()
     );
   }
 

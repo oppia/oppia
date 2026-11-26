@@ -1063,6 +1063,7 @@
   "I18N_LESSON_HEADER": "Lesson",
   "I18N_LESSON_INFO_HEADER": "Lesson Info",
   "I18N_LESSON_INFO_TOOLTIP_MESSAGE": "You've reached a checkpoint. Great job! View your progress and other lesson information here.",
+  "I18N_LESSON_PLAYER_CLOSE_MODAL": "Close the modal",
   "I18N_LESSON_PLAYER_CORRECT_FEEDBACK": "Well Done!",
   "I18N_LESSON_PLAYER_FEEDBACK_BUTTON": "Feedback",
   "I18N_LESSON_PLAYER_REPORT_BUTTON": "Report",

@@ -25,10 +25,6 @@ import {PageContextService} from 'services/page-context.service';
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
 import {HintsAndSolutionManagerService} from '../../services/hints-and-solution-manager.service';
-import {
-  I18nLanguageCodeService,
-  TranslationKeyType,
-} from 'services/i18n-language-code.service';
 import {ImagePreloaderService} from '../../services/image-preloader.service';
 import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
 import {LearnerParamsService} from '../../services/learner-params.service';
@@ -86,10 +82,6 @@ export class NewConversationSkinComponent {
     return this._editorPreviewMode;
   }
 
-  get openInNewWindow(): boolean {
-    return this.isIframed;
-  }
-
   isLoggedIn!: boolean;
   voiceoversAreLoaded: boolean = false;
   explorationId!: string;
@@ -120,7 +112,6 @@ export class NewConversationSkinComponent {
     private explorationInitializationService: ExplorationInitializationService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
     private conceptCardManagerService: ConceptCardManagerService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private imagePreloaderService: ImagePreloaderService,
     private explorationEngineService: ExplorationEngineService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
@@ -590,23 +581,6 @@ export class NewConversationSkinComponent {
     this.currentInteractionService.submitAnswer();
   }
 
-  getRecommendedExpTitleTranslationKey(explorationId: string): string {
-    return this.i18nLanguageCodeService.getExplorationTranslationKey(
-      explorationId,
-      TranslationKeyType.TITLE
-    );
-  }
-
-  isHackyExpTitleTranslationDisplayed(explorationId: string): boolean {
-    let recommendedExpTitleTranslationKey =
-      this.getRecommendedExpTitleTranslationKey(explorationId);
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        recommendedExpTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
-    );
-  }
-
   isDisplayedCardCompletedInPrevSession(): boolean {
     let prevSessionStatesProgress =
       this.playerTranscriptService.getPrevSessionStatesProgress();
@@ -674,10 +648,6 @@ export class NewConversationSkinComponent {
 
   getRecommendationExplorationSummaries(): LearnerExplorationSummary[] {
     return this.conversationFlowService.getRecommendedExplorationSummaries();
-  }
-
-  getIsInStoryMode(): boolean {
-    return this.explorationModeService.isInStoryChapterMode();
   }
 
   isInLessonPlayer(): boolean {

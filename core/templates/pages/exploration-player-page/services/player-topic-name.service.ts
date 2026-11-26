@@ -38,7 +38,7 @@ export class PlayerTopicNameService {
     topicUrlFragment: string,
     classroomUrlFragment: string
   ): Promise<string> {
-    const cacheKey = JSON.stringify([classroomUrlFragment, topicUrlFragment]);
+    const cacheKey = `${classroomUrlFragment}:${topicUrlFragment}`;
     const cachedPromise = this.topicNamePromises.get(cacheKey);
     if (cachedPromise) {
       return cachedPromise;

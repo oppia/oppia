@@ -60,6 +60,8 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
 
     // If either fetch fails (for example, a 404 for an unknown fragment),
     // the corresponding name stays empty and the breadcrumb stays hidden.
+    // The topic name request is shared with the player header, so the topic
+    // data is fetched from the backend only once.
     this.playerTopicNameService
       .getTopicNameAsync(this.topicUrlFragment, this.classroomUrlFragment)
       .then(

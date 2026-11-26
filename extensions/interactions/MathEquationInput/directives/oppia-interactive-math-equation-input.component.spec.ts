@@ -247,5 +247,13 @@ describe('MathEquationInputInteractive', () => {
       validitySpy.and.returnValue(false);
       expect(validityFn()).toBeFalse();
     });
+
+    it('should be false for a whitespace-only value without validating', () => {
+      const validitySpy = spyOn(component, 'isCurrentAnswerValid');
+      component.value = '   ';
+
+      expect(validityFn()).toBeFalse();
+      expect(validitySpy).not.toHaveBeenCalled();
+    });
   });
 });

@@ -9,10 +9,6 @@
   white-space: nowrap;
 }
 
-.oppia-lesson-player-navbar-breadcrumb-hidden {
-  visibility: hidden;
-}
-
 .oppia-lesson-player-navbar-breadcrumb-separator {
   margin: 0 8px;
   opacity: 0.7;

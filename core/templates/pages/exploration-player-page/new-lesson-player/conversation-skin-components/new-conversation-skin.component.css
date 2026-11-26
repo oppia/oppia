@@ -28,28 +28,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
   min-width: 50%;
 }
 
-.new-conversation-skin-next-lesson-wrapper {
-  align-items: center;
-  background-color: white;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  overflow: hidden;
-  padding: 10px;
-  position: relative;
-  text-align: right;
-  vertical-align: middle;
-  width: 100%;
-}
-
-.new-conversation-skin-next-lesson-text {
-  color: #0d48a1;
-  display: block;
-  font-size: 14px;
-  font-weight: 800;
-  height: 14px;
-}
-
 .new-conversation-skin-cards-container {
   align-items: center;
   display: -webkit-flex;
@@ -85,12 +63,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
 
 .new-conversation-skin-animate-cards-container {
   margin: 0 auto;
-}
-
-.new-conversation-skin-next-lesson-text-container {
-  cursor: default;
-  margin-left: 10px;
-  margin-right: 10px;
 }
 
 .supplemental-cards {

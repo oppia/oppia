@@ -56,7 +56,6 @@ import {DiagnosticTestPlayerEngineService} from '../../services/diagnostic-test-
 import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
-import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {LoaderService} from '../../../../services/loader.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {MessengerService} from '../../../../services/messenger.service';
@@ -131,7 +130,6 @@ describe('New Conversation skin component', () => {
   let explorationInitializationService: ExplorationInitializationService;
   let guestCollectionProgressService: GuestCollectionProgressService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
   let mobileMenuService: MobileMenuService;
   let imagePreloaderService: ImagePreloaderService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
@@ -503,7 +501,6 @@ describe('New Conversation skin component', () => {
     hintsAndSolutionManagerService = TestBed.inject(
       HintsAndSolutionManagerService
     );
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
     explorationInitializationService = TestBed.inject(
@@ -811,14 +808,6 @@ describe('New Conversation skin component', () => {
 
     componentInstance._editorPreviewMode = true;
     expect(componentInstance.isInPreviewMode).toBe(true);
-  });
-
-  it('should report whether the skin should open in a new window', () => {
-    componentInstance.isIframed = false;
-    expect(componentInstance.openInNewWindow).toBe(false);
-
-    componentInstance.isIframed = true;
-    expect(componentInstance.openInNewWindow).toBe(true);
   });
 
   it('should initialize component', fakeAsync(() => {
@@ -2432,11 +2421,6 @@ describe('New Conversation skin component', () => {
     expect(componentInstance.getAnswerIsBeingProcessed()).toBeTrue();
   });
 
-  it('should get is in story mode', () => {
-    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
-    expect(componentInstance.getIsInStoryMode()).toBeTrue();
-  });
-
   it('should get exploration link', () => {
     const link = 'exploration_link';
     spyOn(
@@ -2492,40 +2476,6 @@ describe('New Conversation skin component', () => {
     expect(
       componentInstance.isDisplayedCardCompletedInPrevSession()
     ).toBeTrue();
-  });
-
-  it('should get recommended exp title translation key', () => {
-    spyOn(
-      i18nLanguageCodeService,
-      'getExplorationTranslationKey'
-    ).and.returnValue('key');
-    expect(
-      componentInstance.getRecommendedExpTitleTranslationKey('expId')
-    ).toBe('key');
-  });
-
-  it('should check if hacky exp title translation is displayed', () => {
-    spyOn(
-      componentInstance,
-      'getRecommendedExpTitleTranslationKey'
-    ).and.returnValue('key');
-    spyOn(
-      i18nLanguageCodeService,
-      'isHackyTranslationAvailable'
-    ).and.returnValue(true);
-
-    const currentLangSpy = spyOn(
-      i18nLanguageCodeService,
-      'isCurrentLanguageEnglish'
-    ).and.returnValue(false);
-    expect(
-      componentInstance.isHackyExpTitleTranslationDisplayed('expId')
-    ).toBeTrue();
-
-    currentLangSpy.and.returnValue(true);
-    expect(
-      componentInstance.isHackyExpTitleTranslationDisplayed('expId')
-    ).toBeFalse();
   });
 
   it('should call skipCurrentQuestion and update next card', () => {
