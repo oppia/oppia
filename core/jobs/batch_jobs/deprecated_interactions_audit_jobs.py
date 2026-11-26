@@ -238,13 +238,13 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
         )
 
         user_settings_models = grouped_user_data['user_settings']
-        if len(user_settings_models) > 0:
-            user_settings = user_settings_models[0]
-            username = user_settings.username or 'None'
-            email = user_settings.email
-        else:
-            username = 'UNKNOWN_USER'
-            email = 'UNKNOWN_EMAIL'
+        match user_settings_models:
+            case [user_settings]:
+                username = user_settings.username or 'None'
+                email = user_settings.email
+            case _:
+                username = 'UNKNOWN_USER'
+                email = 'UNKNOWN_EMAIL'
 
         formatted_exps_str = ', '.join(
             f"('{exp['exp_id']}', '{exp['title']}', {exp['interactions']})"
