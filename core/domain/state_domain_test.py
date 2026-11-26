@@ -1253,6 +1253,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_does_not_support_android(self, 'GraphInput')
         _verify_interaction_does_not_support_android(self, 'InteractiveMap')
         _verify_interaction_does_not_support_android(self, 'MusicNotesInput')
+        _verify_interaction_does_not_support_android(self, 'NumberLineInput')
         _verify_interaction_does_not_support_android(self, 'PencilCodeEditor')
         _verify_interaction_does_not_support_android(self, 'SetInput')
 

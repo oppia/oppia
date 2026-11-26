@@ -407,6 +407,15 @@ export interface NumericInputCustomizationArgs {
   };
 }
 
+export interface NumberLineInputCustomizationArgsBackendDict {
+  startValue: {value: number};
+  endValue: {value: number};
+  interval: {value: number};
+}
+
+export type NumberLineInputCustomizationArgs =
+  NumberLineInputCustomizationArgsBackendDict;
+
 export interface NumberWithUnitsCustomizationArgsBackendDict {}
 export interface NumberWithUnitsCustomizationArgs {}
 
@@ -427,6 +436,7 @@ export type InteractionCustomizationArgsBackendDict =
   | NumberWithUnitsCustomizationArgsBackendDict
   | NumericExpressionInputCustomizationArgsBackendDict
   | NumericInputCustomizationArgsBackendDict
+  | NumberLineInputCustomizationArgsBackendDict
   | PencilCodeEditorCustomizationArgsBackendDict
   | RatioExpressionInputCustomizationArgsBackendDict
   | SetInputCustomizationArgsBackendDict
@@ -449,6 +459,7 @@ export type InteractionCustomizationArgs =
   | NumberWithUnitsCustomizationArgs
   | NumericExpressionInputCustomizationArgs
   | NumericInputCustomizationArgs
+  | NumberLineInputCustomizationArgs
   | PencilCodeEditorCustomizationArgs
   | RatioExpressionInputCustomizationArgs
   | SetInputCustomizationArgs

@@ -1,0 +1,52 @@
+.oppia-number-line-input {
+  overflow-x: auto;
+  padding: 12px 24px 24px;
+  width: 100%;
+}
+
+.oppia-number-line-track {
+  border-top: 2px solid #333;
+  height: 50px;
+  margin: 40px 12px 0;
+  min-width: 320px;
+  position: relative;
+  touch-action: none;
+}
+
+.oppia-number-line-point {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  height: 54px;
+  padding: 0;
+  position: absolute;
+  top: -27px;
+  transform: translateX(-50%);
+  width: 32px;
+}
+
+.oppia-number-line-tick {
+  background: #333;
+  display: block;
+  height: 16px;
+  margin: 10px auto 0;
+  width: 2px;
+}
+
+.oppia-number-line-point-selected .oppia-number-line-tick {
+  background: #00645c;
+  border-radius: 50%;
+  height: 18px;
+  margin-top: 9px;
+  width: 18px;
+}
+
+.oppia-number-line-point:focus-visible {
+  outline: 2px solid #00645c;
+}
+
+.oppia-number-line-label {
+  display: block;
+  font-size: 12px;
+  white-space: nowrap;
+}

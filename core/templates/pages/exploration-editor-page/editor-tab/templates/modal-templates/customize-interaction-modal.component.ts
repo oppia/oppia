@@ -50,6 +50,7 @@ import {ItemSelectionInputValidationService} from 'interactions/ItemSelectionInp
 import {NumberWithUnitsValidationService} from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import {NumericExpressionInputValidationService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
+import {NumberLineInputValidationService} from 'interactions/NumberLineInput/directives/number-line-input-validation.service';
 import {DragAndDropSortInputValidationService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
 import {GraphInputValidationService} from 'interactions/GraphInput/directives/graph-input-validation.service';
 import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
@@ -100,6 +101,7 @@ const INTERACTION_SERVICE_MAPPING = {
   NumericExpressionInputValidationService:
     NumericExpressionInputValidationService,
   NumericInputValidationService: NumericInputValidationService,
+  NumberLineInputValidationService: NumberLineInputValidationService,
   PencilCodeEditorValidationService: PencilCodeEditorValidationService,
   RatioExpressionInputValidationService: RatioExpressionInputValidationService,
   SetInputValidationService: SetInputValidationService,

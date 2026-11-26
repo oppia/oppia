@@ -49,6 +49,7 @@ import {NumberWithUnitsValidationService} from 'interactions/NumberWithUnits/dir
 import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import {NumericExpressionInputValidationService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
+import {NumberLineInputValidationService} from 'interactions/NumberLineInput/directives/number-line-input-validation.service';
 import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
@@ -91,6 +92,7 @@ const INTERACTION_SERVICE_MAPPING = {
   NumericExpressionInputValidationService:
     NumericExpressionInputValidationService,
   NumericInputValidationService: NumericInputValidationService,
+  NumberLineInputValidationService: NumberLineInputValidationService,
   PencilCodeEditorValidationService: PencilCodeEditorValidationService,
   RatioExpressionInputValidationService: RatioExpressionInputValidationService,
   SetInputValidationService: SetInputValidationService,

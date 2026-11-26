@@ -134,6 +134,45 @@
       "IsInclusivelyBetween": "is between {{a|Real}} and {{b|Real}}, inclusive"
     }
   },
+  "NumberLineInput": {
+    "can_have_solution": true,
+    "show_generic_submit_button": true,
+    "instructions": null,
+    "is_trainable": false,
+    "narrow_instructions": null,
+    "description": "Allows learners to select a point on a number line.",
+    "needs_summary": false,
+    "name": "Number Line",
+    "answer_type": "Real",
+    "is_linear": false,
+    "display_mode": "inline",
+    "id": "NumberLineInput",
+    "customization_arg_specs": [
+      {
+        "description": "Starting integer value",
+        "name": "startValue",
+        "schema": {"type": "int"},
+        "default_value": 0
+      },
+      {
+        "description": "Ending integer value",
+        "name": "endValue",
+        "schema": {"type": "int"},
+        "default_value": 4
+      },
+      {
+        "description": "Distance between adjacent points",
+        "name": "interval",
+        "schema": {"type": "float"},
+        "default_value": 1.0
+      }
+    ],
+    "is_terminal": false,
+    "default_outcome_heading": null,
+    "rule_descriptions": {
+      "Equals": "is equal to {{x|Real}}"
+    }
+  },
   "DragAndDropSortInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,

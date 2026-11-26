@@ -185,6 +185,10 @@ export type NumericInputRuleInputs =
   | NumericInputIsInclusivelyBetweenRuleInputs
   | NumericInputIsWithinToleranceRuleInputs;
 
+export interface NumberLineInputEqualsRuleInputs {
+  x: number;
+}
+
 export interface PencilCodeEditorRuleInputs {
   x: string;
 }
@@ -245,6 +249,7 @@ export type InteractionRuleInputs =
   | NumericExpressionRuleInputs
   | NumberWithUnitsRuleInputs
   | NumericInputRuleInputs
+  | NumberLineInputEqualsRuleInputs
   | PencilCodeEditorRuleInputs
   | RatioInputRuleInputs
   | SetInputRuleInputs

@@ -52,6 +52,8 @@ import {
   NumericExpressionInputCustomizationArgs,
   NumericInputCustomizationArgsBackendDict,
   NumericInputCustomizationArgs,
+  NumberLineInputCustomizationArgsBackendDict,
+  NumberLineInputCustomizationArgs,
   PencilCodeEditorCustomizationArgs,
   RatioExpressionInputCustomizationArgs,
   RatioExpressionInputCustomizationArgsBackendDict,
@@ -507,6 +509,10 @@ export class Interaction extends BaseTranslatableObject {
         return this.createFromNumericInputCustomizationArgsBackendDict(
           caBackendDict as NumericInputCustomizationArgsBackendDict
         );
+      case 'NumberLineInput':
+        return cloneDeep(
+          caBackendDict as NumberLineInputCustomizationArgsBackendDict
+        ) as NumberLineInputCustomizationArgs;
       case 'PencilCodeEditor':
         return cloneDeep(caBackendDict as PencilCodeEditorCustomizationArgs);
       case 'RatioExpressionInput':

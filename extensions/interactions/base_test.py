@@ -59,6 +59,7 @@ INTERACTIONS_THAT_USE_COMPONENTS: Final = [
     'MathEquationInput',
     'MultipleChoiceInput',
     'MusicNotesInput',
+    'NumberLineInput',
     'NumericExpressionInput',
     'NumericInput',
     'NumberWithUnits',

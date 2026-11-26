@@ -32,6 +32,7 @@ require('interactions/MusicNotesInput/MusicNotesInput.ts');
 require('interactions/NumberWithUnits/NumberWithUnits.ts');
 require('interactions/NumericExpressionInput/NumericExpressionInput.ts');
 require('interactions/NumericInput/NumericInput.ts');
+require('interactions/NumberLineInput/NumberLineInput.ts');
 require('interactions/PencilCodeEditor/PencilCodeEditor.ts');
 require('interactions/RatioExpressionInput/RatioExpressionInput.ts');
 require('interactions/SetInput/SetInput.ts');

@@ -48,6 +48,7 @@ export class ExplorationHtmlFormatterService {
     'MusicNotesInput',
     'NumericExpressionInput',
     'NumericInput',
+    'NumberLineInput',
     'PencilCodeEditor',
     'RatioExpressionInput',
     'SetInput',

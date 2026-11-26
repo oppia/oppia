@@ -32,6 +32,7 @@ import {CodeReplInteractionModule} from './CodeRepl/code-repl-interactions.modul
 import {NumberWithUnitsInteractionModule} from './NumberWithUnits/number-with-units-interactions.module';
 import {NumericExpressionInputModule} from './NumericExpressionInput/numeric-expression-input-interactions.module';
 import {NumericInputModule} from './NumericInput/numeric-input-interactions.module';
+import {NumberLineInputModule} from './NumberLineInput/number-line-input-interactions.module';
 import {MathEquationInputModule} from './MathEquationInput/math-equation-input-interactions.module';
 import {InteractiveMapInteractionModule} from './InteractiveMap/interactive-map-interactions.module';
 import {MultipleChoiceInputInteractionModule} from './MultipleChoiceInput/multiple-choice-input-interactions.module';
@@ -57,6 +58,7 @@ import {PencilCodeEditorModule} from './PencilCodeEditor/pencil-code-editor-inte
     NumberWithUnitsInteractionModule,
     NumericExpressionInputModule,
     NumericInputModule,
+    NumberLineInputModule,
     MathEquationInputModule,
     MusicNotesInputModule,
     PencilCodeEditorModule,
@@ -83,6 +85,7 @@ import {PencilCodeEditorModule} from './PencilCodeEditor/pencil-code-editor-inte
     NumericExpressionInputModule,
     PencilCodeEditorModule,
     NumericInputModule,
+    NumberLineInputModule,
     MathEquationInputModule,
     MusicNotesInputModule,
     InteractiveMapInteractionModule,

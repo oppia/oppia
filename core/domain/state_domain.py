@@ -1173,6 +1173,53 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         )
         return value
 
+    def _validate_number_line_input(self, strict: bool = False) -> None:
+        """Validates number line points and the rules that refer to them."""
+        if not strict:
+            return
+
+        # Defer this import to avoid a cycle through the interaction base class.
+        from extensions.interactions.NumberLineInput import (  # pylint: disable=import-outside-toplevel
+            NumberLineInput,
+        )
+
+        start_value = self.customization_args['startValue'].value
+        end_value = self.customization_args['endValue'].value
+        interval = self.customization_args['interval'].value
+        if (
+            not isinstance(start_value, int)
+            or not isinstance(end_value, int)
+            or not isinstance(interval, (int, float))
+        ):
+            raise utils.ValidationError(
+                'NumberLineInput must have numeric start, end and interval '
+                'values.'
+            )
+        points = NumberLineInput.get_number_line_points(
+            start_value, end_value, interval
+        )
+        if not points:
+            raise utils.ValidationError(
+                'NumberLineInput must have 3 to 10 equally spaced points.'
+            )
+
+        for answer_group in self.answer_groups:
+            for rule_spec in answer_group.rule_specs:
+                if (
+                    rule_spec.rule_type == 'Equals'
+                    and rule_spec.inputs['x'] not in points
+                ):
+                    raise utils.ValidationError(
+                        'NumberLineInput rule refers to a point outside '
+                        'the number line.'
+                    )
+
+        if self.solution and self.solution.correct_answer not in points:
+            raise utils.ValidationError(
+                'NumberLineInput solution refers to a point outside '
+                'the number line.'
+            )
+
     def _validate_numeric_input(self, strict: bool = False) -> None:
         """Validates the NumericInput interaction.
 
@@ -2121,6 +2168,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # TODO(#16490): Move the validations with strict mode together in every
         # interaction.
         interaction_id_to_strict_validation_func = {
+            'NumberLineInput': self._validate_number_line_input,
             'NumericInput': self._validate_numeric_input,
             'FractionInput': self._validate_fraction_input,
             'NumberWithUnits': self._validate_number_with_units_input,

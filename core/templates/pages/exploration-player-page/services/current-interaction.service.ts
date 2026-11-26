@@ -35,6 +35,7 @@ import {MathEquationInputRulesService} from 'interactions/MathEquationInput/dire
 import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
+import {NumberLineInputRulesService} from 'interactions/NumberLineInput/directives/number-line-input-rules.service';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {GraphInputRulesService} from 'interactions/GraphInput/directives/graph-input-rules.service';
 import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
@@ -55,6 +56,7 @@ export type InteractionRulesService =
   | MultipleChoiceInputRulesService
   | NumericExpressionInputRulesService
   | NumericInputRulesService
+  | NumberLineInputRulesService
   | PencilCodeEditorRulesService
   | GraphInputRulesService
   | SetInputRulesService
