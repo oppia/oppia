@@ -2589,7 +2589,6 @@ export class ExplorationEditor extends BaseUser {
       );
     }
   }
-
 }
 
 export const ExplorationEditorFactory = (page: Page): ExplorationEditor => {
