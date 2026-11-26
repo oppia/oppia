@@ -34,6 +34,33 @@ describe('LC.12 Visit Creator Dashboard', function () {
   let positiveNumbersExplorationId: string;
   let negativeNumbersExplorationId: string;
 
+  // The explorations have two cards so that the learner's start and
+  // completion stats are sent separately. If they are sent together, the two
+  // stats updates can run at the same time and the view count is lost.
+  // See #26578.
+  const createAndPublishTwoCardExploration = async function (
+    title: string
+  ): Promise<string> {
+    await lessonCreator.navigateToCreatorDashboardPage();
+    await lessonCreator.navigateToExplorationEditorFromCreatorDashboard();
+    await lessonCreator.dismissWelcomeModal(false);
+    await lessonCreator.updateCardContent('Exploration intro text');
+    await lessonCreator.addInteraction('Continue Button');
+    await lessonCreator.viewOppiaResponses();
+    await lessonCreator.directLearnersToNewCard('Last Card');
+    await lessonCreator.saveExplorationDraft();
+
+    await lessonCreator.navigateToCard('Last Card');
+    await lessonCreator.updateCardContent('Thanks for playing!');
+    await lessonCreator.addInteraction('End Exploration');
+    await lessonCreator.saveExplorationDraft();
+    return await lessonCreator.publishExplorationWithMetadata(
+      title,
+      'This is Goal here.',
+      'Math'
+    );
+  };
+
   beforeAll(async function () {
     lessonCreator = await UserFactory.createNewUser(
       'lessonCreator',
@@ -50,16 +77,10 @@ describe('LC.12 Visit Creator Dashboard', function () {
     );
 
     positiveNumbersExplorationId =
-      await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
-        'Positive Numbers',
-        'Math'
-      );
+      await createAndPublishTwoCardExploration('Positive Numbers');
 
     negativeNumbersExplorationId =
-      await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
-        'Negative Numbers',
-        'Math'
-      );
+      await createAndPublishTwoCardExploration('Negative Numbers');
 
     await lessonCreator.navigateToCreatorDashboardPage();
     await lessonCreator.waitForPageToFullyLoad();
@@ -82,6 +103,8 @@ describe('LC.12 Visit Creator Dashboard', function () {
 
     await learner.waitForPageToFullyLoad();
 
+    await learner.continueToNextCard();
+
     await learner.rateExploration(5, 'Great Lesson', false);
 
     await learner.returnToLibraryFromExplorationCompletion();
@@ -89,6 +112,8 @@ describe('LC.12 Visit Creator Dashboard', function () {
     await learner.playExploration(positiveNumbersExplorationId);
 
     await learner.waitForPageToFullyLoad();
+
+    await learner.continueToNextCard();
 
     await learner.rateExploration(3, '', false);
 
