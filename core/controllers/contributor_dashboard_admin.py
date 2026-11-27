@@ -154,6 +154,9 @@ class ContributionRightsHandler(
                     % (username)
                 )
             user_services.allow_user_to_review_question(user_id)
+            contribution_stats_services.create_question_reviewer_total_stats_if_absent(  # pylint: disable=line-too-long
+                user_id
+            )
         else:
             # The handler schema defines the possible values of 'category'.
             # If 'category' has a value other than those defined in the schema,
@@ -228,6 +231,9 @@ class ContributionRightsHandler(
                     '%s does not have rights to review question.' % (username)
                 )
             user_services.remove_question_review_rights(user_id)
+            contribution_stats_services.delete_question_reviewer_total_stats_if_empty(  # pylint: disable=line-too-long
+                user_id
+            )
         else:
             # The handler schema defines the possible values of 'category'.
             # If 'category' has a value other than those defined in the schema,
