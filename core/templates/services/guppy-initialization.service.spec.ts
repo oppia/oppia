@@ -37,8 +37,10 @@ class MockGuppy {
     return 'Dummy value';
   }
   activate(): void {}
+  deactivate(): void {}
 
   configure(name: string, val: Object): void {}
+  static active_guppy: MockGuppy | null = null;
   static event(name: string, handler: Function): void {
     handler({focused: true});
   }
@@ -118,6 +120,101 @@ describe('GuppyInitializationService', () => {
     guppyInitializationService.activate();
 
     expect(activateSpy).toHaveBeenCalled();
+  });
+
+  it('should keep the guppy divs in the normal tab order', () => {
+    let mockDocument = document.createElement('div');
+    mockDocument.classList.add('guppy-div-tab-order');
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
+
+    guppyInitializationService.init('guppy-div-tab-order', 'placeholder');
+
+    const guppyDiv = document.querySelector(
+      '.guppy-div-tab-order'
+    ) as HTMLElement;
+    expect(guppyDiv.tabIndex).toBe(0);
+  });
+
+  it('should deactivate the active guppy div when tab is pressed', () => {
+    let mockDocument = document.createElement('div');
+    mockDocument.classList.add('guppy-div-tab-out');
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
+    guppyInitializationService.init('guppy-div-tab-out', 'placeholder');
+    MockGuppy.active_guppy = new MockGuppy('guppy-div-tab-out', {});
+    const deactivateSpy = spyOn(MockGuppy.prototype, 'deactivate');
+
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', {key: 'Tab', bubbles: true})
+    );
+
+    expect(deactivateSpy).toHaveBeenCalled();
+    expect(MockGuppy.active_guppy).toBeNull();
+  });
+
+  it('should not deactivate the active guppy div for other keys', () => {
+    let mockDocument = document.createElement('div');
+    mockDocument.classList.add('guppy-div-other-key');
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
+    guppyInitializationService.init('guppy-div-other-key', 'placeholder');
+    MockGuppy.active_guppy = new MockGuppy('guppy-div-other-key', {});
+    const deactivateSpy = spyOn(MockGuppy.prototype, 'deactivate');
+
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', {key: 'x', bubbles: true})
+    );
+
+    expect(deactivateSpy).not.toHaveBeenCalled();
+    expect(MockGuppy.active_guppy).not.toBeNull();
+  });
+
+  it('should do nothing when tab is pressed and no guppy div is active', () => {
+    let mockDocument = document.createElement('div');
+    mockDocument.classList.add('guppy-div-none-active');
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
+    guppyInitializationService.init('guppy-div-none-active', 'placeholder');
+    MockGuppy.active_guppy = null;
+    const deactivateSpy = spyOn(MockGuppy.prototype, 'deactivate');
+
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', {key: 'Tab', bubbles: true})
+    );
+
+    expect(deactivateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should activate the guppy div when it receives focus', () => {
+    let mockDocument = document.createElement('div');
+    mockDocument.classList.add('guppy-div-focus');
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
+    guppyInitializationService.init('guppy-div-focus', 'placeholder');
+    const guppyDiv = document.querySelector('.guppy-div-focus') as HTMLElement;
+    MockGuppy.active_guppy = null;
+    const activateSpy = spyOn(MockGuppy.prototype, 'activate');
+
+    guppyDiv.dispatchEvent(new FocusEvent('focus'));
+
+    expect(activateSpy).toHaveBeenCalled();
+  });
+
+  it('should not activate the guppy div again if it is already active', () => {
+    let mockDocument = document.createElement('div');
+    mockDocument.classList.add('guppy-div-already-active');
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
+    guppyInitializationService.init('guppy-div-already-active', 'placeholder');
+    const guppyDiv = document.querySelector(
+      '.guppy-div-already-active'
+    ) as HTMLElement;
+    MockGuppy.active_guppy = null;
+    const activateSpy = spyOn(MockGuppy.prototype, 'activate').and.callFake(
+      function (this: MockGuppy) {
+        MockGuppy.active_guppy = this;
+      }
+    );
+
+    guppyDiv.dispatchEvent(new FocusEvent('focus'));
+    guppyDiv.dispatchEvent(new FocusEvent('focus'));
+
+    expect(activateSpy).toHaveBeenCalledTimes(1);
   });
 
   it('should do nothing when activate is called with no guppy instances', function () {

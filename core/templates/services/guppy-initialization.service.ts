@@ -44,6 +44,7 @@ export class GuppyInitializationService {
   private onScreenKeyboardShown = false;
   static interactionType: string;
   private static allowedVariables: string[] = [];
+  private static tabKeyListenerIsAdded = false;
 
   constructor(private lazyCssLoaderService: LazyCssLoaderService) {}
 
@@ -95,8 +96,52 @@ export class GuppyInitializationService {
         guppyInstance.engine.end();
         guppyInstance.render(true);
       }
+      this.makeEditorKeyboardAccessible(
+        guppyDivs[i] as HTMLElement,
+        guppyInstance
+      );
       this.guppyInstances.push(new GuppyObject(divId, guppyInstance));
     }
+  }
+
+  // Guppy gives every editor a positive tabindex, which takes the editor out
+  // of the page's normal tab order, so reset it. Since Tab now moves focus
+  // out of the editor, activate the editor again when it is tabbed back into.
+  // See #27768.
+  private makeEditorKeyboardAccessible(
+    guppyDiv: HTMLElement,
+    guppyInstance: Guppy
+  ): void {
+    guppyDiv.tabIndex = 0;
+    guppyDiv.addEventListener('focus', () => {
+      if (Guppy.active_guppy !== guppyInstance) {
+        guppyInstance.activate();
+      }
+    });
+    GuppyInitializationService.letTabKeyLeaveGuppy();
+  }
+
+  // Guppy's document-level key handler cancels the Tab key while an editor
+  // is active, which traps keyboard users in the editor (#27768). This
+  // listener runs before that handler and deactivates the editor, in the same
+  // way as when the user clicks outside of it. Guppy's handler then ignores
+  // the key, so the browser moves focus as usual.
+  private static letTabKeyLeaveGuppy(): void {
+    if (GuppyInitializationService.tabKeyListenerIsAdded) {
+      return;
+    }
+    document.addEventListener(
+      'keydown',
+      (event: KeyboardEvent) => {
+        if (event.key !== 'Tab' || !Guppy.active_guppy) {
+          return;
+        }
+        Guppy.active_guppy.deactivate();
+        Guppy.active_guppy = null;
+      },
+      true
+    );
+    GuppyInitializationService.tabKeyListenerIsAdded = true;
   }
 
   findActiveGuppyObject(): GuppyObject | undefined {
