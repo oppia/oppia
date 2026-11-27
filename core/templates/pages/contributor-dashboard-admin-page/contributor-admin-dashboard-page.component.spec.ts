@@ -697,6 +697,68 @@ describe('Contributor dashboard Admin page', () => {
       })
     );
 
+    it('should refresh the table and question reviewers count after question rights are updated', fakeAsync(() => {
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          can_submit_questions: false,
+          can_review_questions: false,
+          can_review_translation_for_language_codes: [],
+          can_review_voiceover_for_language_codes: [],
+        })
+      );
+      const updateRightsSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'updateQuestionRightsAsync'
+      ).and.returnValue(Promise.resolve());
+      const refreshCountSpy = spyOn(component, 'refreshQuestionReviewersCount');
+      const statsTable = jasmine.createSpyObj<ContributorAdminStatsTable>(
+        'ContributorAdminStatsTable',
+        ['refreshPagination']
+      );
+      component.statsTable = statsTable;
+      spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve({
+            isQuestionSubmitter: false,
+            isQuestionReviewer: true,
+          }),
+        } as NgbModalRef;
+      });
+
+      component.openCdAdminQuestionRoleEditorModal('user1');
+      tick();
+
+      expect(updateRightsSpy).toHaveBeenCalledWith(
+        'user1',
+        false,
+        true,
+        false,
+        false
+      );
+      expect(statsTable.refreshPagination).toHaveBeenCalled();
+      expect(refreshCountSpy).toHaveBeenCalled();
+    }));
+
+    it('should update the question reviewers count from community stats', fakeAsync(() => {
+      (
+        contributorDashboardAdminStatsBackendApiService.fetchCommunityStats as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          translation_reviewers_count: {},
+          question_reviewers_count: 5,
+        } as CommunityContributionStatsBackendDict)
+      );
+
+      component.refreshQuestionReviewersCount();
+      tick();
+
+      expect(component.questionReviewersCount).toBe(5);
+    }));
+
     it(
       'should open question role editor modal and return changed' +
         ' value of question reviewer',

@@ -109,6 +109,18 @@ describe('RteHelperModalComponent', () => {
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     alertsService = TestBed.inject(AlertsService);
     activeModal = TestBed.inject(NgbActiveModal);
+
+    // The save() method reads the entity context and image save destination from
+    // static fields on PageContextService. Pin them so the math save flow never
+    // depends on the Karma URL or on state left behind by another spec (see
+    // #27555). Tests that need a different value override it with their own
+    // per-test spy.
+    pageContextService.removeCustomEntityContext();
+    pageContextService.resetImageSaveDestination();
+    pageContextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.EXPLORATION,
+      'explorationId'
+    );
   });
 
   describe('when customization args has a valid youtube video', function () {
@@ -1259,6 +1271,18 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     alertsService = TestBed.inject(AlertsService);
+
+    // The save() method reads the entity context and image save destination from
+    // static fields on PageContextService. Pin them so the math save flow never
+    // depends on the Karma URL or on state left behind by another spec (see
+    // #27555). Tests that need a different value override it with their own
+    // per-test spy.
+    pageContextService.removeCustomEntityContext();
+    pageContextService.resetImageSaveDestination();
+    pageContextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.EXPLORATION,
+      'explorationId'
+    );
     fixture.detectChanges();
   });
 
@@ -1532,4 +1556,88 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     flush();
     expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
   }));
+
+  describe('when a math save cancel path is hit', () => {
+    beforeEach(fakeAsync(() => {
+      component.componentId = 'math';
+      component.attrsCustomizationArgsDict = {
+        math_content: {raw_latex: '', svg_filename: ''},
+      } as unknown as CustomizationArgsForRteType;
+      component.customizationArgSpecs = [
+        {
+          name: 'math_content',
+          default_value: {raw_latex: '', svg_filename: ''},
+        },
+      ] as unknown as CustomizationArgsSpecsType;
+      spyOn(alertsService, 'addWarning');
+      component.tmpCustomizationArgs = [];
+      (component as unknown as {data: undefined}).data = undefined;
+      component.ngOnInit();
+      flush();
+    }));
+
+    it('should dismiss the bottom sheet with cancel when the SVG file is missing', fakeAsync(() => {
+      component.customizationArgsForm.value[0] = {
+        raw_latex: 'x^2',
+        svgFile: null,
+        svg_filename: 'mathImage.svg',
+        mathExpressionSvgIsBeingProcessed: false,
+      };
+
+      component.save();
+      flush();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'SVG file is missing.'
+      );
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+    }));
+
+    it('should dismiss the bottom sheet with cancel when the SVG file cannot be processed', fakeAsync(() => {
+      component.customizationArgsForm.value[0] = {
+        raw_latex: 'x^2',
+        svgFile: 'Svg Data',
+        svg_filename: 'mathImage.svg',
+        mathExpressionSvgIsBeingProcessed: false,
+      };
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(null);
+
+      component.save();
+      flush();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Failed to process SVG file.'
+      );
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+    }));
+
+    it('should dismiss the bottom sheet with cancel when the entity context is missing', fakeAsync(() => {
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('');
+      component.customizationArgsForm.value[0] = {
+        raw_latex: 'x^2',
+        svgFile: 'Svg Data',
+        svg_filename: 'mathImage.svg',
+        mathExpressionSvgIsBeingProcessed: false,
+      };
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(new Blob());
+
+      component.save();
+      flush();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Error: Could not retrieve entity type or entity ID.'
+      );
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+    }));
+  });
 });
