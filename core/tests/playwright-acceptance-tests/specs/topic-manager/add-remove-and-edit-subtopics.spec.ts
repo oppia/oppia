@@ -19,6 +19,8 @@
  * TM.TE Add, remove, and edit the subtopics of a topic.
  */
 
+
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -27,25 +29,33 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Topic Manager', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Topic Manager', function () {
   let topicManager: TopicManager & ExplorationEditor & CurriculumAdmin;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(600000); // Setup takes longer than the default timeout.
+
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_adm@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     const explorationId =
       await curriculumAdmin.createAndPublishExplorationWithCards(
         'Solving problems without a calculator',
-        'Mathematics'
+        'Mathematics',
+        2,
+        true
       );
     await curriculumAdmin.createTopic(
       'Arithmetic Operations',
-      'arithmetic-operation'
+      'arithmetic-operation',
+      true
     );
     await curriculumAdmin.createSubtopicForTopic(
       'Addition',
@@ -82,12 +92,13 @@ describe('Topic Manager', function () {
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
+      browser,
       [ROLES.TOPIC_MANAGER],
       'Arithmetic Operations'
     );
-  }, 600000);
+  });
 
-  it('should be able to add and delete a subtopic in a topic', async function () {
+  test('should be able to add and delete a subtopic in a topic', async function () {
     await topicManager.openTopicEditor('Arithmetic Operations');
     await topicManager.createSubtopicForTopic(
       'Subtraction',
@@ -102,17 +113,17 @@ describe('Topic Manager', function () {
       'Subtraction',
       'Arithmetic Operations'
     );
-    await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
+    await topicManager.saveTopicDraft('Arithmetic Operations');
     await topicManager.openTopicEditor('Arithmetic Operations');
     await topicManager.verifySubtopicPresenceInTopic('Addition');
     await topicManager.verifySubtopicPresenceInTopic(
-      'Subtraction', // Subtopic Name.
+      'Subtraction', // Subtopic name.
       null, // Check in the same topic.
       false // Should not exist.
     );
   });
 
-  it('should be able to edit and preview subtopic', async function () {
+  test('should be able to edit and preview subtopic', async function () {
     await topicManager.openSubtopicEditor('Addition');
     await topicManager.editSubTopicDetails(
       'Intro to Addition and Subtraction',
@@ -120,13 +131,10 @@ describe('Topic Manager', function () {
       'This is introduction to Addition and Subtraction.',
       testConstants.data.profilePicture
     );
-    await topicManager.expectScreenshotToMatch(
-      'updatedAdditionSubtopic',
-      __dirname
-    );
+    await topicManager.expectScreenshotToMatch('updatedAdditionSubtopic');
 
-    await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
-    await topicManager.expectToastMessageToBe('Changes Saved.');
+    await topicManager.saveTopicDraft();
+    await topicManager.expectToastMessage('Changes Saved.');
 
     await topicManager.navigateToSubtopicPreviewTab(
       'Intro to Addition and Subtraction',
@@ -138,7 +146,7 @@ describe('Topic Manager', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
