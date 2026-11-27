@@ -78,6 +78,10 @@ export class CtaSectionComponent {
 
   // Volunteer CTA is the default tab.
   selectedTabIndex = 1;
+  // Index of the open panel in the mobile CTA accordion. It defaults to the
+  // volunteer panel to match the desktop tab selection, and can be null when
+  // every panel is collapsed.
+  openAccordionPanelIndex: number | null = 1;
   donorStatements: DonorStatementData[] = [
     {
       heading: 'I18N_ABOUT_PAGE_CTA_DONOR_STATEMENT_HEADING1',
@@ -236,6 +240,11 @@ export class CtaSectionComponent {
     } else {
       this.volunteerCarousel.next();
     }
+  }
+
+  toggleAccordionPanel(panelIndex: number): void {
+    this.openAccordionPanelIndex =
+      this.openAccordionPanelIndex === panelIndex ? null : panelIndex;
   }
 
   onPartnerBoxButtonClick(outputName: 'partner' | 'partnerLearnMore'): void {

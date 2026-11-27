@@ -117,7 +117,7 @@
           </span>
         </button>
 
-        <ngb-carousel [interval]="0" [showNavigationArrows]="false" [animation]="false"
+        <ngb-carousel role="group" [interval]="0" [showNavigationArrows]="false" [animation]="false"
           #volunteerCarousel
           *ngIf="!mobile && volunteerRolesIndices[screenType].length > 1">
           <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
@@ -132,7 +132,7 @@
           </ng-template>
         </ngb-carousel>
 
-        <ngb-carousel [interval]="0" [showNavigationArrows]="false" [animation]="false"
+        <ngb-carousel role="group" [interval]="0" [showNavigationArrows]="false" [animation]="false"
           #volunteerCarouselMobile
           *ngIf="mobile && volunteerRolesIndices[screenType].length > 1">
           <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
@@ -274,64 +274,99 @@
     </mat-tab-group>
   </div>
 
-  <ngb-accordion #acc="ngbAccordion"
-                 class="oppia-cta-accordion"
-                 [closeOthers]="true"
-                 [animation]="false"
-                 activeIds="ngb-panel-1">
-    <ngb-panel>
-      <ng-template ngbPanelHeader let-opened="opened">
-        <button ngbPanelToggle class="btn oppia-cta-accordion-toggle-btn">
+  <div class="accordion oppia-cta-accordion">
+    <div class="card">
+      <div class="card-header">
+        <button type="button"
+                id="oppia-cta-accordion-toggle-0"
+                class="btn oppia-cta-accordion-toggle-btn"
+                [class.collapsed]="openAccordionPanelIndex !== 0"
+                [attr.aria-expanded]="openAccordionPanelIndex === 0"
+                [attr.aria-controls]="'oppia-cta-accordion-panel-0'"
+                (click)="toggleAccordionPanel(0)">
           <span class="oppia-about-cta-title-small oppia-about-cta-panel-title e2e-test-about-page-donor-mobile-tab">
             {{ 'I18N_ABOUT_PAGE_CTA_DONATE' | translate }}
           </span>
-          <i [ngClass]="{'fa-chevron-down': !opened, 'fa-chevron-up': opened}"
-             class="oppia-cta-accordion-chevron fas">
+          <i class="fas oppia-cta-accordion-chevron"
+             [ngClass]="{
+               'fa-chevron-down': openAccordionPanelIndex !== 0,
+               'fa-chevron-up': openAccordionPanelIndex === 0
+             }">
           </i>
         </button>
-      </ng-template>
-      <ng-template ngbPanelContent>
+      </div>
+      <div class="card-body"
+           *ngIf="openAccordionPanelIndex === 0"
+           id="oppia-cta-accordion-panel-0"
+           role="region"
+           aria-labelledby="oppia-cta-accordion-toggle-0">
         <ng-container
           [ngTemplateOutlet]="donateContent"
           [ngTemplateOutletContext]="{ mobile: true }">
         </ng-container>
-      </ng-template>
-    </ngb-panel>
-    <ngb-panel>
-      <ng-template ngbPanelHeader let-opened="opened">
-        <button ngbPanelToggle class="btn oppia-cta-accordion-toggle-btn">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <button type="button"
+                id="oppia-cta-accordion-toggle-1"
+                class="btn oppia-cta-accordion-toggle-btn"
+                [class.collapsed]="openAccordionPanelIndex !== 1"
+                [attr.aria-expanded]="openAccordionPanelIndex === 1"
+                [attr.aria-controls]="'oppia-cta-accordion-panel-1'"
+                (click)="toggleAccordionPanel(1)">
           <span class="oppia-about-cta-title-small oppia-about-cta-panel-title">
             {{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER' | translate }}
           </span>
-          <i [ngClass]="{'fa-chevron-down': !opened, 'fa-chevron-up': opened}"
-             class="oppia-cta-accordion-chevron fas">
+          <i class="fas oppia-cta-accordion-chevron"
+             [ngClass]="{
+               'fa-chevron-down': openAccordionPanelIndex !== 1,
+               'fa-chevron-up': openAccordionPanelIndex === 1
+             }">
           </i>
         </button>
-      </ng-template>
-      <ng-template ngbPanelContent>
+      </div>
+      <div class="card-body"
+           *ngIf="openAccordionPanelIndex === 1"
+           id="oppia-cta-accordion-panel-1"
+           role="region"
+           aria-labelledby="oppia-cta-accordion-toggle-1">
         <ng-container
           [ngTemplateOutlet]="volunteerContent"
           [ngTemplateOutletContext]="{ mobile: true }">
         </ng-container>
-      </ng-template>
-    </ngb-panel>
-    <ngb-panel>
-      <ng-template ngbPanelHeader let-opened="opened">
-        <button ngbPanelToggle class="btn oppia-cta-accordion-toggle-btn">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <button type="button"
+                id="oppia-cta-accordion-toggle-2"
+                class="btn oppia-cta-accordion-toggle-btn"
+                [class.collapsed]="openAccordionPanelIndex !== 2"
+                [attr.aria-expanded]="openAccordionPanelIndex === 2"
+                [attr.aria-controls]="'oppia-cta-accordion-panel-2'"
+                (click)="toggleAccordionPanel(2)">
           <span class="oppia-about-cta-title-small oppia-about-cta-panel-title e2e-test-about-page-partner-mobile-tab">
             {{ 'I18N_ABOUT_PAGE_CTA_PARTNER' | translate }}
           </span>
-          <i [ngClass]="{'fa-chevron-down': !opened, 'fa-chevron-up': opened}"
-             class="oppia-cta-accordion-chevron fas">
+          <i class="fas oppia-cta-accordion-chevron"
+             [ngClass]="{
+               'fa-chevron-down': openAccordionPanelIndex !== 2,
+               'fa-chevron-up': openAccordionPanelIndex === 2
+             }">
           </i>
         </button>
-      </ng-template>
-      <ng-template ngbPanelContent>
+      </div>
+      <div class="card-body"
+           *ngIf="openAccordionPanelIndex === 2"
+           id="oppia-cta-accordion-panel-2"
+           role="region"
+           aria-labelledby="oppia-cta-accordion-toggle-2">
         <ng-container
           [ngTemplateOutlet]="partnerContent"
           [ngTemplateOutletContext]="{ mobile: true }">
         </ng-container>
-      </ng-template>
-    </ngb-panel>
-  </ngb-accordion>
+      </div>
+    </div>
+  </div>
 </div>

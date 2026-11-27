@@ -113,10 +113,14 @@
           </div>
         </div>
         <div class="oppia-android-carousel-item-container row gx-3">
-          <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 0}" (click)="changeFeaturesShown(0)"></button>
-          <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 1}" (click)="changeFeaturesShown(1)"></button>
-          <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 2}" (click)="changeFeaturesShown(2)"></button>
-          <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 3}" (click)="changeFeaturesShown(3)"></button>
+          <button *ngFor="let featureIndex of [0, 1, 2, 3]"
+                  type="button"
+                  class="oppia-android-carousel-item"
+                  [ngClass]="{'oppia-android-carousel-item-active': featuresShown === featureIndex}"
+                  [attr.aria-label]="'I18N_ANDROID_PAGE_FEATURE_TEXT_' + (featureIndex + 1) | translate"
+                  [attr.aria-pressed]="featuresShown === featureIndex"
+                  (click)="changeFeaturesShown(featureIndex)">
+          </button>
         </div>
       </div>
     </div>
@@ -151,8 +155,11 @@
         </div>
         <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7 px-3">
           <div class="row oppia-android-carousel-direction">
-            <button class="col-md-2 px-3 align-self-center oppia-android-carousel-button" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
-              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-end "></i>
+            <button type="button"
+                    class="col-md-2 px-3 align-self-center oppia-android-carousel-button"
+                    [attr.aria-label]="'I18N_ANDROID_PAGE_CAROUSEL_PREVIOUS_BUTTON_LABEL' | translate"
+                    (click)="changeFeaturesShown((3 + featuresShown) % 4)">
+              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-end " aria-hidden="true"></i>
             </button>
             <div class="oppia-android-key-feature-image-container col-md-8">
               <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="Image showing the story page">
@@ -160,15 +167,22 @@
               <img *ngIf="featuresShown === 2" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="Image showing the lesson in different languages">
               <img *ngIf="featuresShown === 3" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="Image showing that maintaining different profiles are possible">
             </div>
-            <div class="col-md-2 px-3 align-self-center" (click)="changeFeaturesShown((5 + featuresShown) % 4)">
-              <i class="fas fa-chevron-right oppia-android-carousel-chevron"></i>
-            </div>
+            <button type="button"
+                    class="col-md-2 px-3 align-self-center oppia-android-carousel-button"
+                    [attr.aria-label]="'I18N_ANDROID_PAGE_CAROUSEL_NEXT_BUTTON_LABEL' | translate"
+                    (click)="changeFeaturesShown((5 + featuresShown) % 4)">
+              <i class="fas fa-chevron-right oppia-android-carousel-chevron" aria-hidden="true"></i>
+            </button>
           </div>
           <div class="oppia-android-carousel-item-container row oppia-android-carousel-direction">
-            <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 0}" (click)="changeFeaturesShown(0)"></button>
-            <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 1}" (click)="changeFeaturesShown(1)"></button>
-            <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 2}" (click)="changeFeaturesShown(2)"></button>
-            <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 3}" (click)="changeFeaturesShown(3)"></button>
+            <button *ngFor="let featureIndex of [0, 1, 2, 3]"
+                    type="button"
+                    class="oppia-android-carousel-item"
+                    [ngClass]="{'oppia-android-carousel-item-active': featuresShown === featureIndex}"
+                    [attr.aria-label]="'I18N_ANDROID_PAGE_FEATURE_TEXT_' + (featureIndex + 1) | translate"
+                    [attr.aria-pressed]="featuresShown === featureIndex"
+                    (click)="changeFeaturesShown(featureIndex)">
+            </button>
           </div>
         </div>
       </div>
@@ -190,6 +204,7 @@
               <div class="oppia-android-updates-input-label">{{ 'I18N_ANDROID_PAGE_NAME_FIELD_LABEL' | translate }}</div>
               <input class="oppia-android-updates-input w-100"
                      type="text"
+                     [attr.aria-label]="'I18N_ANDROID_PAGE_NAME_FIELD_LABEL' | translate"
                      [(ngModel)]="name"
                      [ngModelOptions]="{standalone: true}">
             </div>
@@ -200,6 +215,7 @@
               </div>
               <input class="oppia-android-updates-input w-100"
                      type="email"
+                     [attr.aria-label]="'I18N_ANDROID_PAGE_EMAIL_FIELD_LABEL' | translate"
                      [(ngModel)]="emailAddress"
                      [ngModelOptions]="{standalone: true}"
                      required="true">
@@ -209,6 +225,7 @@
             </div>
             <div class="oppia-android-updates-input-padding">
               <input class="oppia-android-updates-checkbox"
+                     [attr.aria-label]="'I18N_ANDROID_PAGE_CONSENT_CHECKBOX_LABEL' | translate"
                      [(ngModel)]="userCanSubscribe"
                      type="checkbox">
               <span class="oppia-android-updates-checkbox-label">

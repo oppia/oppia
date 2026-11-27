@@ -530,6 +530,10 @@ a {
   text-decoration: none
 }
 
+.inline-links {
+  text-decoration: underline;
+}
+
 a:hover {
   color: #3f2c76;
 }
