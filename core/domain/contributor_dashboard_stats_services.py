@@ -162,17 +162,12 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
     now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 
     # 1. Fetch published topic IDs.
-    published_topic_ids = set()
-    for rights in topic_models.TopicRightsModel.get_all():
-        if rights.topic_is_published:
-            published_topic_ids.add(rights.id)
-
-    # If no explicit published rights exist yet (e.g. initial dev setup), fallback
-    # to all topics.
+    published_topic_ids = {
+        rights.id
+        for rights in topic_models.TopicRightsModel.get_all()
+        if rights.topic_is_published
+    }
     all_topic_models = list(topic_models.TopicModel.get_all())
-    if not published_topic_ids and all_topic_models:
-        published_topic_ids = {t.id for t in all_topic_models}
-
     published_topics_by_id = {
         t.id: t for t in all_topic_models if t.id in published_topic_ids
     }
@@ -203,37 +198,26 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
     in_review_trans_by_exp_lang: Dict[str, Dict[str, int]] = {}
     in_review_questions_by_skill: Dict[str, int] = {}
 
-    try:
-        all_suggestions = list(
-            suggestion_models.GeneralSuggestionModel.get_all()
-        )
-        for sug in all_suggestions:
-            if sug.status == suggestion_models.STATUS_IN_REVIEW:
-                if (
-                    sug.suggestion_type
-                    == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                ):
-                    exp_id = sug.target_id
-                    lang_code = (
-                        sug.change_cmd.get('language_code')
-                        if hasattr(sug, 'change_cmd')
-                        and isinstance(sug.change_cmd, dict)
-                        else getattr(sug, 'language_code', '')
+    all_suggestions = list(suggestion_models.GeneralSuggestionModel.get_all())
+    for sug in all_suggestions:
+        if sug.status == suggestion_models.STATUS_IN_REVIEW:
+            if (
+                sug.suggestion_type
+                == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+            ):
+                exp_id = sug.target_id
+                lang_code = sug.change_cmd.get('language_code', '')
+                if exp_id and lang_code:
+                    in_review_trans_by_exp_lang.setdefault(
+                        exp_id, {}
+                    ).setdefault(lang_code, 0)
+                    in_review_trans_by_exp_lang[exp_id][lang_code] += 1
+            elif sug.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+                skill_id = sug.target_id
+                if skill_id:
+                    in_review_questions_by_skill[skill_id] = (
+                        in_review_questions_by_skill.get(skill_id, 0) + 1
                     )
-                    if exp_id and lang_code:
-                        in_review_trans_by_exp_lang.setdefault(
-                            exp_id, {}
-                        ).setdefault(lang_code, 0)
-                        in_review_trans_by_exp_lang[exp_id][lang_code] += 1
-                elif sug.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-                    skill_id = getattr(sug, 'target_id', '')
-                    if skill_id:
-                        in_review_questions_by_skill[skill_id] = (
-                            in_review_questions_by_skill.get(skill_id, 0) + 1
-                        )
-    except Exception:
-        # Gracefully handle suggestion model absences in test fixtures.
-        pass
 
     # 5. Retrieve all skill opportunities and group by topic.
     all_skill_opps = list(opportunity_models.SkillOpportunityModel.get_all())

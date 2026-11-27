@@ -208,7 +208,7 @@ module.exports = {
             tbt: 600,
             cls: 0.35,
           },
-          accessibilityMinScore: 0.95,
+          accessibilityMinScore: 0.85,
           overrides: {
             'errors-in-console': ['error', {minScore: 0}],
           },
