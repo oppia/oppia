@@ -53,9 +53,6 @@ describe('Tech Team Lead', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
     await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
-    );
-    await releaseCoordinator.enableFeatureFlag(
       'technical_feedback_dashboard_enabled'
     );
     await releaseCoordinator.enableFeatureFlag('web_feedback_modal_enabled');

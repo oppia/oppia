@@ -33,7 +33,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
-import debounce from 'lodash/debounce';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
 import {AppConstants} from 'app.constants';
@@ -178,23 +177,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     'blog-dashboard',
   ];
 
-  currentWindowWidth = this.windowDimensionsService.getWidth();
-  // The order of the elements in this array specifies the order in
-  // which they will be hidden. Earlier elements will be hidden first.
-  NAV_ELEMENTS_ORDER = [
-    'I18N_TOPNAV_DONATE',
-    'I18N_TOPNAV_LEARN',
-    'I18N_TOPNAV_ABOUT',
-    'I18N_TOPNAV_LIBRARY',
-    'I18N_TOPNAV_HOME',
-  ];
-
   LEARNER_GROUPS_FEATURE_IS_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg'
   );
 
-  navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   constructor(
@@ -258,12 +245,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.isWebFeedbackModalEnabled =
       this.isWebFeedbackModalFeatureFlagEnabled();
 
-    // Inside a setTimeout function call, 'this' points to the global object.
-    // To access the context in which the setTimeout call is made, we need to
-    // first save a reference to that context in a variable, and then use that
-    // variable in place of the 'this' keyword.
-    let that = this;
-
     this.i18nService.updateViewToUserPreferredSiteLanguage();
 
     this.userService
@@ -310,34 +291,17 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.authStatusResolved = true;
       });
 
-    for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {
-      this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]] = true;
-    }
-
     this.directiveSubscriptions.add(
-      this.windowDimensionsService.getResizeEvent().subscribe(evt => {
+      this.windowDimensionsService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-        // If window is resized larger, try displaying the hidden
-        // elements.
-        if (this.currentWindowWidth < this.windowDimensionsService.getWidth()) {
-          for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {
-            if (!this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]]) {
-              this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]] =
-                true;
-            }
-          }
-        }
-
         // Close the sidebar, if necessary.
         this.sidebarStatusService.closeSidebar();
         this.sidebarIsShown = this.sidebarStatusService.isSidebarShown();
-        this.currentWindowWidth = this.windowDimensionsService.getWidth();
         this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
         // The available space on the right of the dropdowns changes when the
         // window is resized, so recompute the offsets explicitly.
         this.updateGetInvolvedMenuOffset();
         this.updateLearnDropdownOffset();
-        debounce(this.truncateNavbar, 500);
       })
     );
 
@@ -366,15 +330,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       });
       this.changeDetectorRef.detectChanges();
     }
-
-    // The function needs to be run after i18n. A timeout of 0 appears
-    // to run after i18n in Chrome, but not other browsers. The
-    // will check if i18n is complete and set a new timeout if it is
-    // not. Since a timeout of 0 works for at least one browser,
-    // it is used here.
-    setTimeout(function () {
-      that.truncateNavbar();
-    }, 0);
   }
 
   /**
@@ -551,68 +506,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
 
     this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
-  }
-
-  /**
-   * Checks if i18n has been run.
-   * If i18n has not yet run, the <a> and <span> tags will have
-   * no text content, so their innerText.length value will be 0.
-   * @returns {boolean}
-   */
-  checkIfI18NCompleted(): boolean {
-    var i18nCompleted = true;
-    var tabs = document.querySelectorAll('.oppia-navbar-tab-content');
-    for (var i = 0; i < tabs.length; i++) {
-      if ((tabs[i] as HTMLElement).innerText.length === 0) {
-        i18nCompleted = false;
-        break;
-      }
-    }
-    return i18nCompleted;
-  }
-
-  /**
-   * Checks if window is >768px and i18n is completed, then checks
-   * for overflow. If overflow is detected, hides the least important
-   * tab and then calls itself again after a 50ms delay.
-   */
-  truncateNavbar(): void {
-    // If the window is narrow, the standard nav tabs are not shown.
-    if (this.windowDimensionsService?.isWindowNarrow()) {
-      return;
-    }
-
-    let that = this;
-    // If i18n hasn't completed, retry after 100ms.
-    if (!this.checkIfI18NCompleted()) {
-      setTimeout(function () {
-        that.truncateNavbar();
-      }, 100);
-      return;
-    }
-
-    // The value of 60px used here comes from measuring the normal
-    // height of the navbar (56px) in Chrome's inspector and rounding
-    // up. If the height of the navbar is changed in the future this
-    // will need to be updated.
-    let navbar = document.querySelector('div.collapse.navbar-collapse');
-    if (navbar && navbar.clientHeight > 60) {
-      for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {
-        if (this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]]) {
-          // Hide one element, then check again after 50ms.
-          // This gives the browser time to render the visibility
-          // change.
-          this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]] = false;
-          // Force a digest cycle to hide element immediately.
-          // Otherwise it would be hidden after the next call.
-          // This is due to setTimeout use in debounce.
-          setTimeout(function () {
-            that.truncateNavbar();
-          }, 50);
-          return;
-        }
-      }
-    }
   }
 
   isHackyTopicTitleTranslationDisplayed(index: number): boolean {

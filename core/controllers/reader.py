@@ -2413,14 +2413,20 @@ class StateVersionHistoryHandler(
         if version_history is None:
             raise self.NotFoundException
 
-        # The editor can ask about a card that is not in this version, e.g. a
-        # card that was added or renamed in changes that are not saved yet.
-        if state_name not in version_history.state_version_history:
-            raise self.NotFoundException
-
-        state_version_history = version_history.state_version_history[
+        state_version_history = version_history.state_version_history.get(
             state_name
-        ]
+        )
+
+        if state_version_history is None:
+            self.render_json(
+                {
+                    'last_edited_version_number': None,
+                    'state_name_in_previous_version': None,
+                    'state_dict_in_previous_version': None,
+                    'last_edited_committer_username': None,
+                }
+            )
+            return
         last_edited_version_number = (
             state_version_history.previously_edited_in_version
         )
