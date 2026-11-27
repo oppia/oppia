@@ -13,17 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Practice Question Reviewer utility file.
+ * @fileoverview Practice question reviewer users utility file.
  */
 
 import {Page} from '@playwright/test';
+import {showMessage} from '../common/show-message';
 import {Contributor} from './contributor';
 
 const opportunityButtonSelector = '.e2e-test-opportunity-list-item-button';
-
 const reviewButtonPrefix = 'e2e-test-question-suggestion-review';
-const reviewModalHeaderSelector =
-  '.e2e-test-question-suggestion-review-modal-header';
+const editButtonSelector = `.${reviewButtonPrefix}-edit-button`;
+const questionSuggestionEditorModalSelector =
+  '.e2e-test-question-suggestion-editor-modal';
+const editQuestionPencilIconSelector =
+  'button.e2e-test-edit-content-pencil-button';
+const saveQuestionButtonSelector = '.e2e-test-save-question-button';
+const rteTextAreaSelector = '.e2e-test-rte';
+const saveRTEButtonSelector = '.e2e-test-save-state-content';
 
 export class PracticeQuestionReviewer extends Contributor {
   /**
@@ -37,18 +43,25 @@ export class PracticeQuestionReviewer extends Contributor {
       skill
     );
 
+    if (!questionElement) {
+      throw new Error(`Opportunity item for question ${question} not found.`);
+    }
+
     if (this.isViewportAtMobileWidth()) {
-      await questionElement.click();
+      await this.clickOnElement(questionElement);
     } else {
-      await questionElement.locator(opportunityButtonSelector).click();
+      const reviewButton = await questionElement.waitForSelector(
+        opportunityButtonSelector
+      );
+      await this.clickOnElement(reviewButton);
     }
     await this.expectModalTitleToBe(skill);
   }
 
   /**
    * Submits a question review.
-   * @param {'accept' | 'reject'} reviewType - The type of review to submit.
-   * @param {string} [reviewMessage] - The message to submit.
+   * @param {string} reviewType - The type of review to submit.
+   * @param {string} reviewMessage - The message to submit.
    */
   async submitReview(
     reviewType: 'accept' | 'reject',
@@ -66,13 +79,53 @@ export class PracticeQuestionReviewer extends Contributor {
   }
 
   /**
-   * Checks if the question review modal is present or not.
-   * @param {boolean} visible - Whether the modal should be visible or not.
+   * Replaces the question text in the question editor modal.
+   * @param {string} question - The new question text.
    */
-  async expectQuestionReviewModalToBePresent(
-    visible: boolean = true
-  ): Promise<void> {
-    await this.expectElementToBeVisible(reviewModalHeaderSelector, visible);
+  async editQuestionInQuestionEditorModal(question: string): Promise<void> {
+    await this.waitForElementToStabilize(editQuestionPencilIconSelector);
+    await this.clickOnElementWithSelector(editQuestionPencilIconSelector);
+
+    const questionEditorModal = await this.expectElementToBeVisible(
+      questionSuggestionEditorModalSelector
+    );
+    if (!questionEditorModal) {
+      throw new Error('Question editor modal not found.');
+    }
+
+    // Clear the existing content of the editor.
+    const textAreaElement = await questionEditorModal.waitForSelector(
+      rteTextAreaSelector,
+      {state: 'visible'}
+    );
+    await textAreaElement.click({clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+    await this.page.waitForFunction(
+      (element: Element) => element.textContent === '',
+      textAreaElement
+    );
+
+    // Type the new content and save it.
+    await textAreaElement.type(question);
+    await this.clickOnElementWithSelector(saveRTEButtonSelector);
+    await this.expectElementToBeVisible(rteTextAreaSelector, false);
+  }
+
+  /**
+   * Edits the question in the review.
+   * @param {string} question - The new question text.
+   */
+  async editQuestionInReview(question: string): Promise<void> {
+    await this.clickOnElementWithSelector(editButtonSelector);
+
+    await this.expectElementToBeVisible(questionSuggestionEditorModalSelector);
+
+    await this.editQuestionInQuestionEditorModal(question);
+
+    await this.clickOnElementWithSelector(saveQuestionButtonSelector);
+    await this.expectToastMessage('Updated question.');
+    await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
+    showMessage(`Question updated to "${question}".`);
   }
 }
 

@@ -38,20 +38,16 @@ import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
 import {BlogPostEditorFactory} from '../user/blog-post-editor';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
-import {
-  PracticeQuestionSubmitter,
-  QuestionSubmitterFactory,
-} from '../user/practice-question-submitter';
 import {Contributor, ContributorFactory} from '../user/contributor';
 import {
-  ContributorAdmin,
-  ContributorAdminFactory,
-} from '../user/contributor-admin';
+  PracticeQuestionSubmitter,
+  PracticeQuestionSubmitterFactory,
+} from '../user/practice-question-submitter';
 import {
   PracticeQuestionReviewer,
   PracticeQuestionReviewerFactory,
 } from '../user/practice-question-reviewer';
-import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
+import {QuestionAdminFactory} from '../user/question-admin';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -66,10 +62,10 @@ const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptanc
 const USER_ROLE_MAPPING = {
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
-  [ROLES.QUESTION_COORDINATOR]: QuestionCoordinatorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -98,11 +94,10 @@ type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
 type BasicRolesUser = LoggedOutUser &
   LoggedInUser &
   ExplorationEditor &
-  PracticeQuestionSubmitter &
-  TopicManager &
   CurriculumAdmin &
+  TopicManager &
   Contributor &
-  ContributorAdmin &
+  PracticeQuestionSubmitter &
   PracticeQuestionReviewer;
 
 /**
@@ -271,12 +266,11 @@ export class UserFactory {
       LoggedOutUserFactory(page),
       LoggedInUserFactory(page),
       ExplorationEditorFactory(page),
-      QuestionSubmitterFactory(page),
       CurriculumAdminFactory(page),
-      ContributorFactory(page),
-      ContributorAdminFactory(page),
-      PracticeQuestionReviewerFactory(page),
       TopicManagerFactory(page),
+      ContributorFactory(page),
+      PracticeQuestionSubmitterFactory(page),
+      PracticeQuestionReviewerFactory(page),
     ]);
 
     user.username = username;
