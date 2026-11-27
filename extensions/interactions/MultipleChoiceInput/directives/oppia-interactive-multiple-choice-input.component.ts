@@ -20,7 +20,13 @@
  * followed by the name of the arg.
  */
 
-import {Component, HostListener, Input, OnInit} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnInit,
+} from '@angular/core';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
@@ -54,7 +60,8 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
     private playerTranscriptService: PlayerTranscriptService,
-    private multipleChoiceInputOrderedChoicesService: MultipleChoiceInputOrderedChoicesService
+    private multipleChoiceInputOrderedChoicesService: MultipleChoiceInputOrderedChoicesService,
+    private elementRef: ElementRef
   ) {}
 
   private getAttrs() {
@@ -136,6 +143,17 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
   @HostListener('document:keydown.enter', ['$event'])
   handleEnterKey(event: KeyboardEvent): void {
+    // Only handle Enter presses meant for this interaction. Enter presses on
+    // other elements (e.g. buttons in the exploration editor's modals) must
+    // keep their native behaviour.
+    const target = event.target as Node | null;
+    if (
+      target &&
+      target !== document.body &&
+      !this.elementRef.nativeElement.contains(target)
+    ) {
+      return;
+    }
     event.preventDefault();
     this.submitAnswer();
   }
