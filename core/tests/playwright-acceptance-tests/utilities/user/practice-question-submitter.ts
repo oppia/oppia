@@ -592,6 +592,27 @@ export class PracticeQuestionSubmitter extends Contributor {
     }
     await this.expectElementToBeVisible(viewQuestionSuggestionModalHeader);
   }
+
+  /**
+   * Closes the practice question modal.
+   */
+  async closePracticeQuestionModal(): Promise<void> {
+    const closeModalButtonSelector = '.e2e-test-close-modal-button';
+    await this.expectElementToBeVisible(closeModalButtonSelector);
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
+    await this.expectElementToBeVisible(closeModalButtonSelector, false);
+  }
+
+  /**
+   * Checks if the selected interaction name is as expected.
+   * @param {string} name - The name of the interaction.
+   */
+  async expectSelectedInteractionNameToBe(name: string): Promise<void> {
+    await this.expectTextContentToBe(
+      '.e2e-test-selected-interaction-name',
+      `Interaction ( ${name} )`
+    );
+  }
 }
 
 export const PracticeQuestionSubmitterFactory = (
