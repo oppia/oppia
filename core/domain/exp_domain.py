@@ -2473,6 +2473,28 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return self.states[state_name].get_content_html(content_id)
 
+    def get_state_name_for_content_id(self, content_id: str) -> Optional[str]:
+        """Returns the name of the state that contains the given content ID.
+
+        Content IDs are unique within an exploration and do not change when a
+        state is renamed, so this can be used to find the current name of the
+        state that a piece of content belongs to.
+
+        Args:
+            content_id: str. The ID of the content.
+
+        Returns:
+            str|None. The name of the state containing the content, or None if
+            no state in the exploration contains the given content ID.
+        """
+        for state_name, state in self.states.items():
+            if (
+                content_id
+                in state.get_translatable_contents_collection().content_id_to_translatable_content
+            ):
+                return state_name
+        return None
+
     # Derived attributes of an exploration.
     @property
     def init_state(self) -> state_domain.State:

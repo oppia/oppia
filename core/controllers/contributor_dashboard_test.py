@@ -1742,6 +1742,60 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         }
         self.assertEqual(output, expected_output)
 
+    def test_handler_does_not_return_in_review_content_with_stale_state_name(
+        self,
+    ) -> None:
+        change_dict = {
+            'cmd': 'add_written_translation',
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0',
+            1,
+            self.owner_id,
+            change_dict,
+            'description',
+        )
+        # Simulate a suggestion whose state was renamed before the fix for
+        # issue #27469, so its state name no longer exists in the exploration.
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
+            suggestion.suggestion_id
+        )
+        suggestion_model.change_cmd['state_name'] = 'Old state name'
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+
+        output = self.get_json(
+            '/gettranslatabletexthandler',
+            params={'language_code': 'hi', 'exp_id': '0'},
+        )
+
+        # The content of the suggestion is still in review, so it should not
+        # be returned as translatable.
+        expected_output = {
+            'version': 1,
+            'state_names_to_content_id_mapping': {
+                'End State': {
+                    'content_3': {
+                        'content_value': 'Content',
+                        'content_id': 'content_3',
+                        'content_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None,
+                    }
+                }
+            },
+        }
+        self.assertEqual(output, expected_output)
+
 
 class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
     """Tests for MachineTranslationStateTextsHandler"""

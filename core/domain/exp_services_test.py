@@ -4081,6 +4081,111 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             rejected_suggestion.status, suggestion_models.STATUS_REJECTED
         )
 
+    def test_rename_state_cmd_updates_state_name_of_translation_suggestions(
+        self,
+    ) -> None:
+        """Verify renaming a state updates the state name of the in-review
+        translation suggestions for the contents of that state.
+        """
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        content_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'old state name',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
+                        )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    ),
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'old state name',
+                    'new_value': {
+                        'content_id': content_id,
+                        'html': '<p>old content html</p>',
+                    },
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index,
+                }
+            ),
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Initial commit'
+        )
+
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'old state name',
+            'content_id': content_id,
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_0_ID,
+            1,
+            self.owner_id,
+            add_translation_change_dict,
+            'test description',
+        )
+
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_0_ID,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_RENAME_STATE,
+                        'old_state_name': 'old state name',
+                        'new_state_name': 'new state name',
+                    }
+                )
+            ],
+            'Rename state',
+        )
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertNotIn('old state name', exploration.states)
+        self.assertIn('new state name', exploration.states)
+
+        # The suggestion should still be in review, and should point to the
+        # renamed state so that it can be reviewed and accepted.
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
+        self.assertEqual(
+            updated_suggestion.change_cmd.state_name, 'new state name'
+        )
+        self.assertEqual(updated_suggestion.change_cmd.content_id, content_id)
+        updated_suggestion.pre_accept_validate()
+
     def test_update_param_changes(self) -> None:
         """Test updating of param_changes."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)

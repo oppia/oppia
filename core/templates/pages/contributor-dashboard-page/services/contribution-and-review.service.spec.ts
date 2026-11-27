@@ -1629,5 +1629,60 @@ describe('Contribution and review service', () => {
       expect(sortedTranslationCards.length).toBe(7);
       expect(sortedTranslationCards[0].suggestion_id).toBe('id_generic');
     });
+
+    it('should append suggestions for states not in the exploration flow at the end instead of dropping them', () => {
+      const states = States.createFromBackendDict(statesBackendDict);
+      const suggestionsWithStaleState = [
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id_stale_feedback',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change_cmd: {
+            state_name: 'Renamed Or Removed State',
+            content_id: 'feedback_5',
+            new_value: {
+              html: 'new_val',
+            },
+            old_value: {
+              html: 'old_val',
+            },
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id_stale_content',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change_cmd: {
+            state_name: 'Renamed Or Removed State',
+            content_id: 'content_4',
+            new_value: {
+              html: 'new_val',
+            },
+            old_value: {
+              html: 'old_val',
+            },
+          },
+          last_updated_msecs: 0,
+        },
+        ...translationSuggestions,
+      ] as unknown as SuggestionBackendDict[];
+
+      const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
+        suggestionsWithStaleState,
+        states,
+        'First State'
+      );
+
+      expect(sortedTranslationCards.length).toBe(8);
+      expect(sortedTranslationCards[6].suggestion_id).toBe('id_stale_content');
+      expect(sortedTranslationCards[7].suggestion_id).toBe('id_stale_feedback');
+    });
   });
 });

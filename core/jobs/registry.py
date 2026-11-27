@@ -59,6 +59,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     exp_migration_jobs,
     exploration_voiceover_sync_jobs,
     firebase_server_sync_jobs,
+    fix_stale_state_names_in_translation_suggestions_jobs,
     legacy_feedback_migration_jobs,
     math_interactions_audit_jobs,
     model_validation_jobs,

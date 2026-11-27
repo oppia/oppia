@@ -3668,6 +3668,40 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.get_content_html('Invalid state', 'hint_1')
 
+    def test_get_state_name_for_content_id(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration.add_states(['Second state'])
+        init_state = exploration.states[exploration.init_state_name]
+        second_state = exploration.states['Second state']
+
+        self.assertEqual(
+            exploration.get_state_name_for_content_id(
+                init_state.content.content_id
+            ),
+            exploration.init_state_name,
+        )
+        self.assertEqual(
+            exploration.get_state_name_for_content_id(
+                second_state.content.content_id
+            ),
+            'Second state',
+        )
+
+        exploration.rename_state('Second state', 'Renamed state')
+        self.assertEqual(
+            exploration.get_state_name_for_content_id(
+                second_state.content.content_id
+            ),
+            'Renamed state',
+        )
+
+        self.assertIsNone(
+            exploration.get_state_name_for_content_id('invalid_content_id')
+        )
+        self.assertIsNone(
+            exploration.get_state_name_for_content_id('exploration_title')
+        )
+
     def test_get_content_html_with_metadata_content_id(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         exploration.title = 'Exploration Title'

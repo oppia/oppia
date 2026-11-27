@@ -2273,6 +2273,14 @@ def compute_models_to_put_when_saving_new_exp_version(
             )
         )
 
+    # Keep the state names of pending translation suggestions in sync with the
+    # exploration when states are renamed. Otherwise, these suggestions can no
+    # longer be reviewed or accepted. See issue #27469 for context.
+    if any(change.cmd == exp_domain.CMD_RENAME_STATE for change in change_list):
+        suggestion_services.update_state_names_of_translation_suggestions_in_review(
+            updated_exploration
+        )
+
     exp_user_data_model_to_put = get_exp_user_data_model_with_draft_discarded(
         exploration_id, committer_id
     )
