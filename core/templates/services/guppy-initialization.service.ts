@@ -104,10 +104,8 @@ export class GuppyInitializationService {
     }
   }
 
-  // Guppy gives every editor a positive tabindex, which takes the editor out
-  // of the page's normal tab order, so reset it. Since Tab now moves focus
-  // out of the editor, activate the editor again when it is tabbed back into.
-  // See #27768.
+  // Guppy uses a positive tabindex, which skips the normal tab order. Also
+  // re-activate the editor when it is tabbed back into (#27768).
   private makeEditorKeyboardAccessible(
     guppyDiv: HTMLElement,
     guppyInstance: Guppy
@@ -121,11 +119,8 @@ export class GuppyInitializationService {
     GuppyInitializationService.letTabKeyLeaveGuppy();
   }
 
-  // Guppy's document-level key handler cancels the Tab key while an editor
-  // is active, which traps keyboard users in the editor (#27768). This
-  // listener runs before that handler and deactivates the editor, in the same
-  // way as when the user clicks outside of it. Guppy's handler then ignores
-  // the key, so the browser moves focus as usual.
+  // Guppy cancels Tab while an editor is active, trapping focus (#27768).
+  // Deactivate the editor first so Tab moves focus as usual.
   private static letTabKeyLeaveGuppy(): void {
     if (GuppyInitializationService.tabKeyListenerIsAdded) {
       return;
