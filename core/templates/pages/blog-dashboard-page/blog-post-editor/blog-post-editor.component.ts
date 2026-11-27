@@ -473,6 +473,7 @@ export class BlogPostEditorComponent implements OnInit {
     this.blogDashboardPageService.blogPostData = this.blogPostData;
     this.ngbModal.open(BlogCardPreviewModalComponent, {
       backdrop: 'static',
+      size: 'lg',
     });
   }
 
