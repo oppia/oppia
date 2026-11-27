@@ -404,13 +404,6 @@ def associate_auth_id_with_user_id(
             % (user_id, auth_id_collision)
         )
 
-    (assoc_by_user_id_model,) = auth_models.UserAuthDetailsModel.get_multi(
-        [user_id], include_deleted=True
-    )
-    assert assoc_by_user_id_model is None or (
-        assoc_by_user_id_model.firebase_auth_id is None
-    )
-
     # A new {auth_id: user_id} mapping needs to be created. We know the model
     # doesn't exist because get_auth_id_from_user_id returned None, even with
     # include_deleted=True.
@@ -469,15 +462,6 @@ def associate_multi_auth_ids_with_user_ids(
             if auth_id is not None
         )
         raise Exception('already associated: %s' % auth_id_collisions_text)
-
-    assoc_by_user_id_model_list = auth_models.UserAuthDetailsModel.get_multi(
-        user_ids
-    )
-    assert all(
-        assoc_by_user_id_model is None
-        or assoc_by_user_id_model.firebase_auth_id is None
-        for assoc_by_user_id_model in assoc_by_user_id_model_list
-    )
 
     # A new {auth_id: user_id} mapping needs to be created. We know the model
     # doesn't exist because get_auth_id_from_user_id returned None.

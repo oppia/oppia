@@ -540,8 +540,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         )
 
         with mailchimp_swap:
-            mailchimp_bulk_email_services.permanently_delete_user_from_list(
-                'missing@example.com'
+            self.assertIsNone(
+                mailchimp_bulk_email_services.permanently_delete_user_from_list(
+                    'missing@example.com'
+                )
             )
 
     @test_utils.set_platform_parameters(
@@ -559,7 +561,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             '_get_mailchimp_class',
             lambda: mailchimp,
         )
-        # Here we use MyPy ignore because the requests stubs are missing RequestException.
+        # Here we use MyPy ignore because the requests stub does not
+        # include RequestException. This is a known limitation.
         request_swap = self.swap_to_always_raise(
             mailchimp.lists.members,
             'get',
@@ -567,7 +570,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         )
 
         with mailchimp_swap, request_swap:
-            # Here we use MyPy ignore because the requests stubs are missing RequestException.
+            # Here we use MyPy ignore because the requests stub does not
+            # include RequestException. This is a known limitation.
             with self.assertRaisesRegex(
                 requests.RequestException, 'request failed'  # type: ignore[attr-defined]
             ):
@@ -582,7 +586,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             '_get_mailchimp_class',
             lambda: mailchimp,
         )
-        # Here we use MyPy ignore because the requests stubs are missing RequestException.
+        # Here we use MyPy ignore because the requests stub does not
+        # include RequestException. This is a known limitation.
         request_swap = self.swap_to_always_raise(
             mailchimp.lists.members,
             'get',
@@ -619,8 +624,20 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             '_get_mailchimp_class',
             lambda: mailchimp,
         )
+        update_data = []
 
-        with mailchimp_swap:
+        def capture_update(
+            unused_audience_id: str,
+            unused_subscriber_hash: str,
+            data: Dict[str, str],
+        ) -> None:
+            update_data.append(data)
+
+        update_swap = self.swap(
+            mailchimp.lists.members, 'update', capture_update
+        )
+
+        with mailchimp_swap, update_swap:
             self.assertTrue(
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_2,
@@ -629,9 +646,17 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     can_receive_email_updates=True,
                 )
             )
-            self.assertEqual(
-                mailchimp.lists.members.users_data[1]['status'], 'subscribed'
-            )
+
+        self.assertEqual(
+            update_data,
+            [
+                {
+                    'email_address': self.user_email_2,
+                    'status': 'subscribed',
+                    'merge_fields': {},
+                }
+            ],
+        )
 
     @test_utils.set_platform_parameters(
         [
