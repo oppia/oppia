@@ -1180,6 +1180,15 @@ class AdminHandler(
                 '#F8BF74',
             )
 
+            fs_services.save_original_and_compressed_versions_of_image(
+                'thumbnail.svg',
+                feconf.ENTITY_TYPE_STORY,
+                story_id,
+                raw_image,
+                'thumbnail',
+                False,
+            )
+
             story_node_dicts: List[DummyStoryNodeDict] = [
                 {
                     'exp_id': '6',
@@ -1224,6 +1233,14 @@ class AdminHandler(
                 assert self.user_id is not None
                 story.add_node(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), title
+                )
+                story.update_node_thumbnail_filename(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    'thumbnail.svg',
+                )
+                story.update_node_thumbnail_bg_color(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
                 )
                 story.update_node_description(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), description

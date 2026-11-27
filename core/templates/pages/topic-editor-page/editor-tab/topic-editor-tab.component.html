@@ -216,8 +216,6 @@
                    tabindex="0"
                    [(ngModel)]="editablePracticeIsDisplayed"
                    aria-label="Show Practice Tab to learners"
-                   role="checkbox"
-                   aria-labelled="Show practice tab to learners"
                    (change)="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)"
                    [disabled]="!topicRights.canEditTopic() || (!editablePracticeIsDisplayed && !doesTopicHaveMinimumPracticeQuestions())">
             <span class="practice-tab-text"> Show Practice Tab to learners.</span>

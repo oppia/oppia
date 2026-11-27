@@ -9,6 +9,7 @@
   <div class="mb-3">
     <span>
       <select class="form-select rubric-options e2e-test-select-rubric-difficulty" [(ngModel)]="this.selectedRubricIndex"
+              aria-label="Rubric difficulty"
               (change)="this.onRubricSelectionChange()">
         <option *ngFor="let option of this.rubricsOptions" [value]="option.id">{{ option.difficulty }}</option>
       </select>

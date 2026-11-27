@@ -23,10 +23,6 @@
 .oppia-back-button-text-class {
   margin-left: 5px;
 }
-.oppia-anchor-tag-under-button {
-  color: white;
-  text-decoration: none;
-}
 .oppia-question-player-card {
   background: #fff;
   border-radius: 4px;
@@ -221,11 +217,6 @@
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 1em;
   }
-  .oppia-anchor-tag-under-button {
-    color: white;
-    display: contents;
-    text-decoration: none;
-  }
   .oppia-diagnostic-test-session {
     color: #01645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
@@ -270,7 +261,7 @@
     background-color: #00645c;
     color: #fff;
     font-weight: bold;
-    min-width: auto;
+    min-width: 24px;
     padding: 10px;
     text-transform: uppercase;
     width: fit-content;
@@ -288,4 +279,26 @@
     font-size: 13px;
     margin-right: 12px;
   }
+}
+
+.oppia-back-to-classroom-button,
+.oppia-goto-classroom-button,
+.oppia-start-topic-button {
+  min-height: 24px;
+  text-decoration: none;
+}
+
+.oppia-back-to-classroom-button,
+.oppia-goto-classroom-button {
+  min-width: 24px;
+}
+
+.oppia-back-to-classroom-button:hover,
+.oppia-goto-classroom-button:hover,
+.oppia-start-topic-button:hover,
+.oppia-back-to-classroom-button:focus,
+.oppia-goto-classroom-button:focus,
+.oppia-start-topic-button:focus {
+  color: #fff;
+  text-decoration: none;
 }

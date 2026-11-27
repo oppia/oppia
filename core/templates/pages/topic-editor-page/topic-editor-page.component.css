@@ -70,6 +70,16 @@
 }
 .navbar-icons {
   display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-icons button.navbar-tab {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  width: 100%;
 }
 .nav-list-item {
   align-items: center;

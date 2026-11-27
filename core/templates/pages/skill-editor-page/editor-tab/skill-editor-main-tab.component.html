@@ -18,11 +18,12 @@
           Status
         </strong>
         <div class="status-box">
-          <strong class="status-key">
+          <strong class="status-key" id="skill-editor-topic-label">
             Topic:
           </strong>
           <select *ngIf="getAssignedSkillTopicData()"
                   class="form-select"
+                  aria-labelledby="skill-editor-topic-label"
                   [(ngModel)]="topicName"
                   (change)="changeSelectedTopic(topicName)"
                   [disabled]="!isTopicDropdownEnabled()">

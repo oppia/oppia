@@ -273,6 +273,39 @@ describe('Story Editor Page Component', () => {
     component.ngOnDestroy();
   });
 
+  it('should render accessible editor navigation buttons', () => {
+    spyOn(urlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(storyEditorStateService, 'loadStory').and.stub();
+    component.validationIssues = [];
+    component.prepublishValidationIssues = [];
+    component.warningsAreShown = false;
+    spyOn(component, 'getActiveTab').and.returnValue('story_editor');
+    component.explorationValidationIssues = [];
+    const navigationSpy0 = spyOn(component, 'navigateToStoryEditor');
+    const navigationSpy1 = spyOn(component, 'navigateToStoryPreviewTab');
+
+    fixture.detectChanges();
+
+    const element: HTMLElement = fixture.nativeElement;
+    const navigation = element.querySelector('ul.navbar-icons');
+    expect(navigation).not.toBeNull();
+
+    const buttons = element.querySelectorAll<HTMLButtonElement>(
+      'ul.navbar-icons > li > button.navbar-tab'
+    );
+    expect(buttons.length).toBe(2);
+
+    expect(buttons[0].type).toBe('button');
+    expect(buttons[0].getAttribute('aria-label')).toBe('Main Editor');
+    buttons[0].click();
+    expect(navigationSpy0).toHaveBeenCalledTimes(1);
+
+    expect(buttons[1].type).toBe('button');
+    expect(buttons[1].getAttribute('aria-label')).toBe('Preview');
+    buttons[1].click();
+    expect(navigationSpy1).toHaveBeenCalledTimes(1);
+  });
+
   it(
     'should load story based on its id on url when component is initialized' +
       ' and set page title',

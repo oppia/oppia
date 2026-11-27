@@ -30,6 +30,7 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {SkillEditorRoutingService} from '../services/skill-editor-routing.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 
 class MockNgbModalRef {
   componentInstance!: {
@@ -49,7 +50,7 @@ describe('Skill editor main tab component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgbModule],
+      imports: [HttpClientTestingModule, NgbModule, FormsModule],
       declarations: [SkillEditorMainTabComponent],
       providers: [
         UndoRedoService,
@@ -140,6 +141,26 @@ describe('Skill editor main tab component', () => {
     expect(component.getAssignedSkillTopicData()).toEqual(
       assignedSkillTopicData
     );
+  });
+
+  it('should associate the topic dropdown with its visible label', () => {
+    spyOn(component, 'hasLoadedSkill').and.returnValue(true);
+    spyOn(skillEditorStateService, 'getAssignedSkillTopicData').and.returnValue(
+      assignedSkillTopicData
+    );
+    component.assignedSkillTopicData = assignedSkillTopicData;
+    component.topicName = 'topic1';
+
+    fixture.detectChanges();
+
+    const element: HTMLElement = fixture.nativeElement;
+    const dropdown = element.querySelector('select.form-select');
+    const label = element.querySelector('#skill-editor-topic-label');
+
+    expect(dropdown).not.toBeNull();
+    expect(label).not.toBeNull();
+    expect(dropdown?.getAttribute('aria-labelledby')).toBe(label?.id);
+    expect(label?.textContent?.trim()).toBe('Topic:');
   });
 
   it('should return subtopic name', () => {

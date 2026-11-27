@@ -11,8 +11,9 @@
     </colgroup>
     <tr>
       <th *ngFor="let key of TOPIC_HEADINGS"
+          scope="col"
           class="dashboard-table-headings">
-        <p *ngIf="key === 'index'"></p>
+        <p *ngIf="key === 'index'" class="visually-hidden">Serial Number</p>
         <p *ngIf="key === 'name'" id="dashboard-table-headings-details">Details</p>
         <p *ngIf="key === 'canonical_story_count'">Published Stories</p>
         <p *ngIf="key === 'subtopic_count'">Subtopics</p>
@@ -96,11 +97,13 @@
       <col class="dashboard-table-subtopic-col">
       <col class="dashboard-table-skill-col">
       <col class="dashboard-table-status-col">
+      <col>
     </colgroup>
     <tr>
       <th *ngFor="let key of TOPIC_HEADINGS"
+          scope="col"
           class="dashboard-table-headings">
-        <p *ngIf="key === 'index'"></p>
+        <p *ngIf="key === 'index'" class="visually-hidden">Serial Number</p>
         <p *ngIf="key === 'name'" id="dashboard-table-headings-details">Details</p>
         <p *ngIf="key === 'added_stories_count'">Added Stories</p>
         <p *ngIf="key === 'published_stories_count'">Published Stories (Partially/Fully)</p>
@@ -108,6 +111,9 @@
         <p *ngIf="key === 'subtopic_count'">Subtopics</p>
         <p *ngIf="key === 'skill_count'" class="text-center">Skills</p>
         <p *ngIf="key === 'topic_status'" class="text-center">Topic Status</p>
+      </th>
+      <th scope="col" class="dashboard-table-headings">
+        <span class="visually-hidden">Actions</span>
       </th>
     </tr>
     <tr *ngFor="let topic of topicSummaries; index as idx" class="list-item">

@@ -63,6 +63,7 @@
 }
 .oppia-cookie-banner-container .oppia-cookie-banner-explanation /deep/ a {
   color: #aed2e9;
+  text-decoration: underline;
 }
 
 .oppia-cookie-banner-container .oppia-cookie-banner {

@@ -295,7 +295,7 @@ module.exports = {
             tbt: 800,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.91,
+          accessibilityMinScore: 1,
           overrides: {
             'errors-in-console': ['error', {minScore: 1}],
             'modern-image-formats': [
@@ -488,7 +488,7 @@ module.exports = {
           overrides: {
             'offscreen-images': ['error', {minScore: 0}],
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern:
@@ -500,7 +500,7 @@ module.exports = {
             tbt: 300,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.88,
+          accessibilityMinScore: 1,
           overrides: {
             'offscreen-images': ['error', {minScore: 0}],
           },
@@ -515,7 +515,7 @@ module.exports = {
             tbt: 300,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.88,
+          accessibilityMinScore: 1,
           overrides: {
             'errors-in-console': ['error', {minScore: 0}],
             'offscreen-images': ['error', {minScore: 0}],
@@ -625,7 +625,7 @@ module.exports = {
             tbt: 420,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.92,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: 'http://[^/]+/skill_editor/.*$',
@@ -636,7 +636,7 @@ module.exports = {
             tbt: 390,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.91,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://[^/]+/story_editor/.*$',
@@ -647,7 +647,7 @@ module.exports = {
             tbt: 330,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.84,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://[^/]+/blog-admin$',
@@ -697,10 +697,7 @@ module.exports = {
             tbt: 975,
             cls: 1.0,
           },
-          // The diagnostic player page's dummy content scores about 0.87 on
-          // accessibility, so the floor matches the lowest threshold used
-          // elsewhere in this file.
-          accessibilityMinScore: 0.84,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://[^/]+/learn/.+/practice/.+$',
@@ -711,7 +708,7 @@ module.exports = {
             tbt: 975,
             cls: 1.0,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern:
@@ -723,7 +720,7 @@ module.exports = {
             tbt: 975,
             cls: 1.0,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern:
@@ -735,7 +732,7 @@ module.exports = {
             tbt: 975,
             cls: 1.0,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           // The signup page only renders for an account that has not finished
@@ -786,7 +783,7 @@ module.exports = {
             tbt: 975,
             cls: 1.0,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 1,
         },
         {
           matchingUrlPattern: '^http://[^/]+/voiceover-admin$',

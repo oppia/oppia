@@ -229,6 +229,50 @@ describe('topicEditorStoriesList', () => {
     ]);
   });
 
+  [false, true].forEach(featureEnabled => {
+    describe(
+      featureEnabled ? 'with feature enabled' : 'with feature disabled',
+      () => {
+        it('should render accessible delete buttons', () => {
+          spyOn(
+            component,
+            'isSerialChapterLaunchFeatureEnabled'
+          ).and.returnValue(featureEnabled);
+          component.storySummaries = storySummaries;
+          const deleteSpy = spyOn(component, 'deleteCanonicalStory');
+
+          component.ngOnInit();
+          const permissionSpy = spyOn(
+            component.topicRights,
+            'canEditTopic'
+          ).and.returnValue(true);
+
+          fixture.detectChanges();
+
+          const element: HTMLElement = fixture.nativeElement;
+          const buttons = element.querySelectorAll<HTMLButtonElement>(
+            'button.delete-story-button'
+          );
+
+          expect(buttons.length).toBe(storySummaries.length);
+          expect(buttons[0].getAttribute('aria-label')).toBe('Delete story');
+          expect(buttons[0].type).toBe('button');
+
+          buttons[0].click();
+
+          expect(deleteSpy).toHaveBeenCalledOnceWith('storyId');
+
+          permissionSpy.and.returnValue(false);
+          fixture.detectChanges();
+
+          expect(
+            element.querySelectorAll('button.delete-story-button').length
+          ).toBe(0);
+        });
+      }
+    );
+  });
+
   it('should delete story when user deletes story', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(modalRef);
     spyOn(topicUpdateService, 'removeCanonicalStory');

@@ -2,16 +2,14 @@
 <div class="diagnostic-test-container position-relative" [ngClass]="{'new-diagnostic-test-container': isNewLessonPlayerEnabled()}">
   <oppia-player-header *ngIf="diagnosticTestIsStarted && !diagnosticTestIsFinished && isNewLessonPlayerEnabled()"></oppia-player-header>
   <div class="oppia-diagnostic-test-page-header" *ngIf="!(diagnosticTestIsStarted && !diagnosticTestIsFinished && isNewLessonPlayerEnabled())">
-    <button class="btn oppia-back-to-classroom-button">
-      <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
-        <span>
-          <i class="fas fa-arrow-left oppia-vcenter" aria-hidden="true"></i>
-        </span>
-        <span class="oppia-back-button-text-class">
-          {{'I18N_DIAGNOSTIC_TEST_EXIT_TEST' | translate}}
-        </span>
-      </a>
-    </button>
+    <a class="btn oppia-back-to-classroom-button" [href]="'/learn/' + classroomUrlFragment">
+      <span>
+        <i class="fas fa-arrow-left oppia-vcenter" aria-hidden="true"></i>
+      </span>
+      <span class="oppia-back-button-text-class">
+        {{'I18N_DIAGNOSTIC_TEST_EXIT_TEST' | translate}}
+      </span>
+    </a>
     <div class="oppia-diagnostic-test-session">
       {{ 'I18N_DIAGNOSTIC_TEST_HEADING' | translate }}
     </div>
@@ -78,12 +76,9 @@
                                       [isPublished]="topicSummary.isTopicPublished()">
             </oppia-topic-summary-tile>
             <div class="oppia-start-button">
-              <button class="btn oppia-start-topic-button" (click)="getRecommendationAcceptanceEvent(topicSummary.getName())">
-                <a class="oppia-anchor-tag-under-button"
-                   [href]="getTopicUrlFromUrlFragment(topicSummary.getUrlFragment())">
-                  {{getTopicButtonText(topicSummary.getName())}}
-                </a>
-              </button>
+              <a class="btn oppia-start-topic-button" [href]="getTopicUrlFromUrlFragment(topicSummary.getUrlFragment())" (click)="getRecommendationAcceptanceEvent(topicSummary.getName())">
+                {{getTopicButtonText(topicSummary.getName())}}
+              </a>
             </div>
           </div>
         </div>
@@ -107,11 +102,9 @@
           {{ 'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_2_FOR_NO_TOPIC' | translate }}
         </p>
         <div class="oppia-classroom-button-container">
-          <button class="btn oppia-goto-classroom-button">
-            <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
-              {{ 'I18N_DIAGNOSTIC_TEST_RESULT_GO_TO_CLASSROOM_BUTTON_TEXT' | translate }}
-            </a>
-          </button>
+          <a class="btn oppia-goto-classroom-button" [href]="'/learn/' + classroomUrlFragment">
+            {{ 'I18N_DIAGNOSTIC_TEST_RESULT_GO_TO_CLASSROOM_BUTTON_TEXT' | translate }}
+          </a>
         </div>
       </div>
     </mat-card>

@@ -121,3 +121,11 @@
 .story-list.cdk-drop-list-dragging .list-item:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
+
+.delete-story-button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  width: 100%;
+}

@@ -418,6 +418,82 @@ describe('Diagnostic test player component', () => {
     expect(component.isStartTestButtonDisabled).toBe(true);
   }));
 
+  describe('accessible diagnostic test navigation', () => {
+    beforeEach(fakeAsync(() => {
+      windowRef.nativeWindow.location.search = '?classroom=math';
+
+      spyOn(component, 'isNewLessonPlayerEnabled').and.returnValue(false);
+      spyOn(preventPageUnloadEventService, 'addListener');
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomDataAsync'
+      ).and.returnValue(Promise.resolve(dummyClassroomData));
+
+      fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
+    }));
+
+    it('should render the exit test control as a native link', () => {
+      const element: HTMLElement = fixture.nativeElement;
+      const link = element.querySelector<HTMLAnchorElement>(
+        'a.oppia-back-to-classroom-button'
+      );
+
+      expect(link).not.toBeNull();
+      expect(link?.getAttribute('href')).toBe('/learn/math');
+      expect(link?.closest('button')).toBeNull();
+      expect(link?.textContent?.trim()).toBeTruthy();
+    });
+
+    it('should render the recommended topic link and track acceptance', () => {
+      component.diagnosticTestIsStarted = true;
+      component.diagnosticTestIsFinished = true;
+      component.recommendedTopicSummaries = [topicData2];
+
+      const analyticsSpy = spyOn(
+        siteAnalyticsService,
+        'registerDiagnosticTestRecommendationAcceptedEvent'
+      );
+
+      fixture.detectChanges();
+
+      const element: HTMLElement = fixture.nativeElement;
+      const link = element.querySelector<HTMLAnchorElement>(
+        'a.oppia-start-topic-button'
+      );
+
+      expect(link).not.toBeNull();
+      expect(link?.getAttribute('href')).toBe(
+        '/learn/math/' + topicData2.getUrlFragment()
+      );
+      expect(link?.closest('button')).toBeNull();
+
+      link?.addEventListener('click', event => event.preventDefault());
+      link?.click();
+
+      expect(analyticsSpy).toHaveBeenCalledOnceWith('math', 'dummy2');
+    });
+
+    it('should render the return to classroom control as a native link', () => {
+      component.diagnosticTestIsStarted = true;
+      component.diagnosticTestIsFinished = true;
+      component.recommendedTopicSummaries = [];
+
+      fixture.detectChanges();
+
+      const element: HTMLElement = fixture.nativeElement;
+      const link = element.querySelector<HTMLAnchorElement>(
+        'a.oppia-goto-classroom-button'
+      );
+
+      expect(link).not.toBeNull();
+      expect(link?.getAttribute('href')).toBe('/learn/math');
+      expect(link?.closest('button')).toBeNull();
+      expect(link?.textContent?.trim()).toBeTruthy();
+    });
+  });
+
   it('should register recommendation acceptance event', fakeAsync(() => {
     spyOn(
       siteAnalyticsService,

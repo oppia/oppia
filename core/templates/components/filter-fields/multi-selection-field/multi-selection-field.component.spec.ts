@@ -74,6 +74,52 @@ describe('Multi Selection Field Component', () => {
     );
   });
 
+  it('should update accessibility attributes when selections change', () => {
+    fixture.detectChanges();
+
+    const chipList = fixture.nativeElement.querySelector(
+      'mat-chip-list'
+    ) as HTMLElement;
+
+    expect(chipList.getAttribute('role')).toBe('group');
+    expect(chipList.hasAttribute('aria-multiselectable')).toBeFalse();
+    expect(chipList.hasAttribute('aria-orientation')).toBeFalse();
+
+    componentInstance.add({value: 'math'});
+    fixture.detectChanges();
+
+    expect(chipList.getAttribute('role')).toBe('listbox');
+    expect(chipList.hasAttribute('aria-multiselectable')).toBeTrue();
+    expect(chipList.hasAttribute('aria-orientation')).toBeTrue();
+
+    componentInstance.remove('math');
+    fixture.detectChanges();
+
+    expect(chipList.getAttribute('role')).toBe('group');
+    expect(chipList.hasAttribute('aria-multiselectable')).toBeFalse();
+    expect(chipList.hasAttribute('aria-orientation')).toBeFalse();
+  });
+
+  it('should expose validation errors when the chip list is empty', () => {
+    componentInstance.allowLowercaseOnly = true;
+    fixture.detectChanges();
+
+    const chipList = fixture.nativeElement.querySelector(
+      'mat-chip-list'
+    ) as HTMLElement;
+
+    componentInstance.formCtrl.setValue('MATH');
+    fixture.detectChanges();
+
+    expect(chipList.getAttribute('role')).toBe('group');
+    expect(chipList.getAttribute('aria-invalid')).toBe('true');
+
+    componentInstance.formCtrl.setValue('math');
+    fixture.detectChanges();
+
+    expect(chipList.getAttribute('aria-invalid')).toBe('false');
+  });
+
   it('should validate input', () => {
     componentInstance.selections = [];
     componentInstance.allowLowercaseOnly = true;

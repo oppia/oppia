@@ -769,6 +769,20 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 [skill_ids_by_description['Dummy Skill 3']],
             ],
         )
+        self.assertEqual(len(story.story_contents.nodes), 3)
+        story_fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
+        thumbnail_path = 'thumbnail/thumbnail.svg'
+        self.assertTrue(story_fs.isfile(thumbnail_path))
+        thumbnail_size = len(story_fs.get(thumbnail_path))
+        self.assertGreater(thumbnail_size, 0)
+        for node in story.story_contents.nodes:
+            self.assertEqual(node.thumbnail_filename, 'thumbnail.svg')
+            self.assertEqual(
+                node.thumbnail_bg_color,
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            )
+            self.assertEqual(node.thumbnail_size_in_bytes, thumbnail_size)
+
         # Testing that there are 3 hindi translation opportunities
         # available on the Contributor Dashboard. Hindi was picked arbitrarily,
         # any language code other than english (what the dummy explorations
