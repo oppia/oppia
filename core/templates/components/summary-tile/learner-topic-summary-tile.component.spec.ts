@@ -13,12 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for LearnerStorySummaryTileComponent.
+ * @fileoverview Unit tests for LearnerTopicSummaryTileComponent.
  */
 
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
-import {MaterialModule} from 'modules/material.module';
-import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -33,7 +31,7 @@ describe('Learner Topic Summary Tile Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MaterialModule, FormsModule, HttpClientTestingModule],
+      imports: [HttpClientTestingModule],
       declarations: [LearnerTopicSummaryTileComponent, MockTranslatePipe],
       providers: [UrlInterpolationService],
       schemas: [NO_ERRORS_SCHEMA],
