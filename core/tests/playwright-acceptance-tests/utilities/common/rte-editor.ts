@@ -43,7 +43,7 @@ export class RTEEditor {
 
   /** Enters LaTeX and commits the field so Angular can validate the formula. */
   async typeMathExpression(latex: string): Promise<void> {
-    const modal = this.user.page.locator('oppia-rte-helper-modal');
+    const modal = this.user.page.locator(rteHelperModalSelector);
     const input = modal.locator(
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
     );
