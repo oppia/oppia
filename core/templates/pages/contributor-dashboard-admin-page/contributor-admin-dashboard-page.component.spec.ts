@@ -63,6 +63,18 @@ describe('Contributor dashboard Admin page', () => {
   let fetchContributorAdminStatsSpy: jasmine.Spy;
   let alertsServiceAddWarningSpy: jasmine.Spy;
   let ContAdminStatsSpy: jasmine.Spy;
+  let translationAdminInfo = new UserInfo(
+    ['USER_ROLE', 'TRANSLATION_ADMIN'],
+    true,
+    false,
+    false,
+    false,
+    true,
+    'en',
+    'username1',
+    'tester@example.com',
+    true
+  );
   let translationCoordinatorInfo = new UserInfo(
     ['USER_ROLE', 'TRANSLATION_COORDINATOR'],
     true,
@@ -304,6 +316,150 @@ describe('Contributor dashboard Admin page', () => {
       fixture.detectChanges();
       tick();
       expect(alertsServiceAddWarningSpy).toHaveBeenCalledTimes(1);
+    }));
+  });
+
+  describe('translation coordinator / featured languages tab', () => {
+    let translationAdminAndCoordinatorInfo = new UserInfo(
+      ['USER_ROLE', 'TRANSLATION_ADMIN', 'TRANSLATION_COORDINATOR'],
+      true,
+      false,
+      false,
+      false,
+      true,
+      'en',
+      'username1',
+      'tester@example.com',
+      true
+    );
+
+    const queryEditor = () =>
+      fixture.debugElement.query(
+        By.css('oppia-featured-translation-languages-editor')
+      );
+    const queryStatsTable = () =>
+      fixture.debugElement.query(By.css('contributor-admin-stats-table'));
+    const queryCoordinatorTab = () =>
+      fixture.debugElement.query(
+        By.css('.e2e-test-translation-coordinators-tab')
+      );
+
+    beforeEach(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchCommunityStats'
+      ).and.returnValue(
+        Promise.resolve({
+          translation_reviewers_count: {
+            en: 1,
+            ar: 1,
+            ms: 1,
+            az: 1,
+            'hi-en': 1,
+          },
+          question_reviewers_count: 1,
+        } as CommunityContributionStatsBackendDict)
+      );
+      getUserInfoSpy = spyOn(userService, 'getUserInfoAsync');
+    });
+
+    it('should label the tab as Translation Coordinators', fakeAsync(() => {
+      getUserInfoSpy.and.returnValue(
+        Promise.resolve(translationCoordinatorInfo)
+      );
+      fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
+
+      // The label wraps onto two lines with a <br>, so join its text nodes
+      // with a space to get the full label.
+      const tabElement: HTMLElement = queryCoordinatorTab().nativeElement;
+      const label = Array.from(tabElement.childNodes)
+        .map(node => (node.textContent ?? '').trim())
+        .filter(text => text.length > 0)
+        .join(' ');
+      expect(label).toBe('Translation Coordinators');
+    }));
+
+    it(
+      'should let a pure translation admin reach the tab and see only the ' +
+        'editor',
+      fakeAsync(() => {
+        getUserInfoSpy.and.returnValue(Promise.resolve(translationAdminInfo));
+        fixture.detectChanges();
+        tick();
+        fixture.detectChanges();
+
+        expect(component.CONTRIBUTION_TYPES).toEqual([
+          component.TAB_NAME_TRANSLATION_COORDINATOR,
+        ]);
+        expect(component.activeTab).toBe(
+          component.TAB_NAME_TRANSLATION_COORDINATOR
+        );
+        expect(fetchAssignedLanguageIdsSpy).not.toHaveBeenCalled();
+        expect(queryCoordinatorTab()).not.toBeNull();
+        expect(queryEditor()).not.toBeNull();
+        expect(queryStatsTable()).toBeNull();
+      })
+    );
+
+    it(
+      'should show the stats table but not the editor to a pure translation ' +
+        'coordinator',
+      fakeAsync(() => {
+        getUserInfoSpy.and.returnValue(
+          Promise.resolve(translationCoordinatorInfo)
+        );
+        fixture.detectChanges();
+        tick();
+        component.setActiveTab(component.TAB_NAME_TRANSLATION_COORDINATOR);
+        fixture.detectChanges();
+
+        expect(component.isTranslationAdmin).toBeFalse();
+        expect(queryCoordinatorTab()).not.toBeNull();
+        expect(queryEditor()).toBeNull();
+        expect(queryStatsTable()).not.toBeNull();
+      })
+    );
+
+    it('should show both the editor and stats table to an admin coordinator', fakeAsync(() => {
+      getUserInfoSpy.and.returnValue(
+        Promise.resolve(translationAdminAndCoordinatorInfo)
+      );
+      fixture.detectChanges();
+      tick();
+      component.setActiveTab(component.TAB_NAME_TRANSLATION_COORDINATOR);
+      fixture.detectChanges();
+
+      expect(queryEditor()).not.toBeNull();
+      expect(queryStatsTable()).not.toBeNull();
+    }));
+
+    it('should not show the editor outside the coordinator tab', fakeAsync(() => {
+      getUserInfoSpy.and.returnValue(
+        Promise.resolve(translationAdminAndCoordinatorInfo)
+      );
+      fixture.detectChanges();
+      tick();
+      component.setActiveTab(component.TAB_NAME_TRANSLATION_SUBMITTER);
+      fixture.detectChanges();
+
+      expect(queryEditor()).toBeNull();
+      expect(queryStatsTable()).not.toBeNull();
+    }));
+
+    it('should show the editor in the mobile layout too', fakeAsync(() => {
+      spyOn(component, 'checkMobileView').and.returnValue(true);
+      getUserInfoSpy.and.returnValue(Promise.resolve(translationAdminInfo));
+      fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
+
+      expect(
+        fixture.debugElement.query(By.css('.dashboard-content-mobile'))
+      ).not.toBeNull();
+      expect(queryEditor()).not.toBeNull();
+      expect(queryStatsTable()).toBeNull();
     }));
   });
 
@@ -696,6 +852,68 @@ describe('Contributor dashboard Admin page', () => {
         expect(removeRightsSpy).toHaveBeenCalled();
       })
     );
+
+    it('should refresh the table and question reviewers count after question rights are updated', fakeAsync(() => {
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          can_submit_questions: false,
+          can_review_questions: false,
+          can_review_translation_for_language_codes: [],
+          can_review_voiceover_for_language_codes: [],
+        })
+      );
+      const updateRightsSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'updateQuestionRightsAsync'
+      ).and.returnValue(Promise.resolve());
+      const refreshCountSpy = spyOn(component, 'refreshQuestionReviewersCount');
+      const statsTable = jasmine.createSpyObj<ContributorAdminStatsTable>(
+        'ContributorAdminStatsTable',
+        ['refreshPagination']
+      );
+      component.statsTable = statsTable;
+      spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve({
+            isQuestionSubmitter: false,
+            isQuestionReviewer: true,
+          }),
+        } as NgbModalRef;
+      });
+
+      component.openCdAdminQuestionRoleEditorModal('user1');
+      tick();
+
+      expect(updateRightsSpy).toHaveBeenCalledWith(
+        'user1',
+        false,
+        true,
+        false,
+        false
+      );
+      expect(statsTable.refreshPagination).toHaveBeenCalled();
+      expect(refreshCountSpy).toHaveBeenCalled();
+    }));
+
+    it('should update the question reviewers count from community stats', fakeAsync(() => {
+      (
+        contributorDashboardAdminStatsBackendApiService.fetchCommunityStats as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          translation_reviewers_count: {},
+          question_reviewers_count: 5,
+        } as CommunityContributionStatsBackendDict)
+      );
+
+      component.refreshQuestionReviewersCount();
+      tick();
+
+      expect(component.questionReviewersCount).toBe(5);
+    }));
 
     it(
       'should open question role editor modal and return changed' +

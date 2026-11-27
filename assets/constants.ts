@@ -6638,6 +6638,21 @@ export default {
   "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
     "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
 
+  // Android-specific version metadata. For example, an Android version name
+  // can be "12.5-5f58b8fbeb-dev". Flavor order is used when comparing
+  // app-version flavors.
+  "ANDROID_PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS": [
+    "dev", "alpha", "beta", "ga"],
+  // Matches dotted numeric versions with at least two components and no suffix,
+  // e.g. "12.5".
+  "ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITHOUT_SUFFIX_REGEXP":
+    "^(\\d+(?:\\.\\d+)+)$",
+  // Allows a release-candidate version followed by its flavor and build hash,
+  // e.g. "0.19-rc03-alpha-9faec1d609", as well as a build label and suffix,
+  // e.g. "12.5-5f58b8fbeb-dev".
+  "ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITH_SUFFIX_REGEXP":
+    "^(\\d+(?:\\.\\d+)+)(?:-rc\\d+-[a-z0-9]+-[a-z0-9]+|(?!-rc)(?:-[a-z0-9]+)?(?:-(.+))?)?$",
+
   // Maximum allowed commit message length. 375 characters because indexed
   // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
   // up to 4 bytes long.
@@ -6646,6 +6661,11 @@ export default {
 
   // When the site cookie policy was last updated in UNIX time milliseconds.
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
+
+  // Keys of routes that are pure redirect handlers (for example login and
+  // logout) without a dedicated page to audit. They cannot have a Lighthouse
+  // page entry, so the Lighthouse coverage and shard checks skip them.
+  "ROUTES_WITH_NO_STANDALONE_PAGE": ["LOGIN", "LOGOUT"],
 
   // Pages registered with angular router.
   "PAGES_REGISTERED_WITH_FRONTEND": {
@@ -6669,6 +6689,10 @@ export default {
     },
     "TECHNICAL_FEEDBACK_DETAIL": {
       "ROUTE": "technical-feedback-dashboard/:team/:reportId",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Technical Feedback Dashboard | Oppia",
       "META": [
         {
@@ -6740,6 +6764,10 @@ export default {
     },
     "EDIT_CERTIFICATE_OFFERING": {
       "ROUTE": "edit-certificate-assessment-offering/:certificate_offering_id",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Edit Certificate Offering | Oppia",
       "META": [
         {
@@ -6911,6 +6939,10 @@ export default {
     },
     "CERTIFICATE_ASSESSMENT_PLAYER": {
       "ROUTE": "certificate-assessment/:certificate_id",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Certificate Assessment Player | Oppia",
       "META": [
         {
@@ -6929,6 +6961,10 @@ export default {
     },
     "CERTIFICATE_ASSESSMENT_RESULT": {
       "ROUTE": "certificate-assessment-result/:attempt_id",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Certificate Assessment Result | Oppia",
       "META": [
         {
@@ -7405,24 +7441,6 @@ export default {
         }
       ]
     },
-    "LIBRARY_RECENTLY_PUBLISHED": {
-      "ROUTE": "community-library/recently-published",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Discover the latest lessons and explorations recently published by creators on Oppia."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Discover the latest lessons and explorations recently published by creators on Oppia."
-        }
-      ]
-    },
     "PRACTICE_SESSION": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/session",
       "TITLE": "Practice Session Page",
@@ -7525,24 +7543,6 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Create and manage blog posts on the Oppia blog dashboard."
-        }
-      ]
-    },
-    "LIBRARY_TOP_RATED": {
-      "ROUTE": "community-library/top-rated",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Explore the highest-rated free lessons and courses available on Oppia's library."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Explore the highest-rated free lessons and courses available on Oppia's library."
         }
       ]
     },
@@ -7802,6 +7802,10 @@ export default {
     },
     "LEARNER_GROUP_EDITOR": {
       "ROUTE": "edit-learner-group/:learner_group_id",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Edit Learner Group | Oppia",
       "META": [
         {
@@ -7976,6 +7980,18 @@ export default {
       "^2": "वर्ग",
       "^3": "घन"
     },
+    "ne": {
+      "+": "जोड",
+      "-": "घटाउ",
+      "*": "गुणन",
+      "×": "गुणन",
+      "÷": "भाग",
+      "=": "बराबर",
+      "!": "फ्याक्टोरियल",
+      "^": "को घात",
+      "^2": "वर्ग",
+      "^3": "घन"
+    },
     "pt": {
       "+": "mais",
       "-": "menos",
@@ -8021,6 +8037,7 @@ export default {
     "en": ".!?",
     "es": ".!?",
     "pt": ".!?",
-    "hi": "।!?"
+    "hi": "।!?",
+    "ne": "।!?"
   }
 } as const;

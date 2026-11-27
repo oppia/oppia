@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from core import utils
 from core.domain import suggestion_registry, user_domain
 from core.platform import models
 
@@ -23,9 +24,11 @@ from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import suggestion_models
+    from mypy_imports import suggestion_models, user_models
 
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+(suggestion_models, user_models) = models.Registry.import_models(
+    [models.Names.SUGGESTION, models.Names.USER]
+)
 
 
 def get_translation_submitter_total_stats_from_model(
@@ -411,12 +414,19 @@ def get_question_reviewer_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
+    reviewer_user_ids = (
+        user_models.UserContributionRightsModel.get_question_reviewer_user_ids()
+    )
+    if not reviewer_user_ids:
+        return ([], 0, False)
+
     question_reviewer_models, next_offset, more = (
         suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
             page_size=page_size,
             offset=offset,
             sort_by=sort_by,
             max_days_since_last_activity=max_days_since_last_activity,
+            reviewer_user_ids=reviewer_user_ids,
         )
     )
 
@@ -483,3 +493,51 @@ def get_translator_counts(language_code: str) -> int:
             model_class.language_code == language_code
         ).fetch()
     )
+
+
+def create_question_reviewer_total_stats_if_absent(user_id: str) -> None:
+    """Creates a zero-count QuestionReviewerTotalContributionStatsModel for
+    the given user if one does not exist yet, so that newly added question
+    reviewers are listed on the contributor admin dashboard before their
+    first review.
+
+    Args:
+        user_id: str. The ID of the user who was granted question review
+            rights.
+    """
+    if (
+        suggestion_models.QuestionReviewerTotalContributionStatsModel.get_by_id(
+            user_id
+        )
+        is not None
+    ):
+        return
+    today = utils.get_current_utc_date()
+    suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
+        contributor_id=user_id,
+        topic_ids_with_question_reviews=[],
+        reviewed_questions_count=0,
+        accepted_questions_count=0,
+        accepted_questions_with_reviewer_edits_count=0,
+        rejected_questions_count=0,
+        first_contribution_date=today,
+        last_contribution_date=today,
+    )
+
+
+def delete_question_reviewer_total_stats_if_empty(user_id: str) -> None:
+    """Deletes the QuestionReviewerTotalContributionStatsModel of the given
+    user if they have not reviewed any questions, so that users whose review
+    rights are removed before any review are no longer listed.
+
+    Args:
+        user_id: str. The ID of the user whose question review rights were
+            removed.
+    """
+    stats_model = (
+        suggestion_models.QuestionReviewerTotalContributionStatsModel.get_by_id(
+            user_id
+        )
+    )
+    if stats_model is not None and stats_model.reviewed_questions_count == 0:
+        stats_model.delete()
