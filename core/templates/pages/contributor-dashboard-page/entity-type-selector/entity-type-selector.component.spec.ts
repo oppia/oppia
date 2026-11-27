@@ -46,6 +46,7 @@ describe('EntityTypeSelectorComponent', () => {
       },
       {id: AppConstants.ENTITY_TYPE.EXPLORATION, label: 'Lessons'},
       {id: AppConstants.ENTITY_TYPE.SKILL, label: 'Skills'},
+      {id: AppConstants.ENTITY_TYPE.TOPIC, label: 'Topics'},
     ]);
   });
 
@@ -111,9 +112,12 @@ describe('EntityTypeSelectorComponent', () => {
     component.activeEntityType = AppConstants.ENTITY_TYPE.SKILL;
     expect(component.getActiveEntityTypeLabel()).toBe('Skills');
 
-    // An entity type with no option of its own falls back to the "All" label
-    // rather than showing an empty selector.
     component.activeEntityType = AppConstants.ENTITY_TYPE.TOPIC;
+    expect(component.getActiveEntityTypeLabel()).toBe('Topics');
+
+    // An unrecognized entity type falls back to the "All" label
+    // rather than returning an undefined label.
+    component.activeEntityType = 'unrecognized_type';
     expect(component.getActiveEntityTypeLabel()).toBe('All');
   });
 
