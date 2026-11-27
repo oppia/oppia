@@ -485,6 +485,15 @@ export class SiteAnalyticsService {
     );
   }
 
+  registerDownloadContributorCertificateEvent(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'contributor_dashboard_download_certificate',
+      {
+        contribution_type: contributionType,
+      }
+    );
+  }
+
   registerLessonActiveUse(): void {
     this._sendEventToGoogleAnalytics('active_user_start_and_saw_cards', {});
   }
@@ -701,29 +710,6 @@ export class SiteAnalyticsService {
       page_path: this.windowRef.nativeWindow.location.pathname,
       source_element: srcElement,
       classroom_name: classroomName,
-    });
-  }
-
-  registerInProgressClassroomLessonEngagedWithEvent(
-    classroomName: string,
-    topicName: string
-  ): void {
-    this._sendEventToGoogleAnalytics(
-      'classroom_lesson_in_progress_engaged_with',
-      {
-        classroom_name: classroomName,
-        topic_name: topicName,
-      }
-    );
-  }
-
-  registerNewClassroomLessonEngagedWithEvent(
-    classroomName: string,
-    topicName: string
-  ): void {
-    this._sendEventToGoogleAnalytics('new_classroom_lesson_engaged_with', {
-      classroom_name: classroomName,
-      topic_name: topicName,
     });
   }
 

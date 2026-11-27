@@ -19,10 +19,18 @@
 import {Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {ExplorationEditorUtils} from '../common/exploration-editor-utils';
+import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 
 const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
-const baseURL = testConstants.URLs.BaseURL;
+
+const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
+const voiceArtistUsernameInputBox = 'input#newVoiceArtistUsername';
+const saveVoiceoverArtistEditButton =
+  'button.e2e-test-add-voice-artist-role-button';
+const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
+const mobileVoiceoverArtistsHeader =
+  '.e2e-test-voice-artist-collapsible-card-header';
 
 const languageAccentOptionSelector =
   '.e2e-test-language-accent-selector-option';
@@ -30,26 +38,192 @@ const addNewLanguageAccentButtonSelector =
   '.e2e-test-add-new-language-accent-button';
 const languageAccentDropdownSelector =
   '.e2e-test-language-accent-dropdown-selector';
+
 const voiceArtistSectionHeaderSelector = '.e2e-test-voice-artists-header';
 const voiceArtistSectionBodySelector = '.e2e-test-voice-artists-content';
-const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
-const voiceArtistUsernameInputBox = '.e2e-test-new-voice-artist-username';
-const saveVoiceoverArtistEditButton =
-  'button.e2e-test-add-voice-artist-role-button';
-const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
-const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
-const mobileSettingsBarSelector = 'li.e2e-test-mobile-settings-button';
-const mobileSettingsDropdownSelector =
-  '.oppia-exploration-editor-tabs-dropdown.show';
-const basicSettingsDropdown = 'h3.e2e-test-settings-container';
-const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
-const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
-const settingsContainerSelector =
-  '.oppia-editor-card.oppia-settings-card-container';
 
 export class VoiceoverAdmin extends BaseUser {
+  /**
+   * Function to navigate to exploration settings tab.
+   */
+  async navigateToExplorationSettingsTab(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const explorationEditorUtils = new ExplorationEditorUtils(this);
+    await explorationEditorUtils.navigateToSettingsTab();
+  }
+
+  /**
+   * Navigate to the voiceover admin page.
+   */
+  async navigateToVoiceoverAdminPage(): Promise<void> {
+    await this.goto(voiceoverAdminURL);
+  }
+
+  /**
+   * Asserts that a voiceover artist does not exist in the list.
+   * @param artistUsername - The username of the voiceover artist to check for.
+   */
+  async expectVoiceoverArtistsListDoesNotContain(
+    artistUsername: string
+  ): Promise<void> {
+    // Expand the section if it is not expanded in mobile view.
+    if (
+      this.isViewportAtMobileWidth() &&
+      (await this.isElementVisible(mobileVoiceoverArtistsHeader))
+    ) {
+      await this.clickOnElementWithSelector(mobileVoiceoverArtistsHeader);
+    }
+
+    await this.page.waitForFunction(
+      ({
+        selector,
+        artistUsername,
+      }: {
+        selector: string;
+        artistUsername: string;
+      }) => {
+        let elements = document.querySelectorAll(selector);
+        if (!elements || elements.length === 0) {
+          return true;
+        }
+
+        for (const element of Array.from(elements)) {
+          const elementText = element.textContent?.trim();
+          if (elementText === artistUsername) {
+            return false;
+          }
+        }
+        return true;
+      },
+      {selector: '.e2e-test-voiceArtist-role-names', artistUsername}
+    );
+  }
+
+  /**
+   * Add voiceover artists to an exploration and verify that they are listed.
+   * @param voiceArtists - The username list of the voiceover artists to add.
+   */
+  async addVoiceoverArtistsToExploration(
+    voiceArtists: string[]
+  ): Promise<void> {
+    for (const voiceArtist of voiceArtists) {
+      await this.submitVoiceoverArtistUsername(voiceArtist);
+      // Verify that the artist is actually listed, so that a silently failed
+      // addition is reported as a test failure rather than a pass.
+      await this.expectElementToBeVisible(
+        `div.e2e-test-voice-artist-${voiceArtist}`
+      );
+      showMessage(`${voiceArtist} has been added as a voice artist.`);
+    }
+  }
+
+  /**
+   * Submit a username in the voiceover artist form without verifying that the
+   * artist was added. This is for submissions that are expected to fail, such
+   * as an invalid username, where the caller asserts the resulting error.
+   * @param voiceArtist - The username to submit.
+   */
+  async submitVoiceoverArtistUsername(voiceArtist: string): Promise<void> {
+    if (!(await this.isElementVisible(voiceArtistSectionBodySelector))) {
+      await this.clickOnElementWithSelector(voiceArtistSectionHeaderSelector);
+      await this.expectElementToBeVisible(voiceArtistSectionBodySelector);
+    }
+    await this.expectElementToBeVisible(editVoiceoverArtistButton);
+    await this.clickOnElementWithSelector(editVoiceoverArtistButton);
+    await this.clickOnElementWithSelector(voiceArtistUsernameInputBox);
+    await this.expectElementToBeVisible(voiceArtistUsernameInputBox);
+    await this.clearAllTextFrom(voiceArtistUsernameInputBox);
+    await this.typeInInputField(voiceArtistUsernameInputBox, voiceArtist);
+    await this.clickOnElementWithSelector(saveVoiceoverArtistEditButton);
+  }
+
+  /**
+   * Function to remove voiceover artist from an exploration.
+   * @param voiceArtistUsername - The username of the voiceover artist to remove.
+   */
+  async removeVoiceoverArtist(voiceArtistUsername: string): Promise<void> {
+    const removeVoiceoverArtistBtnSelector =
+      '.e2e-test-remove-voice-artist-button';
+    await this.expectElementToBeVisible(editVoiceoverArtistButton);
+    await this.clickOnElementWithSelector(editVoiceoverArtistButton);
+
+    const selector = `div.e2e-test-voice-artist-${voiceArtistUsername}`;
+    await this.expectElementToBeVisible(selector);
+
+    const removeBtn = await this.expectElementToBeVisible(
+      `${selector} ${removeVoiceoverArtistBtnSelector}`,
+      true
+    );
+    if (!removeBtn) {
+      throw new Error('Remove button not found.');
+    }
+    await removeBtn.click();
+    await this.clickButtonInModal('Are you sure?', 'confirm');
+  }
+
+  /**
+   * Function to expect voiceover artists list to contain.
+   * @param artistUsername - artist username.
+   */
+  async expectVoiceoverArtistsListContains(
+    artistUsername: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible('.e2e-test-voiceArtist-role-names');
+    const allVoiceoverArtists = await this.getAllVoiceoverArtists();
+    if (!allVoiceoverArtists.includes(artistUsername)) {
+      throw new Error(
+        `Expected ${artistUsername} to be a voiceover artist. Current voice artists for this exploration are: ${allVoiceoverArtists}`
+      );
+    }
+    showMessage(
+      `${artistUsername} added as voiceover artist! Current voice artists for this exploration are: ${allVoiceoverArtists}`
+    );
+  }
+
+  /**
+   * Checks if the voice artist list is empty.
+   */
+  async expectVoiceoverArtistsListToBeEmpty(): Promise<void> {
+    await this.expectElementToBeVisible(
+      '.e2e-test-no-voice-artists-message',
+      true
+    );
+    showMessage('No voiceover artists are added to the exploration!');
+  }
+
+  /**
+   * Function to get all voiceover artists.
+   * @returns {Promise<string[]>} - list of voiceover artists.
+   */
+  async getAllVoiceoverArtists(): Promise<string[]> {
+    await this.expectElementToBeAttachedInDOM(allVoiceoverArtistsList);
+    const voiceoverArtists = await this.page.$$eval(
+      '.e2e-test-voiceArtist-role-names',
+      (elements: Element[]) =>
+        elements.map((el: Element) => (el as HTMLElement).innerText.trim())
+    );
+    return voiceoverArtists;
+  }
+
+  /**
+   * Function to verify voiceover artist is still omitted.
+   * @param artistUsername - artist username.
+   */
+  async verifyVoiceoverArtistStillOmitted(
+    artistUsername: string
+  ): Promise<void> {
+    const allVoiceoverArtists = await this.getAllVoiceoverArtists();
+    if (allVoiceoverArtists.includes(artistUsername)) {
+      throw new Error(
+        `Error: User '${artistUsername}' is unexpectedly listed as a voiceover artist for this exploration.`
+      );
+    } else {
+      showMessage(
+        `Confirmed: Voiceover artist '${artistUsername}' is still not listed.`
+      );
+    }
+  }
+
   /**
    * Function to register supported language and accent combinations for Oppia voiceovers.
    * @param {string} languageAccentDescription - The language-accent to add.
@@ -74,96 +248,16 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Navigate to the voiceover admin page.
-   */
-  async navigateToVoiceoverAdminPage(): Promise<void> {
-    await this.goto(voiceoverAdminURL);
-  }
-
-  /**
-   * Navigate to the settings tab of an exploration editor.
-   */
-  async navigateToExplorationSettingsTab(): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-
-    if (this.isViewportAtMobileWidth()) {
-      if (!(await this.isElementVisible(mobileNavbarDropdown))) {
-        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-      }
-
-      await this.expectElementToBeVisible(mobileNavbarDropdown);
-      await this.clickOnElementWithSelector(mobileNavbarDropdown);
-      await this.clickOnElementWithSelector(mobileSettingsBarSelector);
-
-      if (await this.isElementVisible(mobileSettingsDropdownSelector)) {
-        await this.clickOnElementWithSelector(mobileNavbarDropdown);
-        await this.expectElementToBeVisible(
-          mobileSettingsDropdownSelector,
-          false
-        );
-      }
-
-      // Wait for the settings view to finish rendering before opening its
-      // mobile-only collapsible sections.
-      await this.waitForPageToFullyLoad();
-
-      await this.clickOnElementWithSelector(basicSettingsDropdown);
-      await this.clickOnElementWithSelector(rolesSettingsDropdown);
-      await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
-    } else {
-      await this.clickOnElementWithSelector(settingsTabSelector);
-    }
-
-    await this.expectElementToBeVisible(settingsContainerSelector);
-  }
-
-  /**
-   * Navigate to an exploration editor by its ID.
-   * @param explorationId - The exploration ID.
-   */
-  async navigateToExplorationEditorForVoiceoverAssignment(
-    explorationId: string
-  ): Promise<void> {
-    await this.goto(`${baseURL}/create/${explorationId}#/`);
-    const explorationEditor = new ExplorationEditorUtils(this);
-    await explorationEditor.dismissWelcomeModal(false);
-  }
-
-  /**
-   * Add voiceover submitters to an exploration.
-   * @param voiceArtists - Usernames of the voiceover submitters to add.
-   */
-  async addVoiceoverArtistsToExploration(
-    voiceArtists: string[]
-  ): Promise<void> {
-    if (!(await this.isElementVisible(voiceArtistSectionBodySelector))) {
-      await this.clickOnElementWithSelector(voiceArtistSectionHeaderSelector);
-      await this.expectElementToBeVisible(voiceArtistSectionBodySelector);
-    }
-
-    for (const voiceArtist of voiceArtists) {
-      await this.expectElementToBeVisible(editVoiceoverArtistButton);
-      await this.clickOnElementWithSelector(editVoiceoverArtistButton);
-      await this.expectElementToBeVisible(voiceArtistUsernameInputBox);
-      await this.clearAllTextFrom(voiceArtistUsernameInputBox);
-      await this.typeInInputField(voiceArtistUsernameInputBox, voiceArtist);
-      await this.clickOnElementWithSelector(saveVoiceoverArtistEditButton);
-      await this.expectElementToBeVisible(
-        `div.e2e-test-voice-artist-${voiceArtist}`
-      );
-    }
-  }
-
-  /**
    * Grant a user voiceover-submitter access to an exploration.
-   * @param explorationId - The exploration ID.
-   * @param voiceArtistUsername - The username to grant access to.
+   * @param {string} explorationId - The exploration ID.
+   * @param {string} voiceArtistUsername - The username to grant access to.
    */
   async addVoiceoverArtistToExplorationWithID(
     explorationId: string,
     voiceArtistUsername: string
   ): Promise<void> {
-    await this.navigateToExplorationEditorForVoiceoverAssignment(explorationId);
+    await this.goto(`${testConstants.URLs.BaseURL}/create/${explorationId}#/`);
+    await new ExplorationEditorUtils(this).dismissWelcomeModal(false);
     await this.navigateToExplorationSettingsTab();
     await this.addVoiceoverArtistsToExploration([voiceArtistUsername]);
   }

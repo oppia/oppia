@@ -606,6 +606,79 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
+    def get_translation_suggestions_reviewed_within_given_dates(
+        cls,
+        from_date: datetime.datetime,
+        to_date: datetime.datetime,
+        user_id: str,
+        language_code: str,
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all translation suggestions that were reviewed (accepted or
+        rejected) by the given user within the given date range.
+
+        Args:
+            from_date: Date. The date that suggestions are reviewed on or
+                after.
+            to_date: Date. The date that suggestions are reviewed on or before.
+            user_id: str. The id of the user who reviewed the suggestions.
+            language_code: str. The language that the reviews should be
+                fetched.
+
+        Returns:
+            list(SuggestionModel). A list of translation suggestions that are
+            reviewed within the given date range.
+        """
+        return (
+            cls.get_all()
+            .filter(
+                datastore_services.all_of(
+                    cls.last_updated <= to_date,
+                    cls.last_updated >= from_date,
+                    cls.final_reviewer_id == user_id,
+                    cls.suggestion_type
+                    == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    cls.language_code == language_code,
+                )
+            )
+            .order(cls.last_updated)
+            .fetch()
+        )
+
+    @classmethod
+    def get_question_suggestions_reviewed_within_given_dates(
+        cls,
+        from_date: datetime.datetime,
+        to_date: datetime.datetime,
+        user_id: str,
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all question suggestions that were reviewed (accepted or
+        rejected) by the given user within the given date range.
+
+        Args:
+            from_date: Date. The date that suggestions are reviewed on or
+                after.
+            to_date: Date. The date that suggestions are reviewed on or before.
+            user_id: str. The id of the user who reviewed the suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of question suggestions that are
+            reviewed within the given date range.
+        """
+        return (
+            cls.get_all()
+            .filter(
+                datastore_services.all_of(
+                    cls.last_updated <= to_date,
+                    cls.last_updated >= from_date,
+                    cls.final_reviewer_id == user_id,
+                    cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                )
+            )
+            .order(cls.last_updated)
+            .fetch()
+        )
+
+    @classmethod
     def get_in_review_suggestions_in_score_categories(
         cls, score_categories: List[str], user_id: str
     ) -> Sequence[GeneralSuggestionModel]:
@@ -3627,6 +3700,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         offset: int,
         sort_by: Optional[str],
         max_days_since_last_activity: Optional[int],
+        reviewer_user_ids: Optional[Sequence[str]] = None,
     ) -> Tuple[
         Sequence[QuestionReviewerTotalContributionStatsModel], int, bool
     ]:
@@ -3641,14 +3715,16 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             max_days_since_last_activity: Optional[int]. The number of days
                 before today from which to start considering users'
                 contributions, to filter users.
+            reviewer_user_ids: Optional[Sequence[str]]. The list of user IDs
+                who currently have review rights.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(QuestionReviewerTotalContributionStatsModel).
                     The list of models which match the supplied
-                    max_days_since_last_activity filter, returned in the
-                    order specified by sort_by.
+                    max_days_since_last_activity filter and reviewer_user_ids,
+                    returned in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -3676,9 +3752,19 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         sorted_results: List[QuestionReviewerTotalContributionStatsModel] = []
         today = utils.get_current_utc_date()
 
-        if max_days_since_last_activity is not None:
-            last_date = today - datetime.timedelta(
-                days=max_days_since_last_activity
+        if (
+            max_days_since_last_activity is not None
+            or reviewer_user_ids is not None
+        ):
+            last_date = (
+                today - datetime.timedelta(days=max_days_since_last_activity)
+                if max_days_since_last_activity is not None
+                else None
+            )
+            reviewer_ids_set = (
+                set(reviewer_user_ids)
+                if reviewer_user_ids is not None
+                else None
             )
             next_offset = offset
             while len(sorted_results) < page_size:
@@ -3689,10 +3775,19 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     break
                 for result_model in result_models:
                     next_offset += 1
-                    if result_model.last_contribution_date >= last_date:
-                        sorted_results.append(result_model)
-                        if len(sorted_results) == page_size:
-                            break
+                    if (
+                        reviewer_ids_set is not None
+                        and result_model.contributor_id not in reviewer_ids_set
+                    ):
+                        continue
+                    if (
+                        last_date is not None
+                        and result_model.last_contribution_date < last_date
+                    ):
+                        continue
+                    sorted_results.append(result_model)
+                    if len(sorted_results) == page_size:
+                        break
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)

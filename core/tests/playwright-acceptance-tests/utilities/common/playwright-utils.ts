@@ -28,18 +28,22 @@ const libraryBanner = '.e2e-test-library-banner';
 
 const toastMessageSelector = '.e2e-test-toast-message';
 const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
-const commonModalTitleSelector = '.e2e-test-modal-header';
-const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
-const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
 const pagesWithDialogHandler = new WeakSet<Page>();
 
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
+const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
+const errorModalToggleDetailsSelector = '.e2e-test-error-details-toggle-link';
+const errorModalDetailsContentSelector = '.e2e-test-error-details-content';
+const errorModalCloseButtonSelector = '.e2e-test-close-button';
 const usernameInputSelector = 'input.e2e-test-username-input';
 const agreeToTermsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
 const registerButtonSelector = 'button.e2e-test-register-user:not([disabled])';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+const errorModalSelector = '.oppia-error-modal-window';
 
 export class BaseUser {
   readonly page: Page;
@@ -161,6 +165,16 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.page.reload({waitUntil: 'networkidle'});
+  }
+
+  /**
+   * Scrolls to the top of the page.
+   */
+  async scrollToTopOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -612,27 +626,6 @@ export class BaseUser {
   }
 
   /**
-   * Clicks the requested action button in a confirmation modal.
-   * @param title - The expected title of the modal.
-   * @param action - The modal action to click.
-   */
-  async clickButtonInModal(
-    title: string,
-    action: 'confirm' | 'cancel'
-  ): Promise<void> {
-    await this.expectElementToBeVisible(commonModalTitleSelector);
-    await this.expectTextContentToBe(commonModalTitleSelector, title);
-
-    const actionButtonSelector =
-      action === 'confirm'
-        ? commonModalConfirmBtnSelector
-        : commonModalCancelBtnSelector;
-    await this.expectElementToBeVisible(actionButtonSelector);
-    await this.clickOnElementWithSelector(actionButtonSelector);
-    await this.expectElementToBeVisible(actionButtonSelector, false);
-  }
-
-  /**
    * Verifies the title of a visible modal.
    * @param expectedTitle - The expected modal title.
    */
@@ -688,6 +681,61 @@ export class BaseUser {
       await this.clickOnElementWithSelector(toastMessageSelector);
     }
     await this.expectElementToBeVisible(toastMessageSelector, false);
+  }
+
+  /**
+   * Checks if the error modal is visible on the screen.
+   */
+  async expectErrorModalToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(errorModalSelector, true);
+  }
+
+  /**
+   * Toggles the details on the warning modal and checks if the warning message matches expected message.
+   * @param expectedMessage The expected warning message.
+   */
+  async expectErrorModalMessageToBe(expectedMessage: string): Promise<void> {
+    await this.clickOnElementWithSelector(errorModalToggleDetailsSelector);
+    await this.expectElementToBeVisible(errorModalDetailsContentSelector);
+    await this.expectTextContentToContain(
+      errorModalDetailsContentSelector,
+      expectedMessage
+    );
+  }
+
+  /**
+   * Closes the error modal.
+   */
+  async closeErrorModal(): Promise<void> {
+    await this.clickOnElementWithSelector(errorModalCloseButtonSelector);
+    await this.expectElementToBeVisible(errorModalSelector, false);
+  }
+
+  /**
+   * Clicks on the button in the modal with the given title and action.
+   * @param title - The title of the modal.
+   * @param action - The action to click on the button in the modal.
+   * @param expectModalToClose - Whether to expect the modal to close after clicking the button.
+   */
+  async clickButtonInModal(
+    title: string,
+    action: 'confirm' | 'cancel',
+    expectModalToClose: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToBe(commonModalTitleSelector, title);
+
+    const currentActionBtnSelector =
+      action === 'confirm'
+        ? commonModalConfirmBtnSelector
+        : commonModalCancelBtnSelector;
+    await this.expectElementToBeVisible(currentActionBtnSelector);
+    await this.clickOnElementWithSelector(currentActionBtnSelector);
+
+    await this.expectElementToBeVisible(
+      currentActionBtnSelector,
+      !expectModalToClose
+    );
   }
 
   /**

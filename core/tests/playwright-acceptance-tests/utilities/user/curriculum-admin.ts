@@ -20,8 +20,8 @@ import {Page} from '@playwright/test';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
+import {NavigationUtils} from '../common/navigation-utils';
 
-const baseURL = testConstants.URLs.BaseURL;
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 const classroomBannerImage = testConstants.data.classroomBannerImage;
@@ -56,6 +56,20 @@ const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const enableDiagnosticTestButton =
   '.e2e-test-toggle-diagnostic-test-status-btn';
 
+// Skill editor selectors.
+const mobileOptionsSelector = '.e2e-test-mobile-options-base';
+const selectRubricDifficultySelector = '.e2e-test-select-rubric-difficulty';
+const rteSelector = '.e2e-test-rte';
+const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
+const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
+const commitMessageInputSelector = '.e2e-test-commit-message-input';
+const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const navigationContainerSelector = '.e2e-test-mobile-navigation-bar-container';
+const toggleRubricsDropdownSelector = '.e2e-test-toggle-rubrics-dropdown';
+const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
+const mobileSkillNavToggle =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+
 export class CurriculumAdmin extends TopicManager {
   /**
    * Creates, updates, and publishes a new classroom with a topic.
@@ -86,6 +100,76 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Creates and publishes a topic with two subtopics that have study guides.
+   * The first subtopic has two sections (the first one with a worked
+   * example) and a skill with 10 questions, and the practice tab is enabled
+   * for it. The second subtopic ("Subtracting Numbers") has one section.
+   * This requires the "show_restructured_study_guides" feature flag.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the first subtopic.
+   * @param {string} skillName - The name of the skill for the first subtopic.
+   */
+  async createAndPublishTopicWithSubtopicsAndStudyGuides(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ): Promise<void> {
+    // Topic URL fragments are limited to 20 characters
+    // (MAX_CHARS_IN_TOPIC_URL_FRAGMENT), so "Addition and Subtraction"
+    // becomes "addition-and-subtrac".
+    const topicUrlFragment = topicName
+      .toLowerCase()
+      .replace(/ /g, '-')
+      .slice(0, 20);
+    await this.createTopic(topicName, topicUrlFragment, true);
+    await this.createSubtopicWithStudyGuideForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(/ /g, '-'),
+      'Adding With Your Fingers',
+      'One way to add is using your...',
+      topicName,
+      true
+    );
+    await this.addSubtopicStudyGuideSection(
+      'Using an Addition Table',
+      'To add two single-digit...',
+      1
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 10);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+    await this.togglePracticeTabCheckbox();
+    await this.saveTopicDraft(topicName);
+
+    await this.createSubtopicWithStudyGuideForTopic(
+      'Subtracting Numbers',
+      'subtract-nos',
+      'Common Mistakes',
+      'Some common mistakes students make are...',
+      topicName,
+      true
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic('Skill 2', topicName, false);
+    await this.assignSkillToSubtopicInTopicEditor(
+      'Skill 2',
+      'Subtracting Numbers',
+      topicName
+    );
+
+    await this.publishDraftTopic(topicName);
+    showMessage(`Topic ${topicName} with study guides is published.`);
+  }
+
+  /**
    * Function for creating a new classroom.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} urlFragment - The URL fragment for the classroom.
@@ -111,6 +195,25 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Function to create a topic with a linked skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} skillName - The name of the skill.
+   * @param {boolean} isFirstTopic - Whether this is the first topic being created.
+   */
+  async createTopicWithSkill(
+    topicName: string,
+    skillName: string,
+    isFirstTopic: boolean = false
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-'),
+      isFirstTopic
+    );
+    await this.createSkillForTopic(skillName, topicName, true);
+  }
+
+  /**
    * Enables diagnostic test for a classroom.
    * @param {string} classroomName - The name of the classroom.
    */
@@ -131,12 +234,8 @@ export class CurriculumAdmin extends TopicManager {
   async navigateToExplorationEditor(
     explorationId: string | null
   ): Promise<void> {
-    if (!explorationId) {
-      throw new Error('Cannot navigate to editor: explorationId is null');
-    }
-    const editorUrl = `${baseURL}/create/${explorationId}`;
-    await this.goto(editorUrl);
-    showMessage('Navigation to exploration editor is successful.');
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.navigateToExplorationEditor(explorationId);
   }
 
   /**
@@ -231,6 +330,71 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(saveClassroomButton, false);
 
     showMessage(`Updated ${classroomName} classroom.`);
+  }
+
+  /**
+   * Adds an explanation to the rubric of the given difficulty in the skill
+   * editor.
+   * @param {string} difficulty - The difficulty level of the rubric.
+   * @param {string} explanation - The explanation to add.
+   */
+  async updateRubric(
+    difficulty: 'Easy' | 'Medium' | 'Hard',
+    explanation: string
+  ): Promise<void> {
+    const difficultyValues = {Easy: '0', Medium: '1', Hard: '2'};
+    const difficultyValue = difficultyValues[difficulty];
+    if (difficultyValue === undefined) {
+      throw new Error(`Unknown difficulty: ${difficulty}`);
+    }
+
+    await this.waitForStaticAssetsToLoad();
+    // Expand the rubrics section in mobile view, if it is collapsed.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(selectRubricDifficultySelector, true, 5000))
+    ) {
+      await this.clickOnElementWithSelector(toggleRubricsDropdownSelector);
+    }
+
+    await this.select(selectRubricDifficultySelector, difficultyValue);
+    await this.waitForStaticAssetsToLoad();
+    await this.clickOnElementWithText('+ ADD EXPLANATION FOR DIFFICULTY');
+    await this.typeInInputField(rteSelector, explanation);
+    await this.clickOnElementWithSelector(saveRubricExplanationButton);
+
+    await this.expectElementToBeVisible(saveRubricExplanationButton, false);
+    showMessage(`Updated ${difficulty} rubric with "${explanation}".`);
+  }
+
+  /**
+   * Saves the changes made in the skill editor.
+   * @param {string} updateMessage - The commit message.
+   */
+  async publishUpdatedSkill(updateMessage: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      if (
+        !(await this.isElementVisible(navigationContainerSelector, true, 5000))
+      ) {
+        await this.clickOnElementWithSelector(mobileOptionsSelector);
+      }
+      // The mobile view has 2 instances of the element, from which
+      // the first one is inapplicable here (and may be hidden).
+      await this.expectElementToBeAttachedInDOM(mobileSkillNavToggle);
+      const skillNavToggles = await this.page.$$(mobileSkillNavToggle);
+      await this.clickOnElement(skillNavToggles[1]);
+      await this.clickOnElementWithSelector(mobileSaveOrPublishSkillSelector);
+    } else {
+      await this.waitForStaticAssetsToLoad();
+      await this.clickOnElementWithSelector(saveOrPublishSkillSelector);
+    }
+
+    await this.expectElementToBeVisible(commitMessageInputSelector);
+    await this.typeInInputField(commitMessageInputSelector, updateMessage);
+    await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
+    await this.expectToastMessage('Changes Saved.');
+    await this.expectElementToBeVisible(closeSaveModalButtonSelector, false);
+    showMessage('Skill updated successfully.');
   }
 }
 

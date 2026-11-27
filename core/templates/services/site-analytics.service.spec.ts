@@ -16,14 +16,13 @@
  * @fileoverview Unit tests for SiteAnalyticsService.
  */
 
-// @ts-nocheck
-
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {DOCUMENT} from '@angular/common';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {UserService} from 'services/user.service';
+import {UserInfo} from 'domain/user/user-info.model';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 describe('Site Analytics Service', () => {
@@ -663,6 +662,20 @@ describe('Site Analytics Service', () => {
       );
     });
 
+    it('should register download contributor certificate event', () => {
+      const contributionType = 'Translation';
+      sas.registerDownloadContributorCertificateEvent(contributionType);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'contributor_dashboard_download_certificate',
+        {
+          contribution_type: contributionType,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
     it('should register active lesson usage', () => {
       sas.registerLessonActiveUse();
 
@@ -685,8 +698,8 @@ describe('Site Analytics Service', () => {
     });
 
     it('should wait for user info before sending event if login state is unresolved', fakeAsync(() => {
-      let resolveUserInfoPromise!: () => void;
-      const userInfoPromise = new Promise<void>(resolve => {
+      let resolveUserInfoPromise!: (value: UserInfo) => void;
+      const userInfoPromise = new Promise<UserInfo>(resolve => {
         resolveUserInfoPromise = resolve;
       });
 
@@ -696,14 +709,15 @@ describe('Site Analytics Service', () => {
       const delayedInitSas = new SiteAnalyticsService(
         ws,
         localStorageService,
-        userService
+        userService,
+        document
       );
 
       delayedInitSas.registerCommunityLessonStarted(explorationId);
       expect(gtagSpy).not.toHaveBeenCalled();
 
       userService.isLoggedIn.and.returnValue(true);
-      resolveUserInfoPromise();
+      resolveUserInfoPromise(UserInfo.createDefault());
       flushMicrotasks();
 
       expect(gtagSpy).toHaveBeenCalledWith(
@@ -1026,34 +1040,6 @@ describe('Site Analytics Service', () => {
         classroom_name: 'Math',
         login_status: 'logged_in',
       });
-    });
-
-    it('should register new classroom lesson card click event', () => {
-      sas.registerNewClassroomLessonEngagedWithEvent('Math', 'Addition');
-
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event',
-        'new_classroom_lesson_engaged_with',
-        {
-          classroom_name: 'Math',
-          topic_name: 'Addition',
-          login_status: 'logged_in',
-        }
-      );
-    });
-
-    it('should register in-progress classroom lesson card click event', () => {
-      sas.registerInProgressClassroomLessonEngagedWithEvent('Math', 'Addition');
-
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event',
-        'classroom_lesson_in_progress_engaged_with',
-        {
-          classroom_name: 'Math',
-          topic_name: 'Addition',
-          login_status: 'logged_in',
-        }
-      );
     });
 
     it('should register diagnostic test completion event', () => {

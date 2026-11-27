@@ -63,6 +63,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {UnicodeSchema} from 'services/schema-default-value.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
 
 enum ExpansionTabType {
   CONTENT,
@@ -131,6 +133,8 @@ class MockPlatformFeatureService {
 describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
   let mockPlatformFeatureService: MockPlatformFeatureService;
+  let readOnlyExplorationBackendApiService: jasmine.SpyObj<ReadOnlyExplorationBackendApiService>;
+  let computeGraphService: jasmine.SpyObj<ComputeGraphService>;
   let translateTextService: TranslateTextService;
   let translateTextBackendApiService: TranslateTextBackendApiService;
   let translationLanguageService: TranslationLanguageService;
@@ -181,6 +185,22 @@ describe('Translation Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     mockPlatformFeatureService = new MockPlatformFeatureService();
+    readOnlyExplorationBackendApiService = jasmine.createSpyObj(
+      'ReadOnlyExplorationBackendApiService',
+      ['fetchExplorationAsync']
+    );
+    readOnlyExplorationBackendApiService.fetchExplorationAsync.and.returnValue(
+      Promise.resolve({
+        exploration: {init_state_name: 'stateName1', states: {}},
+      })
+    );
+    computeGraphService = jasmine.createSpyObj('ComputeGraphService', [
+      'computeBfsTraversalOfStates',
+    ]);
+    computeGraphService.computeBfsTraversalOfStates.and.returnValue([
+      'stateName1',
+      'stateName2',
+    ]);
     mockModalRef = new MockConfirmTranslationExitModal();
     mockWindow = {
       addEventListener: jasmine.createSpy('addEventListener'),
@@ -237,6 +257,14 @@ describe('Translation Modal Component', () => {
         {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
+        },
+        {
+          provide: ReadOnlyExplorationBackendApiService,
+          useValue: readOnlyExplorationBackendApiService,
+        },
+        {
+          provide: ComputeGraphService,
+          useValue: computeGraphService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -380,6 +408,7 @@ describe('Translation Modal Component', () => {
   it('should set validation errors and disable save when translation has missing custom tags', () => {
     spyOn(component, 'ngOnInit').and.stub();
     spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
+    spyOn(component, 'computePanelOverflowState').and.stub();
     component.activeDataFormat = 'html';
     component.loadingData = false;
     component.textToTranslate =
@@ -408,6 +437,7 @@ describe('Translation Modal Component', () => {
   it('should clear validation errors and enable save after translated custom tags are added', () => {
     spyOn(component, 'ngOnInit').and.stub();
     spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
+    spyOn(component, 'computePanelOverflowState').and.stub();
     component.activeDataFormat = 'html';
     component.loadingData = false;
     component.textToTranslate =
@@ -1745,6 +1775,41 @@ describe('Translation Modal Component', () => {
     });
   });
 
+  describe('when validating topic metadata length', () => {
+    it('should reject a topic name over the allowed length', () => {
+      translateTextService.activeContentId = 'topic_name';
+      component.textToTranslate = 'Original topic name';
+
+      component.updateHtml(
+        'A'.repeat(AppConstants.MAX_CHARS_IN_TOPIC_NAME + 1)
+      );
+
+      expect(component.hasLengthValidationError).toBe(true);
+      expect(component.hasSubmitValidationErrors()).toBe(true);
+    });
+
+    it('should reject a topic description over the allowed length', () => {
+      translateTextService.activeContentId = 'topic_description';
+      component.textToTranslate = 'Original topic description';
+
+      component.updateHtml(
+        'A'.repeat(AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION + 1)
+      );
+
+      expect(component.hasLengthValidationError).toBe(true);
+      expect(component.hasSubmitValidationErrors()).toBe(true);
+    });
+
+    it('should accept a topic description within the allowed length', () => {
+      translateTextService.activeContentId = 'topic_description';
+      component.textToTranslate = 'Original topic description';
+
+      component.updateHtml('Translated description');
+
+      expect(component.hasLengthValidationError).toBe(false);
+    });
+  });
+
   describe('when checking for validation errors with auto-translated images', () => {
     it('should return true if hasImageInAutoTranslation is true and hasAltTextModalBeenOpened is false', () => {
       component.hasImageInAutoTranslation = true;
@@ -1769,6 +1834,12 @@ describe('Translation Modal Component', () => {
       expect(
         component.getFormattedContentType('metadata', null, 'exploration_tag_0')
       ).toBe('tag');
+      expect(
+        component.getFormattedContentType('metadata', null, 'topic_name')
+      ).toBe('topic name');
+      expect(
+        component.getFormattedContentType('metadata', null, 'topic_description')
+      ).toBe('topic description');
       expect(component.getFormattedContentType('metadata', null, 'other')).toBe(
         'metadata'
       );

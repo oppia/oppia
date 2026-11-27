@@ -20,6 +20,8 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import {INTERACTION_TYPES} from './exploration-editor';
+import {LoggedInUser} from './logged-in-user';
 import puppeteer from 'puppeteer';
 import {ElementHandle} from 'puppeteer';
 
@@ -108,6 +110,8 @@ const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const subtopicNameSelector = '.e2e-test-subtopic-name';
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
+const mobileSubtopicContentSelector = '.e2e-test-mobile-subtopic-content';
+const topicEditorContainerSelector = '.e2e-test-topic-editor-container';
 const assignSubtopicButton = '.e2e-test-assign-subtopic';
 
 const skillsTab = 'a.e2e-test-skills-tab';
@@ -660,9 +664,7 @@ export class CurriculumAdmin extends TopicManager {
     addWorkedExample: boolean = false
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(subtopicReassignHeader);
-    }
+    await this.openSubtopicsSectionOnMobile();
     await this.page.waitForSelector(addSkillButton);
     await this.clickOnElementWithSelector(addSkillButton);
     await this.fillSkillInfoAndSubmit(
@@ -836,6 +838,19 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Opens the subtopics accordion on mobile if it is not already open.
+   */
+  private async openSubtopicsSectionOnMobile(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.isElementVisible(mobileSubtopicContentSelector))) {
+        await this.expectElementToBeVisible(subtopicReassignHeader);
+        await this.clickOnElementWithSelector(subtopicReassignHeader);
+        await this.expectElementToBeVisible(mobileSubtopicContentSelector);
+      }
+    }
+  }
+
+  /**
    * Open the topic editor page for a topic.
    */
   async openTopicEditor(topicName: string): Promise<void> {
@@ -868,6 +883,7 @@ export class CurriculumAdmin extends TopicManager {
     ]);
 
     expect(this.page.url()).toContain('/topic_editor/');
+    await this.expectElementToBeVisible(topicEditorContainerSelector);
   }
 
   /**
@@ -961,9 +977,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName: string
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(subtopicReassignHeader);
-    }
+    await this.openSubtopicsSectionOnMobile();
     await this.clickOnElementWithSelector(addSubtopicButton);
     await this.typeInInputField(subtopicTitleField, title);
     await this.page.waitForSelector(subtopicUrlFragmentField, {
@@ -1009,9 +1023,7 @@ export class CurriculumAdmin extends TopicManager {
     addWorkedExample: boolean = false
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(subtopicReassignHeader);
-    }
+    await this.openSubtopicsSectionOnMobile();
     await this.clickOnElementWithSelector(addSubtopicButton);
     await this.typeInInputField(subtopicTitleField, title);
     await this.page.waitForSelector(subtopicUrlFragmentField, {
@@ -1347,9 +1359,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName: string
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(subtopicReassignHeader);
-    }
+    await this.openSubtopicsSectionOnMobile();
 
     await this.page.waitForSelector('div.e2e-test-skill-item', {visible: true});
     await this.page.evaluate(
@@ -1358,7 +1368,9 @@ export class CurriculumAdmin extends TopicManager {
           document.querySelectorAll('div.e2e-test-skill-item')
         );
         const element = skillItemDivs.find(
-          element => element.textContent?.trim() === skillName
+          element =>
+            element.querySelector('.clickable-item')?.textContent?.trim() ===
+              skillName || element.textContent?.trim() === skillName
         ) as HTMLElement;
         if (element) {
           const assignSkillButton = element.querySelector(
@@ -1379,7 +1391,14 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(assignSubtopicButton, {
       visible: true,
     });
-    await this.clickOnElementWithText('Assign to Subtopic');
+    await this.page.evaluate(selector => {
+      const assignButton = document.querySelector(selector) as HTMLElement;
+      if (assignButton) {
+        assignButton.click();
+      } else {
+        throw new Error('Assign to Subtopic button not found.');
+      }
+    }, assignSubtopicButton);
 
     await this.page.waitForSelector(subtopicNameSelector, {visible: true});
     await this.page.evaluate(
@@ -1409,6 +1428,73 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(changeSubtopicAssignmentModal, {
       hidden: true,
     });
+    await this.saveTopicDraft(topicName);
+  }
+
+  /**
+   * Remove a skill from a subtopic in the topic editor page.
+   */
+  async removeSkillFromSubtopicInTopicEditor(
+    skillName: string,
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    await this.openSubtopicsSectionOnMobile();
+
+    await this.page.waitForSelector('.subtopic-name-card-header', {
+      visible: true,
+    });
+    await this.page.evaluate((targetSubtopic: string) => {
+      const headers = Array.from(
+        document.querySelectorAll('.subtopic-name-card-header')
+      ) as HTMLElement[];
+      const header = headers.find(el =>
+        el.textContent?.includes(targetSubtopic)
+      );
+      if (header) {
+        const card = header.closest('.subtopics-list-item');
+        if (card && !card.querySelector('.subtopic-skill')) {
+          header.click();
+        }
+      }
+    }, subtopicName);
+
+    await this.page.waitForSelector('.subtopic-skill', {visible: true});
+    await this.page.evaluate((targetSkill: string) => {
+      const skills = Array.from(
+        document.querySelectorAll('.subtopic-skill')
+      ) as HTMLElement[];
+      const matchedSkill = skills.find(el =>
+        el.textContent?.includes(targetSkill)
+      );
+      if (matchedSkill) {
+        const moreOptions = matchedSkill.querySelector(
+          'i.fa-ellipsis-v'
+        ) as HTMLElement;
+        if (moreOptions) {
+          moreOptions.click();
+        }
+      } else {
+        throw new Error(`Cannot find skill "${targetSkill}" in subtopic.`);
+      }
+    }, skillName);
+
+    await this.page.waitForSelector('.skill-edit-option', {visible: true});
+    await this.page.evaluate(() => {
+      const options = Array.from(
+        document.querySelectorAll('.skill-edit-option')
+      ) as HTMLElement[];
+      const removeOption = options.find(el =>
+        el.textContent?.includes('Remove from subtopic')
+      );
+      if (removeOption) {
+        removeOption.click();
+      } else {
+        throw new Error('Could not find "Remove from subtopic" option.');
+      }
+    });
+
     await this.saveTopicDraft(topicName);
   }
 
@@ -3148,6 +3234,175 @@ export class CurriculumAdmin extends TopicManager {
 
       await this.page.waitForSelector(publishTopicButton, {hidden: true});
     }
+  }
+
+  /**
+   * Adds review material and an optional misconception to an existing skill
+   * and publishes the update.
+   * @param skillName - The description of the skill.
+   * @param skillExplanation - Review material for the skill.
+   * @param misconception - Optional misconception details for the skill.
+   * @param commitMessage - The commit message for publishing the skill.
+   */
+  async configureSkill(
+    skillName: string,
+    skillExplanation: string,
+    misconception?: {
+      name: string;
+      notes: string;
+      feedback: string;
+    },
+    commitMessage: string = 'Add translatable skill content.'
+  ): Promise<void> {
+    await this.openSkillEditor(skillName);
+    await this.updateReviewMaterial(skillExplanation);
+    if (misconception) {
+      await this.addMisconception(
+        misconception.name,
+        misconception.notes,
+        misconception.feedback
+      );
+    }
+    await this.publishUpdatedSkill(commitMessage);
+  }
+
+  /**
+   * Creates a skill for a topic and configures its review material and misconception.
+   * @param skillName - The description of the skill.
+   * @param topicName - The name of the topic.
+   * @param skillExplanation - Review material for the skill.
+   * @param misconception - Optional misconception details for the skill.
+   */
+  async createAndConfigureSkillForTopic(
+    skillName: string,
+    topicName: string,
+    skillExplanation: string,
+    misconception?: {
+      name: string;
+      notes: string;
+      feedback: string;
+    }
+  ): Promise<void> {
+    await this.createSkillForTopic(skillName, topicName);
+    await this.configureSkill(skillName, skillExplanation, misconception);
+  }
+
+  /**
+   * Creates and publishes a topic with a subtopic and a fully configured skill.
+   * @param topicName - The name of the topic.
+   * @param subtopicName - The title of the subtopic.
+   * @param skillName - The description of the skill.
+   * @param skillExplanation - Optional review material for the skill.
+   * @param misconception - Optional misconception details for the skill.
+   */
+  async createAndPublishTopicWithSkill(
+    topicName: string,
+    subtopicName: string,
+    skillName: string,
+    skillExplanation?: string,
+    misconception?: {
+      name: string;
+      notes: string;
+      feedback: string;
+    }
+  ): Promise<void> {
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.createAndPublishTopic(topicName, subtopicName, skillName);
+    if (skillExplanation) {
+      await this.configureSkill(skillName, skillExplanation, misconception);
+    }
+  }
+
+  /**
+   * Creates, saves and publishes a minimal exploration for curriculum stories.
+   * @param title - The exploration title.
+   * @param objective - The exploration objective.
+   * @param category - The exploration category.
+   * @param tag - Optional exploration tag.
+   * @param cardContent - Initial card content text.
+   * @param linkConceptCard - Whether to link a concept card in the content.
+   * @returns The published exploration ID.
+   */
+  async createAndPublishCuratedExploration(
+    title: string,
+    objective: string,
+    category: string = 'Mathematics',
+    tag?: string,
+    cardContent: string = 'A birthday cake is cut into equal pieces.',
+    linkConceptCard: boolean = false
+  ): Promise<string> {
+    const editor = new LoggedInUser();
+    editor.page = this.page;
+    editor.browserObject = this.browserObject;
+    await editor.navigateToCreatorDashboardPage();
+    await editor.navigateToExplorationEditorPageFromCreatorDashboard();
+    await editor.dismissWelcomeModal();
+    if (linkConceptCard) {
+      await editor.updateCardContentWithConceptCard(cardContent);
+    } else {
+      await editor.updateCardContent(cardContent);
+    }
+    await editor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await editor.saveExplorationDraft();
+    return await editor.publishExplorationWithMetadata(
+      title,
+      objective,
+      category,
+      tag
+    );
+  }
+
+  /**
+   * Creates a topic with a skill, an exploration with metadata, and a story connecting them.
+   * This handles the standard preamble for multi-entity translation acceptance tests.
+   */
+  async setUpCuratedLessonWithSkill(options: {
+    topicName: string;
+    subtopicName: string;
+    skillName: string;
+    skillExplanation?: string;
+    misconception?: {
+      name: string;
+      notes: string;
+      feedback: string;
+    };
+    explorationTitle: string;
+    explorationObjective: string;
+    explorationCategory?: string;
+    explorationTag?: string;
+    explorationCardContent?: string;
+    linkConceptCard?: boolean;
+    storyTitle: string;
+    storyUrlFragment: string;
+    chapterTitle: string;
+  }): Promise<string> {
+    await this.createAndPublishTopicWithSkill(
+      options.topicName,
+      options.subtopicName,
+      options.skillName,
+      options.skillExplanation,
+      options.misconception
+    );
+
+    const explorationId = await this.createAndPublishCuratedExploration(
+      options.explorationTitle,
+      options.explorationObjective,
+      options.explorationCategory ?? 'Mathematics',
+      options.explorationTag,
+      options.explorationCardContent ??
+        'A birthday cake is cut into equal pieces.',
+      options.linkConceptCard ?? false
+    );
+
+    await this.createAndPublishStoryWithChapter(
+      options.storyTitle,
+      options.storyUrlFragment,
+      options.chapterTitle,
+      explorationId,
+      options.topicName
+    );
+
+    return explorationId;
   }
 }
 

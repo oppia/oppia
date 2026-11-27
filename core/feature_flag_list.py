@@ -42,7 +42,6 @@ class FeatureNames(enum.Enum):
     )
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = 'serial_chapter_launch_learner_view'
     SHOW_REDESIGNED_LEARNER_DASHBOARD = 'show_redesigned_learner_dashboard'
-    SHOW_TRANSLATION_SIZE = 'show_translation_size'
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
@@ -130,7 +129,6 @@ class FeatureNames(enum.Enum):
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.ENABLE_DROPDOWN_PAGINATION,
 ]
@@ -162,7 +160,6 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
@@ -187,6 +184,7 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -208,19 +206,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag is for serial chapter launch feature and making changes '
             'only in the learner view.',
             feature_flag_domain.ServerMode.TEST,
-        )
-    ),
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
-        (
-            'This flag is to show redesigned learner dashboard.',
-            feature_flag_domain.ServerMode.PROD,
-        )
-    ),
-    FeatureNames.SHOW_TRANSLATION_SIZE.value: (
-        (
-            'This flag is to show translation size on translation cards in '
-            'contributor dashboard.',
-            feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
