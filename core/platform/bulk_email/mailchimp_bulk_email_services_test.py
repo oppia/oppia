@@ -540,11 +540,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         )
 
         with mailchimp_swap:
-            self.assertIsNone(
-                mailchimp_bulk_email_services.permanently_delete_user_from_list(
-                    'missing@example.com'
-                )
+            self.assertEqual(len(mailchimp.lists.members.users_data), 3)
+            mailchimp_bulk_email_services.permanently_delete_user_from_list(
+                'missing@example.com'
             )
+            self.assertEqual(len(mailchimp.lists.members.users_data), 3)
 
     @test_utils.set_platform_parameters(
         [
