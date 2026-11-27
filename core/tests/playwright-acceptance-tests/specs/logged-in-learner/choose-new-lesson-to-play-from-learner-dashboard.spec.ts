@@ -26,7 +26,6 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
@@ -36,7 +35,6 @@ test.describe.configure({mode: 'serial'});
 test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedOutUser & LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
-  let releaseCoordinator: ReleaseCoordinator;
   let explorationId1: string;
   let explorationId2: string;
 
@@ -54,20 +52,6 @@ test.describe('Logged-In Learner', function () {
       browser,
       [ROLES.CURRICULUM_ADMIN]
     );
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'releaseCoordinator@example.com',
-      browser,
-      [ROLES.RELEASE_COORDINATOR]
-    );
-
-    // Enable redesigned learner dashboard.
-    await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
-    );
-
-    // Reload page to get latest changes.
-    await loggedInLearner.reloadPage();
 
     // Create explorations.
     explorationId1 =
@@ -116,7 +100,7 @@ test.describe('Logged-In Learner', function () {
   test('should be able add a goal', async function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
     await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
-    await loggedInLearner.expectContinueWhereYouLeftOffSectionInLDToBePresent(
+    await loggedInLearner.expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
       false
     );
     await loggedInLearner.navigateToProgressSection();
