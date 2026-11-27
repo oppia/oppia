@@ -82,23 +82,24 @@ auth_models, base_models, user_models = models.Registry.import_models(
 
 datastore_services = models.Registry.import_datastore_services()
 
-# The following tags are used within the pipeline and never reach the job's
-# output.
+# The following tags group each user's data before it is diagnosed.
 
 # Tags a user's models, grouped together.
-_TAG_USER = 'USER'
+_GATHER_USER = 'GATHER_USER'
 # Tags a lowercase email address, used to find emails shared between users.
-_TAG_EMAIL = 'EMAIL'
+_GATHER_EMAIL = 'GATHER_EMAIL'
 # Tags a Firebase auth ID linked to a user, used to find IDs shared between
 # users.
-_TAG_AUTH_ID = 'AUTH_ID'
+_GATHER_AUTH_ID = 'GATHER_AUTH_ID'
+
+# The following tags carry each user's diagnosis, which the job outputs.
 
 # Tags a user that already has all of its auth models.
-_TAG_OK = 'OK'
+_OUTPUT_OK = 'OUTPUT_OK'
 # Tags a message about a user that can't be fixed.
-_TAG_ERR = 'ERR'
+_OUTPUT_ERR = 'OUTPUT_ERR'
 # Tags a new model that a user is missing.
-_TAG_PUT = 'PUT'
+_OUTPUT_PUT = 'OUTPUT_PUT'
 
 # NOTE: Firebase accepts any string of 1 to 128 characters as a uid. This
 # length is used only so that generated IDs look like the ones Firebase
@@ -176,7 +177,7 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
         )
 
         grouped_user_models, all_lowercase_emails, all_auth_ids = (
-            operator.itemgetter(_TAG_USER, _TAG_EMAIL, _TAG_AUTH_ID)
+            operator.itemgetter(_GATHER_USER, _GATHER_EMAIL, _GATHER_AUTH_ID)
         )(
             {
                 'auth': keyed_auth_models,
@@ -186,7 +187,7 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
             | beam.CoGroupByKey()
             | 'Build grouped user models'
             >> beam.FlatMapTuple(_build_grouped_user_models).with_outputs(
-                _TAG_USER, _TAG_EMAIL, _TAG_AUTH_ID
+                _GATHER_USER, _GATHER_EMAIL, _GATHER_AUTH_ID
             )
         )
 
@@ -202,14 +203,16 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
             | 'Keep shared auth ids' >> beam.Filter(lambda kv: kv[1] > 1)
         )
 
-        oks, errs, needs_put = operator.itemgetter(_TAG_OK, _TAG_ERR, _TAG_PUT)(
+        oks, errs, needs_put = operator.itemgetter(
+            _OUTPUT_OK, _OUTPUT_ERR, _OUTPUT_PUT
+        )(
             grouped_user_models
             | 'Diagnose user models'
             >> beam.FlatMap(
                 _diagnose_user_models,
                 shared_lowercase_emails=pvalue.AsDict(shared_lowercase_emails),
                 shared_auth_ids=pvalue.AsDict(shared_auth_ids),
-            ).with_outputs(_TAG_OK, _TAG_ERR, _TAG_PUT)
+            ).with_outputs(_OUTPUT_OK, _OUTPUT_ERR, _OUTPUT_PUT)
         )
 
         outputs = [
@@ -264,18 +267,18 @@ def _build_grouped_user_models(
         group_dict: CoGroupByKeyModels. The user's models, grouped by kind.
 
     Yields:
-        TaggedOutput. _TAG_EMAIL with the user's lowercase email, and
-        _TAG_AUTH_ID with each Firebase auth ID the user claims, whether or not
-        the user can be fixed, then _TAG_USER with the user's models.
+        TaggedOutput. The user's lowercase email to _GATHER_EMAIL, and each
+        Firebase auth ID the user claims to _GATHER_AUTH_ID, whether or not the
+        user can be fixed, then the user's models to _GATHER_USER.
     """
     user = GroupedUserModels.from_group_dict(user_id, group_dict)
     if user.is_profile_user:
         return
     if email := user.email:
-        yield beam.TaggedOutput(_TAG_EMAIL, email.lower())
+        yield beam.TaggedOutput(_GATHER_EMAIL, email.lower())
     for auth_id in user.linked_auth_ids:
-        yield beam.TaggedOutput(_TAG_AUTH_ID, auth_id)
-    yield beam.TaggedOutput(_TAG_USER, user)
+        yield beam.TaggedOutput(_GATHER_AUTH_ID, auth_id)
+    yield beam.TaggedOutput(_GATHER_USER, user)
 
 
 def _diagnose_user_models(
@@ -296,34 +299,34 @@ def _diagnose_user_models(
             more than one user claims.
 
     Yields:
-        TaggedOutput. _TAG_ERR with the first problem found, if any, and nothing
-        else. Otherwise _TAG_OK with 1, or _TAG_PUT with the new models the user
-        is missing, marked as deleted if the user is.
+        TaggedOutput. _OUTPUT_ERR with the first problem found, if any, and
+        nothing else. Otherwise _OUTPUT_OK with 1, or _OUTPUT_PUT with the new
+        models the user is missing, marked as deleted if the user is.
     """
     user_id = group.user_id
     if (email := group.email) is None:
         yield beam.TaggedOutput(
-            _TAG_ERR,
+            _OUTPUT_ERR,
             f'UserSettingsModel({user_id=}) is missing an email',
         )
     elif email.lower() in shared_lowercase_emails:
         yield beam.TaggedOutput(
-            _TAG_ERR,
+            _OUTPUT_ERR,
             f'UserSettingsModel({user_id=}) is sharing an email',
         )
     elif (deleted := group.deleted) is None:
         yield beam.TaggedOutput(
-            _TAG_ERR,
+            _OUTPUT_ERR,
             f'User({user_id=}) has models that disagree on deletion status',
         )
     elif len(auth_ids := group.linked_auth_ids) >= 2:
         yield beam.TaggedOutput(
-            _TAG_ERR,
+            _OUTPUT_ERR,
             f'User({user_id=}) is linked with multiple {auth_ids=}',
         )
     elif (auth_id := auth_ids[0]) in shared_auth_ids:
         yield beam.TaggedOutput(
-            _TAG_ERR,
+            _OUTPUT_ERR,
             f'User({user_id=}) shares {auth_id=} with another user',
         )
     else:
@@ -337,9 +340,9 @@ def _diagnose_user_models(
                 _build_missing_backlink_model(user_id, auth_id, deleted)
             )
         if not missing_models:
-            yield beam.TaggedOutput(_TAG_OK, 1)
+            yield beam.TaggedOutput(_OUTPUT_OK, 1)
         for model in missing_models:
-            yield beam.TaggedOutput(_TAG_PUT, model)
+            yield beam.TaggedOutput(_OUTPUT_PUT, model)
 
 
 def _build_missing_auth_model(
