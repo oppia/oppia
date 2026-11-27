@@ -22,6 +22,7 @@ import {Contributor} from './contributor';
 
 const opportunityButtonSelector = '.e2e-test-opportunity-list-item-button';
 const reviewButtonPrefix = 'e2e-test-question-suggestion-review';
+const reviewModalHeaderSelector = `.${reviewButtonPrefix}-modal-header`;
 const editButtonSelector = `.${reviewButtonPrefix}-edit-button`;
 const questionSuggestionEditorModalSelector =
   '.e2e-test-question-suggestion-editor-modal';
@@ -126,6 +127,16 @@ export class PracticeQuestionReviewer extends Contributor {
     await this.expectToastMessage('Updated question.');
     await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
     showMessage(`Question updated to "${question}".`);
+  }
+
+  /**
+   * Checks if the question review modal is present.
+   * @param {boolean} visible - Whether the modal should be visible.
+   */
+  async expectQuestionReviewModalToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(reviewModalHeaderSelector, visible);
   }
 }
 
