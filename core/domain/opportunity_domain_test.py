@@ -389,50 +389,56 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
-    def test_invalid_skill_id_fails_validation_check(self) -> None:
+    def test_invalid_skill_id_fails_strict_validation_check(self) -> None:
         self.valid_skill_opportunity.id = ''
+        self.valid_skill_opportunity.validate()
         with self.assertRaisesRegex(
             opportunity_domain_errors.InvalidSkillIdError,
             'Expected skill_id to be a non-empty string, received \'\'',
         ):
-            self.valid_skill_opportunity.validate()
+            self.valid_skill_opportunity.validate(strict=True)
 
         self.valid_skill_opportunity.id = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
             opportunity_domain_errors.InvalidSkillIdError,
             'Expected skill_id to be a non-empty string, received 123',
         ):
-            self.valid_skill_opportunity.validate()
+            self.valid_skill_opportunity.validate(strict=True)
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_invalid_skill_description_fails_validation_check(self) -> None:
+    def test_invalid_skill_description_fails_strict_validation_check(
+        self,
+    ) -> None:
         self.valid_skill_opportunity.skill_description = ''
+        # Non-strict validation preserves legacy model reads until audited.
+        self.valid_skill_opportunity.validate()
         with self.assertRaisesRegex(
             opportunity_domain_errors.InvalidSkillDescriptionError,
             'Expected skill_description to be a non-empty string, '
             'received \'\'',
         ):
-            self.valid_skill_opportunity.validate()
+            self.valid_skill_opportunity.validate(strict=True)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.valid_skill_opportunity.skill_description = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
             opportunity_domain_errors.InvalidSkillDescriptionError,
             'Expected skill_description to be a non-empty string, '
             'received 123',
         ):
-            self.valid_skill_opportunity.validate()
+            self.valid_skill_opportunity.validate(strict=True)
 
         max_chars = android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION
         long_description = 'a' * (max_chars + 1)
         self.valid_skill_opportunity.skill_description = long_description
+        self.valid_skill_opportunity.validate()
         with self.assertRaisesRegex(
             opportunity_domain_errors.InvalidSkillDescriptionError,
             'Skill description should be at most %d chars, received %s'
             % (max_chars, long_description),
         ):
-            self.valid_skill_opportunity.validate()
+            self.valid_skill_opportunity.validate(strict=True)
 
 
 class PinnedOpportunityDomainTest(test_utils.GenericTestBase):

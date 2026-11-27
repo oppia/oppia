@@ -314,8 +314,13 @@ class SkillOpportunity:
         self.question_count = question_count
         self.validate()
 
-    def validate(self) -> None:
+    def validate(self, strict: bool = False) -> None:
         """Validates various properties of the object.
+
+        Args:
+            strict: bool. Whether to also enforce strict checks on skill_id
+                and skill_description. Kept opt-in on model reads until
+                existing datastore entities are audited.
 
         Raises:
             InvalidSkillIdError. The skill ID is not a non-empty string.
@@ -324,29 +329,30 @@ class SkillOpportunity:
             InvalidQuestionCountError. The question count is not a
                 non-negative integer.
         """
-        if not isinstance(self.id, str) or not self.id:
-            raise opportunity_domain_errors.InvalidSkillIdError(
-                'Expected skill_id to be a non-empty string, received %r'
-                % self.id
-            )
+        if strict:
+            if not isinstance(self.id, str) or not self.id:
+                raise opportunity_domain_errors.InvalidSkillIdError(
+                    'Expected skill_id to be a non-empty string, received %r'
+                    % self.id
+                )
 
-        if (
-            not isinstance(self.skill_description, str)
-            or not self.skill_description
-        ):
-            raise opportunity_domain_errors.InvalidSkillDescriptionError(
-                'Expected skill_description to be a non-empty string, '
-                'received %r' % self.skill_description
-            )
+            if (
+                not isinstance(self.skill_description, str)
+                or not self.skill_description
+            ):
+                raise opportunity_domain_errors.InvalidSkillDescriptionError(
+                    'Expected skill_description to be a non-empty string, '
+                    'received %r' % self.skill_description
+                )
 
-        description_length_limit = (
-            android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION
-        )
-        if len(self.skill_description) > description_length_limit:
-            raise opportunity_domain_errors.InvalidSkillDescriptionError(
-                'Skill description should be at most %d chars, received %s'
-                % (description_length_limit, self.skill_description)
+            description_length_limit = (
+                android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION
             )
+            if len(self.skill_description) > description_length_limit:
+                raise opportunity_domain_errors.InvalidSkillDescriptionError(
+                    'Skill description should be at most %d chars, received %s'
+                    % (description_length_limit, self.skill_description)
+                )
 
         if (
             isinstance(self.question_count, bool)

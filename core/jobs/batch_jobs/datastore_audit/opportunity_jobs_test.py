@@ -212,7 +212,8 @@ class SkillOpportunityModelValidationJobTests(job_test_utils.JobTestBase):
     def test_non_skill_opportunity_models_are_ignored(self) -> None:
         base_model = self.create_model(base_models.BaseModel, id='base_id')
         base_model.update_timestamps()
-        self.put_multi([base_model])
+        skill_model = self._create_skill_model()
+        self.put_multi([base_model, skill_model])
 
         self.assert_job_output_is([])
 
@@ -327,6 +328,32 @@ class SkillOpportunityModelValidationJobTests(job_test_utils.JobTestBase):
                         expected_count_error.stderr
                     ]
                 },
+            ]
+        )
+
+    def test_empty_skill_description_triggers_strict_domain_error(
+        self,
+    ) -> None:
+        skill_model = self._create_skill_model(description='')
+        opportunity_model = self._create_skill_opportunity_model(
+            skill_description='', question_count=0
+        )
+        self.put_multi([skill_model, opportunity_model])
+
+        expected_domain_error = (
+            base_validation_errors.ModelDomainObjectValidateError(
+                opportunity_model,
+                'Expected skill_description to be a non-empty string, '
+                'received \'\'',
+            )
+        )
+        self.assert_job_output_is(
+            [
+                {
+                    'ModelDomainObjectValidateError': [
+                        expected_domain_error.stderr
+                    ]
+                }
             ]
         )
 
