@@ -448,7 +448,7 @@ URLS = [
     ),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_STATS_URL,
-        contributor_dashboard_stats.ContributorDashboardStatsPageHandler,
+        contributor_dashboard_stats.ContributorDashboardStatsPage,
     ),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_STATS_DATA_URL,

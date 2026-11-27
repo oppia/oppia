@@ -23,7 +23,7 @@ from core.domain import contributor_dashboard_stats_services
 from typing import Dict
 
 
-class ContributorDashboardStatsPageHandler(
+class ContributorDashboardStatsPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Renders the contributor dashboard stats page."""

@@ -200,6 +200,20 @@ module.exports = {
           accessibilityMinScore: 0.95,
         },
         {
+          matchingUrlPattern: 'http://[^/]+/contributor-dashboard-stats$',
+          pagePerfThresholds: {
+            fcp: 3500,
+            speedIndex: 5500,
+            lcp: 12000,
+            tbt: 600,
+            cls: 0.35,
+          },
+          accessibilityMinScore: 0.95,
+          overrides: {
+            'errors-in-console': ['error', {minScore: 0}],
+          },
+        },
+        {
           matchingUrlPattern: 'http://[^/]+/creator-dashboard$',
           pagePerfThresholds: {
             fcp: 2775,

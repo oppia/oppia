@@ -20,8 +20,8 @@ from core import feconf
 from core.tests import test_utils
 
 
-class ContributorDashboardStatsPageHandlerTest(test_utils.GenericTestBase):
-    """Test for ContributorDashboardStatsPageHandler."""
+class ContributorDashboardStatsPageTest(test_utils.GenericTestBase):
+    """Test for ContributorDashboardStatsPage."""
 
     def test_get_page_returns_200(self) -> None:
         response = self.get_html_response(
