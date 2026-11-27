@@ -51,6 +51,13 @@ test.describe('Exploration Editor', function () {
       browser
     )) as ExplorationEditor & LoggedInUser & LoggedOutUser;
 
+    // This suite was written for the 1920x1080 desktop window that the
+    // Puppeteer tests use. At the default 1280x720, the image region and
+    // drag-and-drop steps fail, so use the larger size for this suite only.
+    if (process.env.MOBILE !== 'true') {
+      await explorationEditor.page.setViewportSize({width: 1920, height: 1080});
+    }
+
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
