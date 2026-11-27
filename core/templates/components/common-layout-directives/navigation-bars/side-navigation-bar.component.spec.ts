@@ -36,6 +36,7 @@ import {SideNavigationBarComponent} from './side-navigation-bar.component';
 import {UserService} from 'services/user.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {SidebarStatusService} from 'services/sidebar-status.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
@@ -47,6 +48,13 @@ class MockWindowRef {
       href: '',
     },
     gtag: () => {},
+    document: {
+      body: {
+        style: {
+          overflowY: 'auto',
+        },
+      },
+    },
   };
 }
 
@@ -159,10 +167,22 @@ describe('Side Navigation Bar Component', () => {
     expect(componentInstance.getStaticImageUrl('test')).toEqual(imageUrl);
   });
 
-  it('should close sidebar on swipe left', () => {
-    spyOn(sidebarStatusService, 'closeSidebar');
+  it('should close sidebar on swipe left and restore body scrolling', () => {
+    spyOn(
+      TestBed.inject(WindowDimensionsService),
+      'isWindowNarrow'
+    ).and.returnValue(true);
+    sidebarStatusService.openSidebar();
+    mockWindowRef.nativeWindow.document.body.style.overflowY = 'hidden';
+    spyOn(sidebarStatusService, 'closeSidebar').and.callThrough();
+
     componentInstance.closeSidebarOnSwipeleft();
+
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
+    expect(sidebarStatusService.isSidebarShown()).toBeFalse();
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'auto'
+    );
   });
 
   it(
