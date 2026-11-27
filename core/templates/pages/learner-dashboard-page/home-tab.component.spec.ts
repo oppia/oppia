@@ -27,13 +27,10 @@ import {AppConstants} from 'app.constants';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {HomeTabComponent} from './home-tab.component';
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -42,10 +39,6 @@ import {LoaderService} from 'services/loader.service';
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
   let fixture: ComponentFixture<HomeTabComponent>;
-  let urlInterpolationService: UrlInterpolationService;
-  let windowDimensionsService: WindowDimensionsService;
-  let mockResizeEmitter: EventEmitter<void>;
-  let siteAnalyticsService: SiteAnalyticsService;
   class MockPlatformFeatureService {
     status = {
       SerialChapterLaunchLearnerView: {
@@ -56,19 +49,10 @@ describe('Home tab Component', () => {
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
-    mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
       declarations: [MockTranslatePipe, HomeTabComponent],
       providers: [
-        UrlInterpolationService,
-        {
-          provide: WindowDimensionsService,
-          useValue: {
-            isWindowNarrow: () => true,
-            getResizeEvent: () => mockResizeEmitter,
-          },
-        },
         {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -78,11 +62,6 @@ describe('Home tab Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(HomeTabComponent);
     component = fixture.componentInstance;
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
-
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
@@ -237,59 +216,7 @@ describe('Home tab Component', () => {
       ),
     ];
     component.untrackedTopics = {};
-    component.username = 'username';
     fixture.detectChanges();
-  });
-
-  it('should get the correct width in mobile view', () => {
-    component.ngOnInit();
-    expect(component.width).toEqual(233);
-    expect(component.windowIsNarrow).toBe(true);
-  });
-
-  it('should check whether window is narrow on resizing the screen', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    expect(component.windowIsNarrow).toBe(true);
-
-    mockResizeEmitter.emit();
-
-    expect(component.windowIsNarrow).toBe(false);
-  });
-
-  it('should get time of day as morning', () => {
-    var baseTime = new Date();
-    baseTime.setHours(11);
-    jasmine.clock().mockDate(baseTime);
-
-    expect(component.getTimeOfDay()).toEqual(
-      'I18N_LEARNER_DASHBOARD_MORNING_GREETING'
-    );
-  });
-
-  it('should get time of day as afternoon', () => {
-    var baseTime = new Date();
-    baseTime.setHours(15);
-    jasmine.clock().mockDate(baseTime);
-
-    expect(component.getTimeOfDay()).toEqual(
-      'I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING'
-    );
-  });
-
-  it('should get time of day as evening', () => {
-    var baseTime = new Date();
-    baseTime.setHours(20);
-    jasmine.clock().mockDate(baseTime);
-
-    expect(component.getTimeOfDay()).toEqual(
-      'I18N_LEARNER_DASHBOARD_EVENING_GREETING'
-    );
-  });
-
-  it('should switch the tab to Goals', () => {
-    const setActiveSection = spyOn(component.setActiveSection, 'emit');
-    component.changeActiveSection();
-    expect(setActiveSection).toHaveBeenCalled();
   });
 
   it(
@@ -303,21 +230,6 @@ describe('Home tab Component', () => {
       expect(result).toBe(true);
     }
   );
-
-  it('should get the classroom link', () => {
-    component.classroomUrlFragment = 'math';
-    const urlSpy = spyOn(
-      urlInterpolationService,
-      'interpolateUrl'
-    ).and.returnValue('/learn/math');
-    expect(component.getClassroomLink('math')).toEqual('/learn/math');
-    expect(urlSpy).toHaveBeenCalled();
-  });
-
-  it('should get the correct width', () => {
-    expect(component.getWidth(1)).toEqual(328);
-    expect(component.getWidth(3)).toEqual(662);
-  });
 
   it(
     'should show empty learn something new tab' +
@@ -353,28 +265,6 @@ describe('Home tab Component', () => {
       expect(component.isGoalLimitReached()).toBe(false);
     }
   );
-
-  it('should record analytics when lesson card in home tab clicked', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerNewClassroomLessonEngagedWithEvent'
-    ).and.callThrough();
-    component.registerNewClassroomLessonEvent('Math', 'Addition');
-    expect(
-      siteAnalyticsService.registerNewClassroomLessonEngagedWithEvent
-    ).toHaveBeenCalled();
-  });
-
-  it('should record analytics when in-progress lesson card in home tab clicked', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerInProgressClassroomLessonEngagedWithEvent'
-    ).and.callThrough();
-    component.registerClassroomInProgressLessonEvent('Math', 'Addition');
-    expect(
-      siteAnalyticsService.registerInProgressClassroomLessonEngagedWithEvent
-    ).toHaveBeenCalled();
-  });
 
   it('should get the correct number of stories that have available story nodes to recommend', () => {
     expect(component.storySummariesWithAvailableNodes).toEqual(new Set(['1']));
@@ -769,7 +659,6 @@ describe('Home tab Component Loader visibility tests', () => {
     component.partiallyLearntTopicsList = [];
 
     component.untrackedTopics = {};
-    component.username = 'testuser';
     component.allCardsLoaded = false;
     component.loadingMessage = 'Loading';
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
@@ -811,7 +700,6 @@ describe('Home tab Component Loader visibility tests', () => {
     component.partiallyLearntTopicsList = [];
 
     component.untrackedTopics = {};
-    component.username = 'testuser';
     component.allCardsLoaded = false;
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
 
@@ -854,7 +742,6 @@ describe('Home tab Component Loader visibility tests', () => {
     component.partiallyLearntTopicsList = [];
 
     component.untrackedTopics = {};
-    component.username = 'testuser';
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
 
     component.ngOnInit();

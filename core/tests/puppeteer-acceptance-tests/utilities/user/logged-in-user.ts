@@ -65,8 +65,6 @@ const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
-const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-section';
-const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
 const communityLessonToggleButton = '.e2e-test-toggle-community-lesson-button';
 const communityLessonChevronUp =
   '.e2e-test-toggle-community-lesson-button .fa-chevron-up';
@@ -76,7 +74,6 @@ const communityLessonsExpanded =
   '.e2e-test-card-display-content.card-display-content-shown';
 const communityLessonsCollapsed =
   '.e2e-test-card-display-content.card-display-content-hidden';
-const progressSectionSelector = '.e2e-test-progress-section';
 const addProfilePictureButton = '.e2e-test-photo-upload-submit';
 const cancelProfileUploadButtonSelector = '.e2e-test-photo-upload-cancel';
 const editProfilePictureButton = '.e2e-test-photo-clickable';
@@ -105,26 +102,9 @@ const reportExplorationTextAreaSelector =
   '.e2e-test-report-exploration-text-area';
 const submitReportButtonSelector = '.e2e-test-submit-report-button';
 const latestFeedbackMessageSelector = '.e2e-test-conversation-feedback-latest';
-const desktopCompletedLessonsSectionSelector =
-  '.e2e-test-completed-community-lessons-section';
-const lessonTileTitleSelector =
-  '.e2e-test-topic-name-in-learner-story-summary-tile';
 const goalsSectionSelector = '.e2e-test-goals-section';
-const homeSectionSelector = '.e2e-test-home-section';
-const mobileHomeSectionSelector = '.e2e-test-mobile-home-section';
-const topicNameInEditGoalsSelector = '.e2e-test-topic-name-in-edit-goals';
-const completedGoalsSectionSelector = '.e2e-test-completed-goals-section';
-const completedGoalsTopicNameSelector = '.e2e-test-completed-goals-topic-name';
-const completedStoriesSectionSelector = '.completed-stories';
-const storyNameSelector = '.e2e-test-story-name-in-learner-story-summary-tile';
-const continueFromWhereLeftOffSectionSelector =
-  '.continue-where-you-left-off-section';
 const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
-const addTopicToCurrentGoalsButton =
-  '.e2e-test-add-topic-to-current-goals-button';
-const mobileCompletedLessonSection = '.community-lessons-section';
 const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
-const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const matFormTextSelector = '.oppia-form-text';
 const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
@@ -188,28 +168,15 @@ const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
 const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
-const greetingSelector = '.e2e-learner-dashboard-greeting';
 
 // Auth Pages selectors.
 const loginPage = '.e2e-test-login-page';
 
 // Learner dashboard selectors.
-const communityLessonsSectionInLearnerDashboard =
-  '.e2e-test-community-lessons-section';
 const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
-const progressTabSectionInLearnerDashboard =
-  '.e2e-test-learner-dash-progress-tab';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
 
 const emptySuggestionSectionSelector = '.e2e-test-home-tab-empty-suggestions';
-const emptyCurrentGoalsSectionSelector =
-  '.e2e-test-goals-section .e2e-test-current-goals-section.e2e-test-empty-section';
-const nonEmptyCurrentGoalsSectionSelector =
-  '.e2e-test-goals-section .e2e-test-current-goals-section.e2e-test-non-empty-section';
-const goalsStatusTitleSelector =
-  '.e2e-test-goals-section .e2e-test-goals-status-title';
-const topicInCurrentGoalsSelector =
-  '.e2e-test-goals-section .e2e-test-topic-name-in-current-goals';
 const currentGoalsContainerSelector = '.e2e-test-current-goals-section';
 const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
 const goalContainerSelector = 'oppia-goal-list';
@@ -220,10 +187,8 @@ const emptyProgressSectionContainerSelector =
 const emptyProgressSectionMessage = '.e2e-test-empty-progress-message';
 
 // Learner Dashboard > Home Tab Seclectors.
-const hometabSectionHeadingSelector =
-  '.e2e-test-learner-dash-home-tab .e2e-test-section-heading';
 const emptySuggestedForYouSectionSelector =
-  '.e2e-test-learner-dash-home-tab .empty-suggested-for-you';
+  '.e2e-test-home-tab-empty-suggestions';
 const learnerGreetingsSelector = '.e2e-test-learner-greetings';
 const addGoalsButtonInRedesignedLearnerDashboard = '.e2e-test-add-goals-button';
 const newGoalsListInRedesignedLearnerDashboard = '.e2e-test-new-goals-list';
@@ -273,10 +238,6 @@ const tabSelectorMap: Record<string, string> = {
   Progress: '.e2e-test-progress-section',
   My_Suggestions: '.e2e-test-my-suggestions-section',
 };
-
-// Learner Dashboard > Progress section selectors.
-const completedLessonsSectionSelector =
-  '.e2e-test-completed-community-lessons-section';
 
 // Creator dashboard selectors.
 const creatorDashboardContainerSelector =
@@ -358,8 +319,6 @@ const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-
 const closeModalButton = '.e2e-test-close-modal-btn';
 const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
 const usernameSelector = '.e2e-test-username';
-const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
-const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 const availableChapters = '.e2e-test-available-chapters';
 const comingSoonChaptersListSelector = '.e2e-test-coming-soon-chapters';
 const chapterSelector = '.e2e-test-chapter-title';
@@ -675,40 +634,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the community library tab of the learner dashboard.
-   */
-  async navigateToCommunityLessonsSection(): Promise<void> {
-    await this.waitForPageToFullyLoad();
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(progressSectionSelector);
-      await this.clickOnElementWithSelector(progressSectionSelector);
-
-      try {
-        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
-          timeout: 5000,
-        });
-      } catch (error) {
-        if (error instanceof puppeteer.errors.TimeoutError) {
-          // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(progressSectionSelector);
-        } else {
-          throw error;
-        }
-      }
-      await this.clickOnElementWithSelector(mobileCommunityLessonSectionButton);
-    } else {
-      await this.page.waitForSelector(progressSectionSelector, {
-        visible: true,
-      });
-      await this.page.click(communityLessonsSectionButton);
-    }
-
-    await this.page.waitForSelector(communityLessonsSectionInLearnerDashboard, {
-      visible: true,
-    });
-  }
-
-  /**
    * Function to subscribe to a creator with the given username.
    * @param {string} username - The username of the creator to subscribe to.
    *     If not provided, the function will subscribe to the creator of the
@@ -769,85 +694,6 @@ export class LoggedInUser extends BaseUser {
     const selector = `.e2e-test-${page.toLowerCase().replace(/ /g, '-')}-link`;
     await this.clickOnElementWithSelector(selector);
     await this.expectElementToBeVisible(`${profileDropdown}.show`, false);
-  }
-
-  /**
-   * Navigates to the progress section of the learner dashboard.
-   */
-  async navigateToProgressSection(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(progressSectionSelector);
-      await this.clickOnElementWithSelector(progressSectionSelector);
-
-      try {
-        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
-          timeout: 5000,
-        });
-      } catch (error) {
-        if (error instanceof puppeteer.errors.TimeoutError) {
-          // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(progressSectionSelector);
-        } else {
-          throw error;
-        }
-      }
-
-      await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
-        visible: true,
-      });
-    } else {
-      await this.page.waitForSelector(progressSectionSelector);
-      const progressSection = await this.page.$(progressSectionSelector);
-      if (!progressSection) {
-        throw new Error('Progress section not found.');
-      }
-      await progressSection.click();
-    }
-
-    await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
-      visible: true,
-    });
-  }
-
-  /**
-   * Navigates to the home section of the learner dashboard.
-   */
-  async navigateToHomeSection(): Promise<void> {
-    if (await this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileHomeSectionSelector);
-      await this.clickOnElementWithSelector(mobileHomeSectionSelector);
-
-      try {
-        await this.page.waitForSelector(homeSectionGreetingElement, {
-          timeout: 10000,
-        });
-      } catch (error) {
-        if (error instanceof puppeteer.errors.TimeoutError) {
-          // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(mobileHomeSectionSelector);
-        } else {
-          throw error;
-        }
-      }
-
-      await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
-        visible: true,
-      });
-    } else {
-      await this.page.waitForSelector(homeSectionSelector);
-      const homeSectionElement = await this.page.$(homeSectionSelector);
-      if (!homeSectionElement) {
-        throw new Error('Home section not found.');
-      }
-      await this.waitForElementToBeClickable(homeSectionElement);
-      await homeSectionElement.click();
-    }
-
-    await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
-      visible: true,
-    });
   }
 
   /**
@@ -1952,175 +1798,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Adds goals from the goals section in the learner dashboard.
-   * @param {string[]} goals - The goals to add.
-   */
-  async addGoals(goals: string[]): Promise<void> {
-    await this.page.waitForSelector(topicNameInEditGoalsSelector, {
-      visible: true,
-    });
-    await this.page.waitForSelector(addTopicToCurrentGoalsButton, {
-      visible: true,
-    });
-
-    const topicNames = await this.page.$$(topicNameInEditGoalsSelector);
-    const addGoalButtons = await this.page.$$(addTopicToCurrentGoalsButton);
-
-    const actualTopicNames = await Promise.all(
-      topicNames.map(topicName =>
-        this.page.evaluate(el => el.textContent.trim(), topicName)
-      )
-    );
-
-    for (const goal of goals) {
-      const matchingTopicIndex = actualTopicNames.findIndex(
-        topicName => topicName === goal
-      );
-
-      if (matchingTopicIndex !== -1) {
-        await this.waitForElementToBeClickable(
-          addGoalButtons[matchingTopicIndex]
-        );
-        await addGoalButtons[matchingTopicIndex]?.click();
-        showMessage(`Goal "${goal}" added.`);
-      } else {
-        throw new Error(`Goal not found: ${goal}`);
-      }
-    }
-  }
-
-  /**
-   * Checks if the completed goals include the expected goals.
-   * @param {string[]} expectedGoals - The expected goals.
-   */
-  async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
-    await this.waitForPageToFullyLoad();
-
-    await this.page.waitForSelector(completedGoalsSectionSelector, {
-      visible: true,
-    });
-    await this.page
-      .waitForSelector(completedGoalsTopicNameSelector)
-      .catch(() => {
-        throw new Error('Completed goals section is empty');
-      });
-
-    const completedGoals = await this.page.$$eval(
-      `${completedGoalsSectionSelector} ${completedGoalsTopicNameSelector}`,
-      (elements: Element[]) =>
-        elements.map(el =>
-          el.textContent ? el.textContent.trim().replace('Learnt ', '') : ''
-        )
-    );
-
-    for (const expectedGoal of expectedGoals) {
-      if (!completedGoals.includes(expectedGoal)) {
-        throw new Error(
-          `Goal not found in completed lesson section: ${expectedGoal}`
-        );
-      }
-    }
-  }
-
-  /**
-   * Checks if the completed stories include the expected stories.
-   * @param {string[]} expectedStories - The expected stories.
-   */
-  async expectStoriesCompletedToInclude(
-    expectedStories: string[]
-  ): Promise<void> {
-    await this.waitForPageToFullyLoad();
-
-    await this.page.waitForSelector(completedStoriesSectionSelector);
-    const storyNames = await this.page.$$(
-      completedStoriesSectionSelector + ' ' + storyNameSelector
-    );
-    const actualStories = await Promise.all(
-      storyNames.map(async storyName => {
-        return await this.page.evaluate(el => el.textContent.trim(), storyName);
-      })
-    );
-
-    for (const expectedStory of expectedStories) {
-      if (!actualStories.includes(expectedStory)) {
-        throw new Error(`Story not found: ${expectedStory}`);
-      }
-    }
-  }
-
-  /**
-   * Checks if the completed lessons include the expected lessons in the community lessons section of learner dashboard.
-   * @param {string[]} expectedLessons - The expected lessons.
-   */
-  async expectCompletedLessonsToInclude(
-    expectedLessons: string[]
-  ): Promise<void> {
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const completedLessonsSection = isMobileViewport
-      ? mobileCompletedLessonSection
-      : desktopCompletedLessonsSectionSelector;
-
-    await this.page.waitForSelector(completedLessonsSection);
-    await this.page.waitForSelector(lessonCardTitleSelector);
-    const lessonObjectives = await this.page.$$(
-      completedLessonsSection + ' ' + lessonCardTitleSelector
-    );
-
-    const actualLessons = await Promise.all(
-      lessonObjectives.map(async lessonObjective => {
-        return await this.page.evaluate(
-          el => el.textContent.trim(),
-          lessonObjective
-        );
-      })
-    );
-
-    for (const expectedLesson of expectedLessons) {
-      if (!actualLessons.includes(expectedLesson)) {
-        throw new Error(`Lesson not found: ${expectedLesson}`);
-      }
-    }
-  }
-
-  /**
-   * Plays a lesson from the "Continue Where you Left off section" section in learner dashboard.
-   * @param {string} lessonName - The name of the lesson.
-   */
-  async playLessonFromContinueWhereLeftOff(lessonName: string): Promise<void> {
-    await this.page.waitForSelector(continueFromWhereLeftOffSectionSelector);
-    await this.page.waitForSelector(lessonTileTitleSelector);
-
-    const lessonTileTitles = await this.page.$$(
-      continueFromWhereLeftOffSectionSelector + ' ' + lessonTileTitleSelector
-    );
-
-    for (const lessonTileTitle of lessonTileTitles) {
-      const actualLessonName = await this.page.evaluate(
-        el => el.textContent.trim(),
-        lessonTileTitle
-      );
-
-      if (actualLessonName === lessonName) {
-        await Promise.all([
-          this.page.waitForNavigation({waitUntil: 'networkidle0'}),
-          await this.waitForElementToBeClickable(lessonTileTitle),
-          lessonTileTitle.click(),
-        ]);
-
-        await this.page.waitForSelector(
-          continueFromWhereLeftOffSectionSelector,
-          {
-            hidden: true,
-          }
-        );
-        return;
-      }
-    }
-
-    throw new Error(`Lesson not found: ${lessonName}`);
-  }
-
-  /**
    * Checks if the error page with the given status code is displayed.
    * @param {number} statusCode - The expected error status code.
    */
@@ -2904,26 +2581,11 @@ export class LoggedInUser extends BaseUser {
    * Checks if greeting has name of the user.
    */
   async expectGreetingToHaveNameOfUser(userName: string): Promise<void> {
-    // Check for redesigned dashboard greeting first.
-    const isRedesignedGreetingVisible = await this.isElementVisible(
-      learnerGreetingsSelector,
-      true
+    await this.expectElementToBeVisible(learnerGreetingsSelector);
+    const greetingText = await this.page.$eval(learnerGreetingsSelector, el =>
+      el.textContent?.trim()
     );
-    if (isRedesignedGreetingVisible) {
-      const greetingText = await this.page.$eval(learnerGreetingsSelector, el =>
-        el.textContent?.trim()
-      );
-      expect(greetingText).toContain(userName);
-    } else {
-      // Fall back to old dashboard greeting selector.
-      await this.expectElementToBeVisible(greetingSelector);
-      const greetingElement = await this.page.$(greetingSelector);
-      const greetingText = await this.page.evaluate(
-        el => el.textContent,
-        greetingElement
-      );
-      expect(greetingText).toContain(userName);
-    }
+    expect(greetingText).toContain(userName);
   }
 
   /**
@@ -2931,53 +2593,6 @@ export class LoggedInUser extends BaseUser {
    */
   async expectLearnSomethingNewInLDToBeEmpty(): Promise<void> {
     await this.expectElementToBeVisible(emptySuggestionSectionSelector);
-  }
-
-  /**
-   * Checks if the continue from where you left off section in Learner Dashboard is present.
-   * @param {boolean} visible - Whether the section should be visible or not.
-   */
-  async expectContinueWhereYouLeftOffSectionInLDToBePresent(
-    visible: boolean = true
-  ): Promise<void> {
-    await this.expectElementToBeVisible(
-      `${continueWhereYouLeftOffSection}${nonEmptySectionSelector}`,
-      visible
-    );
-  }
-
-  /**
-   * Function to verify the goals section contains the expected heading.
-   * @param {string} heading - The heading to check for.
-   */
-  async expectGoalsSectionToContainHeadings(
-    expectedHeadings: string[]
-  ): Promise<void> {
-    await this.page.waitForSelector(goalsStatusTitleSelector);
-    const headings: (string | null)[] = await this.page.$$eval(
-      goalsStatusTitleSelector,
-      headings => headings.map(heading => heading.textContent)
-    );
-
-    expect(headings).toContain(expectedHeadings);
-  }
-
-  /**
-   * Function to verify the current goals section is empty or not.
-   * @param {boolean} empty - Whether the section should be empty or not.
-   */
-  async expectCurrentGoalsSectionToBeEmpty(
-    empty: boolean = true
-  ): Promise<void> {
-    if (empty) {
-      await this.page.waitForSelector(emptyCurrentGoalsSectionSelector, {
-        visible: true,
-      });
-    } else {
-      await this.page.waitForSelector(nonEmptyCurrentGoalsSectionSelector, {
-        visible: true,
-      });
-    }
   }
 
   /**
@@ -3096,38 +2711,6 @@ export class LoggedInUser extends BaseUser {
         }
       );
     }
-  }
-
-  /**
-   * Check if the given topic is in the current goals section.
-   * @param {string} topicName - The name of the topic to check.
-   */
-  async expectCurrentGoalsToInclude(topicName: string): Promise<void> {
-    await this.page.waitForSelector(nonEmptyCurrentGoalsSectionSelector);
-
-    const topicsInCurrentGoals = await this.page.$$eval(
-      topicInCurrentGoalsSelector,
-      (elements: Element[]) => elements.map(el => el.textContent)
-    );
-
-    expect(topicsInCurrentGoals).toContain(topicName);
-  }
-
-  /**
-   * Check if the given section heading is in the home tab section.
-   * @param {string[]} expectedHeading - The expected heading to check.
-   */
-  async expectSectinoHeadingInLDToContain(
-    expectedHeading: string[]
-  ): Promise<void> {
-    await this.page.waitForSelector(homeTabSectionInLearnerDashboard);
-
-    const headings = await this.page.$$eval(
-      hometabSectionHeadingSelector,
-      (elements: Element[]) => elements.map(el => el.textContent)
-    );
-
-    expect(headings).toContain(expectedHeading);
   }
 
   /**
@@ -3620,10 +3203,8 @@ export class LoggedInUser extends BaseUser {
       throw new Error('Goals tab button not found.');
     }
 
-    const isActive = await goalsTab.evaluate(
-      el =>
-        el.classList.contains('oppia-learner-dash-sidebar_btn--active') ||
-        el.classList.contains('oppia-learner-dashboard-section-active')
+    const isActive = await goalsTab.evaluate(el =>
+      el.classList.contains('oppia-learner-dash-sidebar_btn--active')
     );
 
     expect(isActive).toBe(true);
@@ -3832,26 +3413,6 @@ export class LoggedInUser extends BaseUser {
 
     if (!context) {
       throw new Error('Continue Where You Left Off Section not found.');
-    }
-
-    for (const lessonTitle of lessonTitles) {
-      await this.expectLessonCardToBePresent(lessonTitle, context);
-    }
-  }
-
-  /**
-   * Function to verify the lesson cards in the incomplete lessons section.
-   * @param {string[]} lessonTitles - The titles of the lesson cards to check.
-   */
-  async expectCompletedLessonsSectionToContainLessonCards(
-    lessonTitles: string[]
-  ): Promise<void> {
-    await this.page.waitForSelector(completedLessonsSectionSelector);
-
-    const context = await this.page.$(completedLessonsSectionSelector);
-
-    if (!context) {
-      throw new Error('Completed Lessons Section not found.');
     }
 
     for (const lessonTitle of lessonTitles) {
