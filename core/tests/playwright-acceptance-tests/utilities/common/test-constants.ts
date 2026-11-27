@@ -128,7 +128,6 @@ export default {
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
-    LearnerDashboard: '.oppia-learner-dashboard-main-content',
   },
 
   SignInDetails: {

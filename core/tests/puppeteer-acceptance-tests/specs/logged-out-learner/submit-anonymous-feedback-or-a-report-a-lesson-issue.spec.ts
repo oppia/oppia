@@ -47,9 +47,6 @@ describe('Logged-Out User', function () {
       'releaseCoordinator@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
-    await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
-    );
     await releaseCoordinator.enableFeatureFlag('web_feedback_modal_enabled');
     await releaseCoordinator.enableFeatureFlag('new_lesson_player');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
