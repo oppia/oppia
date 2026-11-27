@@ -687,7 +687,9 @@ class BaseHandler(
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'post' method with different number of arguments and types.
-    def post(self, *args: Any) -> None:  # pylint: disable=unused-argument
+    def post(
+        self, *args: Any, **kwargs: Any  # pylint: disable=unused-argument
+    ) -> None:
         """Base method to handle POST requests.
 
         Raises:
@@ -697,7 +699,9 @@ class BaseHandler(
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'put' method with different number of arguments and types.
-    def put(self, *args: Any) -> None:  # pylint: disable=unused-argument
+    def put(
+        self, *args: Any, **kwargs: Any  # pylint: disable=unused-argument
+    ) -> None:
         """Base method to handle PUT requests.
 
         Raises:
@@ -707,7 +711,9 @@ class BaseHandler(
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'delete' method with different number of arguments and types.
-    def delete(self, *args: Any) -> None:  # pylint: disable=unused-argument
+    def delete(
+        self, *args: Any, **kwargs: Any  # pylint: disable=unused-argument
+    ) -> None:
         """Base method to handle DELETE requests.
 
         Raises:

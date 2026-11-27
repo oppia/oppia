@@ -1740,7 +1740,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         )
         if len(choices) < 2:
             raise utils.ValidationError(
-                'There should be atleast 2 values inside DragAndDrop '
+                'There should be at least 2 values inside DragAndDrop '
                 'interaction.'
             )
 

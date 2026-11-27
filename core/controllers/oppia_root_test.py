@@ -137,3 +137,20 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
             ],
             False,
         )
+
+    def test_unsupported_http_methods_with_url_kwargs_return_404(
+        self,
+    ) -> None:
+        """Tests that POST, PUT, and DELETE requests to root page routes with
+        named URL arguments return 404 instead of raising TypeError.
+        """
+        post_response = self.testapp.post('/learn/math/undefined', status=404)
+        self.assertEqual(post_response.status_int, 404)
+
+        put_response = self.testapp.put('/learn/math/undefined', status=404)
+        self.assertEqual(put_response.status_int, 404)
+
+        delete_response = self.testapp.delete(
+            '/learn/math/undefined', status=404
+        )
+        self.assertEqual(delete_response.status_int, 404)

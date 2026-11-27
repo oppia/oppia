@@ -2705,7 +2705,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.new_exploration,
             (
-                'There should be atleast 2 values inside DragAndDrop '
+                'There should be at least 2 values inside DragAndDrop '
                 'interaction.'
             ),
         )
