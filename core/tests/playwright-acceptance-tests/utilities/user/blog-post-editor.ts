@@ -20,6 +20,7 @@ import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {RTEEditor} from '../common/rte-editor';
 
 // URLs.
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
@@ -31,6 +32,17 @@ const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const usernameInputSelector = '.e2e-test-blog-author-name-field';
 const authorBioSaveButton = 'button.e2e-test-save-author-details-button';
 const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
+const firstPostButtonSelector = '.e2e-test-first-post-button';
+const newPostButtonSelector = '.e2e-test-new-post-button';
+const gridViewButtonSelector = '.e2e-test-tiles-view-button';
+const listViewButtonSelector = '.e2e-test-list-view-button';
+const editBlogPostBtnSelector = '.e2e-test-edit-blog-post-button';
+const deleteBlogPostBtnSelector =
+  '.cdk-overlay-pane .e2e-test-delete-blog-post-button';
+const blogPostEditBoxSelector = '.e2e-test-blog-post-edit-box';
+const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
+const blogPostTitlePage = '.e2e-test-blog-post-title';
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
 // Selectors for the blog post editor.
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
@@ -43,6 +55,12 @@ const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
 const confirmButtonSelector = 'button.e2e-test-confirm-button';
+const blogPostEditorContainerSelector = '.e2e-test-blog-post-editor-container';
+const editBlogBodySelector = '.e2e-test-ck-editor';
+const blogTitleHelpSelector = '.e2e-test-blog-title-help';
+const previewBlogPostButtonSelector = '.e2e-test-blog-card-preview-button';
+const closePreviewModalButtonSelector = '.e2e-test-close-preview-button';
+const photoUploadErrorSelector = '.e2e-test-upload-error';
 
 export class BlogPostEditor extends BaseUser {
   /**
@@ -207,6 +225,313 @@ export class BlogPostEditor extends BaseUser {
     await this.clickOnElementWithSelector(saveDraftButtonSelector);
 
     await expect(this.page.locator(saveDraftButtonSelector)).toBeDisabled();
+  }
+
+  /**
+   * Fills the bio in the register modal shown when first visiting the blog
+   * dashboard.
+   * @param {string} bio - The bio to enter in the register modal.
+   */
+  async updateUserBioInRegisterModal(bio: string): Promise<void> {
+    await this.expectElementToBeVisible(blogAuthorBioField);
+    await this.clearAllTextFrom(blogAuthorBioField);
+    await this.typeInInputField(blogAuthorBioField, bio);
+    await this.expectElementValueToBe(blogAuthorBioField, bio);
+  }
+
+  /**
+   * Fills the username in the register modal shown when first visiting the
+   * blog dashboard.
+   * @param {string} username - The username to enter in the register modal.
+   */
+  async updateUsernameInRegisterModal(username: string): Promise<void> {
+    await this.expectElementToBeVisible(usernameInputSelector);
+    await this.clearAllTextFrom(usernameInputSelector);
+    await this.typeInInputField(usernameInputSelector, username);
+    await this.expectElementValueToBe(usernameInputSelector, username);
+  }
+
+  /**
+   * Clicks the Save button in the blog profile modal.
+   */
+  async clickOnSaveProfileButton(): Promise<void> {
+    await this.expectElementToBeVisible(authorBioSaveButton);
+    await this.clickOnElementWithSelector(authorBioSaveButton);
+    await this.expectElementToBeVisible(authorBioSaveButton, false);
+  }
+
+  /**
+   * Checks the disabled/enabled state of the Save button in the profile
+   * register modal.
+   * @param {'disabled' | 'enabled' | 'hidden'} status - The expected state of
+   *     the register button.
+   */
+  async expectRegisterButtonToBe(
+    status: 'disabled' | 'enabled' | 'hidden'
+  ): Promise<void> {
+    if (status === 'hidden') {
+      await this.expectElementToBeVisible(authorBioSaveButton, false);
+    } else if (status === 'disabled') {
+      await this.expectElementToBeClickable(authorBioSaveButton, false);
+    } else {
+      await this.expectElementToBeClickable(authorBioSaveButton);
+    }
+  }
+
+  /**
+   * Checks whether the "+ Blog Post" (new post) button is visible.
+   * @param {boolean} visible - Whether the button should be visible.
+   */
+  async expectNewBlogPostButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(newPostButtonSelector, visible);
+  }
+
+  /**
+   * Checks whether the "Create new blog post" (first post) button is visible.
+   * @param {boolean} visible - Whether the button should be visible.
+   */
+  async expectFirstBlogPostButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(firstPostButtonSelector, visible);
+  }
+
+  /**
+   * Checks that the blog editor container is on screen.
+   */
+  async expectToBeOnBlogEditorPage(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostEditorContainerSelector);
+  }
+
+  /**
+   * Clicks on the thumbnail photo box to open the upload dialog (desktop
+   * only).
+   */
+  async clickOnThumbnailImage(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage('Skipped: click on thumbnail image (mobile).');
+      return;
+    }
+    await this.expectElementToBeVisible(thumbnailPhotoBox);
+    await this.clickOnElementWithSelector(thumbnailPhotoBox);
+  }
+
+  /**
+   * Checks the error message that appears when an invalid image is uploaded.
+   * @param {string} expectedMessage - The expected error message.
+   */
+  async expectPhotoUploadErrorMessageToBe(
+    expectedMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(photoUploadErrorSelector);
+    await this.expectElementContentToContain(
+      photoUploadErrorSelector,
+      expectedMessage
+    );
+  }
+
+  /**
+   * Checks that the title validation help text contains the given string.
+   * @param {string} helpText - The expected help text.
+   */
+  async expectBlogTitleHelpToContain(helpText: string): Promise<void> {
+    await this.expectElementToBeVisible(blogTitleHelpSelector);
+    const blogTitleHelpContents = await this.page.$$eval(
+      blogTitleHelpSelector,
+      elements => elements.map(element => element.textContent)
+    );
+    expect(blogTitleHelpContents).toContain(helpText);
+  }
+
+  /**
+   * Uses all available RTE features to fill the blog body and then saves.
+   */
+  async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
+    await this.expectElementToBeVisible(editBlogBodySelector);
+    const rteEditor = new RTEEditor(this);
+
+    // Heading paragraph.
+    await this.clickOnElementWithSelector(editBlogBodySelector);
+    await rteEditor.changeFormatTo('heading');
+    await this.page.keyboard.type('Test Heading\n');
+
+    // Normal paragraph.
+    await rteEditor.changeFormatTo('normal');
+    await this.page.keyboard.type('Test Normal Paragraph\n');
+
+    // Bold text.
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
+    await this.page.keyboard.type('Test Bold Text\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
+
+    // Italic text.
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
+    await this.page.keyboard.type('Test Italic Text\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
+
+    // Numbered list, Increase Indent, and Decrease Indent.
+    await rteEditor.clickOnRTEOptionWithTitle('Numbered List');
+    await this.page.keyboard.type('Numbered List Item 1\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Increase Indent');
+    await this.page.keyboard.type('Numbered List Item 1.1\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Decrease Indent');
+    await this.page.keyboard.type('Numbered List Item 2\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Numbered List');
+
+    // Bulleted list.
+    await rteEditor.clickOnRTEOptionWithTitle('Bulleted List');
+    await this.page.keyboard.type('Bulleted List Item 1\n');
+    await this.page.keyboard.type('Bulleted List Item 2\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Bulleted List');
+
+    // Pre formatted text.
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
+    await this.page.keyboard.type('Pre formatted text\n');
+
+    // Block quote.
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
+    await this.page.keyboard.type('Block Quote text\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
+
+    // Save changes.
+    await this.saveBlogBodyChanges();
+  }
+
+  /**
+   * Opens the blog post preview modal.
+   */
+  async previewBlogPost(): Promise<void> {
+    await this.expectElementToBeVisible(previewBlogPostButtonSelector);
+    await this.clickOnElementWithSelector(previewBlogPostButtonSelector);
+  }
+
+  /**
+   * Closes the blog post preview modal.
+   */
+  async closePreviewModal(): Promise<void> {
+    await this.expectElementToBeVisible(closePreviewModalButtonSelector);
+    await this.clickOnElementWithSelector(closePreviewModalButtonSelector);
+    await this.expectElementToBeVisible(closePreviewModalButtonSelector, false);
+  }
+
+  /**
+   * Checks that the currently selected tab header in the blog dashboard
+   * matches the given text (e.g. 'DRAFTS (1)').
+   * @param {string} expectedHeader - The expected tab header text.
+   */
+  async expectCurrentMatTabHeaderToBe(expectedHeader: string): Promise<void> {
+    const activeTabSelector = '.mat-tab-label-active .mat-tab-label-content';
+    await this.expectElementToBeVisible(activeTabSelector);
+    await this.expectTextContentToBe(activeTabSelector, expectedHeader);
+  }
+
+  /**
+   * Checks that both the tiles-view and list-view toggle buttons are visible
+   * (desktop only).
+   */
+  async expectTilesViewAndListViewButtonsArePresent(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage(
+        'Skipped: tiles/list view buttons are not present on mobile.'
+      );
+      return;
+    }
+    await this.expectElementToBeVisible(gridViewButtonSelector);
+    await this.expectElementToBeVisible(listViewButtonSelector);
+  }
+
+  /**
+   * Clicks the tiles-view or list-view toggle button and verifies the
+   * corresponding container becomes visible.
+   * @param {'tiles' | 'list'} view - The view mode to switch to.
+   */
+  async changeBlogPostViewTo(view: 'tiles' | 'list'): Promise<void> {
+    const selector = `.e2e-test-${view}-view-button`;
+    const viewContainerSelector = `.e2e-test-${view}-view-dashboard`;
+    await this.expectElementToBeVisible(selector);
+    await this.clickOnElementWithSelector(selector);
+    await this.expectElementToBeVisible(viewContainerSelector);
+  }
+
+  /**
+   * Clicks the edit (three-dots) menu for a draft post with the given title
+   * and then clicks the Edit button.
+   * @param {string} draftBlogPostTitle - The title of the draft blog post to
+   *     edit.
+   */
+  async editDraftBlogPostWithTitle(draftBlogPostTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(listOfBlogsInBlogDashboard);
+    const allDraftBlogPosts = await this.page.$$(listOfBlogsInBlogDashboard);
+    for (let i = 0; i < allDraftBlogPosts.length; i++) {
+      const checkDraftBlogPostTitle = await allDraftBlogPosts[i].$eval(
+        blogPostTitlePage,
+        element => (element as HTMLElement).innerText
+      );
+      if (draftBlogPostTitle === checkDraftBlogPostTitle) {
+        await allDraftBlogPosts[i].$eval(blogPostEditBoxSelector, element =>
+          (element as HTMLElement).click()
+        );
+        await this.clickOnElementWithSelector(editBlogPostBtnSelector);
+        return;
+      }
+    }
+    throw new Error(
+      `Draft blog post with title ${draftBlogPostTitle} not found.`
+    );
+  }
+
+  /**
+   * Deletes the draft blog post with the given title via its three-dots menu.
+   * @param {string} draftBlogPostTitle - The title of the draft blog post to
+   *     delete.
+   */
+  async deleteDraftBlogPostWithTitle(
+    draftBlogPostTitle: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(listOfBlogsInBlogDashboard);
+    const allDraftBlogPosts = await this.page.$$(listOfBlogsInBlogDashboard);
+    for (let i = 0; i < allDraftBlogPosts.length; i++) {
+      const checkDraftBlogPostTitle = await allDraftBlogPosts[i].$eval(
+        blogPostTitlePage,
+        element => (element as HTMLElement).innerText
+      );
+      if (draftBlogPostTitle === checkDraftBlogPostTitle) {
+        await this.clickOnElementWithSelector(
+          blogPostEditBoxSelector,
+          {},
+          allDraftBlogPosts[i]
+        );
+        await this.expectElementToBeClickable(deleteBlogPostBtnSelector);
+        await this.clickOnElementWithSelector(deleteBlogPostBtnSelector);
+        await this.expectElementToBeVisible('div.modal-dialog');
+        await this.clickOnElementWithSelector(confirmButtonSelector);
+        await this.expectElementToBeVisible(confirmButtonSelector, false);
+        showMessage('Draft blog post deleted successfully.');
+        return;
+      }
+    }
+    throw new Error(
+      'Draft blog post with given title does not exist in the blog dashboard!'
+    );
+  }
+
+  /**
+   * Checks that the blog post with the given title appears on the blog page.
+   * @param {string} blogPostTitle - The title of the blog post to check for.
+   */
+  async expectBlogPostToBePresent(blogPostTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const titles = await this.page.$$eval(blogPostTitleSelector, elements =>
+      elements.map(el => el.textContent?.trim() ?? '')
+    );
+    if (!titles.includes(blogPostTitle)) {
+      throw new Error(
+        `Blog post with title "${blogPostTitle}" was not found on the blog page.`
+      );
+    }
+    showMessage(`Blog post "${blogPostTitle}" is present on the blog page.`);
   }
 }
 

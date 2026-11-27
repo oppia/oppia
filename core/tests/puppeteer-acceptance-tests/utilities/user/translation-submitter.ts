@@ -17,10 +17,11 @@
  */
 
 import {ElementHandle} from 'puppeteer';
-import {BaseUser} from '../common/puppeteer-utils';
 import {RTEEditor} from '../common/rte-editor';
 import isElementClickable from '../../functions/is-element-clickable';
 import {showMessage} from '../common/show-message';
+import testConstants from '../common/test-constants';
+import {CONTENT_TYPE_FILTER, Contributor} from './contributor';
 
 // Common Selectors.
 const selectedSkillSelector = '.e2e-test-rte-skill-selected';
@@ -60,13 +61,27 @@ const currentProgressSelector =
   '.e2e-test-opportunity-list-item-progress-percentage';
 const autoTranslateButtonSelector = '.e2e-test-auto-translate-button';
 
+// The instruction line naming the content type being translated, the block
+// listing the validation errors for the current translation, and the single
+// save button whose label depends on whether more items remain. None of the
+// three carries an e2e class, so they are matched on their layout classes.
+const translationInstructionSelector =
+  '.oppia-translatable-text-section strong';
+const translationErrorSectionSelector = '.oppia-translation-error-section';
+const saveTranslationButtonSelector = '.e2e-test-save-button';
+
+// How long to wait when checking whether the current item still offers a Skip
+// link. The link's presence is decided by the item already on screen rather
+// than by a pending request, so this only has to cover a render.
+const skipLinkProbeTimeoutMsecs = 2000;
+
 // Number of times a translate button click is attempted before giving up, and
 // how long each attempt waits for the translation modal to open. The product of
 // the two is kept at the default 30 second selector timeout.
 const translateButtonClickAttempts = 3;
 const translateModalTimeoutMsecs = 10000;
 
-export class TranslationSubmitter extends BaseUser {
+export class TranslationSubmitter extends Contributor {
   /**
    * Clicks on the given pagination button.
    * @param button - The button to click on.
@@ -153,6 +168,14 @@ export class TranslationSubmitter extends BaseUser {
     // the opportunity is re-queried and clicked again if the modal does not
     // open within the timeout.
     for (let attempt = 1; attempt <= translateButtonClickAttempts; attempt++) {
+      // The top navigation's menus open on mouseover and close only on
+      // mouseleave. Puppeteer's pointer is virtual and stays wherever the last
+      // native click left it, so one of those menus can still be hanging open
+      // over the opportunity list, which puts its own markup at the centre of
+      // the translate button and fails the clickability check below. Parking
+      // the pointer at the page origin fires the mouseleave that closes it.
+      await this.page.mouse.move(0, 0);
+
       const opportunityItem =
         await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
           chapterName,
@@ -376,7 +399,9 @@ export class TranslationSubmitter extends BaseUser {
     let subjectOption: ElementHandle<Element> | null = null;
     await this.expectElementToBeVisible(topicOptionSelector);
     for (const option of await this.page.$$(topicOptionSelector)) {
-      const optionText = await option.evaluate(el => el.textContent?.trim());
+      const optionText = await option.evaluate(el =>
+        el.querySelector('.e2e-test-topic-name')?.textContent?.trim()
+      );
       if (optionText?.includes(subject)) {
         subjectOption = option;
         break;
@@ -482,24 +507,33 @@ export class TranslationSubmitter extends BaseUser {
     // Get the opportunity item element.
     const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
-      );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunitySubHeadingSelector
+      const {headingTitle, headingText, subheadingTitle, subheadingText} =
+        await opportunityItemElement.evaluate(
+          (el: Element, headingSel: string, subheadingSel: string) => {
+            const headingEl = el.querySelector(headingSel);
+            const subheadingEl = el.querySelector(subheadingSel);
+            return {
+              headingTitle: headingEl?.getAttribute('title')?.trim(),
+              headingText: headingEl?.textContent?.trim(),
+              subheadingTitle: subheadingEl?.getAttribute('title')?.trim(),
+              subheadingText: subheadingEl?.textContent?.trim(),
+            };
+          },
+          opportunityItemHeadingSelector,
+          opportunitySubHeadingSelector
+        );
+
+      const matchesHeading =
+        headingTitle === heading || headingText === heading;
+      const matchesSubheading = Boolean(
+        (subheadingTitle && subheadingTitle.includes(subheading)) ||
+          (subheadingText && subheadingText.includes(subheading))
       );
 
-      if (
-        opportunityItemHeading === heading &&
-        opportunityItemSubHeading?.includes(subheading)
-      ) {
+      if (matchesHeading && matchesSubheading) {
         if (!visible) {
           throw new Error(
-            `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
+            `Failure: Translation opportunity for ${heading} in ${subheadingTitle || subheadingText} was found.`
           );
         }
         return opportunityItemElement;
@@ -571,8 +605,319 @@ export class TranslationSubmitter extends BaseUser {
     );
   }
 
+  /**
+   * Checks the instruction line at the top of the translation modal, which
+   * names the content type of the item currently being translated.
+   * @param contentType - The content type as it is spelled out to the
+   *     contributor, for example "title" or "skill description".
+   * @param languageDescription - The target language as it is shown in the
+   *     language filter, for example "हिन्दी (Hindi)".
+   */
+  async expectTranslationInstructionToBe(
+    contentType: string,
+    languageDescription: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      translationInstructionSelector,
+      `Please translate the given ${contentType} in ${languageDescription}:`
+    );
+  }
+
+  /**
+   * Steps through the translation modal until the instruction line names the
+   * given content type, so that a test can reach a specific item without
+   * depending on the order the items are served in.
+   * @param contentType - The content type to stop on.
+   * @param maxSkips - How many items to step past before giving up.
+   */
+  async skipToTranslationItemOfContentType(
+    contentType: string,
+    maxSkips: number
+  ): Promise<void> {
+    const instructionsSeen: (string | undefined)[] = [];
+    for (let skips = 0; skips <= maxSkips; skips++) {
+      // The source block is removed while an item is loading and while a
+      // translation is uploading, so waiting for it back settles the modal
+      // before the instruction is read. Without this the read can land on the
+      // item that was just saved or skipped, and the skip below would then
+      // consume the item the caller was looking for.
+      await this.expectElementToBeVisible(textToTranslateContainerSelector);
+      await this.expectElementToBeVisible(translationInstructionSelector);
+      const instruction = await this.page.$eval(
+        translationInstructionSelector,
+        el => el.textContent?.trim()
+      );
+      if (
+        instruction?.startsWith(`Please translate the given ${contentType} `)
+      ) {
+        showMessage(`Reached the ${contentType} item after ${skips} skips.`);
+        return;
+      }
+      instructionsSeen.push(instruction);
+
+      // The last item carries no Skip link, so running out of items is
+      // reported as such rather than as a selector timeout.
+      const skipLinkIsShown = await this.isElementVisible(
+        skipTranslationButtonSelector,
+        true,
+        skipLinkProbeTimeoutMsecs
+      );
+      if (!skipLinkIsShown) {
+        throw new Error(
+          `Ran out of items before reaching a ${contentType} item. ` +
+            `Items seen: ${instructionsSeen.join(' | ')}.`
+        );
+      }
+      await this.clickOnSkipTranslationButton();
+    }
+    throw new Error(
+      `No ${contentType} item was reached within ${maxSkips} skips. ` +
+        `Items seen: ${instructionsSeen.join(' | ')}.`
+    );
+  }
+
+  /**
+   * Saves the current translation and waits for the next item or modal close.
+   * Clicking save alone is not enough to move on, because the upload and
+   * the fetch that follows it are asynchronous, so a caller that read the
+   * modal straight afterwards would still see the item it had just saved.
+   * @param expectedToastMessage - The toast the save is expected to raise, if
+   *     it is being checked. The toast clears after a few seconds, so it is
+   *     checked before waiting for the next item rather than after.
+   */
+  async saveTranslationAndMoveToNextItem(
+    expectedToastMessage?: string
+  ): Promise<boolean> {
+    await this.expectElementToBeVisible(textToTranslateContainerSelector);
+    const contentBeforeSave = await this.page.$eval(
+      textToTranslateContainerSelector,
+      el => el.textContent
+    );
+    const moreItemsRemain = await this.isElementVisible(
+      skipTranslationButtonSelector,
+      true,
+      skipLinkProbeTimeoutMsecs
+    );
+
+    await this.expectTextContentToBe(
+      `${saveTranslationButtonSelector} span:not([hidden])`,
+      moreItemsRemain ? 'Save and translate another' : 'Save and close'
+    );
+    await this.clickOnElementWithSelector(saveTranslationButtonSelector);
+
+    if (expectedToastMessage) {
+      await this.expectToastMessage(expectedToastMessage);
+    }
+
+    if (!moreItemsRemain) {
+      await this.expectElementToBeVisible(
+        translateTextModalHeaderContainerSelector,
+        false
+      );
+      return false;
+    }
+
+    // The source block is taken out of the DOM while the translation uploads,
+    // so requiring it back with different text proves the next item has
+    // arrived rather than the saved one still being on screen.
+    await this.page.waitForFunction(
+      (selector: string, previousContent: string) => {
+        const element = document.querySelector(selector);
+        return element !== null && element.textContent !== previousContent;
+      },
+      {},
+      textToTranslateContainerSelector,
+      contentBeforeSave ?? ''
+    );
+    return true;
+  }
+
+  /**
+   * Submits one translation and returns to the opportunity list.
+   * @param expectedToastMessage - The expected submission confirmation.
+   */
+  async saveTranslationAndCloseModal(
+    expectedToastMessage: string
+  ): Promise<void> {
+    if (await this.saveTranslationAndMoveToNextItem(expectedToastMessage)) {
+      await this.closeTranslateTextModal();
+    }
+  }
+
+  /**
+   * Checks the source text shown for the item currently being translated.
+   * @param text - The expected source text.
+   */
+  async expectTextToTranslateToBe(text: string): Promise<void> {
+    await this.expectTextContentToBe(textToTranslateContainerSelector, text);
+  }
+
+  /**
+   * Checks that the translation modal is reporting the given validation error.
+   * @param message - The expected error message.
+   */
+  async expectTranslationErrorToBe(message: string): Promise<void> {
+    await this.expectTextContentToContain(
+      translationErrorSectionSelector,
+      message
+    );
+  }
+
+  /**
+   * Checks that the translation modal is reporting no validation error. The
+   * error block is always in the DOM, so it is its text that is checked rather
+   * than its presence.
+   */
+  async expectNoTranslationErrors(): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        return element !== null && element.textContent?.trim() === '';
+      },
+      {},
+      translationErrorSectionSelector
+    );
+    showMessage('Success: The translation modal reports no errors.');
+  }
+
+  /**
+   * Checks whether the save button in the translation modal can be clicked.
+   * @param enabled - Whether the button should be enabled.
+   */
+  async expectSaveTranslationButtonToBeEnabled(
+    enabled: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(saveTranslationButtonSelector);
+    await this.expectElementToBeClickable(
+      saveTranslationButtonSelector,
+      enabled
+    );
+  }
+
   async clickOnAutoTranslateButton(): Promise<void> {
     await this.clickOnElementWithSelector(autoTranslateButtonSelector);
+  }
+
+  /**
+   * Navigates to the contributor dashboard.
+   */
+  async navigateToContributorDashboard(): Promise<void> {
+    await this.goto(testConstants.URLs.ContributorDashboard);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Navigates to the "Translate Text" tab of the Contributor Dashboard
+   * and applies the target language, topic, and optional content type filters.
+   * @param language - Target translation language.
+   * @param topicName - Topic name to filter by.
+   * @param contentType - Optional content type filter option.
+   */
+  async navigateToTranslateTextTab(
+    language: string,
+    topicName: string,
+    contentType?: CONTENT_TYPE_FILTER
+  ): Promise<void> {
+    if (!this.page.url().includes('/contributor-dashboard')) {
+      await this.navigateToContributorDashboard();
+    }
+    await this.switchToTabInContributionDashboard('Translate Text');
+    await this.selectLanguageFilter(language);
+    await this.selectSubjectInTranslateTextTab(topicName);
+    if (contentType) {
+      await this.selectContentTypeFilter(contentType);
+    }
+  }
+
+  /**
+   * Submits translations for a lesson's metadata items (title, objective, optional tag).
+   * @param language - Target translation language.
+   * @param topicName - Topic the lesson belongs to.
+   * @param chapterName - Chapter title.
+   * @param lessonSubheading - Opportunity subheading.
+   * @param metadata - The translated title, objective, and optional tag.
+   */
+  async submitLessonMetadataTranslations(
+    language: string,
+    topicName: string,
+    chapterName: string,
+    lessonSubheading: string,
+    metadata: {
+      title: string;
+      objective: string;
+      tag?: string;
+    }
+  ): Promise<void> {
+    await this.navigateToTranslateTextTab(
+      language,
+      topicName,
+      CONTENT_TYPE_FILTER.LESSONS
+    );
+    await this.clickOnTranslateButtonInTranslateTextTab(
+      chapterName,
+      lessonSubheading
+    );
+
+    await this.skipToTranslationItemOfContentType('title', 15);
+    await this.typeTextInTranslationInput(metadata.title);
+    await this.saveTranslationAndMoveToNextItem();
+
+    await this.skipToTranslationItemOfContentType('objective', 15);
+    await this.typeTextInTranslationInput(metadata.objective);
+
+    if (metadata.tag) {
+      await this.saveTranslationAndMoveToNextItem(
+        'Submitted translation for review.'
+      );
+      await this.skipToTranslationItemOfContentType('tag', 15);
+      await this.typeTextInTranslationInput(metadata.tag);
+    }
+
+    await this.saveTranslationAndCloseModal(
+      'Submitted translation for review.'
+    );
+  }
+
+  /**
+   * Submits translations for a skill's translatable items.
+   * @param language - Target translation language.
+   * @param topicName - Topic the skill belongs to.
+   * @param skillName - Skill description.
+   * @param skillSubheading - Opportunity subheading.
+   * @param items - Items to translate.
+   */
+  async submitSkillTranslations(
+    language: string,
+    topicName: string,
+    skillName: string,
+    skillSubheading: string,
+    items: {
+      type: string;
+      text: string;
+      html: boolean;
+    }[]
+  ): Promise<void> {
+    await this.navigateToTranslateTextTab(
+      language,
+      topicName,
+      CONTENT_TYPE_FILTER.SKILLS
+    );
+
+    for (const item of items) {
+      await this.clickOnTranslateButtonInTranslateTextTab(
+        skillName,
+        skillSubheading
+      );
+      await this.skipToTranslationItemOfContentType(item.type, 15);
+      if (item.html) {
+        await this.typeTextForRTE(item.text);
+      } else {
+        await this.typeTextInTranslationInput(item.text);
+      }
+      await this.saveTranslationAndCloseModal(
+        'Submitted translation for review.'
+      );
+    }
   }
 }
 

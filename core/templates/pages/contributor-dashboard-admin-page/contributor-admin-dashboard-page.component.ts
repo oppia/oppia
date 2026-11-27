@@ -25,6 +25,7 @@ import {
   HostListener,
   ViewEncapsulation,
 } from '@angular/core';
+import {ContributorAdminStatsTable} from './contributor-dashboard-tables/contributor-admin-stats-table.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {
@@ -90,6 +91,9 @@ export const PICK_FORMATS = {
   encapsulation: ViewEncapsulation.None,
 })
 export class ContributorAdminDashboardPageComponent implements OnInit {
+  @ViewChild(ContributorAdminStatsTable, {static: false})
+  statsTable?: ContributorAdminStatsTable;
+
   @ViewChild('languageDropdown', {static: false})
   languageDropdownRef!: ElementRef;
 
@@ -109,6 +113,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   selectedContributionType!: string;
   isQuestionCoordinator!: boolean;
   isTranslationCoordinator!: boolean;
+  isTranslationAdmin: boolean = false;
   loadingMessage!: string;
   allTopicNames: string[] = [];
   today!: Date;
@@ -168,12 +173,12 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             this.lastDateToFilterUsersActivity = this.getDateNDaysAgo(90);
             this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
             this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+            this.isTranslationAdmin = userInfo.isTranslationAdmin();
 
             if (this.isTranslationCoordinator) {
               this.CONTRIBUTION_TYPES.push(
                 this.TAB_NAME_TRANSLATION_SUBMITTER,
-                this.TAB_NAME_TRANSLATION_REVIEWER,
-                this.TAB_NAME_TRANSLATION_COORDINATOR
+                this.TAB_NAME_TRANSLATION_REVIEWER
               );
 
               this.contributorDashboardAdminStatsBackendApiService
@@ -191,6 +196,15 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
                       this.selectedLanguage.id
                     ];
                 });
+            }
+            // Translation admins need this tab to reach the featured
+            // languages editor, even if they are not translation coordinators.
+            // This is kept outside the block above so that admin-only users do
+            // not trigger the assigned-languages fetch.
+            if (this.isTranslationCoordinator || this.isTranslationAdmin) {
+              this.CONTRIBUTION_TYPES.push(
+                this.TAB_NAME_TRANSLATION_COORDINATOR
+              );
             }
             if (this.isQuestionCoordinator) {
               this.CONTRIBUTION_TYPES.push(
@@ -243,6 +257,23 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     return (
       this.activeTab === this.TAB_NAME_TRANSLATION_COORDINATOR ||
       this.activeTab === this.TAB_NAME_QUESTION_COORDINATOR
+    );
+  }
+
+  shouldShowFeaturedLanguagesEditor(): boolean {
+    return (
+      this.isTranslationAdmin &&
+      this.activeTab === this.TAB_NAME_TRANSLATION_COORDINATOR
+    );
+  }
+
+  // Translation admins who are not coordinators can open the translation
+  // coordinator tab (for the featured languages editor), but must not see or
+  // fetch the coordinator stats.
+  shouldShowStatsTable(): boolean {
+    return (
+      this.activeTab !== this.TAB_NAME_TRANSLATION_COORDINATOR ||
+      this.isTranslationCoordinator
     );
   }
 
@@ -360,6 +391,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.setActiveTab(selectedContributionType);
   }
 
+  refreshQuestionReviewersCount(): void {
+    this.contributorDashboardAdminStatsBackendApiService
+      .fetchCommunityStats()
+      .then(response => {
+        this.questionReviewersCount = response.question_reviewers_count;
+      });
+  }
+
   openUsernameInputModal(): void {
     const modalRef = this.modalService.open(UsernameInputModal);
     modalRef.componentInstance.activeTab = this.activeTab;
@@ -384,14 +423,16 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           isQuestionReviewer: response.can_review_questions,
         };
         modelRef.result.then(
-          results => {
-            this.contributorDashboardAdminBackendApiService.updateQuestionRightsAsync(
+          async results => {
+            await this.contributorDashboardAdminBackendApiService.updateQuestionRightsAsync(
               username,
               results.isQuestionSubmitter,
               results.isQuestionReviewer,
               response.can_submit_questions,
               response.can_review_questions
             );
+            this.statsTable?.refreshPagination();
+            this.refreshQuestionReviewersCount();
           },
           () => {
             // Note to developers:

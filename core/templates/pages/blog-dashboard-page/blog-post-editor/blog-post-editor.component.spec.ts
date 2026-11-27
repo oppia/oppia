@@ -614,15 +614,16 @@ describe('Blog Post Editor Component', () => {
 
   it('should get formatted date string from the timestamp in milliseconds', () => {
     spyOn(dateTimeFormatService, 'getDateTimeInWords').and.returnValue(
-      'Friday, November 21, 2014 at 4:52 AM'
+      'November 21, 2014 at 4:52 AM'
     );
     // This corresponds to Fri, 21 Nov 2014 04:52 AM GMT.
     let DATE = '11/21/2014, 04:52:46:713463';
     expect(component.getDateStringInWords(DATE)).toBe(
-      'Friday, November 21, 2014 at 4:52 AM'
+      'November 21, 2014 at 4:52 AM'
     );
     expect(dateTimeFormatService.getDateTimeInWords).toHaveBeenCalledWith(
-      1416545566713
+      1416545566713,
+      false
     );
   });
 
