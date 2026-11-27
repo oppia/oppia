@@ -16,10 +16,17 @@
  * @fileoverview Unit tests for YamlService.
  */
 
-// @ts-nocheck
-
 import {TestBed} from '@angular/core/testing';
 import {YamlService} from './yaml.service';
+
+interface SampleYamlObject {
+  someProperty: string;
+  someOtherProperty: {
+    someSubProperty: number;
+    someOtherSubProperty: string;
+    yetAnotherSubProperty: boolean;
+  };
+}
 
 describe('Yaml service', () => {
   let yamlService: YamlService;
@@ -56,7 +63,7 @@ describe('Yaml service', () => {
       '  someSubProperty: 1\n' +
       '  someOtherSubProperty: some other sub property\n' +
       '  yetAnotherSubProperty: true\n';
-    const expectedObject = {
+    const expectedObject: SampleYamlObject = {
       someProperty: 'some property',
       someOtherProperty: {
         someSubProperty: 1,
@@ -65,7 +72,7 @@ describe('Yaml service', () => {
       },
     };
 
-    const parsedObject = yamlService.parse(yamlString);
+    const parsedObject = yamlService.parse(yamlString) as SampleYamlObject;
 
     expect(expectedObject).toEqual(parsedObject);
   });

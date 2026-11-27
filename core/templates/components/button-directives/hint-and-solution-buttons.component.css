@@ -5,24 +5,24 @@ oppia-hint-and-solution-buttons .list-inline {
 oppia-hint-and-solution-buttons .btn-close {
   bottom: 6px;
   font-size: 22px;
-  margin-left: 10px;
+  margin-inline-start: 10px;
   position: relative;
 }
 
 oppia-hint-and-solution-buttons .hint-box-add-ons {
-  left: -5.5px;
+  inset-inline-start: -5.5px;
 }
 
 oppia-hint-and-solution-buttons .hint-box-add-ons .btn-close {
-  left: 0;
+  inset-inline-start: 0;
 }
 
 oppia-hint-and-solution-buttons .hint-box-add-ons::after {
-  margin-left: 163px;
+  margin-inline-start: 163px;
 }
 
 oppia-hint-and-solution-buttons .hint-box-add-ons::before {
-  margin-left: 161px;
+  margin-inline-start: 161px;
 }
 
 oppia-hint-and-solution-buttons .hint-box {
@@ -50,7 +50,7 @@ oppia-hint-and-solution-buttons .hint-box::after,
 oppia-hint-and-solution-buttons .hint-box::before {
   border: solid transparent;
   content: " ";
-  left: 50%;
+  inset-inline-start: 50%;
   position: absolute;
   top: 100%;
 }
@@ -59,7 +59,7 @@ oppia-hint-and-solution-buttons .solution-container ::after,
 oppia-hint-and-solution-buttons .solution-container ::before {
   border: solid transparent;
   content: " ";
-  left: 55%;
+  inset-inline-start: 55%;
   position: absolute;
   top: 100%;
 }
@@ -115,17 +115,17 @@ oppia-hint-and-solution-buttons .hint-box::before {
   }
 
   oppia-hint-and-solution-buttons .hint-box-add-ons::before {
-    margin-left: 125px;
+    margin-inline-start: 125px;
   }
 
   oppia-hint-and-solution-buttons .hint-box-add-ons::after {
-    margin-left: 127px;
+    margin-inline-start: 127px;
   }
 
   oppia-hint-and-solution-buttons .hint-box {
     bottom: 80px;
     font-size: 15px;
-    left: 5px;
+    inset-inline-start: 5px;
     pointer-events: auto;
   }
 
@@ -157,7 +157,7 @@ oppia-hint-and-solution-buttons .hint-box::before {
 }
 
 .oppia-hint-and-solution-buttons .list-inline > li {
-  float: left;
+  float: inline-start;
 }
 
 .oppia-hint-and-solution-buttons .uib-position-measure {
@@ -197,7 +197,7 @@ oppia-hint-and-solution-buttons .hint-box::before {
 @media screen and (max-width: 546px) {
   oppia-hint-and-solution-buttons .hint-box {
     font-size: 15px;
-    left: 5px;
+    inset-inline-start: 5px;
   }
   .oppia-hint-and-solution-buttons .footer-hints-label {
     display: none;

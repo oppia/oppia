@@ -56,9 +56,14 @@ editor-navigation > ul > li.nav-link {
   margin-top: 8px;
 }
 .oppia-exploration-editor-tabs-dropdown-item .oppia-exploration-editor-tabs-dropdown-element {
+  background: none;
+  border: 0;
   color: #000;
+  cursor: pointer;
   margin: 0;
+  padding: 0;
   position: absolute;
+  text-align: left;
   text-decoration: none;
   top: 50%;
   -ms-transform: translateY(-50%);
