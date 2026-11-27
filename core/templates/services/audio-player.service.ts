@@ -60,6 +60,12 @@ export class AudioPlayerService {
     if (this._currentTrackFilename === filename) {
       return;
     }
+    if (this._currentTrack) {
+      this._currentTrack.stop();
+      this._currentTrack.unload?.();
+      this._stopIntervalSubject.next();
+      this._currentTrack = null;
+    }
     const explorationId = this.pageContextService.getExplorationId();
 
     if (!this.assetsBackendApiService.isCached(filename)) {
@@ -155,6 +161,7 @@ export class AudioPlayerService {
       return;
     }
     this._currentTrack.stop();
+    this._currentTrack.unload?.();
     this._stopIntervalSubject.next();
     this._currentTrack = null;
     this._currentTrackFilename = null;
@@ -192,7 +199,7 @@ export class AudioPlayerService {
     }
     const currentTime = this._currentTrack.seek();
     if (typeof currentTime !== 'number') {
-      return 0;
+      return this._lastPauseOrSeekPos ?? 0;
     }
     return Math.floor(currentTime * 10) / 10;
   }
@@ -205,8 +212,9 @@ export class AudioPlayerService {
       this._currentTrack.seek(0);
       return;
     }
-    if (val > this._currentTrack.duration()) {
-      this._currentTrack.seek(this._currentTrack.duration());
+    const trackDuration = this._currentTrack.duration();
+    if (trackDuration > 0 && val > trackDuration) {
+      this._currentTrack.seek(trackDuration);
       return;
     }
     this._lastPauseOrSeekPos = val;

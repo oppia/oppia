@@ -136,9 +136,13 @@ export class AudioBarComponent {
     ) {
       this.currentVoiceoverTime =
         this.audioPlayerService.getCurrentTimeInSecs();
-      this.totalVoiceoverDurationSecs = Math.floor(
+      const audioDuration = Math.floor(
         this.audioPlayerService.getAudioDuration()
       );
+      this.totalVoiceoverDurationSecs =
+        audioDuration > 0
+          ? audioDuration
+          : this.voiceoverToBePlayed?.durationSecs ?? 0;
     }
     if (!this.audioPlayerService.isTrackLoaded()) {
       this.currentVoiceoverTime = 0;
@@ -146,6 +150,7 @@ export class AudioBarComponent {
   }
 
   setProgress(val: {value: number}): void {
+    this.currentVoiceoverTime = val.value;
     this.audioPlayerService.setCurrentTime(val.value);
   }
 
@@ -323,6 +328,8 @@ export class AudioBarComponent {
       this.audioPreloaderService.getMostRecentlyRequestedAudioFilename();
     if (
       this.audioLoadingIndicatorIsShown &&
+      !this.audioPlayerService.isPlaying() &&
+      !this.audioPlayerService.isTrackLoaded() &&
       audioFilename === mostRecentlyRequestedAudioFilename
     ) {
       this.playCachedAudioTranslation(audioFilename);
