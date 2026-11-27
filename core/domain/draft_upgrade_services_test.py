@@ -701,8 +701,39 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'Intro',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                    ),
                     'new_value': outcome_dict_with_refresher,
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'New state',
+                    'content_id_for_state_content': 'content',
+                    'content_id_for_default_outcome': 'default_outcome',
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': '<p>New Content</p>',
+                    },
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                    ),
+                    'new_value': None,
                 }
             ),
         ]
@@ -719,6 +750,15 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             'refresher_exploration_id',
             default_outcome,
         )
+        self.assertEqual(
+            migrated_draft[2].cmd,
+            exp_domain.CMD_ADD_STATE,
+        )
+        self.assertEqual(
+            migrated_draft[3].property_name,
+            exp_domain.STATE_PROPERTY_CONTENT,
+        )
+        self.assertIsNone(migrated_draft[4].new_value)
 
     def test_convert_states_v56_dict_to_v57_dict_without_state_changes(
         self,

@@ -5504,12 +5504,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for answer_group in interaction.get('answer_groups', []):
                 outcome = answer_group.get('outcome')
                 if outcome and 'refresher_exploration_id' in outcome:
+                    # Here we use MyPy ignore because the latest schema of state
+                    # dict does not contain refresher_exploration_id property.
                     del outcome['refresher_exploration_id']  # type: ignore[typeddict-item]
             default_outcome = interaction.get('default_outcome')
             if (
                 default_outcome
                 and 'refresher_exploration_id' in default_outcome
             ):
+                # Here we use MyPy ignore because the latest schema of state
+                # dict does not contain refresher_exploration_id property.
                 del default_outcome['refresher_exploration_id']  # type: ignore[typeddict-item]
 
         return states_dict

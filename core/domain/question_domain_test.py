@@ -629,52 +629,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             )
         )
 
-    def test_convert_state_v57_dict_to_v58_dict(self) -> None:
-        """Test _convert_state_v57_dict_to_v58_dict removes refresher_exploration_id."""
-        v57_state_dict = {
-            'interaction': {
-                'answer_groups': [
-                    {
-                        'outcome': {
-                            'dest': 'State1',
-                            'dest_if_really_stuck': None,
-                            'feedback': {
-                                'content_id': 'feedback_1',
-                                'html': '',
-                            },
-                            'labelled_as_correct': False,
-                            'param_changes': [],
-                            'refresher_exploration_id': 'exp_refresher',
-                            'missing_prerequisite_skill_id': None,
-                        }
-                    }
-                ],
-                'default_outcome': {
-                    'dest': 'State1',
-                    'dest_if_really_stuck': None,
-                    'feedback': {'content_id': 'default_outcome', 'html': ''},
-                    'labelled_as_correct': False,
-                    'param_changes': [],
-                    'refresher_exploration_id': 'exp_refresher_2',
-                    'missing_prerequisite_skill_id': None,
-                },
-            }
-        }
-        v58_state_dict = (
-            question_domain.Question._convert_state_v57_dict_to_v58_dict(
-                cast(state_domain.StateDict, v57_state_dict)
-            )
-        )
-        outcome = cast(
-            Dict[str, Any],
-            v58_state_dict['interaction']['answer_groups'][0]['outcome'],
-        )
-        default_outcome = cast(
-            Dict[str, Any], v58_state_dict['interaction']['default_outcome']
-        )
-        self.assertNotIn('refresher_exploration_id', outcome)
-        self.assertNotIn('refresher_exploration_id', default_outcome)
-
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
@@ -732,6 +686,52 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_question_domain_validation_error(
             'Expected ID to be a string'
         )
+
+    def test_convert_state_v57_dict_to_v58_dict(self) -> None:
+        """Test _convert_state_v57_dict_to_v58_dict removes refresher_exploration_id."""
+        v57_state_dict = {
+            'interaction': {
+                'answer_groups': [
+                    {
+                        'outcome': {
+                            'dest': 'State1',
+                            'dest_if_really_stuck': None,
+                            'feedback': {
+                                'content_id': 'feedback_1',
+                                'html': '',
+                            },
+                            'labelled_as_correct': False,
+                            'param_changes': [],
+                            'refresher_exploration_id': 'exp_refresher',
+                            'missing_prerequisite_skill_id': None,
+                        }
+                    }
+                ],
+                'default_outcome': {
+                    'dest': 'State1',
+                    'dest_if_really_stuck': None,
+                    'feedback': {'content_id': 'default_outcome', 'html': ''},
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': 'exp_refresher_2',
+                    'missing_prerequisite_skill_id': None,
+                },
+            }
+        }
+        v58_state_dict = (
+            question_domain.Question._convert_state_v57_dict_to_v58_dict(
+                cast(state_domain.StateDict, v57_state_dict)
+            )
+        )
+        outcome = cast(
+            Dict[str, Any],
+            v58_state_dict['interaction']['answer_groups'][0]['outcome'],
+        )
+        default_outcome = cast(
+            Dict[str, Any], v58_state_dict['interaction']['default_outcome']
+        )
+        self.assertNotIn('refresher_exploration_id', outcome)
+        self.assertNotIn('refresher_exploration_id', default_outcome)
 
     def test_create_default_question(self) -> None:
         """Test to verify create_default_question method of the Question domain
