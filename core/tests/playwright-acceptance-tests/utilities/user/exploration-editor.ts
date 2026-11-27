@@ -1207,16 +1207,26 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
-    if (this.isViewportAtMobileWidth()) {
-      // Selecting the active card does not trigger navigation on mobile.
-      await this.expectElementToBeVisible(currentCardNameContainerSelector);
-      const currentCardHeading = await this.getTextContent(
-        `${currentCardNameContainerSelector} strong`
-      );
-      if (currentCardHeading === cardName) {
-        return;
-      }
+    // Selecting the active card does not trigger navigation on mobile and
+    // triggers a redundant fade/re-init cycle on desktop.
+    const headingName = !cardName.trimEnd().endsWith('...')
+      ? cardName
+      : cardName.trimEnd().slice(0, -3);
+    await this.expectElementToBeVisible(
+      `${currentCardNameContainerSelector} strong`
+    );
+    const currentCardHeading = await this.getTextContent(
+      `${currentCardNameContainerSelector} strong`
+    );
+    if (
+      currentCardHeading === cardName ||
+      (cardName.trimEnd().endsWith('...') &&
+        currentCardHeading.startsWith(headingName))
+    ) {
+      return;
+    }
 
+    if (this.isViewportAtMobileWidth()) {
       // Check if the state graph modal is already open before clicking the
       // resize button.
       const stateGraphModalIsOpen = await this.page.$(
@@ -1280,9 +1290,6 @@ export class ExplorationEditor extends BaseUser {
     );
     await this.clickOnElement(nodeBackground);
 
-    const headingName = !cardName.trimEnd().endsWith('...')
-      ? cardName
-      : cardName.trimEnd().slice(0, -3);
     try {
       await this.page.waitForFunction(
         ({selector, value}: {selector: string; value: string}) => {
