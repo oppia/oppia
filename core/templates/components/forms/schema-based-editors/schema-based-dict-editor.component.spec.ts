@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Schema Based Dict Editor Component
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
@@ -64,7 +62,10 @@ describe('Schema Based Dict Editor Component', () => {
     expect(component).toBeDefined();
     expect(component.validate(new FormControl(1))).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
-    expect(component.onChange({first: 'true'})).toEqual({first: 'true'});
+    const expectedDict: Record<string, SchemaDefaultValue> = {first: 'true'};
+    expect<Record<string, SchemaDefaultValue> | void>(
+      component.onChange({first: 'true'})
+    ).toEqual(expectedDict);
   }));
 
   it('should set directive properties on initialization', () => {
@@ -99,8 +100,9 @@ describe('Schema Based Dict Editor Component', () => {
       first: 'false',
     };
 
-    component.writeValue({first: 'true'});
-    expect(component.localValue).toEqual({first: 'true'});
+    const expectedDict = {first: 'true'};
+    component.writeValue(expectedDict);
+    expect(component.localValue).toEqual(expectedDict);
   });
 
   it('should update value when local value change', () => {
