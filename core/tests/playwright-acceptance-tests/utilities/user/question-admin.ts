@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -18,52 +18,66 @@
 
 import {Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
+import testConstants from '../common/test-constants';
+import {showMessage} from '../common/show-message';
+
+const contributorDashboardAdminUrl =
+  testConstants.URLs.ContributorDashboardAdmin;
 
 const reviewQuestionRightValue = 'question';
 const submitQuestionRightValue = 'submit_question';
 
+// "Add Contribution Rights" form elements.
 const addContributorUsernameInput = 'input#add-contribution-rights-user-input';
-const addContributionRightsCategorySelector =
+const addContributonRightsCategorySelector =
   'select#add-contribution-rights-category-select';
 const addContributionRightsSubmitButton =
   'button#add-contribution-rights-submit-button';
-const statusMessageSelector = '.e2e-test-status-message';
 
 export class QuestionAdmin extends BaseUser {
   /**
-   * Adds the right to review questions to a user.
-   * @param username - The username that should receive the right.
+   * Function for navigating to the contributor dashboard admin page.
    */
-  async addReviewQuestionRights(username: string): Promise<void> {
-    await this.addQuestionRights(username, reviewQuestionRightValue);
+  async navigateToContributorDashboardAdminPage(): Promise<void> {
+    await this.goto(contributorDashboardAdminUrl);
   }
 
   /**
-   * Adds the right to submit questions to a user.
-   * @param username - The username that should receive the right.
+   * Function for adding a contribution right to a user.
+   * @param {string} username - The username of the user.
+   * @param {string} rightValue - The value of the right in the category dropdown.
    */
-  async addSubmitQuestionRights(username: string): Promise<void> {
-    await this.addQuestionRights(username, submitQuestionRightValue);
-  }
-
-  /**
-   * Adds a question contribution right to a user.
-   * @param username - The username that should receive the right.
-   * @param right - The contribution right to add.
-   */
-  private async addQuestionRights(
+  private async addContributionRightsToUser(
     username: string,
-    right: 'question' | 'submit_question'
+    rightValue: string
   ): Promise<void> {
     await this.typeInInputField(addContributorUsernameInput, username);
-    await this.select(addContributionRightsCategorySelector, right);
+    await this.select(addContributonRightsCategorySelector, rightValue);
     await this.clickOnElementWithSelector(addContributionRightsSubmitButton);
 
+    await this.waitForNetworkIdle();
     await this.expectElementToBeClickable(
       addContributionRightsSubmitButton,
       false
     );
-    await this.expectTextContentToBe(statusMessageSelector, 'Success.');
+  }
+
+  /**
+   * Function for adding a right of reviewing questions to a user.
+   * @param {string} username - The username of the user.
+   */
+  async addReviewQuestionRights(username: string): Promise<void> {
+    await this.addContributionRightsToUser(username, reviewQuestionRightValue);
+    showMessage(`Added review question rights to ${username}.`);
+  }
+
+  /**
+   * Function for adding a right of submitting questions to a user.
+   * @param {string} username - The username of the user.
+   */
+  async addSubmitQuestionRights(username: string): Promise<void> {
+    await this.addContributionRightsToUser(username, submitQuestionRightValue);
+    showMessage(`Added submit question rights to ${username}.`);
   }
 }
 

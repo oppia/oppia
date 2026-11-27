@@ -13,10 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility class for contributor actions.
+ * @fileoverview Contributor users utility file. It contains the functions
+ * common to all the users of the contributor dashboard.
  */
 
-import {expect, Locator, Page} from '@playwright/test';
+import {Page, ElementHandle} from '@playwright/test';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditor} from './exploration-editor';
 
@@ -28,10 +29,10 @@ const opportunityItemHeadingSelector =
 const opportunitySubHeadingSelector =
   '.e2e-test-opportunity-list-item-subheading';
 const contributionTabClass = 'e2e-test-contribution-tab';
-const activeElementClass = 'oppia-contributions-active-navbar';
+const activeElementClass = 'e2e-test-active';
+const activeNavbarButtonClass = 'oppia-contributions-active-navbar';
 const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
-const viewDropdownOptionSelector =
-  '.e2e-test-mobile-contribution-dropdown-option';
+const viewDropdownOptionClass = 'e2e-test-mobile-contribution-dropdown-option';
 const desktopBadgeContainerSelector = '.e2e-test-desktop-badge-container';
 const mobileBadgeContainerSelector = '.e2e-test-mobile-badge-container';
 const badgeSelector = '.e2e-test-badge';
@@ -43,48 +44,112 @@ const selectedTopicSelector = '.e2e-test-topic-selector-selected';
 const topicOptionSelector = '.e2e-test-topic-selector-option';
 const mobileElementSelector = '.e2e-test-mobile-element';
 const desktopElementSelector = '.e2e-test-desktop-element';
+const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
 const reviewCommentTextareaSelector = '.e2e-test-suggestion-review-message';
-const mobileStatsRowSelector = '.e2e-test-mobile-stats-row';
-const mobileStatsCellSelector = '.e2e-test-mobile-stats-cell';
-const desktopStatsRowSelector = 'tr';
-const desktopStatsCellSelector = 'td';
-
-const exactText = (value: string): RegExp =>
-  new RegExp(`^\\s*${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`);
+const rteDisplaySelector = '.e2e-test-state-content-display';
 
 export class Contributor extends ExplorationEditor {
   /**
    * Checks if the opportunity is visible and matches the expected values.
-   * @param heading - The expected heading of the opportunity.
-   * @param subheading - The expected subheading of the opportunity.
-   * @param visible - Whether the opportunity should be visible or not.
+   * @param {string} heading - The expected heading of the opportunity.
+   * @param {string} subheading - The expected subheading of the opportunity.
+   * @param {boolean} visible - Whether the opportunity should be visible or not.
+   * @returns {Promise<ElementHandle | null>} The opportunity element, if found.
    */
   async expectOpportunityToBePresent(
     heading: string,
     subheading: string,
     visible: boolean = true
-  ): Promise<Locator | null> {
+  ): Promise<ElementHandle<Element> | null> {
     await this.waitForNetworkIdle();
-    const opportunityItems = this.page
-      .locator(opportunityItemSelector)
-      .filter({
-        has: this.page
-          .locator(opportunityItemHeadingSelector)
-          .filter({hasText: exactText(heading)}),
-      })
-      .filter({
-        has: this.page
-          .locator(opportunitySubHeadingSelector)
-          .filter({hasText: subheading}),
-      });
 
-    if (visible) {
-      const opportunityItem = opportunityItems.first();
-      await expect(opportunityItem).toBeVisible();
-      return opportunityItem;
+    // Wait for the opportunities to load. If they are not loaded within the
+    // timeout, we still check the list below.
+    await this.isElementVisible(opportunityItemSelector);
+
+    // Sometimes, the opportunities refresh after they have been loaded.
+    // This causes the older nodes to get detached from the DOM. So, we
+    // ensure that the opportunity list hasn't changed for 200 ms.
+    let previousElementIds: string[] = [];
+    let opportunityItemListChanged = true;
+
+    // TODO(#23395): Currently, the opportunity list is refreshed after the
+    // page is loaded. This causes the test to fail. We are using a workaround
+    // for now, by waiting for the opportunity list to be loaded.
+    // Once the issue is fixed, remove the following do-while loop.
+    do {
+      await this.page.waitForTimeout(200);
+
+      let currentElementIds: string[];
+      try {
+        currentElementIds = await this.page.evaluate((selector: string) => {
+          const elements = document.querySelectorAll(selector);
+          return Array.from(elements).map((el, index) => {
+            return el.textContent?.trim() || `element-${index}`;
+          });
+        }, opportunityItemSelector);
+      } catch (error) {
+        // The page may still be navigating (e.g. after using the navbar to
+        // open the contributor dashboard), which destroys the execution
+        // context. In that case, we check the list again in the next
+        // iteration.
+        showMessage(`Opportunity list is not ready yet: ${error}`);
+        previousElementIds = [];
+        continue;
+      }
+
+      opportunityItemListChanged =
+        previousElementIds.length !== currentElementIds.length ||
+        !previousElementIds.every(
+          (id, index) => id === currentElementIds[index]
+        );
+
+      previousElementIds = currentElementIds;
+    } while (opportunityItemListChanged);
+
+    // Handle the case where no opportunity is present.
+    if (previousElementIds.length === 0) {
+      if (visible) {
+        throw new Error(
+          `Opportunity for ${heading} in ${subheading} not found.`
+        );
+      }
+      showMessage(
+        `Success: Opportunity for ${heading} in ${subheading} not found.`
+      );
+      return null;
     }
 
-    await expect(opportunityItems).toHaveCount(0);
+    // Get the opportunity item element.
+    const opportunityItems = await this.page.$$(opportunityItemSelector);
+    for (const opportunityItemElement of opportunityItems) {
+      const opportunityItemHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunityItemHeadingSelector
+      );
+      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunitySubHeadingSelector
+      );
+
+      if (
+        opportunityItemHeading === heading &&
+        opportunityItemSubHeading?.includes(subheading)
+      ) {
+        if (!visible) {
+          throw new Error(
+            `Failure: Opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
+          );
+        }
+        return opportunityItemElement;
+      }
+    }
+
+    if (visible) {
+      throw new Error(`Opportunity for ${heading} in ${subheading} not found.`);
+    }
     showMessage(
       `Success: Opportunity for ${heading} in ${subheading} not found.`
     );
@@ -92,8 +157,8 @@ export class Contributor extends ExplorationEditor {
   }
 
   /**
-   * Navigates to a tab within the My Contributions view.
-   * @param tabName - The name of the tab to navigate to.
+   * Navigates to the tab in the My Contributions tab.
+   * @param {string} tabName - The name of the tab to navigate to.
    */
   async navigateToTabInMyContributions(
     tabName: 'Contribution Stats' | 'Badges' | 'Review Questions'
@@ -101,37 +166,46 @@ export class Contributor extends ExplorationEditor {
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
       await this.expectElementToBeVisible(viewDropdownSelector);
+      await this.page.waitForFunction((selector: string) => {
+        const element = document.querySelector(selector);
+        return element && element.textContent !== '';
+      }, viewDropdownSelector);
       await this.clickOnElementWithSelector(viewDropdownSelector);
 
-      const option = this.page
-        .locator(viewDropdownOptionSelector)
-        .filter({hasText: tabName})
-        .first();
-      await option.waitFor({state: 'visible'});
-      await option.click();
+      const optionElement = await this.expectElementToBeVisible(
+        `xpath=//*[contains(@class, "${viewDropdownOptionClass}") and contains(text(), "${tabName}")]`
+      );
+      if (!optionElement) {
+        throw new Error(`Option ${tabName} not found.`);
+      }
+      await this.clickOnElement(optionElement);
+
       await this.expectTextContentToBe(viewDropdownSelector, tabName);
-      return;
+    } else {
+      const tabXPath = `//button[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}")]`;
+
+      const tabElement = await this.expectElementToBeVisible(
+        `xpath=${tabXPath}`
+      );
+      if (!tabElement) {
+        throw new Error(`Tab ${tabName} not found in the contributions tab.`);
+      }
+      await this.clickOnElement(tabElement);
+
+      // Verify that the tab is active. The review tabs don't have the
+      // e2e-test-active class, so we also accept the active navbar class.
+      await this.expectElementToBeVisible(
+        `xpath=${tabXPath}[contains(@class, "${activeElementClass}") or contains(@class, "${activeNavbarButtonClass}")]`
+      );
     }
-
-    const tab = this.page
-      .locator(`.${contributionTabClass}`)
-      .filter({hasText: tabName})
-      .first();
-    await tab.waitFor({state: 'visible'});
-    await tab.click();
-
-    await this.page
-      .locator(`.${contributionTabClass}.${activeElementClass}`)
-      .filter({hasText: tabName})
-      .first()
-      .waitFor({state: 'visible'});
+    showMessage(`Navigated to ${tabName} tab in My Contributions.`);
   }
 
   /**
-   * Checks whether a badge with the expected value and caption is present.
-   * @param expectedBadgeValue - The expected value of the badge.
-   * @param expectedBadgeCaption - The expected caption of the badge.
-   * @param expectedBadgeLanguage - The expected language of the badge.
+   * Checks if the badge is present or not.
+   * @param {string} expectedBadgeValue - The expected value of the badge.
+   * @param {string} expectedBadgeCaption - The expected caption of the badge.
+   * @param {string | null} expectedBadgeLanguage - The expected language of the badge.
    */
   async expectBadgesToContain(
     expectedBadgeValue: string,
@@ -141,55 +215,91 @@ export class Contributor extends ExplorationEditor {
     const viewBasedBadgeSelector = this.isViewportAtMobileWidth()
       ? `${mobileBadgeContainerSelector} ${badgeSelector}`
       : `${desktopBadgeContainerSelector} ${badgeSelector}`;
+    // Wait until the badges are visible, so we only check what the user can see.
     await this.expectElementToBeVisible(viewBasedBadgeSelector);
 
-    let matchingBadges = this.page
-      .locator(viewBasedBadgeSelector)
-      .filter({
-        has: this.page
-          .locator(badgeValueSelector)
-          .filter({hasText: exactText(expectedBadgeValue)}),
-      })
-      .filter({
-        has: this.page
-          .locator(badgeCaptionSelector)
-          .filter({hasText: exactText(expectedBadgeCaption)}),
-      });
-
-    if (expectedBadgeLanguage !== null) {
-      matchingBadges = matchingBadges.filter({
-        has: this.page
-          .locator(badgeLanguageSelector)
-          .filter({hasText: exactText(expectedBadgeLanguage)}),
-      });
+    // The badges list may be re-rendered (e.g. after changing the badge
+    // type), so we wait until the expected badge is found.
+    try {
+      await this.page.waitForFunction(
+        ({
+          selector,
+          value,
+          caption,
+          language,
+          selectors,
+        }: {
+          selector: string;
+          value: string;
+          caption: string;
+          language: string | null;
+          selectors: {value: string; caption: string; language: string};
+        }) =>
+          Array.from(document.querySelectorAll(selector)).some(badge => {
+            const getText = (sel: string): string | undefined =>
+              badge.querySelector(sel)?.textContent?.trim();
+            return (
+              getText(selectors.value) === value &&
+              getText(selectors.caption) === caption &&
+              (!language || getText(selectors.language) === language)
+            );
+          }),
+        {
+          selector: viewBasedBadgeSelector,
+          value: expectedBadgeValue,
+          caption: expectedBadgeCaption,
+          language: expectedBadgeLanguage,
+          selectors: {
+            value: badgeValueSelector,
+            caption: badgeCaptionSelector,
+            language: badgeLanguageSelector,
+          },
+        },
+        {timeout: 10000}
+      );
+    } catch (error) {
+      throw new Error(
+        `Badge "${expectedBadgeValue} ${expectedBadgeCaption}" not found.\n` +
+          `Original error: ${error}`
+      );
     }
-
-    await expect(matchingBadges.first()).toBeVisible();
+    showMessage(
+      `Badge "${expectedBadgeValue} ${expectedBadgeCaption}" is present.`
+    );
   }
 
   /**
-   * Selects the badge type in the contribution dashboard.
-   * @param badgeType - The badge type to select.
+   * Selects the badge type in the contribution dashboard (mobile view only).
+   * @param {string} badgeType - The badge type to select.
    */
-  async selectBadgeType(badgeType: 'Translation' | 'Question'): Promise<void> {
+  async selectBadgeTypeInMobileView(
+    badgeType: 'Translation' | 'Question'
+  ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
-      // Desktop requires no action since both badge types are displayed.
+      showMessage(
+        "Skipping selecting badge type in mobile view as it's not required in desktop view"
+      );
       return;
     }
 
     await this.clickOnElementWithSelector(topicSelector);
-    const badgeOption = this.page
-      .locator(topicOptionSelector)
-      .filter({hasText: badgeType})
-      .first();
-    await badgeOption.waitFor({state: 'visible'});
-    await badgeOption.click();
+    await this.expectElementToBeVisible(topicOptionSelector);
+
+    const badgeOption = await this.expectElementToBeVisible(
+      `xpath=//*[normalize-space(.)='${badgeType}']`
+    );
+    if (!badgeOption) {
+      throw new Error(`Badge type ${badgeType} not found.`);
+    }
+    await this.clickOnElement(badgeOption);
+
+    // Verify option is selected.
     await this.expectTextContentToBe(selectedTopicSelector, badgeType);
   }
 
   /**
    * Selects the contribution type in the contribution dashboard.
-   * @param contributionType - The contribution type to select.
+   * @param {string} contributionType - The contribution type to select.
    */
   async selectContributionTypeInContributionDashboard(
     contributionType:
@@ -202,103 +312,176 @@ export class Contributor extends ExplorationEditor {
       ? `${selectedTopicSelector}${mobileElementSelector}`
       : `${selectedTopicSelector}${desktopElementSelector}`;
 
-    await this.clickOnElementWithSelector(selectedOptionSelector);
-    await this.expectElementToBeVisible(topicOptionSelector);
+    if (this.isViewportAtMobileWidth()) {
+      await this.waitForPageToFullyLoad();
+    }
 
-    const option = this.page
-      .locator(topicOptionSelector)
-      .filter({hasText: exactText(contributionType)})
-      .first();
-    await option.click();
+    await this.clickOnElementWithSelector(selectedOptionSelector);
+
+    await this.expectElementToBeVisible(topicOptionSelector);
+    const contributionTypeOptions = await this.page.$$(topicOptionSelector);
+    let optionElement: ElementHandle<Element> | null = null;
+    const foundOptions: string[] = [];
+    for (const option of contributionTypeOptions) {
+      const optionText = await option.evaluate(el => el.textContent?.trim());
+      if (optionText === contributionType) {
+        optionElement = option;
+        break;
+      }
+      foundOptions.push(optionText ?? '');
+    }
+
+    if (!optionElement) {
+      throw new Error(
+        `Option "${contributionType}" not found.\n` +
+          `Found Options: "${foundOptions.join('", "')}"`
+      );
+    }
+
+    await this.clickOnElement(optionElement);
+
+    // Verify option is selected.
     await this.expectTextContentToBe(selectedOptionSelector, contributionType);
   }
 
   /**
-   * Switches to a tab in the contribution dashboard.
-   * @param tabName - The name of the tab to switch to.
+   * Switches to the tab in the contribution dashboard.
+   * @param {string} tabName - The name of the tab to switch to.
    */
   async switchToTabInContributionDashboard(
     tabName: 'Translate Text' | 'My Contributions' | 'Submit Question'
   ): Promise<void> {
-    const tab = this.page
-      .locator(contributionTabSelector)
-      .filter({hasText: tabName})
-      .first();
-    await tab.waitFor({state: 'visible'});
-    await tab.click();
+    await this.page.waitForFunction(
+      ({selector, name}: {selector: string; name: string}) => {
+        const tabs = Array.from(document.querySelectorAll(selector));
+        return tabs.some(tab => tab.textContent?.trim() === name);
+      },
+      {selector: contributionTabSelector, name: tabName}
+    );
 
-    if (tabName === 'My Contributions') {
-      await this.expectElementToBeVisible(activeTabNameSelector, false);
-    } else {
+    // Get required tab element.
+    const tabElements = await this.page.$$(contributionTabSelector);
+    let tabElement: ElementHandle<Element> | null = null;
+    for (const tabEle of tabElements) {
+      const tabText = await tabEle.evaluate(el => el.textContent?.trim());
+      if (tabText === tabName) {
+        tabElement = tabEle;
+        break;
+      }
+    }
+
+    if (!tabElement) {
+      throw new Error(`Tab ${tabName} not found.`);
+    }
+
+    await this.clickOnElement(tabElement);
+
+    // Verify tab is active.
+    if (tabName !== 'My Contributions') {
       await this.expectTextContentToBe(activeTabNameSelector, tabName);
+    } else {
+      await this.expectElementToBeVisible(activeTabNameSelector, false);
     }
   }
 
   /**
-   * Checks whether the contribution table contains the expected row.
-   * A null expected value skips comparison for that cell.
-   * @param rowValues - The expected values of the row.
+   * Expects the contribution table to contain a row with the given values.
+   * @param {(string | null)[]} rowValues - The values of the row to be
+   *     checked. A null value means that the cell is not compared.
    */
   async expectContributionTableToContainRow(
     rowValues: (string | null)[]
   ): Promise<void> {
     const rowSelector = this.isViewportAtMobileWidth()
-      ? mobileStatsRowSelector
-      : desktopStatsRowSelector;
+      ? '.e2e-test-mobile-stats-row'
+      : 'tr';
     const cellSelector = this.isViewportAtMobileWidth()
-      ? mobileStatsCellSelector
-      : desktopStatsCellSelector;
+      ? '.e2e-test-mobile-stats-cell'
+      : 'td';
     await this.expectElementToBeVisible(rowSelector);
 
-    const tableRows = this.page.locator(rowSelector);
-    await expect
-      .poll(
-        async () => {
-          for (
-            let rowIndex = 0;
-            rowIndex < (await tableRows.count());
-            rowIndex++
-          ) {
-            const rowCells = tableRows.nth(rowIndex).locator(cellSelector);
-            if (rowValues.length !== (await rowCells.count())) {
-              continue;
-            }
+    const tableRows = await this.page.$$(rowSelector);
+    if (tableRows.length === 0) {
+      throw new Error('No rows found in the contribution table.');
+    }
 
-            let rowMatches = true;
-            for (let cellIndex = 0; cellIndex < rowValues.length; cellIndex++) {
-              const expectedValue = rowValues[cellIndex];
-              if (expectedValue === null) {
-                continue;
-              }
-              const cellValue = (
-                await rowCells.nth(cellIndex).textContent()
-              )?.trim();
-              if (cellValue !== expectedValue) {
-                rowMatches = false;
-                break;
-              }
-            }
+    for (const row of tableRows) {
+      const rowCells = await row.$$(cellSelector);
+      if (rowValues.length !== rowCells.length) {
+        continue;
+      }
 
-            if (rowMatches) {
-              return true;
-            }
-          }
-          return false;
-        },
-        {message: 'Expected row not found in the contribution table.'}
-      )
-      .toBe(true);
+      let match = true;
+      for (let i = 0; i < rowValues.length; i++) {
+        if (!rowValues[i]) {
+          // If row cell from input is null, we skip comparing it.
+          continue;
+        }
+        const cellValue = await rowCells[i].evaluate((el: Element) =>
+          el.textContent?.trim()
+        );
+        if (cellValue !== rowValues[i]) {
+          match = false;
+          break;
+        }
+      }
+
+      if (match) {
+        showMessage(
+          `Contribution table contains row: ${JSON.stringify(rowValues)}.`
+        );
+        return;
+      }
+    }
+
+    throw new Error(
+      `Row not found in the contribution table with values: ${JSON.stringify(rowValues)}.`
+    );
+  }
+
+  /**
+   * Checks if the contribution status is as expected.
+   * @param {string} heading - The heading of the opportunity.
+   * @param {string} subheading - The subheading of the opportunity.
+   * @param {string} expectedStatus - The expected status.
+   */
+  async expectContributionStatusToBe(
+    heading: string,
+    subheading: string,
+    expectedStatus: string
+  ): Promise<void> {
+    const opportunityItem = await this.expectOpportunityToBePresent(
+      heading,
+      subheading
+    );
+
+    if (!opportunityItem) {
+      throw new Error(`Opportunity item ${heading} (${subheading}) not found.`);
+    }
+    await this.expectTextContentToBe(
+      opportunityStatusLabelSelector,
+      expectedStatus,
+      opportunityItem
+    );
   }
 
   /**
    * Fills the review comment textarea with the given comment.
-   * @param comment - The comment to fill the textarea with.
+   * @param {string} comment - The comment to fill the textarea with.
    */
   async fillReviewComment(comment: string): Promise<void> {
     await this.expectElementToBeVisible(reviewCommentTextareaSelector);
     await this.typeInInputField(reviewCommentTextareaSelector, comment);
 
     await this.expectElementValueToBe(reviewCommentTextareaSelector, comment);
+  }
+
+  /**
+   * Checks that the question in the review modal is the same as the one passed in.
+   * @param {string} question - The question to check.
+   */
+  async expectQuestionInReviewModalToBe(question: string): Promise<void> {
+    await this.expectTextContentToBe(rteDisplaySelector, question);
   }
 }
 

@@ -13,180 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Practice Question Reviewer utility file.
+ * @fileoverview Practice question reviewer users utility file.
  */
 
 import {Page} from '@playwright/test';
+import {showMessage} from '../common/show-message';
 import {Contributor} from './contributor';
-import {INTERACTION_TYPES} from './exploration-editor';
 
 const opportunityButtonSelector = '.e2e-test-opportunity-list-item-button';
-
 const reviewButtonPrefix = 'e2e-test-question-suggestion-review';
-const reviewModalHeaderSelector =
-  '.e2e-test-question-suggestion-review-modal-header';
-const reviewModalWindowSelector =
-  'ngb-modal-window:has(.e2e-test-question-suggestion-review-modal-header)';
-
-// Question Suggestion Editor Modal Selectors.
+const editButtonSelector = `.${reviewButtonPrefix}-edit-button`;
 const questionSuggestionEditorModalSelector =
   '.e2e-test-question-suggestion-editor-modal';
 const editQuestionPencilIconSelector =
   'button.e2e-test-edit-content-pencil-button';
 const saveQuestionButtonSelector = '.e2e-test-save-question-button';
-const editButtonSelector = `.${reviewButtonPrefix}-edit-button`;
-const stateContentInputField = 'div.e2e-test-rte';
-const saveContentButton = 'button.e2e-test-save-state-content';
-const removeInteractionButtonSelector = '.e2e-test-delete-interaction';
-const confirmDeleteInteractionButtonSelector =
-  '.e2e-test-confirm-delete-interaction';
+const rteTextAreaSelector = '.e2e-test-rte';
+const saveRTEButtonSelector = '.e2e-test-save-state-content';
 
 export class PracticeQuestionReviewer extends Contributor {
   /**
-   * Opens the question editor and waits for the review modal to be hidden.
-   */
-  private async openQuestionEditorModal(): Promise<void> {
-    await this.clickOnElementWithSelector(editButtonSelector);
-
-    // The review and editor modals contain several identical controls. Wait
-    // for the dismissed review modal to hide so that subsequent selectors
-    // cannot resolve to one of its controls during the closing animation.
-    await this.page
-      .locator(reviewModalWindowSelector)
-      .waitFor({state: 'hidden'});
-    await this.expectElementToBeVisible(questionSuggestionEditorModalSelector);
-  }
-
-  /**
-   * Removes the interaction from the question being edited.
-   */
-  private async removeInteraction(): Promise<void> {
-    const questionEditorModal = await this.getElementInParent(
-      questionSuggestionEditorModalSelector
-    );
-    const removeInteractionButton = await this.getElementInParent(
-      removeInteractionButtonSelector,
-      questionEditorModal
-    );
-
-    await this.clickOnElement(removeInteractionButton);
-    await this.clickOnElementWithSelector(
-      confirmDeleteInteractionButtonSelector
-    );
-    await this.expectElementToBeVisible(
-      confirmDeleteInteractionButtonSelector,
-      false
-    );
-  }
-
-  /**
-   * Checks that the question in the review modal is the same as the one passed in.
-   * @param question The question to check.
-   */
-  async expectQuestionInReviewModalToBe(question: string): Promise<void> {
-    const rteDisplaySelector = '.e2e-test-state-content-display';
-    await this.expectTextContentToBe(rteDisplaySelector, question);
-  }
-
-  /**
-   * Checks if the question review modal is present.
-   * @param visible Whether the modal should be visible.
-   */
-  async expectQuestionReviewModalToBePresent(
-    visible: boolean = true
-  ): Promise<void> {
-    await this.expectElementToBeVisible(reviewModalHeaderSelector, visible);
-  }
-
-  /**
-   * Edits the question in the question editor modal.
-   * @param {string} question - The question to edit.
-   */
-  async editQuestionInQuestionEditorModal(question: string): Promise<void> {
-    const questionEditorModal = await this.getElementInParent(
-      questionSuggestionEditorModalSelector
-    );
-    const editQuestionButton = await this.getElementInParent(
-      editQuestionPencilIconSelector,
-      questionEditorModal
-    );
-
-    await this.clickOnElement(editQuestionButton);
-
-    const contentInput = await this.getElementInParent(
-      stateContentInputField,
-      questionEditorModal
-    );
-    await contentInput.press('ControlOrMeta+A');
-    await contentInput.press('Backspace');
-    await this.typeInInputField(contentInput, question);
-
-    const saveContentButtonElement = await this.getElementInParent(
-      saveContentButton,
-      questionEditorModal
-    );
-    await this.clickOnElement(saveContentButtonElement);
-    await questionEditorModal.waitForSelector(stateContentInputField, {
-      state: 'hidden',
-    });
-  }
-
-  /**
-   * Edits the question in the review.
-   * @param {string} question - The question to edit.
-   */
-  async editQuestionInReview(question: string): Promise<void> {
-    await this.openQuestionEditorModal();
-
-    // Update the question.
-    await this.editQuestionInQuestionEditorModal(question);
-
-    // Save the question.
-    await this.clickOnElementWithSelector(saveQuestionButtonSelector);
-    await this.expectToastMessage('Updated question.');
-    await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
-  }
-
-  /**
-   * Edits the question interaction in the review.
-   */
-  async editQuestionInteractionInReview(): Promise<void> {
-    await this.expectElementToBeVisible(editButtonSelector);
-    await this.openQuestionEditorModal();
-
-    await this.removeInteraction();
-
-    await this.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
-
-    // Add responses to the number input interaction.
-    await this.addResponsesToTheInteraction(
-      INTERACTION_TYPES.NUMBER_INPUT,
-      '100',
-      'Perfect!',
-      undefined,
-      true
-    );
-
-    // Add hint.
-    await this.addHintToState('Test Hint');
-
-    // Add a solution to the state.
-    await this.addSolutionToState(
-      '100',
-      'As said in the question itself.',
-      true
-    );
-
-    // Save the question.
-    await this.clickOnElementWithSelector(saveQuestionButtonSelector);
-    await this.expectToastMessage('Updated question.');
-    await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
-  }
-
-  /**
    * Starts a question review.
-   * @param question - The question to review.
-   * @param skill - The skill the question belongs to.
+   * @param {string} question - The question to review.
+   * @param {string} skill - The skill the question belongs to.
    */
   async startQuestionReview(question: string, skill: string): Promise<void> {
     const questionElement = await this.expectOpportunityToBePresent(
@@ -199,17 +48,20 @@ export class PracticeQuestionReviewer extends Contributor {
     }
 
     if (this.isViewportAtMobileWidth()) {
-      await questionElement.click();
+      await this.clickOnElement(questionElement);
     } else {
-      await questionElement.locator(opportunityButtonSelector).click();
+      const reviewButton = await questionElement.waitForSelector(
+        opportunityButtonSelector
+      );
+      await this.clickOnElement(reviewButton);
     }
     await this.expectModalTitleToBe(skill);
   }
 
   /**
    * Submits a question review.
-   * @param reviewType - The type of review to submit.
-   * @param reviewMessage - The message to submit.
+   * @param {string} reviewType - The type of review to submit.
+   * @param {string} reviewMessage - The message to submit.
    */
   async submitReview(
     reviewType: 'accept' | 'reject',
@@ -224,6 +76,56 @@ export class PracticeQuestionReviewer extends Contributor {
 
     await this.clickOnElementWithSelector(buttonSelector);
     await this.expectToastMessage('Submitted suggestion review.');
+  }
+
+  /**
+   * Replaces the question text in the question editor modal.
+   * @param {string} question - The new question text.
+   */
+  async editQuestionInQuestionEditorModal(question: string): Promise<void> {
+    await this.waitForElementToStabilize(editQuestionPencilIconSelector);
+    await this.clickOnElementWithSelector(editQuestionPencilIconSelector);
+
+    const questionEditorModal = await this.expectElementToBeVisible(
+      questionSuggestionEditorModalSelector
+    );
+    if (!questionEditorModal) {
+      throw new Error('Question editor modal not found.');
+    }
+
+    // Clear the existing content of the editor.
+    const textAreaElement = await questionEditorModal.waitForSelector(
+      rteTextAreaSelector,
+      {state: 'visible'}
+    );
+    await textAreaElement.click({clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+    await this.page.waitForFunction(
+      (element: Element) => element.textContent === '',
+      textAreaElement
+    );
+
+    // Type the new content and save it.
+    await textAreaElement.type(question);
+    await this.clickOnElementWithSelector(saveRTEButtonSelector);
+    await this.expectElementToBeVisible(rteTextAreaSelector, false);
+  }
+
+  /**
+   * Edits the question in the review.
+   * @param {string} question - The new question text.
+   */
+  async editQuestionInReview(question: string): Promise<void> {
+    await this.clickOnElementWithSelector(editButtonSelector);
+
+    await this.expectElementToBeVisible(questionSuggestionEditorModalSelector);
+
+    await this.editQuestionInQuestionEditorModal(question);
+
+    await this.clickOnElementWithSelector(saveQuestionButtonSelector);
+    await this.expectToastMessage('Updated question.');
+    await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
+    showMessage(`Question updated to "${question}".`);
   }
 }
 
