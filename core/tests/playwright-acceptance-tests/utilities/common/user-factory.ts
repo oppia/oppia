@@ -48,6 +48,11 @@ import {
   PracticeQuestionReviewerFactory,
 } from '../user/practice-question-reviewer';
 import {QuestionAdminFactory} from '../user/question-admin';
+import {
+  ContributorAdmin,
+  ContributorAdminFactory,
+} from '../user/contributor-admin';
+import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -62,6 +67,7 @@ const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptanc
 const USER_ROLE_MAPPING = {
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
+  [ROLES.QUESTION_COORDINATOR]: QuestionCoordinatorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
@@ -97,6 +103,7 @@ type BasicRolesUser = LoggedOutUser &
   CurriculumAdmin &
   TopicManager &
   Contributor &
+  ContributorAdmin &
   PracticeQuestionSubmitter &
   PracticeQuestionReviewer;
 
@@ -269,6 +276,7 @@ export class UserFactory {
       CurriculumAdminFactory(page),
       TopicManagerFactory(page),
       ContributorFactory(page),
+      ContributorAdminFactory(page),
       PracticeQuestionSubmitterFactory(page),
       PracticeQuestionReviewerFactory(page),
     ]);
