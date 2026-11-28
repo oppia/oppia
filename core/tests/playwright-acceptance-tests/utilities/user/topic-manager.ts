@@ -156,6 +156,19 @@ const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const photoBoxButton = 'div.e2e-test-photo-button';
 const createNewTopicButton = '.e2e-test-create-topic-button';
 const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
+const topicEditorTopicNameField = 'input.e2e-test-topic-name-field';
+const desktopTopicEditBox = '.e2e-test-topic-edit-box';
+const mobileTopicEditBox = '.e2e-test-mobile-topic-edit-box';
+const desktopDeleteTopicButton = '.e2e-test-delete-topic-button';
+const mobileDeleteTopicButton = '.e2e-test-mobile-delete-topic-button';
+const createNewSkillButtonCircle = '.e2e-test-create-skill-button-circle';
+const createNewSkillMobileButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
+const desktopSkillEditBox = '.e2e-test-skill-edit-box p.skill-edit-box-icon';
+const mobileSkillEditBox =
+  '.e2e-test-mobile-skills-option p.skill-edit-box-icon';
+const desktopDeleteSkillButton = '.e2e-test-delete-skill-button';
+const mobileDeleteSkillButton = '.e2e-test-mobile-delete-skill-button';
 const insertWorkedExampleButton = '.cke_button__oppiaworkedexample';
 const editWorkedExampleModalQuestionRte =
   '.e2e-test-arg-editor-inner-0 .e2e-test-rte';
@@ -1211,6 +1224,133 @@ export class TopicManager extends BaseUser {
       console.error(error instanceof Error ? error.stack : error);
       throw error;
     }
+  }
+
+  /**
+   * Navigates to the topics and skills dashboard page.
+   */
+  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
+  }
+
+  /**
+   * Navigates to the skills tab in the topics and skills dashboard.
+   */
+  async navigateToSkillsTab(): Promise<void> {
+    await this.expectElementToBeVisible(skillsTab);
+    await this.clickOnElementWithSelector(skillsTab);
+  }
+
+  /**
+   * Checks if the topic name field is disabled as a topic manager cannot edit
+   * the topic name of unassigned topics.
+   */
+  async expectTopicNameFieldDisabled(): Promise<void> {
+    const topicNameInput = this.page.locator(topicEditorTopicNameField);
+    await expect(topicNameInput).toBeDisabled();
+    showMessage('Verified: Topic name field is disabled as expected.');
+  }
+
+  /**
+   * Opens the story editor page with the given story ID.
+   * @param {string} storyId - The ID of the story to open.
+   */
+  async openStoryEditorWithId(storyId: string): Promise<void> {
+    await this.goto(`${testConstants.URLs.BaseURL}/story_editor/${storyId}`);
+  }
+
+  /**
+   * Checks that the "Create Topic" button is not present as a topic manager
+   * cannot create topics.
+   */
+  async expectCreateTopicButtonNotPresent(): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const createTopicButtonSelector = isMobileViewport
+      ? createNewTopicMobileButton
+      : createNewTopicButton;
+    await expect(this.page.locator(createTopicButtonSelector)).toHaveCount(0);
+    showMessage('Create topic button is not present as expected.');
+  }
+
+  /**
+   * Verifies the absence of the delete button for a given topic as a topic
+   * manager cannot delete a topic.
+   * @param {string} topicName - The name of the topic to check.
+   */
+  async verifyAbsenceOfDeleteTopicButtonInTopic(
+    topicName: string
+  ): Promise<void> {
+    const isMobile = this.isViewportAtMobileWidth();
+    const itemLocator = isMobile
+      ? this.page.locator('.topic-item').filter({
+          has: this.page.locator(mobileTopicSelector, {hasText: topicName}),
+        })
+      : this.page.locator('tr').filter({
+          has: this.page.locator(desktopTopicSelector, {hasText: topicName}),
+        });
+    await expect(itemLocator.first()).toBeVisible();
+
+    const optionsButton = itemLocator
+      .first()
+      .locator(isMobile ? mobileTopicEditBox : desktopTopicEditBox);
+    await optionsButton.click();
+
+    await expect(
+      itemLocator.first().locator('.topic-edit-options')
+    ).toBeVisible();
+
+    const deleteButtonLocator = itemLocator
+      .first()
+      .locator(isMobile ? mobileDeleteTopicButton : desktopDeleteTopicButton);
+    await expect(deleteButtonLocator).toHaveCount(0);
+    showMessage(`Delete button is not available in the topic "${topicName}".`);
+  }
+
+  /**
+   * Checks that the "Create Skill" button is not present as a topic manager
+   * cannot create skills.
+   */
+  async expectCreateSkillButtonNotPresent(): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const createSkillButtonSelector = isMobileViewport
+      ? createNewSkillMobileButton
+      : createNewSkillButtonCircle;
+    await expect(this.page.locator(createSkillButtonSelector)).toHaveCount(0);
+    showMessage('Create skill button is not present as expected.');
+  }
+
+  /**
+   * Verifies the absence of the delete button for a given skill as a topic
+   * manager cannot delete a skill.
+   * @param {string} skillName - The name of the skill to check.
+   */
+  async verifyAbsenceOfDeleteSkillButtonInSkill(
+    skillName: string
+  ): Promise<void> {
+    const isMobile = this.isViewportAtMobileWidth();
+    const itemLocator = isMobile
+      ? this.page.locator('.e2e-test-mobile-skill-item').filter({
+          has: this.page.locator(mobileSkillSelector, {hasText: skillName}),
+        })
+      : this.page.locator('.e2e-test-skill-item').filter({
+          has: this.page.locator(desktopSkillSelector, {hasText: skillName}),
+        });
+    await expect(itemLocator.first()).toBeVisible();
+
+    const optionsButton = itemLocator
+      .first()
+      .locator(isMobile ? mobileSkillEditBox : desktopSkillEditBox);
+    await optionsButton.click();
+
+    await expect(
+      itemLocator.first().locator('.skill-edit-options')
+    ).toBeVisible();
+
+    const deleteButtonLocator = itemLocator
+      .first()
+      .locator(isMobile ? mobileDeleteSkillButton : desktopDeleteSkillButton);
+    await expect(deleteButtonLocator).toHaveCount(0);
+    showMessage(`Delete button is not available in the skill "${skillName}".`);
   }
 }
 export let TopicManagerFactory = (page: Page): TopicManager => {
