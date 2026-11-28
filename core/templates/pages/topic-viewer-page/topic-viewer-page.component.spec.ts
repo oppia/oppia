@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for topic viewer page component.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -54,7 +52,7 @@ class MockWindowRef {
       },
     },
     history: {
-      pushState(title: string, url: string | null) {},
+      pushState(data: object, unused: string, url: string) {},
     },
   };
 

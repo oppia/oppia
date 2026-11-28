@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the create new subtopic modal component.
  */
 
-// @ts-nocheck
-
 import {Topic} from 'domain/topic/topic-object.model';
 import {
   ComponentFixture,
@@ -46,6 +44,7 @@ import {Subject, of, throwError} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -97,7 +96,7 @@ class MockTopicEditorStateService {
     return 'non';
   }
 
-  deleteSubtopicPage() {}
+  deleteSubtopicPage(topicId: string, subtopicId: number) {}
 
   get onTopicReinitialized(): EventEmitter<void> {
     return this.topicReinitializedEventEmitter;
@@ -132,7 +131,7 @@ describe('create new subtopic modal', function () {
   let htmlLengthService: MockHtmlLengthService;
   let topic: Topic;
   let DefaultSubtopicPageSchema = {
-    type: 'html',
+    type: 'html' as const,
     ui_config: {
       rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
       rows: 100,
@@ -594,14 +593,21 @@ describe('create new subtopic modal', function () {
     let assetsBackendApiService: AssetsBackendApiService;
     let alertsService: AlertsService;
     let pageContextService: PageContextService;
-    let imageData;
+    let getEntityTypeSpy: jasmine.Spy;
+    let getEntityIdSpy: jasmine.Spy;
+    let imageData: ImageUploaderData;
 
     beforeEach(() => {
       assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
       alertsService = TestBed.inject(AlertsService);
       pageContextService = TestBed.inject(PageContextService);
-      spyOn(pageContextService, 'getEntityType').and.returnValue('topic');
-      spyOn(pageContextService, 'getEntityId').and.returnValue('topicId');
+      getEntityTypeSpy = spyOn(
+        pageContextService,
+        'getEntityType'
+      ).and.returnValue('topic');
+      getEntityIdSpy = spyOn(pageContextService, 'getEntityId').and.returnValue(
+        'topicId'
+      );
       imageData = {
         filename: 'img_new.svg',
         bg_color: '#FFFFFF',
@@ -697,7 +703,7 @@ describe('create new subtopic modal', function () {
     }));
 
     it('should not upload the thumbnail if the entity type is missing', () => {
-      pageContextService.getEntityType.and.returnValue(undefined);
+      getEntityTypeSpy.and.returnValue(undefined);
       const postThumbnailFileSpy = spyOn(
         assetsBackendApiService,
         'postThumbnailFile'
@@ -709,7 +715,7 @@ describe('create new subtopic modal', function () {
     });
 
     it('should not upload the thumbnail if the entity id is missing', () => {
-      pageContextService.getEntityId.and.returnValue('');
+      getEntityIdSpy.and.returnValue('');
       const postThumbnailFileSpy = spyOn(
         assetsBackendApiService,
         'postThumbnailFile'

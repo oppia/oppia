@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// @ts-nocheck
 /**
  * @fileoverview Unit tests for TopicStorySectionComponent.
  */
@@ -26,7 +25,10 @@ import {
 } from '@angular/core/testing';
 import {SimpleChange} from '@angular/core';
 import {EventEmitter} from '@angular/core';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {
+  MatBottomSheet,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -3568,7 +3570,7 @@ describe('TopicStorySectionComponent', () => {
     const mockBottomSheetRef = {
       afterDismissed: () => ({subscribe: jasmine.createSpy('subscribe')}),
     };
-    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+    (bottomSheet.open as jasmine.Spy).and.returnValue(mockBottomSheetRef);
 
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -3610,7 +3612,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
-    expect(bottomSheet.open).toHaveBeenCalledWith(
+    expect(bottomSheet.open as jasmine.Spy).toHaveBeenCalledWith(
       ModuleSkipConfirmationModalComponent,
       jasmine.objectContaining({data: jasmine.any(Object)})
     );
@@ -3624,7 +3626,7 @@ describe('TopicStorySectionComponent', () => {
     const mockBottomSheetRef = {
       afterDismissed: () => ({subscribe: jasmine.createSpy('subscribe')}),
     };
-    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+    (bottomSheet.open as jasmine.Spy).and.returnValue(mockBottomSheetRef);
 
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
@@ -3665,7 +3667,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(bottomSheet.open).toHaveBeenCalledWith(
+    expect(bottomSheet.open as jasmine.Spy).toHaveBeenCalledWith(
       ModuleMasteredModalComponent,
       jasmine.objectContaining({data: jasmine.any(Object)})
     );
@@ -3682,7 +3684,7 @@ describe('TopicStorySectionComponent', () => {
         },
       }),
     };
-    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+    bottomSheet.open.and.returnValue(mockBottomSheetRef as MatBottomSheetRef);
 
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -3745,7 +3747,7 @@ describe('TopicStorySectionComponent', () => {
         },
       }),
     };
-    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+    bottomSheet.open.and.returnValue(mockBottomSheetRef as MatBottomSheetRef);
 
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -3804,7 +3806,7 @@ describe('TopicStorySectionComponent', () => {
         },
       }),
     };
-    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+    bottomSheet.open.and.returnValue(mockBottomSheetRef as MatBottomSheetRef);
 
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
@@ -3861,7 +3863,7 @@ describe('TopicStorySectionComponent', () => {
         },
       }),
     };
-    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+    bottomSheet.open.and.returnValue(mockBottomSheetRef as MatBottomSheetRef);
 
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
