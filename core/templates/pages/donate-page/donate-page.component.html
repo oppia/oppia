@@ -93,8 +93,8 @@
                   </i>
                   <span class="visually-hidden">Previous</span>
                 </button>
-                <ngb-carousel #learnerCarousel [interval]="0" [showNavigationArrows]="false" [animation]="false">
-                  <ng-template ngbSlide *ngFor="let learner of learners">
+                <ngb-carousel #learnerCarousel [interval]="5000" [showNavigationArrows]="false" [showNavigationIndicators]="false" [animation]="false" (slid)="onLearnerSlideChange($event)">
+                  <ng-template ngbSlide *ngFor="let learner of learners; index as i" [id]="i.toString()">
                     <div class="donate-learners-tile">
                       <picture>
                         <source class="donate-learners-img" type="image/webp" [srcset]="getStaticImageUrl(learner.webpUrl)">
@@ -105,7 +105,12 @@
                     <div class="donate-learners-content">
                       <p class="donate-learners-country">{{ learner.country | translate }}</p>
                       <div class="donate-learners-text">
-                        <p>{{ learner.text | translate }}</p>
+                        <p *ngFor="let quoteLearner of learners"
+                           class="donate-learners-quote"
+                           [ngClass]="{'donate-learners-quote-hidden': quoteLearner !== learner}"
+                           [attr.aria-hidden]="quoteLearner !== learner ? 'true' : null">
+                          {{ quoteLearner.text | translate }}
+                        </p>
                       </div>
                       <p class="donate-learners-name">- {{ learner.name | translate }} </p>
                     </div>
@@ -118,6 +123,16 @@
                   </i>
                   <span class="visually-hidden">Next</span>
                 </button>
+                <div class="donate-learner-carousel-indicators">
+                  <button *ngFor="let learner of learners; index as i"
+                          type="button"
+                          class="donate-learner-carousel-indicator e2e-test-donate-page-learner-carousel-indicator"
+                          [ngClass]="{'active': i === activeLearnerSlideIndex}"
+                          [attr.aria-label]="'Go to slide ' + (i + 1)"
+                          [attr.aria-current]="i === activeLearnerSlideIndex"
+                          (click)="selectLearnerSlide(i)">
+                  </button>
+                </div>
               </div>
             </div>
           </div>

@@ -1,7 +1,6 @@
 {
   "I18N_ABOUT_PAGE_TITLE": "За нас — Опија",
   "I18N_ACTION_BROWSE_EXPLORATIONS": "Прелистајте по нашите истражувања",
-  "I18N_ACTION_BROWSE_LESSONS": "Прелистајте по нашите четива",
   "I18N_ACTION_CREATE_EXPLORATION": "Создајте истражување",
   "I18N_CONTACT_PAGE_HEADING": "Вклучете се!",
   "I18N_CREATE_ACCOUNT": "Создај сметка",
@@ -90,7 +89,6 @@
   "I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Завршено",
   "I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "Во тек",
   "I18N_LEARNER_DASHBOARD_REMOVE_BUTTON": "Отстрани",
-  "I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION": "Претплати",
   "I18N_LEARNER_GROUP_CREATION_NEXT_BUTTON_TEXT": "Следно",
   "I18N_LEARNER_GROUP_CREATION_PREV_BUTTON_TEXT": "Претходен чекор",
   "I18N_LEARNER_GROUP_DETAILS_GROUP_TITLE": "Наслов на групата",

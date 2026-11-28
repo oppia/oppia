@@ -50,6 +50,8 @@ export default {
     CreatorGuidelines: 'http://localhost:8181/creator-guidelines',
     Donate: 'http://localhost:8181/donate',
     DonatePageThanksModalURL: 'http://localhost:8181/donate?thanks=',
+    DonatePageThanksModalWatchAVideoUrl:
+      'https://www.facebook.com/oppiaorg/videos/189487953721583/',
     AboutPageThanksModalURL: 'http://localhost:8181/about?thanks=',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
     ExplorationDesignTips: 'http://oppia.github.io/#/DesignTips',
@@ -140,7 +142,6 @@ export default {
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
-    LearnerDashboard: '.oppia-learner-dashboard-main-content',
   },
 
   SignInDetails: {
