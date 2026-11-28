@@ -17,8 +17,6 @@
  * entity in a given language accent code.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {EntityVoiceovers} from '../../../domain/voiceover/entity-voiceovers.model';
@@ -76,6 +74,7 @@ describe('Voiceover player service', () => {
       entity_version: 1,
       language_accent_code: 'en-US',
       voiceovers_mapping: contentIdToVoiceoversMapping,
+      automated_voiceovers_audio_offsets_msecs: {},
     };
     entityVoiceovers = EntityVoiceovers.createFromBackendDict(
       entityVoiceoversBackendDict
@@ -114,12 +113,12 @@ describe('Voiceover player service', () => {
   it('should be able to get active voiceovers', () => {
     voiceoverPlayerService.activeVoiceover = manualVoiceover;
 
-    expect(voiceoverPlayerService.getActiveVoiceover().filename).toEqual(
+    expect(voiceoverPlayerService.getActiveVoiceover()?.filename).toEqual(
       'a.mp3'
     );
 
     manualVoiceover.filename = 'b.mp3';
-    expect(voiceoverPlayerService.getActiveVoiceover().filename).toEqual(
+    expect(voiceoverPlayerService.getActiveVoiceover()?.filename).toEqual(
       'b.mp3'
     );
   });

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the player position service.
  */
 
-// @ts-nocheck
-
 import {EventEmitter} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 
@@ -27,7 +25,6 @@ import {PlayerPositionService} from './player-position.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Player position service', () => {
   let pts: PlayerTranscriptService;
@@ -78,7 +75,6 @@ describe('Player position service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
         ''
       )
     );
@@ -89,7 +85,6 @@ describe('Player position service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
         ''
       )
     );

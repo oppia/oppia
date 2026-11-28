@@ -16,14 +16,17 @@
  * @fileoverview Unit tests for ExplorationInitializationService.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
 import {ExplorationInitializationService} from './exploration-initialization.service';
 import {PageContextService} from '../../../services/page-context.service';
 import {EditableExplorationBackendApiService} from '../../../domain/exploration/editable-exploration-backend-api.service';
-import {ExplorationFeaturesBackendApiService} from '../../../services/exploration-features-backend-api.service';
+import {ExplorationBackendDict} from '../../../domain/exploration/exploration.model';
+import {ExplorationMetadataBackendDict} from '../../../domain/exploration/exploration-metadata.model';
+import {
+  ExplorationFeatures,
+  ExplorationFeaturesBackendApiService,
+} from '../../../services/exploration-features-backend-api.service';
 import {ExplorationFeaturesService} from '../../../services/exploration-features.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {NumberAttemptsService} from './number-attempts.service';
@@ -32,7 +35,10 @@ import {UrlService} from '../../../services/contextual/url.service';
 import {ExplorationModeService} from './exploration-mode.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {PlaythroughService} from '../../../services/playthrough.service';
-import {ReadOnlyExplorationBackendApiService} from '../../../domain/exploration/read-only-exploration-backend-api.service';
+import {
+  FetchExplorationBackendResponse,
+  ReadOnlyExplorationBackendApiService,
+} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {CurrentEngineService} from './current-engine.service';
 
 describe('ExplorationInitializationService', () => {
@@ -49,6 +55,25 @@ describe('ExplorationInitializationService', () => {
   let playthroughService: PlaythroughService;
   let urlService: UrlService;
   let explorationModeService: ExplorationModeService;
+  const explorationFeatures: ExplorationFeatures = {
+    explorationIsCurated: false,
+    alwaysAskLearnersForAnswerDetails: false,
+  };
+  const explorationMetadata: ExplorationMetadataBackendDict = {
+    title: 'Test Exploration',
+    category: 'Algebra',
+    objective: '',
+    language_code: 'en',
+    tags: [],
+    blurb: '',
+    author_notes: '',
+    states_schema_version: 1,
+    init_state_name: 'Intro',
+    param_specs: {},
+    param_changes: [],
+    auto_tts_enabled: true,
+    edits_allowed: true,
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -144,11 +169,26 @@ describe('ExplorationInitializationService', () => {
     pageContextService.isInExplorationEditorPage.and.returnValue(true);
     pageContextService.getExplorationId.and.returnValue('exp123');
 
+    const explorationDict: ExplorationBackendDict = {
+      auto_tts_enabled: false,
+      draft_changes: [],
+      is_version_of_draft_valid: true,
+      init_state_name: 'Intro',
+      param_changes: [],
+      param_specs: {},
+      states: {},
+      title: 'Test Exploration',
+      language_code: 'en',
+      draft_change_list_id: 0,
+      version: 1,
+      next_content_id_index: 0,
+      exploration_metadata: explorationMetadata,
+    };
     editableBackendApi.fetchApplyDraftExplorationAsync.and.returnValue(
-      Promise.resolve({param_changes: [], states: {}})
+      Promise.resolve(explorationDict)
     );
     featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
-      Promise.resolve({})
+      Promise.resolve(explorationFeatures)
     );
 
     const callback = jasmine.createSpy('callback');
@@ -160,10 +200,10 @@ describe('ExplorationInitializationService', () => {
 
     expect(explorationFeaturesService.init).toHaveBeenCalledWith(
       {param_changes: [], states: {}},
-      {}
+      explorationFeatures
     );
     expect(explorationEngineService.init).toHaveBeenCalledWith(
-      {param_changes: [], states: {}},
+      explorationDict,
       null,
       null,
       null,
@@ -179,7 +219,8 @@ describe('ExplorationInitializationService', () => {
     pageContextService.getExplorationId.and.returnValue('exp123');
     pageContextService.getExplorationVersion.and.returnValue(null);
 
-    const mockExplorationData = {
+    const mockExplorationData: FetchExplorationBackendResponse = {
+      can_edit: false,
       exploration: {
         title: 'Story Mode Exploration',
         init_state_name: 'Intro',
@@ -187,8 +228,11 @@ describe('ExplorationInitializationService', () => {
         param_specs: {},
         states: {},
         language_code: 'en',
+        objective: '',
         next_content_id_index: 0,
       },
+      exploration_id: 'exp123',
+      is_logged_in: false,
       version: 1,
       session_id: 'session_story',
       auto_tts_enabled: true,
@@ -197,7 +241,12 @@ describe('ExplorationInitializationService', () => {
       displayable_language_codes: [],
       draft_change_list_id: 1,
       record_playthrough_probability: 1.0,
-      exploration_metadata: {},
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'Intro',
+      most_recently_reached_checkpoint_state_name: 'Intro',
+      most_recently_reached_checkpoint_exp_version: 1,
+      exploration_metadata: explorationMetadata,
     };
 
     spyOn(
@@ -205,7 +254,7 @@ describe('ExplorationInitializationService', () => {
       'loadLatestExplorationAsync'
     ).and.returnValue(Promise.resolve(mockExplorationData));
     featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
-      Promise.resolve({})
+      Promise.resolve(explorationFeatures)
     );
 
     spyOn(urlService, 'getUrlParams').and.returnValue({
@@ -244,7 +293,8 @@ describe('ExplorationInitializationService', () => {
     );
     spyOn(urlService, 'getUrlParams').and.returnValue({});
 
-    const mockExplorationData = {
+    const mockExplorationData: FetchExplorationBackendResponse = {
+      can_edit: false,
       exploration: {
         title: 'Test Exploration',
         init_state_name: 'Intro',
@@ -252,8 +302,11 @@ describe('ExplorationInitializationService', () => {
         param_specs: {},
         states: {},
         language_code: 'en',
+        objective: '',
         next_content_id_index: 0,
       },
+      exploration_id: 'exp123',
+      is_logged_in: false,
       version: 1,
       session_id: 'session_123',
       auto_tts_enabled: true,
@@ -262,7 +315,12 @@ describe('ExplorationInitializationService', () => {
       displayable_language_codes: [],
       draft_change_list_id: 1,
       record_playthrough_probability: 1.0,
-      exploration_metadata: {},
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'Intro',
+      most_recently_reached_checkpoint_state_name: 'Intro',
+      most_recently_reached_checkpoint_exp_version: 1,
+      exploration_metadata: explorationMetadata,
     };
 
     spyOn(
@@ -270,7 +328,7 @@ describe('ExplorationInitializationService', () => {
       'loadLatestExplorationAsync'
     ).and.returnValue(Promise.resolve(mockExplorationData));
     featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
-      Promise.resolve({})
+      Promise.resolve(explorationFeatures)
     );
 
     spyOn(statsReportingService, 'initSession');
@@ -288,7 +346,7 @@ describe('ExplorationInitializationService', () => {
 
     expect(explorationFeaturesService.init).toHaveBeenCalledWith(
       mockExplorationData.exploration,
-      {}
+      explorationFeatures
     );
 
     expect(statsReportingService.initSession).toHaveBeenCalledWith(
