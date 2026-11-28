@@ -2922,6 +2922,7 @@ class CanManageFeaturedTranslationLanguagesTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_manage_featured_translation_languages
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
