@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the feature tab in release coordinator page.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA, ElementRef, QueryList} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
@@ -186,7 +184,7 @@ describe('Release coordinator page feature tab', function () {
     let featureFlagVM = component.featureFlagViewModels[0];
     component.resetUserGroupSearch(featureFlagVM);
 
-    expect(component.userGroupInputs._results[0].nativeElement.value).toEqual(
+    expect(component.userGroupInputs.first.nativeElement.value).toEqual(
       'UserGroup1'
     );
     expect(featureFlagVM.filteredUserGroups).toEqual(component.allUserGroups);
@@ -439,19 +437,19 @@ describe('Release coordinator page feature tab', function () {
       featureFlag.forceEnableForAllUsers = true;
       component.clearChanges(featureFlag);
 
-      expect(featureFlag.forceEnableForAllUsers).toBeFalse();
+      expect(featureFlag.forceEnableForAllUsers).toBe(false);
     });
 
     it("should not proceed if the user doesn't confirm", () => {
       mockConfirmResult(false);
       const featureFlag = component.featureFlagViewModels[0];
 
-      expect(featureFlag.forceEnableForAllUsers).toBeFalse();
+      expect(featureFlag.forceEnableForAllUsers).toBe(false);
 
       featureFlag.forceEnableForAllUsers = true;
       component.clearChanges(featureFlag);
 
-      expect(featureFlag.forceEnableForAllUsers).toBeTrue();
+      expect(featureFlag.forceEnableForAllUsers).toBe(true);
     });
   });
 
@@ -789,7 +787,7 @@ describe('Release coordinator page feature tab', function () {
     it('should return false if the feature is the same as the backup instance', () => {
       const featureFlag = component.featureFlagViewModels[0];
 
-      expect(component.isFeatureFlagViewModelChanged(featureFlag)).toBeFalse();
+      expect(component.isFeatureFlagViewModelChanged(featureFlag)).toBe(false);
     });
 
     it('should return true if the feature is different from the backup instance', () => {
@@ -797,7 +795,7 @@ describe('Release coordinator page feature tab', function () {
 
       featureFlag.userGroupIds = ['user_group_1'];
 
-      expect(component.isFeatureFlagViewModelChanged(featureFlag)).toBeTrue();
+      expect(component.isFeatureFlagViewModelChanged(featureFlag)).toBe(true);
     });
 
     it('should throw error if the feature name is not found', () => {
@@ -856,12 +854,12 @@ describe('Release coordinator page feature tab', function () {
   describe('.dummyFeatureFlagForE2eTestsIsEnabled', () => {
     it('should return true when dummy feature is enabled', () => {
       mockDummyFeatureFlagForE2ETestsStatus(true);
-      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeTrue();
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBe(true);
     });
 
     it('should return false when dummy feature is disabled', () => {
       mockDummyFeatureFlagForE2ETestsStatus(false);
-      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeFalse();
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBe(false);
     });
   });
 

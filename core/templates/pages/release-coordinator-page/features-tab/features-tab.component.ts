@@ -225,7 +225,7 @@ export class FeaturesTabComponent implements OnInit {
     };
   }
 
-  getLastUpdatedDate(featureFlagVM: FeatureFlagViewModel): string {
+  getLastUpdatedDate(featureFlagVM: FeatureFlag): string {
     if (featureFlagVM.lastUpdated === null) {
       return 'The feature has not been updated yet.';
     }
@@ -258,7 +258,7 @@ export class FeaturesTabComponent implements OnInit {
     return parsedDate.toLocaleDateString('en-US', options);
   }
 
-  getFeatureStageString(featureFlagVM: FeatureFlagViewModel): string {
+  getFeatureStageString(featureFlagVM: FeatureFlag): string {
     if (featureFlagVM.featureStage === 'dev') {
       return 'Dev (can only be enabled on dev server).';
     } else if (featureFlagVM.featureStage === 'test') {
@@ -268,7 +268,7 @@ export class FeaturesTabComponent implements OnInit {
     }
   }
 
-  getFeatureValidOnCurrentServer(featureFlagVM: FeatureFlagViewModel): boolean {
+  getFeatureValidOnCurrentServer(featureFlagVM: FeatureFlag): boolean {
     if (this.serverStage === this.DEV_SERVER_STAGE) {
       return true;
     } else if (this.serverStage === this.TEST_SERVER_STAGE) {
@@ -347,7 +347,7 @@ export class FeaturesTabComponent implements OnInit {
     }
   }
 
-  isFeatureFlagViewModelChanged(featureFlagVM: FeatureFlagViewModel): boolean {
+  isFeatureFlagViewModelChanged(featureFlagVM: FeatureFlag): boolean {
     const original = this.featureFlagNameToBackupMap.get(featureFlagVM.name);
     if (original === undefined) {
       throw new Error(
@@ -367,11 +367,11 @@ export class FeaturesTabComponent implements OnInit {
   /**
    * Validates feature flag before updating.
    *
-   * @param {FeatureFlagViewModel} featureFlagVM - the feature flag to be validated.
+   * @param {FeatureFlag} featureFlagVM - the feature flag to be validated.
    *
    * @returns {string[]} - Array of issue messages, if any.
    */
-  validateFeatureFlagViewModel(featureFlagVM: FeatureFlagViewModel): string[] {
+  validateFeatureFlagViewModel(featureFlagVM: FeatureFlag): string[] {
     const issues = [];
 
     if (

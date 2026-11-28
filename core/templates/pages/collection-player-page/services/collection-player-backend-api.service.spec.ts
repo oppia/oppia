@@ -16,8 +16,6 @@
  * @fileoverview Unit Tests for CollectionPlayerBackendApiService.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -150,14 +148,21 @@ describe('Collection Player Backend Api Service', () => {
     let requestUrl =
       '/collectionsummarieshandler/data?' +
       'stringified_collection_ids=%5B%22collectionId%22%5D';
+    let collectionSummariesResponse = {
+      is_admin: false,
+      summaries: [],
+      user_email: '',
+      is_topic_manager: false,
+      username: '',
+    };
 
     cpbas.fetchCollectionSummariesAsync('collectionId').then(dataUrl => {
-      expect(dataUrl).toEqual({stringified_collection_ids: ''});
+      expect(dataUrl).toEqual(collectionSummariesResponse);
     });
 
     const req2 = httpTestingController.expectOne(requestUrl);
     expect(req2.request.method).toEqual('GET');
-    req2.flush({stringified_collection_ids: ''});
+    req2.flush(collectionSummariesResponse);
 
     flushMicrotasks();
   }));

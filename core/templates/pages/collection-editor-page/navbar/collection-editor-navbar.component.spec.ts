@@ -16,8 +16,6 @@
  * @fileoverview Unit test for collection editor navbar component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -166,7 +164,7 @@ describe('Collection editor navbar component', () => {
     const unpublishSpy = spyOn(
       collectionRightsBackendApiService,
       'setCollectionPrivateAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(Promise.resolve(mockPrivateCollectionRights));
     const setRightsSpy = spyOn(
       collectionEditorStateService,
       'setCollectionRights'

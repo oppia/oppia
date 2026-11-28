@@ -16,8 +16,6 @@
  * @fileoverview Tests for the classroom admin component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -261,6 +259,7 @@ describe('Classroom Admin Page component ', () => {
         topic_id: 'topic_id',
         classroom_name: null,
         classroom_url_fragment: null,
+        feedback_recipient_email: null,
       },
     ];
     spyOn(
@@ -1572,7 +1571,11 @@ describe('Classroom Admin Page component ', () => {
     const modalRef = {
       componentInstance: {},
       result: Promise.resolve([
-        {classroom_id: 'classroomId_1', classroom_index: 2},
+        {
+          classroom_id: 'classroomId_1',
+          classroom_name: 'math',
+          classroom_index: 2,
+        },
       ]),
     } as NgbModalRef;
 
@@ -1592,10 +1595,18 @@ describe('Classroom Admin Page component ', () => {
     expect(
       classroomBackendApiService.updateClassroomIndexMappingAsync
     ).toHaveBeenCalledWith([
-      {classroom_id: 'classroomId_1', classroom_index: 2},
+      {
+        classroom_id: 'classroomId_1',
+        classroom_name: 'math',
+        classroom_index: 2,
+      },
     ]);
     expect(component.classroomIdToClassroomNameIndex).toEqual([
-      {classroom_id: 'classroomId_1', classroom_index: 2},
+      {
+        classroom_id: 'classroomId_1',
+        classroom_name: 'math',
+        classroom_index: 2,
+      },
     ]);
   }));
 
@@ -1652,7 +1663,7 @@ describe('Classroom Admin Page component ', () => {
     const modalRef = {
       componentInstance: {},
       result: Promise.reject(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(modalRef);
 

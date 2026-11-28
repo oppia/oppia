@@ -16,8 +16,6 @@
  * @fileoverview Tests for the diagnostic test player component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -384,6 +382,20 @@ describe('Diagnostic test player component', () => {
         courseDetails: '',
         topicListIntro: '',
         topicIdToPrerequisiteTopicIds: topicIdToPrerequisiteTopicIds,
+        feedbackRecipientEmail: '',
+        teaserText: '',
+        isPublished: true,
+        diagnosticTestIsEnabled: true,
+        thumbnailData: {
+          filename: 'thumbnail.svg',
+          bg_color: 'transparent',
+          size_in_bytes: 1000,
+        },
+        bannerData: {
+          filename: 'banner.png',
+          bg_color: 'transparent',
+          size_in_bytes: 1000,
+        },
       },
     };
 
