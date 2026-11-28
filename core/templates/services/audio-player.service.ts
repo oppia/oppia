@@ -17,6 +17,7 @@
  */
 
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
+import {AppConstants} from 'app.constants';
 import {AudioFile} from 'domain/utilities/audio-file.model';
 import {AudioTranslations} from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import {AssetsBackendApiService} from './assets-backend-api.service';
@@ -59,29 +60,59 @@ export class AudioPlayerService {
     if (this._currentTrackFilename === filename) {
       return;
     }
-    this.assetsBackendApiService
-      .loadAudio(this.pageContextService.getExplorationId(), filename)
-      .then(
-        (loadedAudioFile: AudioFile) => {
-          this._currentTrack = new Howl({
-            src: [URL.createObjectURL(loadedAudioFile.data)],
-            format: ['mp3'],
-          });
-          this._currentTrack.on('load', () => {
-            this._stopIntervalSubject.next();
-            this._currentTrackFilename = loadedAudioFile.filename;
-            this._lastPauseOrSeekPos = 0;
-            successCallback();
-          });
-          this._currentTrack.on('end', () => {
-            this._stopIntervalSubject.next();
-            this._currentTrack = null;
-            this._currentTrackFilename = null;
-            this._lastPauseOrSeekPos = null;
-          });
-        },
-        e => errorCallback(e)
+    if (this._currentTrack) {
+      this._currentTrack.stop();
+      this._currentTrack.unload?.();
+      this._stopIntervalSubject.next();
+      this._currentTrack = null;
+    }
+    const explorationId = this.pageContextService.getExplorationId();
+
+    if (!this.assetsBackendApiService.isCached(filename)) {
+      const audioDownloadUrl = this.assetsBackendApiService.getAudioDownloadUrl(
+        AppConstants.ENTITY_TYPE.EXPLORATION,
+        explorationId,
+        filename
       );
+      this._currentTrack = new Howl({
+        src: [audioDownloadUrl],
+        format: ['mp3'],
+        html5: true,
+      });
+      this._stopIntervalSubject.next();
+      this._currentTrackFilename = filename;
+      this._lastPauseOrSeekPos = 0;
+      successCallback();
+      this._currentTrack.on('end', () => {
+        this._stopIntervalSubject.next();
+        this._currentTrack = null;
+        this._currentTrackFilename = null;
+        this._lastPauseOrSeekPos = null;
+      });
+      return;
+    }
+
+    this.assetsBackendApiService.loadAudio(explorationId, filename).then(
+      (loadedAudioFile: AudioFile) => {
+        this._currentTrack = new Howl({
+          src: [URL.createObjectURL(loadedAudioFile.data)],
+          format: ['mp3'],
+        });
+        this._currentTrack.on('load', () => {
+          this._stopIntervalSubject.next();
+          this._currentTrackFilename = loadedAudioFile.filename;
+          this._lastPauseOrSeekPos = 0;
+          successCallback();
+        });
+        this._currentTrack.on('end', () => {
+          this._stopIntervalSubject.next();
+          this._currentTrack = null;
+          this._currentTrackFilename = null;
+          this._lastPauseOrSeekPos = null;
+        });
+      },
+      e => errorCallback(e)
+    );
   }
 
   async loadAsync(filename: string): Promise<void> {
@@ -130,6 +161,7 @@ export class AudioPlayerService {
       return;
     }
     this._currentTrack.stop();
+    this._currentTrack.unload?.();
     this._stopIntervalSubject.next();
     this._currentTrack = null;
     this._currentTrackFilename = null;
@@ -167,7 +199,7 @@ export class AudioPlayerService {
     }
     const currentTime = this._currentTrack.seek();
     if (typeof currentTime !== 'number') {
-      return 0;
+      return this._lastPauseOrSeekPos ?? 0;
     }
     return Math.floor(currentTime * 10) / 10;
   }
@@ -180,8 +212,9 @@ export class AudioPlayerService {
       this._currentTrack.seek(0);
       return;
     }
-    if (val > this._currentTrack.duration()) {
-      this._currentTrack.seek(this._currentTrack.duration());
+    const trackDuration = this._currentTrack.duration();
+    if (trackDuration > 0 && val > trackDuration) {
+      this._currentTrack.seek(trackDuration);
       return;
     }
     this._lastPauseOrSeekPos = val;

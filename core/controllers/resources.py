@@ -151,6 +151,29 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True
             self.response.cache_control.max_age = 600
+            self.response.headers['Accept-Ranges'] = 'bytes'
+
+            range_header = self.request.headers.get('Range')
+            if range_header and range_header.startswith('bytes='):
+                byte_range = range_header[6:].split('-')
+                start = int(byte_range[0]) if byte_range[0] else 0
+                end = (
+                    int(byte_range[1])
+                    if len(byte_range) > 1 and byte_range[1]
+                    else len(raw) - 1
+                )
+                if start < len(raw):
+                    end = min(end, len(raw) - 1)
+                    self.response.status_int = 206
+                    self.response.headers['Content-Range'] = (
+                        'bytes %d-%d/%d' % (start, end, len(raw))
+                    )
+                    self.response.headers['Content-Length'] = str(
+                        end - start + 1
+                    )
+                    self.response.body_file = io.BytesIO(raw[start : end + 1])
+                    return
+
             self.response.body_file = io.BytesIO(raw)
         except Exception as e:
             logging.exception('File not found: %s. %s' % (encoded_filename, e))

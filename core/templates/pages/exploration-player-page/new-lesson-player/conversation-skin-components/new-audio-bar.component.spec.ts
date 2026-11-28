@@ -617,7 +617,7 @@ describe('NewAudioBarComponent', () => {
     );
   });
 
-  it('should restart audio preloader when audio is not cached and not loading', () => {
+  it('should play audio translation when audio is not cached', () => {
     component.voiceoverToBePlayed = Voiceover.createFromBackendDict({
       filename: 'test.mp3',
       file_size_bytes: 1000,
@@ -632,19 +632,23 @@ describe('NewAudioBarComponent', () => {
       entityVoiceoversService,
       'getAllContentIdsToVoiceovers'
     ).and.returnValue({});
-    spyOn(audioPreloaderService, 'restartAudioPreloader');
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'TestState'
     );
+    spyOn(audioPreloaderService, 'restartAudioPreloader');
+    spyOn(component, 'playCachedAudioTranslation');
 
     component.loadAndPlayAudioTranslation();
 
+    expect(component.playCachedAudioTranslation).toHaveBeenCalledWith(
+      'test.mp3'
+    );
     expect(audioPreloaderService.restartAudioPreloader).toHaveBeenCalledWith(
       'TestState'
     );
   });
 
-  it('should not restart audio preloader when audio is already loading', () => {
+  it('should play audio translation when audio is not cached and loading', () => {
     component.voiceoverToBePlayed = Voiceover.createFromBackendDict({
       filename: 'test.mp3',
       file_size_bytes: 1000,
@@ -656,9 +660,13 @@ describe('NewAudioBarComponent', () => {
     spyOn(component, 'isCached').and.returnValue(false);
     spyOn(audioPreloaderService, 'isLoadingAudioFile').and.returnValue(true);
     spyOn(audioPreloaderService, 'restartAudioPreloader');
+    spyOn(component, 'playCachedAudioTranslation');
 
     component.loadAndPlayAudioTranslation();
 
+    expect(component.playCachedAudioTranslation).toHaveBeenCalledWith(
+      'test.mp3'
+    );
     expect(audioPreloaderService.restartAudioPreloader).not.toHaveBeenCalled();
   });
 
