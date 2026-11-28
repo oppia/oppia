@@ -2,6 +2,7 @@
 .lesson-player-page-container {
   display: flex;
   flex-direction: column;
+  overflow-anchor: none;
 }
 
 .oppia-new-player-content {

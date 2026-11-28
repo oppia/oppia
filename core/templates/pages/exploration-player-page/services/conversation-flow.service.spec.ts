@@ -1445,6 +1445,86 @@ describe('Conversation flow service', () => {
     expect(loadSpy).not.toHaveBeenCalled();
   }));
 
+  it('should resume from the backend checkpoint when the in-memory one is not set yet', fakeAsync(() => {
+    const card = createCard('First', 'TextInput');
+    const states = {First: {}, Mid: {}};
+    conversationFlowService.displayedCard = card;
+
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      false
+    );
+    spyOn(
+      explorationModeService,
+      'isInDiagnosticTestPlayerMode'
+    ).and.returnValue(false);
+    spyOn(focusManagerService, 'setFocusIfOnDesktop').and.callFake(() => {});
+    spyOn(loaderService, 'hideLoadingScreen').and.callFake(() => {});
+    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode').and.callFake(
+      () => {}
+    );
+    spyOn(conversationFlowService, '_addNewCard').and.callFake(() => {});
+    const changeCardSpy = spyOn(
+      conversationFlowService,
+      '_changeCard'
+    ).and.callFake(() => {});
+    spyOn(explorationEngineService, 'getShortestPathToState').and.returnValue([
+      'First',
+      'Mid',
+    ]);
+    spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue({
+      cardIsCheckpoint: true,
+    });
+    spyOn(explorationEngineService, 'getStateCardByName').and.callFake(
+      (name: string) => createCard(name)
+    );
+    spyOn(playerTranscriptService, 'hasEncounteredStateBefore').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'setPrevSessionStatesProgress');
+    spyOn(
+      checkpointProgressService,
+      'checkIfCheckpointIsVisited'
+    ).and.returnValue(false);
+    spyOn(checkpointProgressService, 'setVisitedCheckpointStateNames');
+    spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'next');
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'loadLatestExplorationAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        version: 1,
+        exploration: {states: states, init_state_name: 'First'},
+        most_recently_reached_checkpoint_state_name: 'Mid',
+      })
+    );
+
+    // Nothing has set the in-memory checkpoint, so its getter throws.
+    expect(() =>
+      checkpointProgressService.getMostRecentlyReachedCheckpoint()
+    ).toThrowError('Last completed checkpoint is not set.');
+
+    conversationFlowService.initializeDirectiveComponents(card, 'label');
+    flushMicrotasks();
+
+    expect(
+      explorationEngineService.getShortestPathToState
+    ).toHaveBeenCalledWith(states, 'Mid');
+    expect(changeCardSpy).toHaveBeenCalledWith(1);
+    expect(checkpointProgressService.getMostRecentlyReachedCheckpoint()).toBe(
+      'Mid'
+    );
+    tick(ExplorationPlayerConstants.ALERT_MESSAGE_TIMEOUT);
+  }));
+
   it('should set i18nLanguageCode to URL lang if iframe and lang is valid', fakeAsync(() => {
     const card = createCard('', 'TextInput');
     conversationFlowService.displayedCard = card;

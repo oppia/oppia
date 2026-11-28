@@ -1,0 +1,67 @@
+<div class="oppia-lesson-exit-modal e2e-test-lesson-exit-modal">
+  <button class="oppia-lesson-exit-modal-close e2e-test-lesson-exit-modal-close"
+          type="button"
+          (click)="cancel()"
+          [attr.aria-label]="'I18N_SIGNUP_CLOSE_BUTTON' | translate">
+    <span aria-hidden="true">&times;</span>
+  </button>
+
+  <h2 class="oppia-lesson-exit-modal-title">
+    {{ 'I18N_LESSON_EXIT_MODAL_TITLE' | translate }}
+  </h2>
+
+  <ng-container *ngIf="isLoggedIn; else loggedOutBody">
+    <p class="oppia-lesson-exit-modal-subtitle e2e-test-lesson-exit-saved-text">
+      {{ 'I18N_LESSON_EXIT_MODAL_PROGRESS_SAVED' | translate }}
+    </p>
+
+    <!-- This is the same bar the learner sees in the lesson footer, so it
+         always reflects their progress in the current lesson. -->
+    <div class="oppia-lesson-exit-checkpoint-bar e2e-test-lesson-exit-checkpoint-bar">
+      <oppia-checkpoint-bar></oppia-checkpoint-bar>
+    </div>
+
+    <label class="oppia-lesson-exit-dont-show">
+      <input type="checkbox"
+             class="e2e-test-lesson-exit-dont-show-again"
+             [(ngModel)]="dontShowAgain">
+      <span>{{ 'I18N_LESSON_EXIT_MODAL_DONT_SHOW_AGAIN' | translate }}</span>
+    </label>
+
+    <div class="oppia-lesson-exit-actions">
+      <button type="button"
+              class="oppia-lesson-exit-secondary-button e2e-test-lesson-exit-confirm"
+              (click)="close('exit')">
+        {{ 'I18N_LESSON_EXIT_MODAL_EXIT' | translate }}
+      </button>
+      <button type="button"
+              class="oppia-lesson-exit-primary-button e2e-test-lesson-exit-stay"
+              (click)="cancel()">
+        {{ 'I18N_LESSON_EXIT_MODAL_STAY' | translate }}
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-template #loggedOutBody>
+    <p class="oppia-lesson-exit-modal-subtitle e2e-test-lesson-exit-lost-text">
+      {{ 'I18N_LESSON_EXIT_MODAL_PROGRESS_LOST' | translate }}
+    </p>
+    <button type="button"
+            class="oppia-lesson-exit-primary-button oppia-lesson-exit-sign-in-button e2e-test-lesson-exit-sign-in"
+            (click)="close('sign-in')">
+      {{ 'I18N_LESSON_EXIT_MODAL_SIGN_IN_TO_SAVE' | translate }}
+    </button>
+    <button type="button"
+            class="oppia-lesson-exit-link-button e2e-test-lesson-exit-without-saving"
+            (click)="close('exit-without-saving')">
+      {{ 'I18N_LESSON_EXIT_MODAL_EXIT_WITHOUT_SAVING' | translate }}
+    </button>
+    <div class="oppia-lesson-exit-actions oppia-lesson-exit-actions-end">
+      <button type="button"
+              class="oppia-lesson-exit-secondary-button e2e-test-lesson-exit-stay"
+              (click)="cancel()">
+        {{ 'I18N_LESSON_EXIT_MODAL_STAY_IN_LESSON' | translate }}
+      </button>
+    </div>
+  </ng-template>
+</div>

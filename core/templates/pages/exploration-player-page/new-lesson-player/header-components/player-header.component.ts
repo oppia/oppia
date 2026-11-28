@@ -16,7 +16,7 @@
  * @fileoverview Component for the new lesson player header
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -31,6 +31,24 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheet,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {UserService} from 'services/user.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
+import {LessonExitService} from './lesson-exit.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {
+  LessonExitModalComponent,
+  LessonExitModalResult,
+} from './lesson-exit-modal.component';
+
+const MOBILE_SCREEN_BREAKPOINT = 480;
 
 enum PageContextConstants {
   EXPLORATION_PAGE = 'exploration',
@@ -73,7 +91,16 @@ export class PlayerHeaderComponent {
     private mobileMenuService: MobileMenuService,
     private router: Router,
     private windowRef: WindowRef,
-    private accessValidationBackendApiService: AccessValidationBackendApiService
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
+    private ngbModal: NgbModal,
+    private userService: UserService,
+    private lessonExitService: LessonExitService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
+    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
+    private localStorageService: LocalStorageService,
+    private checkpointProgressService: CheckpointProgressService,
+    private windowDimensionsService: WindowDimensionsService,
+    @Optional() private bottomSheet: MatBottomSheet
   ) {}
 
   ngOnInit(): void {
@@ -229,36 +256,129 @@ export class PlayerHeaderComponent {
     );
   }
 
-  closePlayer(): void {
+  async closePlayer(): Promise<void> {
+    if (this.explorationContext !== PageContextConstants.EXPLORATION_PAGE) {
+      this.closeNonLessonPlayer();
+      return;
+    }
+
+    const userInfo = await this.userService.getUserInfoAsync();
+    const isLoggedIn = userInfo.isLoggedIn();
+    const username = userInfo.getUsername() || '';
+
+    if (isLoggedIn && this.lessonExitService.isExitModalHidden(username)) {
+      this.exitLesson();
+      return;
+    }
+
+    const modalOrSheetRef = this.openExitModal(isLoggedIn);
+    const onResult = (result: LessonExitModalResult): void => {
+      if (result.action === 'sign-in') {
+        this.signInToSaveProgress();
+        return;
+      }
+      if (result.dontShowAgain) {
+        this.lessonExitService.hideExitModal(username);
+      }
+      this.exitLesson();
+    };
+
+    if ('result' in modalOrSheetRef) {
+      modalOrSheetRef.result.then(onResult, () => {});
+    } else {
+      modalOrSheetRef.afterDismissed().subscribe(result => {
+        if (result && typeof result === 'object') {
+          onResult(result);
+        }
+      });
+    }
+  }
+
+  private openExitModal(
+    isLoggedIn: boolean
+  ): NgbModalRef | MatBottomSheetRef<LessonExitModalComponent> {
+    if (this.isMobileScreenSize()) {
+      return this.bottomSheet.open(LessonExitModalComponent, {
+        data: {isLoggedIn: isLoggedIn},
+      });
+    }
+    const modalRef = this.ngbModal.open(LessonExitModalComponent, {
+      backdrop: 'static',
+    });
+    modalRef.componentInstance.isLoggedIn = isLoggedIn;
+    return modalRef;
+  }
+
+  isMobileScreenSize(): boolean {
+    return this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT;
+  }
+
+  private exitLesson(): void {
+    this.router.navigateByUrl(this.lessonExitService.getExitUrl());
+  }
+
+  private async signInToSaveProgress(): Promise<void> {
+    this.preventPageUnloadEventService.removeListener();
+    try {
+      await this.saveLoggedOutProgress();
+      this.lessonExitService.saveSignInIntent(this.explorationId);
+    } catch (e) {
+      this.lessonExitService.clearSignInIntent();
+    }
+    try {
+      const loginUrl = await this.userService.getLoginUrlAsync();
+      if (loginUrl) {
+        this.windowRef.nativeWindow.location.href = loginUrl;
+      } else {
+        this.windowRef.nativeWindow.location.reload();
+      }
+    } catch (e) {
+      this.lessonExitService.clearSignInIntent();
+    }
+  }
+
+  // Records the checkpoint the logged-out learner has reached and keeps the
+  // resulting unique progress id in local storage.
+  private async saveLoggedOutProgress(): Promise<void> {
+    this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+    let checkpointStateName: string;
+    try {
+      checkpointStateName =
+        this.checkpointProgressService.getMostRecentlyReachedCheckpoint();
+    } catch (e) {
+      return;
+    }
+    const response =
+      await this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
+        this.explorationId
+      );
+    if (!response.version) {
+      return;
+    }
+    const progress =
+      await this.editableExplorationBackendApiService.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+        this.explorationId,
+        response.version,
+        checkpointStateName
+      );
+    this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
+      progress.unique_progress_url_id
+    );
+  }
+
+  // Practice sessions and diagnostic tests keep the original confirmation.
+  private closeNonLessonPlayer(): void {
     const pathnameArray = this.urlService.getPathname().split('/');
     const confirmed = this.confirmExit();
-    if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
-      if (this.isLinkedToTopic) {
-        if (confirmed) {
-          this.router.navigate([
-            'learn',
-            this.classroomUrlFragment,
-            this.topicUrlFragment,
-            'story',
-            this.storyUrlFragment,
-          ]);
-        }
-      } else {
-        if (confirmed) {
-          this.router.navigate(['community-library']);
-        }
-      }
-    } else if (this.explorationContext === PageContextConstants.PRACTICE_PAGE) {
-      const targetPath = pathnameArray.slice(1, 4);
-      if (confirmed) {
-        this.router.navigate(targetPath);
-      }
+    if (!confirmed) {
+      return;
+    }
+    if (this.explorationContext === PageContextConstants.PRACTICE_PAGE) {
+      this.router.navigate(pathnameArray.slice(1, 4));
     } else if (
       this.explorationContext === PageContextConstants.DIAGNOSTIC_PAGE
     ) {
-      if (confirmed) {
-        this.router.navigate(['learn', this.classroomUrlFragment]);
-      }
+      this.router.navigate(['learn', this.classroomUrlFragment]);
     }
   }
 }
