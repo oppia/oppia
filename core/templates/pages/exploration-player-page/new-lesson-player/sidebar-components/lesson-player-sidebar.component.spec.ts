@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for new lesson player sidebar component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -27,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {LessonPlayerSidebarComponent} from './lesson-player-sidebar.component';
-import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform, Type} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {
@@ -42,13 +40,25 @@ import {MockTranslateService} from '../../../../components/forms/schema-based-ed
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {PageContextService} from '../../../../services/page-context.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {
+  MatBottomSheet,
+  MatBottomSheetConfig,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {ShareLessonModalComponent} from './share-lesson-modal.component';
 import {NewFlagExplorationModalComponent} from './flag-lesson-modal.component';
 import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {FeedbackModalComponent} from '../../../../base-components/feedback-modal.component';
+
+// These tests exercise the component overload rather than the template overload.
+interface ComponentBottomSheet {
+  open: (
+    component: Type<object>,
+    config?: MatBottomSheetConfig
+  ) => MatBottomSheetRef<object>;
+}
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncateAndCapitalizePipe implements PipeTransform {
@@ -75,7 +85,7 @@ describe('LessonPlayerSidebarComponent', () => {
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let urlService: UrlService;
   let mockNgbModal: jasmine.SpyObj<NgbModal>;
-  let mockBottomSheet: jasmine.SpyObj<MatBottomSheet>;
+  let mockBottomSheet: jasmine.SpyObj<ComponentBottomSheet>;
   let conversationFlowService: ConversationFlowService;
   let mockWindowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
   let visibilitySubject: BehaviorSubject<boolean>;
@@ -92,7 +102,11 @@ describe('LessonPlayerSidebarComponent', () => {
     };
 
     const ngbModalSpy = jasmine.createSpyObj('NgbModal', ['open']);
-    const bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
+    const bottomSheetSpy = jasmine.createSpyObj<ComponentBottomSheet>(
+      'MatBottomSheet',
+      ['open']
+    ) as jasmine.SpyObj<ComponentBottomSheet>;
+    mockBottomSheet = bottomSheetSpy;
     const windowDimensionsServiceSpy = jasmine.createSpyObj(
       'WindowDimensionsService',
       ['getWidth']
@@ -152,9 +166,6 @@ describe('LessonPlayerSidebarComponent', () => {
     urlService = TestBed.inject(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     mockNgbModal = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
-    mockBottomSheet = TestBed.inject(
-      MatBottomSheet
-    ) as jasmine.SpyObj<MatBottomSheet>;
     mockWindowDimensionsService = TestBed.inject(
       WindowDimensionsService
     ) as jasmine.SpyObj<WindowDimensionsService>;
@@ -409,7 +420,7 @@ describe('LessonPlayerSidebarComponent', () => {
 
   it('should get is user logged in', () => {
     spyOn(conversationFlowService, 'getIsLoggedIn').and.returnValue(true);
-    expect(component.isUserLoggedIn()).toBeTrue();
+    expect(component.isUserLoggedIn()).toBe(true);
   });
 
   it('should reopen the lesson feedback modal when the session storage flag is present', () => {
