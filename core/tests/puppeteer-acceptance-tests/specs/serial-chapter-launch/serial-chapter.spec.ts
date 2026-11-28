@@ -40,6 +40,12 @@ const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const returnToStoryFromLastStateSelector =
   '.e2e-test-end-chapter-return-to-story';
+const nextChapterEndCardSelectors = [
+  // Old lesson player end card.
+  '.e2e-test-recommended-next-chapter-button',
+  // New lesson player end card.
+  '.e2e-test-next-chapter-end-card-button',
+];
 const studyGuideRecommendationSelector =
   '.e2e-test-study-guide-recommendation-text';
 const topicPageRevisionTabContentSelector =
@@ -173,12 +179,22 @@ describe('Logged-In Learner', function () {
         'Congratulations for completing this lesson!'
       );
 
+      // Chapter 2 is marked as "Coming soon", so the end card of chapter 1
+      // must not offer a way to navigate to it.
+      await loggedInLearner1.expectNextChapterNotAccessibleFromEndCard(
+        nextChapterEndCardSelectors
+      );
+
       await loggedInLearner1.returnToStoryFromLastState();
 
       await loggedInLearner1.expectChapterToBeNavigable(
         'Find the Value of a Number',
         false
       );
+
+      // Knowing the exploration ID of the coming soon chapter must not let
+      // the learner open it either.
+      await loggedInLearner1.expectExplorationLinkReturns404(chapterIds[1]);
 
       await loggedInLearner1.navigateToLearnerDashboard();
       await loggedInLearner1.expectScreenshotToMatch(
@@ -242,6 +258,9 @@ describe('Logged-In Learner', function () {
       );
       await loggedInLearner2.expectElementToBeVisible(
         returnToStoryFromLastStateSelector
+      );
+      await loggedInLearner2.expectNextChapterNotAccessibleFromEndCard(
+        nextChapterEndCardSelectors
       );
       await loggedInLearner2.expectElementToBeVisible(
         studyGuideRecommendationSelector
@@ -344,6 +363,11 @@ describe('Logged-In Learner', function () {
       );
       await loggedInLearner1.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson! You will now start the lesson from the beginning the next time you come back'
+      );
+      // Chapter 3 is now published, so it should be reachable from the end
+      // card of chapter 2.
+      await loggedInLearner1.expectNextChapterAccessibleFromEndCard(
+        nextChapterEndCardSelectors
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

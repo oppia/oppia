@@ -25,12 +25,13 @@ from __future__ import annotations
 import copy
 import logging
 
-from core import feconf, utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     caching_services,
     exp_fetchers,
     exp_services,
+    feature_flag_services,
     learner_group_services,
     opportunity_services,
     rights_manager,
@@ -1236,3 +1237,33 @@ def get_chapter_notifications_stories_list() -> (
                     chapter_notifications_stories_list.append(story_timeliness)
 
     return chapter_notifications_stories_list
+
+
+def is_story_node_accessible_to_learner(
+    node: story_domain.StoryNode, user_id: Optional[str]
+) -> bool:
+    """Checks whether a learner is allowed to start the given story node.
+
+    This mirrors what the story viewer page shows to learners: draft chapters
+    are never accessible, and chapters that are 'Ready To Publish' are shown as
+    'Coming soon' (and hence are not accessible) when the serial chapter launch
+    learner view is enabled.
+
+    Args:
+        node: StoryNode. The story node to check.
+        user_id: str|None. The ID of the learner, or None for logged-out
+            learners.
+
+    Returns:
+        bool. Whether the learner can navigate to the given node.
+    """
+    if node.status == constants.STORY_NODE_STATUS_DRAFT:
+        return False
+    if node.status == constants.STORY_NODE_STATUS_READY_TO_PUBLISH:
+        learner_view_flag_name = (
+            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW
+        ).value
+        return not feature_flag_services.is_feature_flag_enabled(
+            learner_view_flag_name, user_id
+        )
+    return True

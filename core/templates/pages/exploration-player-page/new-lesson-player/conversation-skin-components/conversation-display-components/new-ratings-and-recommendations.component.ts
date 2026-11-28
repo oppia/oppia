@@ -35,7 +35,9 @@ import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-bac
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AppConstants} from 'app.constants';
+import constants from 'assets/constants';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
@@ -116,7 +118,8 @@ export class NewRatingsAndRecommendationsComponent
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private assetsBackendApiService: AssetsBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private explorationModeService: ExplorationModeService
+    private explorationModeService: ExplorationModeService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -137,7 +140,13 @@ export class NewRatingsAndRecommendationsComponent
           this.storyId = storyData.id;
           storyData.nodes.forEach((node: ReadOnlyStoryNode, i: number) => {
             if (node.id === nodeId && i + 1 < storyData.nodes.length) {
-              this.nextStoryNode = storyData.nodes[i + 1];
+              const candidateNode = storyData.nodes[i + 1];
+              // Chapters displayed as 'Coming soon' must not be reachable
+              // from the end card of the previous chapter.
+              if (this.isChapterDisplayedAsComingSoon(candidateNode)) {
+                return;
+              }
+              this.nextStoryNode = candidateNode;
               this.nextStoryNodeIconUrl = this.getIconUrl(
                 this.storyId as string,
                 this.nextStoryNode.thumbnailFilename
@@ -175,6 +184,14 @@ export class NewRatingsAndRecommendationsComponent
         this.userRating = userRating;
       });
     }
+  }
+
+  isChapterDisplayedAsComingSoon(node: ReadOnlyStoryNode): boolean {
+    return (
+      node.getStatus() === constants.STORY_NODE_STATUS_READY_TO_PUBLISH &&
+      this.platformFeatureService.status.SerialChapterLaunchLearnerView
+        .isEnabled
+    );
   }
 
   getIconUrl(storyId: string, thumbnailFilename: string): string {

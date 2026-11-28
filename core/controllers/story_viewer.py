@@ -158,8 +158,14 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Returns:
             3-Tuple(next_exp_ids, next_node_id, completed_node_ids). Where:
                 next_exp_ids: List[str]. The next_exp_ids list contains
-                    the exploration IDs of the next node(s) to be explored
-                next_node_id: str. The ID of the next node to be explored.
+                    the exploration IDs of the next node(s) to be explored.
+                    It is empty if there is no next node, or if the next node
+                    is not yet accessible to learners (e.g. it is marked as
+                    'Coming soon').
+                next_node_id: str. The ID of the next node in the story that
+                    the learner has not yet completed. This is set even if
+                    that node is not yet accessible to learners, so that the
+                    story is not wrongly treated as completed.
                 completed_node_ids: List[str]. An updated list of IDS that
                     represents all the nodes the user has completed.
 
@@ -196,9 +202,15 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
             for node in ordered_nodes:
                 if node.id not in completed_node_ids:
-                    next_exp_ids = (
-                        [node.exploration_id] if node.exploration_id else []
-                    )
+                    # Do not hand out the exploration of a chapter that is not
+                    # available to learners yet (e.g. a 'Coming soon' chapter),
+                    # since that would let learners bypass the story page.
+                    if node.exploration_id and (
+                        story_services.is_story_node_accessible_to_learner(
+                            node, self.user_id
+                        )
+                    ):
+                        next_exp_ids = [node.exploration_id]
                     next_node_id = node.id
                     break
         return (next_exp_ids, next_node_id, completed_node_ids)
@@ -246,7 +258,9 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         (next_exp_ids, next_node_id, _) = self._record_node_completion(
             story_id, node_id, [], ordered_nodes
         )
-        if next_node_id is None:
+        # If there is no next node, or the next node is not accessible to
+        # learners yet, send the learner back to the story page.
+        if next_node_id is None or not next_exp_ids:
             self.redirect(
                 '/learn/%s/%s/story/%s'
                 % (
