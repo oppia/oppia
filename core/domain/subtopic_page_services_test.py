@@ -614,6 +614,22 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(learner_2_progress[0]['subtopic_mastery'])
 
+    def test_users_progress_skips_subtopic_pages_of_missing_topics(
+        self,
+    ) -> None:
+        progress = (
+            subtopic_page_services.get_multi_users_subtopic_pages_progress(
+                ['learner_1'],
+                ['missing_topic_id:1', '{}:{}'.format(self.TOPIC_ID_1, 1)],
+            )
+        )
+
+        self.assertEqual(len(progress['learner_1']), 1)
+        self.assertEqual(
+            progress['learner_1'][0]['parent_topic_id'], self.TOPIC_ID_1
+        )
+        self.assertEqual(progress['learner_1'][0]['subtopic_id'], 1)
+
     def test_get_learner_group_syllabus_subtopic_page_summaries(self) -> None:
         subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
         expected_summaries = [

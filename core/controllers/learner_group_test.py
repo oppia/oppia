@@ -854,6 +854,41 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_get_progress_skips_subtopic_pages_of_missing_topics(
+        self,
+    ) -> None:
+        # The group still refers to a topic that no longer exists.
+        learner_group_services.update_learner_group(
+            self.learner_group_id,
+            'Learner Group Name',
+            'Description',
+            [self.facilitator_id],
+            [self.LEARNER_ID_1, self.LEARNER_ID_2],
+            [],
+            [self.SUBTOPIC_PAGE_ID_1, 'missing_topic_id:1'],
+            [self.STORY_ID_1],
+        )
+        self.login(self.NEW_USER_EMAIL)
+
+        params = {
+            'learner_usernames': json.dumps(
+                [self.LEARNER_1_USERNAME, self.LEARNER_2_USERNAME]
+            )
+        }
+        response = self.get_json(
+            '/learner_group_user_progress_handler/%s' % (self.learner_group_id),
+            params=params,
+        )
+
+        learner1_subtopics_prog = response[0]['subtopic_pages_progress']
+        self.assertEqual(len(learner1_subtopics_prog), 1)
+        self.assertEqual(
+            learner1_subtopics_prog[0]['parent_topic_id'], self.TOPIC_ID_1
+        )
+        self.assertEqual(learner1_subtopics_prog[0]['subtopic_id'], 1)
+
+        self.logout()
+
 
 class LearnerGroupLearnerSpecificProgressHandlerTests(
     test_utils.GenericTestBase
@@ -1083,6 +1118,39 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             % ('invalidId'),
             expected_status_int=400,
         )
+
+        self.logout()
+
+    def test_get_progress_skips_subtopic_pages_of_missing_topics(
+        self,
+    ) -> None:
+        # The group still refers to a topic that no longer exists.
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.learner_group_id, strict=True
+        )
+        learner_group_services.update_learner_group(
+            self.learner_group_id,
+            learner_group.title,
+            learner_group.description,
+            learner_group.facilitator_user_ids,
+            learner_group.learner_user_ids,
+            learner_group.invited_learner_user_ids,
+            learner_group.subtopic_page_ids + ['missing_topic_id:1'],
+            learner_group.story_ids,
+        )
+        self.login(self.LEARNER_1_EMAIL)
+
+        response = self.get_json(
+            '/learner_group_learner_specific_progress_handler/%s'
+            % (self.learner_group_id)
+        )
+
+        learner1_subtopics_prog = response['subtopic_pages_progress']
+        self.assertEqual(len(learner1_subtopics_prog), 1)
+        self.assertEqual(
+            learner1_subtopics_prog[0]['parent_topic_id'], self.TOPIC_ID_1
+        )
+        self.assertEqual(learner1_subtopics_prog[0]['subtopic_id'], 1)
 
         self.logout()
 

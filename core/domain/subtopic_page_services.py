@@ -436,15 +436,20 @@ def get_multi_users_subtopic_pages_progress(
     Returns:
         dict(str, list(SubtopicPageSummaryDict)). User IDs as keys and Subtopic
         Page Summary domain object dictionaries containing details of the
-        subtopic page and users mastery in it as values.
+        subtopic page and users mastery in it as values. Ids whose topic or
+        subtopic does not exist are skipped.
     """
 
     topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
-    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
-
-    all_skill_ids_lists = [
-        topic.get_all_skill_ids() for topic in topics if topic
+    # A learner group can still refer to a topic that no longer exists, so
+    # such topics are skipped instead of failing the learners' progress.
+    topics = [
+        topic
+        for topic in topic_fetchers.get_topics_by_ids(topic_ids)
+        if topic is not None
     ]
+
+    all_skill_ids_lists = [topic.get_all_skill_ids() for topic in topics]
     all_skill_ids = list(
         {
             skill_id
