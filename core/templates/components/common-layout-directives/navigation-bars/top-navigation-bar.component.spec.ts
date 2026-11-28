@@ -202,19 +202,6 @@ describe('TopNavigationBarComponent', () => {
     component.ngOnDestroy();
   });
 
-  it('should truncate navbar after search bar is loaded', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
-
-    component.ngOnInit();
-    tick(10);
-
-    tick(101);
-
-    fixture.whenStable().then(() => {
-      expect(component.truncateNavbar).toHaveBeenCalled();
-    });
-  }));
-
   it('should unsubscribe upon component destruction', () => {
     spyOn(component.directiveSubscriptions, 'unsubscribe');
 
@@ -223,27 +210,86 @@ describe('TopNavigationBarComponent', () => {
     expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 
-  it(
-    'should try displaying the hidden navbar elements if resized' +
-      ' window is larger',
-    fakeAsync(() => {
-      let donateElement = 'I18N_TOPNAV_DONATE';
-      spyOn(component, 'truncateNavbar').and.stub();
+  it('should close the sidebar only when a resize makes the window wide', () => {
+    const isWindowNarrow = spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    component.ngOnInit();
+    component.toggleSidebar(new Event('click'));
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'hidden'
+    );
 
-      component.ngOnInit();
-      tick(10);
+    mockResizeEmitter.emit();
+    expect(component.isSidebarShown()).toBeTrue();
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'hidden'
+    );
 
-      component.currentWindowWidth = 600;
-      component.navElementsVisibilityStatus[donateElement] = false;
+    isWindowNarrow.and.returnValue(false);
+    mockResizeEmitter.emit();
+    expect(component.isSidebarShown()).toBeFalse();
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'auto'
+    );
+  });
 
-      mockResizeEmitter.emit();
-      tick(501);
+  it('should provide an accessible mobile menu control with a visible X', fakeAsync(() => {
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    fixture.detectChanges();
+    tick();
 
-      fixture.whenStable().then(() => {
-        expect(component.navElementsVisibilityStatus[donateElement]).toBe(true);
-      });
-    })
-  );
+    const menuControl = fixture.debugElement.query(
+      By.css('.e2e-mobile-test-navbar-button')
+    );
+    expect(menuControl.nativeElement.getAttribute('role')).toBe('button');
+    expect(menuControl.nativeElement.getAttribute('aria-label')).toBe(
+      'I18N_TOPNAV_OPEN_MENU'
+    );
+    expect(menuControl.nativeElement.getAttribute('aria-expanded')).toBe(
+      'false'
+    );
+
+    menuControl.triggerEventHandler(
+      'keydown.enter',
+      new KeyboardEvent('keydown', {key: 'Enter'})
+    );
+    fixture.detectChanges();
+
+    expect(component.isSidebarShown()).toBeTrue();
+    expect(menuControl.nativeElement.getAttribute('aria-label')).toBe(
+      'I18N_TOPNAV_CLOSE_MENU'
+    );
+    expect(menuControl.nativeElement.getAttribute('aria-expanded')).toBe(
+      'true'
+    );
+    const closeIcon = menuControl.query(By.css('.oppia-navbar-close-icon'));
+    expect(closeIcon.nativeElement.textContent.trim()).toBe('✕');
+    expect(closeIcon.nativeElement.getAttribute('aria-hidden')).toBe('true');
+
+    const spaceKeydownEvent = new KeyboardEvent('keydown', {
+      key: ' ',
+      cancelable: true,
+    });
+    menuControl.triggerEventHandler('keydown.space', spaceKeydownEvent);
+    fixture.detectChanges();
+
+    expect(spaceKeydownEvent.defaultPrevented).toBeTrue();
+    expect(component.isSidebarShown()).toBeTrue();
+
+    menuControl.triggerEventHandler(
+      'keyup.space',
+      new KeyboardEvent('keyup', {key: ' '})
+    );
+    fixture.detectChanges();
+
+    expect(component.isSidebarShown()).toBeFalse();
+    expect(menuControl.nativeElement.getAttribute('aria-label')).toBe(
+      'I18N_TOPNAV_OPEN_MENU'
+    );
+    expect(menuControl.nativeElement.getAttribute('aria-expanded')).toBe(
+      'false'
+    );
+  }));
 
   it("should show Oppia's logos", () => {
     expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp')).toBe(
@@ -444,33 +490,6 @@ describe('TopNavigationBarComponent', () => {
     expect(mockWindowRef.nativeWindow.location.href).toBe('/blog');
   });
 
-  it('should check if i18n has been run', () => {
-    spyOn(document, 'querySelectorAll')
-      .withArgs('.oppia-navbar-tab-content')
-      .and.returnValues(
-        [{innerText: ''}] as unknown as NodeListOf<Element>,
-        [{innerText: 'About'}] as unknown as NodeListOf<Element>
-      );
-
-    expect(component.checkIfI18NCompleted()).toBe(false);
-    expect(component.checkIfI18NCompleted()).toBe(true);
-  });
-
-  it('should not truncate navbar if the window is narrow', () => {
-    // The truncateNavbar() function returns, as soon as the check for
-    // narrow window passes.
-    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
-    spyOn(component, 'checkIfI18NCompleted');
-    spyOn(document, 'querySelector');
-
-    // We also, check if the subsequent function calls have been made or not,
-    // thus confirming that the returned 'undefined' value is because of
-    // narrow window.
-    expect(component.truncateNavbar()).toBe(undefined);
-    expect(component.checkIfI18NCompleted).not.toHaveBeenCalled();
-    expect(document.querySelector).not.toHaveBeenCalled();
-  });
-
   it('should show logo and language dropdown when component is embedded', () => {
     expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp')).toBe(
       '/assets/images/logo/288x128_logo_white.webp'
@@ -488,52 +507,6 @@ describe('TopNavigationBarComponent', () => {
     );
     expect(languageChangeElement).toBeTruthy();
   });
-
-  it(
-    'should retry calling truncate navbar if i18n is not' + ' complete',
-    fakeAsync(() => {
-      spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
-      spyOn(document, 'querySelector').and.stub();
-      spyOn(component, 'checkIfI18NCompleted').and.returnValue(false);
-
-      component.truncateNavbar();
-      tick(101);
-
-      fixture.whenStable().then(() => {
-        expect(document.querySelector).not.toHaveBeenCalled();
-      });
-    })
-  );
-
-  it("should hide navbar if it's height more than 60px", fakeAsync(() => {
-    spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
-    const mockElement = document.createElement('div');
-    Object.defineProperty(mockElement, 'clientHeight', {value: 61});
-    spyOn(document, 'querySelector')
-      .withArgs('div.collapse.navbar-collapse')
-      .and.returnValue(mockElement);
-
-    component.navElementsVisibilityStatus = {
-      I18N_TOPNAV_DONATE: true,
-      I18N_TOPNAV_LEARN: true,
-      I18N_TOPNAV_ABOUT: true,
-      I18N_TOPNAV_LIBRARY: true,
-      I18N_TOPNAV_HOME: true,
-    };
-
-    component.truncateNavbar();
-    tick(51);
-
-    fixture.whenStable().then(() => {
-      expect(component.navElementsVisibilityStatus).toEqual({
-        I18N_TOPNAV_DONATE: false,
-        I18N_TOPNAV_LEARN: true,
-        I18N_TOPNAV_ABOUT: true,
-        I18N_TOPNAV_LIBRARY: true,
-        I18N_TOPNAV_HOME: true,
-      });
-    });
-  }));
 
   it('should emit language change event when URL contains lesson', () => {
     const langCode = 'hi';
@@ -558,7 +531,6 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should check if learner groups feature is enabled', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
     mockPlatformFeatureService.status.LearnerGroupsAreEnabled.isEnabled = true;
 
     component.ngOnInit();
@@ -575,7 +547,6 @@ describe('TopNavigationBarComponent', () => {
         i18nLanguageCodeService,
         'onI18nLanguageCodeChange'
       ).and.returnValue(onI18nLanguageCodeChangeEmitter);
-      spyOn(component, 'truncateNavbar').and.stub();
 
       component.ngOnInit();
 
@@ -601,7 +572,6 @@ describe('TopNavigationBarComponent', () => {
       'tester@example.com',
       true
     );
-    spyOn(component, 'truncateNavbar').and.stub();
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
     spyOn(
       i18nLanguageCodeService,
@@ -647,7 +617,6 @@ describe('TopNavigationBarComponent', () => {
       'tester@example.com',
       true
     );
-    spyOn(component, 'truncateNavbar').and.stub();
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
 
     expect(component.isModerator).toBe(false);
@@ -669,7 +638,6 @@ describe('TopNavigationBarComponent', () => {
   }));
 
   it('should set default profile pictures when username is null', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
     let userInfo = {
       isModerator: () => false,
       isCurriculumAdmin: () => false,
@@ -741,7 +709,6 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should check if dropdown offsets are updated', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
     spyOn(component, 'getDropdownOffset')
       .withArgs('.learn-tab', '.classroom-enabled')
       .and.returnValue(-10)
@@ -792,7 +759,6 @@ describe('TopNavigationBarComponent', () => {
   it('should recompute the dropdown offsets when the window is resized', () => {
     spyOn(component, 'updateLearnDropdownOffset').and.stub();
     spyOn(component, 'updateGetInvolvedMenuOffset').and.stub();
-    spyOn(component, 'truncateNavbar').and.stub();
 
     component.ngOnInit();
     mockResizeEmitter.emit();
@@ -921,7 +887,6 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should not enable learner groups feature on signup page', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
     mockPlatformFeatureService.status.LearnerGroupsAreEnabled.isEnabled = false;
 
     mockWindowRef.nativeWindow.location.pathname = '/signup';
@@ -1015,7 +980,6 @@ describe('TopNavigationBarComponent', () => {
       'tester@example.com',
       true
     );
-    spyOn(component, 'truncateNavbar').and.stub();
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
 
     expect(component.authStatusResolved).toBe(false);
@@ -1027,7 +991,6 @@ describe('TopNavigationBarComponent', () => {
   }));
 
   it('should set authStatusResolved to true even if getUserInfoAsync fails', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
     spyOn(userService, 'getUserInfoAsync').and.rejectWith('Auth error');
 
     expect(component.authStatusResolved).toBe(false);
