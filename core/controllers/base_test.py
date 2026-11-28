@@ -749,6 +749,30 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
     Each test case runs within a context where ENABLE_MAINTENANCE_MODE is True.
     """
 
+    class MutationOnlyHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Handles writes without defining a GET response type."""
+
+        def post(self, *args: Any) -> None:
+            """Handles POST requests."""
+            self.render_json({'unexpected': True})
+
+        def put(self, *args: Any) -> None:
+            """Handles PUT requests."""
+            self.render_json({'unexpected': True})
+
+        def delete(self, *args: Any) -> None:
+            """Handles DELETE requests."""
+            self.render_json({'unexpected': True})
+
+    class DownloadableHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Handles downloads with JSON error responses."""
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
+
+        def get(self, *args: Any) -> None:
+            """Handles GET requests."""
+            self.render_json({'unexpected': True})
+
     def setUp(self) -> None:
         super(MaintenanceModeTests, self).setUp()
         self.signup(
@@ -778,7 +802,92 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         )
 
         self.assertNotIn(b'<oppia-library-page-root>', response.body)
+        self.assertEqual(response.location, 'http://localhost/maintenance')
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
+    def test_maintenance_page_is_available(self) -> None:
+        response = self.get_html_response('/maintenance')
+
+        self.assertEqual(response.status_int, 200)
+
+    def test_json_get_response_has_service_unavailable_status(self) -> None:
+        response = self.get_json(
+            '/url_handler?current_url=/', expected_status_int=503
+        )
+
+        self.assertEqual(
+            response,
+            {
+                'error': 'The site is currently under maintenance.',
+                'status_code': 503,
+            },
+        )
+
+    def test_json_post_response_has_service_unavailable_status(self) -> None:
+        response = self.post_json('/url_handler', {}, expected_status_int=503)
+
+        self.assertEqual(response['status_code'], 503)
+
+    def test_write_only_handler_returns_json_service_unavailable(self) -> None:
+        testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mutation-only', self.MutationOnlyHandler)],
+                debug=feconf.DEBUG,
+            )
+        )
+
+        for method in ('POST', 'PUT', 'DELETE'):
+            response = testapp.request(
+                '/mutation-only', method=method, status=503
+            )
+            self.assertEqual(response.content_type, 'application/json')
+            self.assertEqual(
+                json.loads(response.body[len(feconf.XSSI_PREFIX) :]),
+                {
+                    'error': 'The site is currently under maintenance.',
+                    'status_code': 503,
+                },
+            )
+
+    def test_downloadable_handler_returns_json_service_unavailable(
+        self,
+    ) -> None:
+        testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/download', self.DownloadableHandler)],
+                debug=feconf.DEBUG,
+            )
+        )
+
+        response = testapp.get('/download', status=503)
+
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(
+            json.loads(response.body[len(feconf.XSSI_PREFIX) :]),
+            {
+                'error': 'The site is currently under maintenance.',
+                'status_code': 503,
+            },
+        )
+
+    def test_html_head_response_redirects_to_maintenance_page(self) -> None:
+        response = self.testapp.head('/community-library', status=302)
+
+        self.assertEqual(response.location, 'http://localhost/maintenance')
+
+    def test_json_head_response_has_service_unavailable_status(self) -> None:
+        response = self.testapp.head('/url_handler?current_url=/', status=503)
+
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.body, b'')
+
+    def test_html_and_json_routes_work_outside_maintenance_mode(self) -> None:
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            html_response = self.get_html_response('/community-library')
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(html_response.status_int, 200)
+        self.assertIn(b'<oppia-root></oppia-root>', html_response.body)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(
         self,
@@ -885,9 +994,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        self.get_html_response(
-            '/url_handler?current_url=/', expected_status_int=302
-        )
+        self.get_json('/url_handler?current_url=/', expected_status_int=503)
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
