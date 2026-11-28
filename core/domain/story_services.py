@@ -38,6 +38,7 @@ from core.domain import (
     story_fetchers,
     suggestion_services,
     topic_fetchers,
+    user_domain,
 )
 from core.platform import models
 
@@ -1179,7 +1180,14 @@ def record_completed_node_in_story_context(
     )
 
     if node_id not in progress_model.completed_node_ids:
-        progress_model.completed_node_ids.append(node_id)
+        new_completed_nodes = list(progress_model.completed_node_ids) + [
+            node_id
+        ]
+        story_progress = user_domain.StoryProgress(
+            user_id, story_id, new_completed_nodes
+        )
+        story_progress.validate()
+        progress_model.completed_node_ids = new_completed_nodes
         progress_model.update_timestamps()
         progress_model.put()
 

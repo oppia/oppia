@@ -70,3 +70,36 @@ class DraftChangeListLastUpdatedInvalidError(
             'when job was run' % model.draft_change_list_last_updated
         )
         super().__init__(message, model)
+
+
+class StoryProgressModelIdMismatchError(
+    base_validation_errors.BaseValidationError
+):
+    """Error class for StoryProgressModel whose id does not match user_id.story_id."""
+
+    def __init__(self, model: user_models.StoryProgressModel) -> None:
+        expected_id = '%s.%s' % (model.user_id, model.story_id)
+        message = 'id %r does not match expected id %r' % (
+            model.id,
+            expected_id,
+        )
+        super().__init__(message, model)
+
+
+class NonexistentCompletedNodeIdError(
+    base_validation_errors.BaseValidationError
+):
+    """Error class for StoryProgressModel containing completed node IDs
+    that do not exist in the corresponding StoryModel.
+    """
+
+    def __init__(
+        self,
+        model: user_models.StoryProgressModel,
+        nonexistent_node_ids: List[str],
+    ) -> None:
+        message = (
+            'completed_node_ids %s do not exist in corresponding story '
+            '%s' % (nonexistent_node_ids, model.story_id)
+        )
+        super().__init__(message, model)

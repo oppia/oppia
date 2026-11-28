@@ -23,7 +23,12 @@ import logging
 
 from core import feconf, utils
 from core.constants import constants
-from core.domain import auth_services, user_domain, user_services
+from core.domain import (
+    auth_services,
+    user_domain,
+    user_domain_errors,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -1889,3 +1894,162 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             user_contribution_rights.can_submit_at_least_one_item()
         )
+
+
+class StoryProgressTests(test_utils.GenericTestBase):
+    """Tests for the StoryProgress domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.valid_user_id = 'uid_%s' % (
+            'a' * feconf.USER_ID_RANDOM_PART_LENGTH
+        )
+        self.valid_story_id = 'a' * constants.STORY_ID_LENGTH
+        self.valid_node_ids = ['node_1', 'node_2']
+
+    def test_story_progress_to_and_from_dict(self) -> None:
+        story_progress = user_domain.StoryProgress(
+            self.valid_user_id, self.valid_story_id, self.valid_node_ids
+        )
+        expected_dict: user_domain.StoryProgressDict = {
+            'user_id': self.valid_user_id,
+            'story_id': self.valid_story_id,
+            'completed_node_ids': self.valid_node_ids,
+        }
+        self.assertEqual(story_progress.to_dict(), expected_dict)
+
+        from_dict_progress = user_domain.StoryProgress.from_dict(expected_dict)
+        self.assertEqual(from_dict_progress.user_id, self.valid_user_id)
+        self.assertEqual(from_dict_progress.story_id, self.valid_story_id)
+        self.assertEqual(
+            from_dict_progress.completed_node_ids, self.valid_node_ids
+        )
+
+    def test_valid_story_progress(self) -> None:
+        story_progress = user_domain.StoryProgress(
+            self.valid_user_id, self.valid_story_id, self.valid_node_ids
+        )
+        # Should not raise any error.
+        story_progress.validate()
+
+    def test_valid_story_progress_with_system_user(self) -> None:
+        story_progress = user_domain.StoryProgress(
+            feconf.SYSTEM_COMMITTER_ID,
+            self.valid_story_id,
+            self.valid_node_ids,
+        )
+        # Should not raise any error.
+        story_progress.validate()
+
+    def test_user_id_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        story_progress = user_domain.StoryProgress(
+            123, self.valid_story_id, self.valid_node_ids  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidUserIdError,
+            'Expected user_id to be a string, received 123',
+        ):
+            story_progress.validate()
+
+        # User ID is empty.
+        story_progress = user_domain.StoryProgress(
+            '', self.valid_story_id, self.valid_node_ids
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidUserIdError, 'Invalid user ID: '
+        ):
+            story_progress.validate()
+
+        # User ID has invalid format.
+        story_progress = user_domain.StoryProgress(
+            'invalid_user_id', self.valid_story_id, self.valid_node_ids
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidUserIdError,
+            'Invalid user ID: invalid_user_id',
+        ):
+            story_progress.validate()
+
+        # User ID is pseudonymous ID (not allowed for StoryProgress).
+        pseudonymous_id = 'pid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+        story_progress = user_domain.StoryProgress(
+            pseudonymous_id, self.valid_story_id, self.valid_node_ids
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidUserIdError,
+            'Invalid user ID: %s' % pseudonymous_id,
+        ):
+            story_progress.validate()
+
+    def test_story_id_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        story_progress = user_domain.StoryProgress(
+            self.valid_user_id, 123, self.valid_node_ids  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidStoryIdError,
+            'Expected story_id to be a string, received 123',
+        ):
+            story_progress.validate()
+
+        # Story ID wrong length.
+        story_progress = user_domain.StoryProgress(
+            self.valid_user_id, 'short_id', self.valid_node_ids
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidStoryIdError,
+            'Invalid story ID: short_id',
+        ):
+            story_progress.validate()
+
+    def test_completed_node_ids_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        story_progress = user_domain.StoryProgress(
+            self.valid_user_id, self.valid_story_id, 'not_a_list'  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidCompletedNodeIdsError,
+            'Expected completed_node_ids to be a list, received not_a_list',
+        ):
+            story_progress.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        story_progress = user_domain.StoryProgress(
+            self.valid_user_id, self.valid_story_id, ['node_1', 123]  # type: ignore[list-item]
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidCompletedNodeIdsError,
+            'Invalid node ID in completed_node_ids: 123',
+        ):
+            story_progress.validate()
+
+        # completed_node_ids contains invalid format.
+        story_progress = user_domain.StoryProgress(
+            self.valid_user_id, self.valid_story_id, ['node_1', 'invalid_node']
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidCompletedNodeIdsError,
+            'Invalid node ID in completed_node_ids: invalid_node',
+        ):
+            story_progress.validate()
+
+        # completed_node_ids contains duplicates.
+        story_progress = user_domain.StoryProgress(
+            self.valid_user_id,
+            self.valid_story_id,
+            ['node_1', 'node_2', 'node_1'],
+        )
+        with self.assertRaisesRegex(
+            user_domain_errors.DuplicateCompletedNodeIdsError,
+            'Duplicate node ID node_1 found in completed_node_ids',
+        ):
+            story_progress.validate()
