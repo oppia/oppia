@@ -16,7 +16,7 @@
  * @fileoverview Component for the navbar breadcrumb of the topic editor.
  */
 
-import {Component} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
@@ -28,7 +28,7 @@ import {TopicRights} from 'domain/topic/topic-rights.model';
   templateUrl: './topic-editor-navbar-breadcrumb.component.html',
   styleUrls: ['./topic-editor-navbar-breadcrumb.component.css'],
 })
-export class TopicEditorNavbarBreadcrumbComponent {
+export class TopicEditorNavbarBreadcrumbComponent implements OnDestroy {
   // This property is initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -67,5 +67,9 @@ export class TopicEditorNavbarBreadcrumbComponent {
     );
     this.topic = this.topicEditorStateService.getTopic();
     this.topicRights = this.topicEditorStateService.getTopicRights();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

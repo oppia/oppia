@@ -16,7 +16,7 @@
  * @fileoverview Component for a schema-based editor for lists.
  */
 
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, Input, OnDestroy} from '@angular/core';
 import {
   AbstractControl,
   ControlValueAccessor,
@@ -54,7 +54,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
   ],
 })
 export class SchemaBasedListEditorComponent
-  implements ControlValueAccessor, Validator
+  implements ControlValueAccessor, Validator, OnDestroy
 {
   _localValue: SchemaDefaultValue[] = [];
   @Input() set localValue(val: SchemaDefaultValue[]) {
@@ -332,5 +332,9 @@ export class SchemaBasedListEditorComponent
         );
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

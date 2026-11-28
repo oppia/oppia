@@ -16,7 +16,7 @@
  * @fileoverview Diagnostic test player component.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
@@ -39,7 +39,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
   templateUrl: './diagnostic-test-player.component.html',
   styleUrls: ['./diagnostic-test-player.component.css'],
 })
-export class DiagnosticTestPlayerComponent implements OnInit {
+export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_IMAGE_URL!: string;
   diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   diagnosticTestIsStarted: boolean = false;
@@ -205,5 +205,9 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   isNewLessonPlayerEnabled(): boolean {
     return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
+  }
+
+  ngOnDestroy(): void {
+    this.componentSubscription.unsubscribe();
   }
 }

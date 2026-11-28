@@ -16,7 +16,7 @@
  * @fileoverview Component for the skill editor page.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -42,7 +42,7 @@ import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-red
   templateUrl: './skill-editor-page.component.html',
   styleUrls: ['./skill-editor-page.component.css'],
 })
-export class SkillEditorPageComponent implements OnInit {
+export class SkillEditorPageComponent implements OnInit, OnDestroy {
   constructor(
     private bottomNavbarStatusService: BottomNavbarStatusService,
     private localStorageService: LocalStorageService,
@@ -249,5 +249,9 @@ export class SkillEditorPageComponent implements OnInit {
     this.windowRef.nativeWindow.addEventListener('storage', event => {
       this.onCreateOrUpdateSkillEditorBrowserTabsInfo(event);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

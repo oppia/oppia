@@ -17,7 +17,7 @@
  * on conversation skin.
  */
 
-import {Component, Input, ViewChild} from '@angular/core';
+import {Component, Input, OnDestroy, ViewChild} from '@angular/core';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -59,7 +59,7 @@ export interface QuestionPlayerConfig {
   templateUrl: './ratings-and-recommendations.component.html',
   styleUrls: ['./ratings-and-recommendations.component.css'],
 })
-export class RatingsAndRecommendationsComponent {
+export class RatingsAndRecommendationsComponent implements OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -219,5 +219,9 @@ export class RatingsAndRecommendationsComponent {
       this.localStorageService.getEndChapterSignUpSectionHiddenPreference() ===
       'true'
     );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

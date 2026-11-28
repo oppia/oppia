@@ -173,5 +173,6 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.pageContextService.clearQuestionPlayerIsOpen();
+    this.directiveSubscriptions.unsubscribe();
   }
 }

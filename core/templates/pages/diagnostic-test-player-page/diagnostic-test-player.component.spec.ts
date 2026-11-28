@@ -433,4 +433,12 @@ describe('Diagnostic test player component', () => {
       siteAnalyticsService.registerDiagnosticTestRecommendationAcceptedEvent
     ).toHaveBeenCalledWith('math', 'dummy2');
   }));
+
+  it('should unsubscribe upon component destruction', () => {
+    spyOn(component.componentSubscription, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.componentSubscription.unsubscribe).toHaveBeenCalled();
+  });
 });

@@ -21,6 +21,7 @@ import {
   EventEmitter,
   Input,
   Output,
+  OnDestroy,
   ViewEncapsulation,
 } from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -41,7 +42,7 @@ import {ViewLearnerGroupDetailsModalComponent} from './modal-templates/view-lear
   styleUrls: ['./learner-groups-tab.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
-export class LearnerGroupsTabComponent {
+export class LearnerGroupsTabComponent implements OnDestroy {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -189,5 +190,9 @@ export class LearnerGroupsTabComponent {
         // No further action is needed.
       }
     );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

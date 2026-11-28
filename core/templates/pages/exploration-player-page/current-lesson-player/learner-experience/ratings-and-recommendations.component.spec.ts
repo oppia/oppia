@@ -436,4 +436,14 @@ describe('Ratings and recommendations component', () => {
 
     expect(componentInstance.isSignUpSectionHidden()).toBe(false);
   });
+
+  it('should unsubscribe upon component destruction', () => {
+    spyOn(componentInstance.directiveSubscriptions, 'unsubscribe');
+
+    componentInstance.ngOnDestroy();
+
+    expect(
+      componentInstance.directiveSubscriptions.unsubscribe
+    ).toHaveBeenCalled();
+  });
 });

@@ -707,4 +707,12 @@ describe('Release coordinator page', () => {
       }).toThrowError();
     }));
   });
+
+  it('should unsubscribe upon component destruction', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
 });

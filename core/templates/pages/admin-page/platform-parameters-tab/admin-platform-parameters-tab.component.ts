@@ -16,7 +16,13 @@
  * @fileoverview Component for the Platform Parameters tab in the admin panel.
  */
 
-import {Component, OnInit, EventEmitter, Output} from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  EventEmitter,
+  Output,
+} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
@@ -48,7 +54,7 @@ type FilterType = keyof typeof PlatformParameterFilterType;
   templateUrl: './admin-platform-parameters-tab.component.html',
   styleUrls: ['./admin-platform-parameters-tab.component.css'],
 })
-export class AdminPlatformParametersTabComponent implements OnInit {
+export class AdminPlatformParametersTabComponent implements OnInit, OnDestroy {
   @Output() setStatusMessage = new EventEmitter<string>();
 
   readonly availableFilterTypes: PlatformParameterFilterType[] = Object.keys(
@@ -443,5 +449,9 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     this.platformParametersAreFetched = true;
     this.loaderService.showLoadingScreen('Loading');
     this.reloadPlatformParametersAsync();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

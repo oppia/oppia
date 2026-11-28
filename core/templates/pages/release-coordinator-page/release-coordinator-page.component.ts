@@ -19,6 +19,7 @@
 import {ENTER} from '@angular/cdk/keycodes';
 import {
   Component,
+  OnDestroy,
   OnInit,
   ChangeDetectorRef,
   ViewChild,
@@ -52,7 +53,7 @@ interface MemoryCacheProfile {
   templateUrl: './release-coordinator-page.component.html',
   styleUrls: ['./release-coordinator-page.component.css'],
 })
-export class ReleaseCoordinatorPageComponent implements OnInit {
+export class ReleaseCoordinatorPageComponent implements OnInit, OnDestroy {
   @ViewChild('userInputToAddUserToGroup')
   userInputToAddUserToGroup!: ElementRef<HTMLInputElement>;
   // These properties are initialized using Angular lifecycle hooks
@@ -450,5 +451,9 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     );
     this.loaderService.showLoadingScreen('Loading');
     this.fetchUserGroupData();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

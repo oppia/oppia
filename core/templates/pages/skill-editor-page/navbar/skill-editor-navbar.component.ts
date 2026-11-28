@@ -19,7 +19,7 @@
 import {Subscription} from 'rxjs';
 import {SkillEditorSaveModalComponent} from '../modal-templates/skill-editor-save-modal.component';
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SkillEditorRoutingService} from '../services/skill-editor-routing.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -37,7 +37,7 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
   templateUrl: './skill-editor-navbar.component.html',
   styleUrls: ['./skill-editor-navbar.component.css'],
 })
-export class SkillEditorNavabarComponent implements OnInit {
+export class SkillEditorNavabarComponent implements OnInit, OnDestroy {
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -209,5 +209,9 @@ export class SkillEditorNavabarComponent implements OnInit {
         this.questionUndoRedoService.hasChanges()
       );
     });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
