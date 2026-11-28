@@ -22,8 +22,13 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain, exp_fetchers, exp_services
-from core.jobs import base_jobs
+from core.domain import (
+    draft_upgrade_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+)
+from core.jobs import base_jobs, job_utils
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms, results_transforms
 from core.jobs.types import job_run_result
@@ -31,14 +36,19 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Iterable, Sequence, Tuple
+from typing import Iterable, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models, datastore_services, exp_models
+    from mypy_imports import (
+        base_models,
+        datastore_services,
+        exp_models,
+        user_models,
+    )
 
-(base_models, exp_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.EXPLORATION]
+(base_models, exp_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.EXPLORATION, models.Names.USER]
 )
 datastore_services = models.Registry.import_datastore_services()
 
@@ -54,7 +64,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
     """
 
     @staticmethod
-    def _migrate_exploration(
+    def migrate_exploration(
         exp_model: exp_models.ExplorationModel, exp_is_published: bool
     ) -> result.Result[
         Tuple[str, exp_domain.Exploration], Tuple[str, Exception]
@@ -177,7 +187,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
             >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Transform and migrate model'
             >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
-                lambda exploration_models, status: self._migrate_exploration(
+                lambda exploration_models, status: self.migrate_exploration(
                     exploration_models[0], status[0]
                 )
             )
@@ -266,8 +276,291 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         return (transformed_exp_objects_list, job_run_results)
 
 
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
+class MigrateExplorationDraftModels(beam.PTransform):  # type: ignore[misc]
+    """Transform that gets all ExplorationUserDataModel objects with draft
+    changes, performs draft migration, and filters any error results.
+    """
+
+    @staticmethod
+    def _migrate_exploration_draft(
+        user_data_model: user_models.ExplorationUserDataModel,
+        exp_model: exp_models.ExplorationModel,
+    ) -> result.Result[
+        Tuple[str, Optional[user_models.ExplorationUserDataModel]],
+        Tuple[str, Exception],
+    ]:
+        """Migrates exploration draft change list in ExplorationUserDataModel
+        to match the migrated exploration version and states schema version,
+        or discards the draft if it cannot be migrated.
+
+        Args:
+            user_data_model: ExplorationUserDataModel. The user data model
+                to migrate.
+            exp_model: ExplorationModel. The exploration model corresponding
+                to the draft.
+
+        Returns:
+            Result((str, ExplorationUserDataModel|None), (str, Exception)).
+            Result containing tuple that consists of user data model ID and
+            either the migrated ExplorationUserDataModel (or None if already
+            migrated) or Exception.
+        """
+        try:
+            if (
+                exp_model.states_schema_version
+                == feconf.CURRENT_STATE_SCHEMA_VERSION
+                and user_data_model.draft_change_list_exp_version
+                == exp_model.version
+            ):
+                return result.Ok((user_data_model.id, None))
+
+            migrated_user_data_model = job_utils.clone_model(user_data_model)
+            assert migrated_user_data_model.draft_change_list is not None
+            draft_changes = [
+                exp_domain.ExplorationChange(change)
+                for change in migrated_user_data_model.draft_change_list
+            ]
+            current_draft_version = (
+                migrated_user_data_model.draft_change_list_exp_version
+            )
+            upgraded_draft_changes: Optional[
+                List[exp_domain.ExplorationChange]
+            ] = draft_changes
+            if current_draft_version != exp_model.version:
+                with datastore_services.get_ndb_context():
+                    upgraded_draft_changes = draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                        draft_changes,
+                        current_draft_version,
+                        exp_model.version,
+                        exp_model.id,
+                    )
+            if (
+                upgraded_draft_changes is not None
+                and exp_model.states_schema_version
+                < feconf.CURRENT_STATE_SCHEMA_VERSION
+            ):
+                with datastore_services.get_ndb_context():
+                    upgraded_draft_changes = draft_upgrade_services.convert_states_in_draft_change_list(
+                        upgraded_draft_changes,
+                        exp_model.states_schema_version,
+                        feconf.CURRENT_STATE_SCHEMA_VERSION,
+                    )
+
+            to_exp_version = (
+                exp_model.version + 1
+                if exp_model.states_schema_version
+                < feconf.CURRENT_STATE_SCHEMA_VERSION
+                else exp_model.version
+            )
+            if upgraded_draft_changes is not None:
+                migrated_user_data_model.draft_change_list = [
+                    change.to_dict() for change in upgraded_draft_changes
+                ]
+                migrated_user_data_model.draft_change_list_exp_version = (
+                    to_exp_version
+                )
+            else:
+                migrated_user_data_model.draft_change_list = None
+                migrated_user_data_model.draft_change_list_last_updated = None
+                migrated_user_data_model.draft_change_list_exp_version = None
+            migrated_user_data_model.update_timestamps()
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((user_data_model.id, e))
+
+        return result.Ok((user_data_model.id, migrated_user_data_model))
+
+    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+        beam.PCollection[user_models.ExplorationUserDataModel],
+        beam.PCollection[job_run_result.JobRunResult],
+    ]:
+        """Migrates exploration draft objects and flushes the input
+        in case of errors.
+
+        Args:
+            pipeline: Pipeline. Input beam pipeline.
+
+        Returns:
+            (PCollection, PCollection). Tuple containing
+            PCollection of models which should be put into the datastore and
+            a PCollection of results from the exploration draft migration.
+        """
+        unmigrated_exploration_models = (
+            pipeline
+            | 'Get all non-deleted exploration models'
+            >> (
+                ndb_io.GetModels(
+                    exp_models.ExplorationModel.get_all(include_deleted=False)
+                )
+            )
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add exploration keys'
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda exp_model: exp_model.id
+            )
+        )
+
+        exp_publication_status = (
+            pipeline
+            | 'Get all non-deleted exploration rights models'
+            >> (ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
+            | 'Extract publication status'
+            >> beam.Map(
+                lambda exp_rights: (
+                    exp_rights.id,
+                    exp_rights.status == constants.ACTIVITY_STATUS_PUBLIC,
+                )
+            )
+        )
+
+        all_migrated_exp_results = (
+            (unmigrated_exploration_models, exp_publication_status)
+            | 'Merge model and status' >> beam.CoGroupByKey()
+            | 'Get rid of exp ID'
+            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Transform and migrate model'
+            >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
+                lambda exploration_models, status: (
+                    MigrateExplorationModels.migrate_exploration(
+                        exploration_models[0], status[0]
+                    )
+                )
+            )
+        )
+
+        filtered_migrated_exp = (
+            all_migrated_exp_results
+            | 'Filter migration results'
+            >> (results_transforms.DrainResultsOnError())
+        )
+        migrated_exp = filtered_migrated_exp | 'Unwrap ok' >> beam.Map(
+            lambda result_item: result_item.unwrap()
+        )
+
+        unmigrated_exp_user_data_models = (
+            pipeline
+            | 'Get all non-deleted exploration user data models'
+            >> (
+                ndb_io.GetModels(
+                    user_models.ExplorationUserDataModel.get_all(
+                        include_deleted=False
+                    )
+                )
+            )
+            | 'Filter models with draft changes'
+            >> beam.Filter(
+                lambda user_data_model: (
+                    user_data_model.draft_change_list is not None
+                )
+            )
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add exploration keys to user data models'
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda user_data_model: user_data_model.exploration_id
+            )
+        )
+
+        exp_draft_objects_list = (
+            {
+                'exp_model': unmigrated_exploration_models,
+                'exploration': migrated_exp,
+                'user_data_models': unmigrated_exp_user_data_models,
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID'
+            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove explorations without drafts or failed migration'
+            >> beam.Filter(
+                lambda x: (
+                    len(x['exploration']) > 0 and len(x['user_data_models']) > 0
+                )
+            )
+            | 'Unpack user data models per exploration'
+            >> beam.FlatMap(
+                lambda objects: [
+                    (user_data_model, objects['exp_model'][0])
+                    for user_data_model in objects['user_data_models']
+                ]
+            )
+        )
+
+        all_migrated_draft_results = (
+            exp_draft_objects_list
+            | 'Transform and migrate draft model'
+            >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
+                self._migrate_exploration_draft
+            )
+        )
+
+        migrated_draft_job_run_results = (
+            all_migrated_draft_results
+            | 'Generate results for draft migration'
+            >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'EXP DRAFT PROCESSED'
+                )
+            )
+        )
+
+        filtered_migrated_drafts = (
+            all_migrated_draft_results
+            | 'Filter draft migration results'
+            >> (results_transforms.DrainResultsOnError())
+        )
+        unwrapped_migrated_drafts = (
+            filtered_migrated_drafts
+            | 'Unwrap draft ok'
+            >> beam.Map(lambda result_item: result_item.unwrap()[1])
+        )
+
+        migrated_exp_user_data_models = (
+            unwrapped_migrated_drafts
+            | 'Filter migrated drafts'
+            >> beam.Filter(lambda model: model is not None)
+        )
+
+        migrated_draft_count_job_run_results = (
+            migrated_exp_user_data_models
+            | 'Transform migrated drafts into job run results'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXP DRAFT MIGRATED'
+                )
+            )
+        )
+
+        already_migrated_draft_job_run_results = (
+            unwrapped_migrated_drafts
+            | 'Filter previously migrated drafts'
+            >> beam.Filter(lambda model: model is None)
+            | 'Transform previously migrated drafts into job run results'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXP DRAFT PREVIOUSLY MIGRATED'
+                )
+            )
+        )
+
+        job_run_results = (
+            migrated_draft_job_run_results,
+            migrated_draft_count_job_run_results,
+            already_migrated_draft_job_run_results,
+        ) | 'Flatten draft job run results' >> beam.Flatten()
+
+        return (migrated_exp_user_data_models, job_run_results)
+
+
 class MigrateExplorationJob(base_jobs.JobBase):
-    """Job that migrates Exploration models."""
+    """Job that migrates Exploration models and ExplorationUserDataModel
+    drafts.
+    """
 
     @staticmethod
     def _update_exploration(
@@ -327,6 +620,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Perform migration and filter migration results'
             >> (MigrateExplorationModels())
         )
+        migrated_exp_user_data_models, draft_job_run_results = (
+            self.pipeline
+            | 'Perform draft migration and filter migration results'
+            >> (MigrateExplorationDraftModels())
+        )
 
         exp_related_models_results = (
             transformed_exp_objects_list
@@ -357,8 +655,14 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 )
             )
         )
+
+        models_to_put = (
+            exp_related_models_to_put,
+            migrated_exp_user_data_models,
+        ) | 'Merge exploration and draft models' >> beam.Flatten()
+
         unused_put_results = (
-            exp_related_models_to_put
+            models_to_put
             | 'Filter None models' >> beam.Filter(lambda x: x is not None)
             | 'Put models into datastore' >> ndb_io.PutModels()
         )
@@ -366,11 +670,14 @@ class MigrateExplorationJob(base_jobs.JobBase):
         return (
             job_run_results,
             exp_related_models_job_results,
+            draft_job_run_results,
         ) | beam.Flatten()
 
 
 class AuditExplorationMigrationJob(base_jobs.JobBase):
-    """Job that migrates Exploration models."""
+    """Job that audits migration of Exploration models and
+    ExplorationUserDataModel drafts.
+    """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the audit of exploration
@@ -385,6 +692,59 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
             self.pipeline
             | 'Perform migration and filter migration results'
             >> (MigrateExplorationModels())
+        )
+        unused_migrated_exp_user_data_models, draft_job_run_results = (
+            self.pipeline
+            | 'Perform draft migration and filter migration results'
+            >> (MigrateExplorationDraftModels())
+        )
+
+        return (
+            job_run_results,
+            draft_job_run_results,
+        ) | beam.Flatten()
+
+
+class MigrateExplorationDraftJob(base_jobs.JobBase):
+    """Job that migrates ExplorationUserDataModel draft changes."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the exploration draft
+        migration.
+
+        Returns:
+            PCollection. A PCollection of results from the exploration draft
+            migration.
+        """
+        migrated_exp_user_data_models, job_run_results = (
+            self.pipeline
+            | 'Perform draft migration and filter migration results'
+            >> (MigrateExplorationDraftModels())
+        )
+
+        unused_put_results = (
+            migrated_exp_user_data_models
+            | 'Put models into datastore' >> ndb_io.PutModels()
+        )
+
+        return job_run_results
+
+
+class AuditExplorationDraftMigrationJob(base_jobs.JobBase):
+    """Job that audits migration of ExplorationUserDataModel draft changes."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the audit of exploration draft
+        migration.
+
+        Returns:
+            PCollection. A PCollection of results from the exploration draft
+            migration.
+        """
+        unused_migrated_exp_user_data_models, job_run_results = (
+            self.pipeline
+            | 'Perform draft migration and filter migration results'
+            >> (MigrateExplorationDraftModels())
         )
 
         return job_run_results

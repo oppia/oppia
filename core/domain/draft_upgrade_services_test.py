@@ -134,6 +134,18 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_convert_states_in_draft_change_list_across_multiple_versions(
+        self,
+    ) -> None:
+        upgraded_draft_change_list = (
+            draft_upgrade_services.convert_states_in_draft_change_list(
+                self.DRAFT_CHANGELIST,
+                27,
+                feconf.CURRENT_STATE_SCHEMA_VERSION,
+            )
+        )
+        self.assertEqual(upgraded_draft_change_list, self.DRAFT_CHANGELIST)
+
 
 class DraftUpgradeBranchUnitTests(test_utils.TestBase):
     """Test preservation and conversion branches in legacy drafts."""
