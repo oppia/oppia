@@ -292,7 +292,8 @@ class CompleteExplorationEventHandler(BaseEventHandler):
         """Perform in-request processing of recording exploration completion
         events.
         """
-        stats_models.CompleteExplorationEventLogEntryModel.create(
+        event_entry = stats_domain.CompleteExplorationEventLogEntry(
+            feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
             exp_id,
             exp_version,
             state_name,
@@ -300,6 +301,17 @@ class CompleteExplorationEventHandler(BaseEventHandler):
             time_spent,
             params,
             play_type,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+        )
+        event_entry.validate()
+        stats_models.CompleteExplorationEventLogEntryModel.create(
+            event_entry.exploration_id,
+            event_entry.exploration_version,
+            event_entry.state_name,
+            event_entry.session_id,
+            event_entry.client_time_spent_in_secs,
+            event_entry.params,
+            event_entry.play_type,
         )
 
 

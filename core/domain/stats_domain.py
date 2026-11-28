@@ -2388,3 +2388,177 @@ class LearnerAnswerInfo:
         """
         learner_answer_info_dict = self.to_dict()
         return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))
+
+
+class CompleteExplorationEventLogEntryDict(TypedDict):
+    """Dictionary representation of CompleteExplorationEventLogEntry."""
+
+    event_type: str
+    exploration_id: str
+    exploration_version: int
+    state_name: str
+    session_id: str
+    client_time_spent_in_secs: float
+    params: Dict[str, str]
+    play_type: str
+    event_schema_version: int
+
+
+class CompleteExplorationEventLogEntry:
+    """Domain object for a complete exploration event log entry."""
+
+    def __init__(
+        self,
+        event_type: str,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        session_id: str,
+        client_time_spent_in_secs: float,
+        params: Dict[str, str],
+        play_type: str,
+        event_schema_version: int,
+    ) -> None:
+        self.event_type = event_type
+        self.exploration_id = exploration_id
+        self.exploration_version = exploration_version
+        self.state_name = state_name
+        self.session_id = session_id
+        self.client_time_spent_in_secs = client_time_spent_in_secs
+        self.params = params
+        self.play_type = play_type
+        self.event_schema_version = event_schema_version
+
+    def to_dict(self) -> CompleteExplorationEventLogEntryDict:
+        """Returns a dict representing this CompleteExplorationEventLogEntry
+        domain object.
+
+        Returns:
+            CompleteExplorationEventLogEntryDict. A dict representation of
+            the CompleteExplorationEventLogEntry instance.
+        """
+        return {
+            'event_type': self.event_type,
+            'exploration_id': self.exploration_id,
+            'exploration_version': self.exploration_version,
+            'state_name': self.state_name,
+            'session_id': self.session_id,
+            'client_time_spent_in_secs': self.client_time_spent_in_secs,
+            'params': self.params,
+            'play_type': self.play_type,
+            'event_schema_version': self.event_schema_version,
+        }
+
+    def validate(self) -> None:
+        """Validates the CompleteExplorationEventLogEntry domain object."""
+        if not isinstance(self.event_type, str):
+            raise utils.ValidationError(
+                'Expected event_type to be a str, received %s'
+                % self.event_type
+            )
+        if self.event_type != feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
+            raise utils.ValidationError(
+                'Expected event_type to be %s, received %s'
+                % (feconf.EVENT_TYPE_COMPLETE_EXPLORATION, self.event_type)
+            )
+
+        if not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+                'Expected exploration_id to be a str, received %s'
+                % self.exploration_id
+            )
+        if not self.exploration_id:
+            raise utils.ValidationError(
+                'Expected exploration_id to be non-empty'
+            )
+
+        if (
+            not isinstance(self.exploration_version, int)
+            or isinstance(self.exploration_version, bool)
+        ):
+            raise utils.ValidationError(
+                'Expected exploration_version to be an int, received %s'
+                % self.exploration_version
+            )
+        if self.exploration_version < 1:
+            raise utils.ValidationError(
+                'Expected exploration_version to be >= 1, received %s'
+                % self.exploration_version
+            )
+
+        if not isinstance(self.state_name, str):
+            raise utils.ValidationError(
+                'Expected state_name to be a str, received %s'
+                % self.state_name
+            )
+        if not self.state_name:
+            raise utils.ValidationError(
+                'Expected state_name to be non-empty'
+            )
+
+        if not isinstance(self.session_id, str):
+            raise utils.ValidationError(
+                'Expected session_id to be a str, received %s'
+                % self.session_id
+            )
+        if not self.session_id:
+            raise utils.ValidationError(
+                'Expected session_id to be non-empty'
+            )
+
+        if (
+            not isinstance(self.client_time_spent_in_secs, (float, int))
+            or isinstance(self.client_time_spent_in_secs, bool)
+        ):
+            raise utils.ValidationError(
+                'Expected client_time_spent_in_secs to be a float, received %s'
+                % type(self.client_time_spent_in_secs)
+            )
+        if self.client_time_spent_in_secs < 0:
+            raise utils.ValidationError(
+                'Expected client_time_spent_in_secs to be >= 0, received %s'
+                % self.client_time_spent_in_secs
+            )
+
+        if not isinstance(self.params, dict):
+            raise utils.ValidationError(
+                'Expected params to be a dict, received %s'
+                % self.params
+            )
+        for key, value in self.params.items():
+            if not isinstance(key, str) or not isinstance(value, str):
+                raise utils.ValidationError(
+                    'Expected params keys and values to be strings'
+                )
+
+        allowed_play_types = (
+            feconf.PLAY_TYPE_PLAYTEST,
+            feconf.PLAY_TYPE_NORMAL,
+        )
+        if self.play_type not in allowed_play_types:
+            raise utils.ValidationError(
+                'Expected play_type to be one of %s, received %s'
+                % (allowed_play_types, self.play_type)
+            )
+
+        if (
+            not isinstance(self.event_schema_version, int)
+            or isinstance(self.event_schema_version, bool)
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be an int, received %s'
+                % self.event_schema_version
+            )
+        if (
+            self.event_schema_version < 1
+            or self.event_schema_version
+            > feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be between 1 and %s, '
+                'received %s'
+                % (
+                    feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+                    self.event_schema_version,
+                )
+            )
