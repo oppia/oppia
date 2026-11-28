@@ -152,8 +152,8 @@
     },
     {
       "name": "exploration-editor/submit-review-and-respond-to-feedback",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "lesson-creator/check-improvements-tab",

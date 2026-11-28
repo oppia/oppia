@@ -37,6 +37,18 @@ const createExplorationButtonSelector =
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
+const feedBackButtonTab = '.e2e-test-feedback-tab';
+const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
+const feedbackSelector = '.e2e-test-exploration-feedback';
+const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
+const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
+const explorationFeedbackCardActiveSelector =
+  '.e2e-test-exploration-feedback-card-active';
+const explorationFeedbackTabContentSelector =
+  '.e2e-test-exploration-feedback-card';
+const feedbackTabBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
+const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
 const languageUpdateDropdown =
   'mat-select.e2e-test-exploration-language-select';
 const languageDropdownValueSelector =
@@ -2183,6 +2195,172 @@ export class ExplorationEditor extends BaseUser {
       );
     }
     showMessage(`Solutions contain "${expectedSolution}".`);
+  }
+
+  /**
+   * Navigate to feedback tab.
+   */
+  async navigateToFeedbackTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page
+        .$(mobileNavbarOptions)
+        .catch(() => null);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+        await this.expectElementToBeVisible(mobileNavbarDropdown);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileFeedbackTabButton);
+    } else {
+      await this.clickOnElementWithSelector(feedBackButtonTab);
+      await this.page.waitForLoadState('networkidle');
+    }
+
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  /**
+   * Checks the number of suggestions in the exploration editor.
+   * @param {number} expectedNumber - The expected number of suggestions.
+   */
+  async expectNoOfSuggestionsToBe(expectedNumber: number): Promise<void> {
+    await this.page.waitForSelector(feedbackSubjectSelector);
+    const count = await this.page.locator(feedbackSubjectSelector).count();
+
+    if (count === expectedNumber) {
+      showMessage('Number of suggestions matches the expected number.');
+    } else {
+      throw new Error(
+        `Number of suggestions does not match the expected number. Expected: ${expectedNumber}, Found: ${count}`
+      );
+    }
+  }
+
+  /**
+   * Views a feedback thread.
+   * @param {number} expectedThread - The 1-indexed position of the expected thread.
+   */
+  async viewFeedbackThread(expectedThread: number): Promise<void> {
+    // Reloading to make sure the feedback threads are updated.
+    await this.reloadPage();
+    await this.page.waitForSelector(feedbackSubjectSelector);
+    const feedbackSubjects = this.page.locator(feedbackSubjectSelector);
+    const count = await feedbackSubjects.count();
+
+    if (expectedThread > 0 && expectedThread <= count) {
+      await feedbackSubjects.nth(expectedThread - 1).click();
+
+      await this.page.waitForSelector(explorationFeedbackCardActiveSelector, {
+        state: 'visible',
+      });
+    } else {
+      throw new Error(`Expected thread not found: ${expectedThread}`);
+    }
+  }
+
+  /**
+   * Checks if a suggestion is anonymous.
+   * @param {string} suggestion - The expected suggestion.
+   * @param {boolean} anonymouslySubmitted - Indicates whether the suggestion is expected to be anonymous.
+   */
+  async expectSuggestionToBeAnonymous(
+    suggestion: string,
+    anonymouslySubmitted: boolean
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(feedbackSelector);
+    const actualSuggestion = await this.page.$eval(feedbackSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualSuggestion !== suggestion) {
+      throw new Error(
+        `Suggestion does not match the expected value. Expected: ${suggestion}, Found: ${actualSuggestion}`
+      );
+    }
+
+    const isAnonymouslySubmitted = await this.isTextPresentOnPage(
+      '(anonymously submitted)'
+    );
+
+    if (isAnonymouslySubmitted !== anonymouslySubmitted) {
+      throw new Error(
+        `Anonymity does not match the expected value. Expected: ${anonymouslySubmitted ? 'Anonymous' : 'Not anonymous'}, Found: ${isAnonymouslySubmitted ? 'Anonymous' : 'Not anonymous'}`
+      );
+    }
+  }
+
+  /**
+   * Replies to a suggestion.
+   * @param {string} reply - The reply to the suggestion.
+   */
+  async replyToSuggestion(reply: string): Promise<void> {
+    await this.page.waitForSelector(responseTextareaSelector, {
+      state: 'visible',
+    });
+    await this.typeInInputField(responseTextareaSelector, reply);
+    await this.clickOnElementWithSelector(sendButtonSelector);
+
+    // Wait until send button is disabled after clicking.
+    await this.page.waitForFunction((selector: string) => {
+      const btn = document.querySelector(selector) as HTMLButtonElement | null;
+      return btn !== null && btn.disabled;
+    }, sendButtonSelector);
+  }
+
+  /**
+   * Navigates back to the feedback tab.
+   */
+  async goBackToTheFeedbackTab(): Promise<void> {
+    await this.page.waitForSelector(feedbackTabBackButtonSelector, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(feedbackTabBackButtonSelector);
+    await this.page.waitForSelector(feedbackTabBackButtonSelector, {
+      state: 'hidden',
+    });
+  }
+
+  /**
+   * Changes the status of the current feedback thread.
+   * @param {string} statusValue - The new status value to set for the feedback.
+   */
+  async changeFeedbackStatus(statusValue: string): Promise<void> {
+    await this.page.waitForSelector(responseTextareaSelector, {
+      state: 'visible',
+    });
+    if (statusValue === 'ignored' || statusValue === 'not_actionable') {
+      await this.typeInInputField(responseTextareaSelector, statusValue);
+    }
+    await this.select(feedbackStatusMenu, statusValue);
+  }
+
+  /**
+   * Updates the feedback status and clicks on the send button.
+   * @param {string} statusValue - The new status value to set for the feedback.
+   */
+  async updateFeedbackStatus(statusValue: string): Promise<void> {
+    await this.changeFeedbackStatus(statusValue);
+    await this.clickOnElementWithSelector(sendButtonSelector);
+
+    await this.expectElementToBeClickable(sendButtonSelector, false);
+  }
+
+  /**
+   * Checks if the current feedback status matches the expected value.
+   * @param {string} statusValue - The expected status value of the feedback.
+   */
+  async expectFeedbackStatusToBe(statusValue: string): Promise<void> {
+    const currentStatus = await this.page.$eval(
+      feedbackStatusMenu,
+      el => (el as HTMLSelectElement).value
+    );
+    if (currentStatus !== statusValue) {
+      throw new Error(
+        `Expected feedback status to be ${statusValue}, but found ${currentStatus}`
+      );
+    }
   }
 }
 
