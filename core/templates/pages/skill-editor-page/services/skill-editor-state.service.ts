@@ -22,10 +22,13 @@ import cloneDeep from 'lodash/cloneDeep';
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
-import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {
+  SkillBackendApiService,
+  SkillSummariesByTopic,
+} from 'domain/skill/skill-backend-api.service';
 import {SkillRights} from 'domain/skill/skill-rights.model';
 import {SkillRightsBackendApiService} from 'domain/skill/skill-rights-backend-api.service';
-import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {AlertsService} from 'services/alerts.service';
 import {QuestionsListService} from 'services/questions-list.service';
@@ -34,16 +37,9 @@ import {LoaderService} from 'services/loader.service';
 export interface AssignedSkillTopicData {
   [topicName: string]: string;
 }
-interface GroupedSkillSummaryDictionaries {
-  [topicName: string]: SkillSummaryBackendDict[];
-}
-
 export interface GroupedSkillSummaries {
-  current: {
-    id: string;
-    description: string;
-  }[];
-  others: SkillSummaryBackendDict[];
+  current: Pick<SkillSummary, 'id' | 'description'>[];
+  others: Pick<SkillSummary, 'id' | 'description'>[];
 }
 @Injectable({
   providedIn: 'root',
@@ -93,7 +89,7 @@ export class SkillEditorStateService {
   };
 
   private _updateGroupedSkillSummaries = (
-    groupedSkillSummaries: GroupedSkillSummaryDictionaries
+    groupedSkillSummaries: SkillSummariesByTopic
   ) => {
     let topicName = null;
     this._groupedSkillSummaries.current = [];
