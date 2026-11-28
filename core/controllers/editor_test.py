@@ -1994,6 +1994,57 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             'Please provide a role for the new member of the exploration.',
         )
 
+    def test_cannot_add_playtester_to_public_exploration(self) -> None:
+        self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        collaborator_id = self.get_user_id_from_email(self.COLLABORATOR_EMAIL)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        exploration = self.save_new_valid_exploration(
+            exp_id,
+            self.owner_id,
+            title='Title for rights handler test!',
+            category='My category',
+        )
+        rights_manager.publish_exploration(self.owner, exp_id)
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        response = self.put_json(
+            rights_url,
+            {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_VIEWER,
+                'viewable_if_private': None,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'Playtesters can only be added to private explorations, '
+            'because anyone can play a public exploration.',
+        )
+        exploration_rights = rights_manager.get_exploration_rights(exp_id)
+        self.assertNotIn(collaborator_id, exploration_rights.viewer_ids)
+
+        # Other roles can still be given on a public exploration.
+        self.put_json(
+            rights_url,
+            {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'viewable_if_private': None,
+            },
+            csrf_token=csrf_token,
+        )
+        exploration_rights = rights_manager.get_exploration_rights(exp_id)
+        self.assertIn(collaborator_id, exploration_rights.editor_ids)
+
+        self.logout()
+
     def test_that_an_editor_can_edit_the_exploration(self) -> None:
         self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)

@@ -553,6 +553,17 @@ class ExplorationRightsHandler(
                     'Users are not allowed to assign other roles to '
                     'themselves.'
                 )
+            # Anyone can play a public exploration, so it has no playtesters.
+            # Checking here turns what would be an Exception in
+            # ActivityRights.assign_new_role (a 500) into a clear 400.
+            if (
+                new_member_role == rights_domain.ROLE_VIEWER
+                and not rights_manager.is_exploration_private(exploration_id)
+            ):
+                raise self.InvalidInputException(
+                    'Playtesters can only be added to private explorations, '
+                    'because anyone can play a public exploration.'
+                )
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role
             )
