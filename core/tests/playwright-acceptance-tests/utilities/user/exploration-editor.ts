@@ -52,6 +52,10 @@ const solutionInputTextArea =
   'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
+const previousCardButton = '.e2e-test-back-button';
+const previewRestartButton = '.e2e-test-preview-restart-button';
+const stateConversationContent = '.e2e-test-conversation-content';
+const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 
@@ -1130,6 +1134,56 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(previewTabContainer);
+  }
+
+  /**
+   * Verifies that the preview tab displays the expected card content.
+   * @param {string} expectedCardContent - The expected text content.
+   */
+  async expectPreviewCardContentToBe(
+    expectedCardContent: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(stateConversationContent);
+    await this.expectTextContentToBe(
+      stateConversationContent,
+      expectedCardContent
+    );
+  }
+
+  /**
+   * Verifies that the preview completion toast message is displayed and then disappears.
+   * @param {string} message - The expected toast message.
+   */
+  async expectPreviewCompletionToastMessage(message: string): Promise<void> {
+    await this.expectElementToBeVisible(explorationCompletionToastMessage);
+    await this.expectTextContentToContain(
+      explorationCompletionToastMessage,
+      message
+    );
+    showMessage('Exploration has completed successfully');
+    await this.expectElementToBeVisible(
+      explorationCompletionToastMessage,
+      false
+    );
+  }
+
+  /**
+   * Restarts the exploration preview.
+   */
+  async restartPreview(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isMobileNavbarExpanded = await this.page
+        .locator(mobileNavbarOptions)
+        .isVisible();
+      if (isMobileNavbarExpanded) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+    }
+    await this.expectElementToBeVisible(previewRestartButton);
+    await this.clickOnElementWithSelector(previewRestartButton);
+
+    await this.waitForNetworkIdle();
+    await this.expectElementToBeVisible(previousCardButton, false);
   }
 
   /**
