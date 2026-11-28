@@ -142,6 +142,60 @@ export class FractionInputValidationService {
       ) {
         return false;
       }
+      // An earlier IsEquivalentToAndInSimplestForm rule only matches answers
+      // written exactly as its fraction's simplest form (e.g. 1/2 but not 2/4,
+      // and 1 1/2 but not 3/2, even though 3/2 is also in simplest form), so
+      // later rules matching other representations of the value can still
+      // be reached.
+      if (earlierRule.type === 'IsEquivalentToAndInSimplestForm') {
+        const earlierSimplestForm = Fraction.fromDict(
+          earlierRule.inputs.f as FractionAnswer
+        ).convertToSimplestForm();
+        if (laterRule.type === 'IsExactlyEqualTo') {
+          return isEqual(
+            this.normalizeFractionToDict(laterRule.inputs.f as FractionAnswer),
+            earlierSimplestForm.toDict()
+          );
+        }
+        if (laterRule.type === 'IsEquivalentToAndInSimplestForm') {
+          return isEqual(
+            Fraction.fromDict(laterRule.inputs.f as FractionAnswer)
+              .convertToSimplestForm()
+              .toDict(),
+            earlierSimplestForm.toDict()
+          );
+        }
+        // The only other rule type with a single-value range is
+        // IsEquivalentTo, which matches every representation learners can
+        // submit for the value. It is only unreachable if the earlier rule's
+        // simplest form is the only one: answers must be in simplest form,
+        // that form must itself be allowed, and the value must not be
+        // writable as both a mixed number and an improper fraction (only
+        // values of 1 or more can be, and only if both are allowed). A whole
+        // number can also be submitted with a zero numerator (e.g. 0/2 or
+        // 1 0/2), which passes the simplest form check because its string
+        // form is unchanged by simplifying, so the later rule is reachable
+        // whenever that form is allowed.
+        const earlierFormIsAllowed =
+          (allowImproperFraction ||
+            !earlierSimplestForm.isImproperFraction()) &&
+          (allowNonzeroIntegerPart ||
+            !earlierSimplestForm.hasNonzeroIntegerPart());
+        const valueHasMixedAndImproperForms =
+          allowImproperFraction &&
+          allowNonzeroIntegerPart &&
+          (earlierSimplestForm.hasNonzeroIntegerPart() ||
+            earlierSimplestForm.isImproperFraction());
+        const value = earlierSimplestForm.toFloat();
+        const valueHasZeroNumeratorForms =
+          Number.isInteger(value) && (value === 0 || allowNonzeroIntegerPart);
+        return (
+          shouldBeInSimplestForm &&
+          earlierFormIsAllowed &&
+          !valueHasMixedAndImproperForms &&
+          !valueHasZeroNumeratorForms
+        );
+      }
       return true;
     };
 
