@@ -25,6 +25,7 @@ from core.controllers import (
     acl_decorators,
     admin,
     android,
+    android_release_coordinator,
     base,
     beam_jobs,
     blog_admin,
@@ -835,6 +836,14 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.FEATURE_FLAGS_URL,
         release_coordinator.FeatureFlagsHandler,
+    ),
+    get_redirect_route(
+        r'%s/<feature_flag_name>' % feconf.ANDROID_FEATURE_FLAGS_ADMIN_URL,
+        android_release_coordinator.AndroidFeatureFlagsAdminHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.ANDROID_FEATURE_FLAGS_ADMIN_URL,
+        android_release_coordinator.AndroidFeatureFlagsAdminHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.USER_GROUPS_HANDLER_URL,

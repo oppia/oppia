@@ -921,6 +921,67 @@ def can_access_release_coordinator_page(
     return test_can_access_release_coordinator_page
 
 
+def can_access_android_release_coordinator_page(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Checks if the user is logged in and can access Android release coordinator
+    page.
+
+    Args:
+        **kwargs: *. Keyword arguments.
+
+    Returns:
+        *. The return value of the decorated function.
+
+    Raises:
+        NotLoggedInException. The user is not logged in.
+        UnauthorizedUserException. The user does not have credentials to
+            access the Android release coordinator page.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_android_release_coordinator_page(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user is logged in and can access Android release coordinator
+        page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the Android release coordinator page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        can_manage_android_flags = (
+            role_services.ACTION_ACCESS_ANDROID_RELEASE_COORDINATOR_PAGE
+            in self.user.actions
+        )
+        can_view_android_flags = (
+            role_services.ACTION_ACCESS_RELEASE_COORDINATOR_PAGE
+            in self.user.actions
+        )
+        if can_manage_android_flags or (
+            self.request.method == 'GET' and can_view_android_flags
+        ):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access Android release coordinator page.'
+        )
+
+    return test_can_access_android_release_coordinator_page
+
+
 def can_access_translation_stats(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
