@@ -1418,6 +1418,84 @@ describe('Exploration editor page component', () => {
       ).not.toHaveBeenCalled();
     });
 
+    it('should not open feedback prompt modal if modal becomes not openable during fetch', fakeAsync(() => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        true;
+      const mockFeedbackStatusCounts: FeedbackStatusCountsBackendResponse = {
+        lesson_feedback_counts: {
+          open: 2,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 2,
+        },
+        platform_report_counts: {
+          open: 0,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 0,
+        },
+      };
+
+      spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      ).and.returnValue(Promise.resolve(mockFeedbackStatusCounts));
+      spyOn(ngbModal, 'open');
+
+      component.feedbackPromptModalHasBeenShown = false;
+      component.isModalOpenable = true;
+
+      component.maybeShowFeedbackPromptModal();
+      // Simulate another modal opening while fetch was in flight.
+      component.isModalOpenable = false;
+      tick();
+
+      expect(ngbModal.open).not.toHaveBeenCalled();
+    }));
+
+    it('should not open feedback prompt modal if modal was already shown during fetch', fakeAsync(() => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        true;
+      const mockFeedbackStatusCounts: FeedbackStatusCountsBackendResponse = {
+        lesson_feedback_counts: {
+          open: 2,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 2,
+        },
+        platform_report_counts: {
+          open: 0,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 0,
+        },
+      };
+
+      spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      ).and.returnValue(Promise.resolve(mockFeedbackStatusCounts));
+      spyOn(ngbModal, 'open');
+
+      component.feedbackPromptModalHasBeenShown = false;
+      component.isModalOpenable = true;
+
+      component.maybeShowFeedbackPromptModal();
+      // Simulate modal already marked shown while fetch was in flight.
+      component.feedbackPromptModalHasBeenShown = true;
+      tick();
+
+      expect(ngbModal.open).not.toHaveBeenCalled();
+    }));
+
     it('should handle error when fetching feedback status counts fails', fakeAsync(() => {
       mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
         true;

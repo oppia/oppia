@@ -245,7 +245,6 @@ const tagsField = '.e2e-test-chip-list-tags';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
-const stayInEditorButtonSelector = '.e2e-test-stay-in-editor-button';
 const goToFeedbackButtonSelector = '.e2e-test-go-to-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
@@ -2987,17 +2986,6 @@ export class ExplorationEditor extends BaseUser {
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
     await this.dismissWelcomeModal(false);
-  }
-
-  /**
-   * Function to dismiss the feedback prompt modal and stay in editor.
-   */
-  async dismissFeedbackPromptModal(): Promise<void> {
-    await this.page.waitForSelector(stayInEditorButtonSelector, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(stayInEditorButtonSelector);
-    await this.waitForNetworkIdle();
   }
 
   /**

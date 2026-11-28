@@ -872,7 +872,11 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         .then(response => {
           const openFeedbackCount = response.lesson_feedback_counts.open;
 
-          if (openFeedbackCount === 0) {
+          if (
+            openFeedbackCount === 0 ||
+            !this.isModalOpenable ||
+            this.feedbackPromptModalHasBeenShown
+          ) {
             return;
           }
 
