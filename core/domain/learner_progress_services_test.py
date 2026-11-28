@@ -686,6 +686,27 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [self.EXP_ID_0, self.EXP_ID_1],
         )
 
+        # Test that a non-existent exploration is not added to the completed list.
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, 'invalid_exp_id'
+        )
+        self.assertEqual(
+            self._get_all_completed_exp_ids(self.user_id),
+            [self.EXP_ID_0, self.EXP_ID_1],
+        )
+
+        # Test that a private exploration is not added to the completed list.
+        self.save_new_valid_exploration(
+            'private_exp_id_for_completed', self.owner_id
+        )
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, 'private_exp_id_for_completed'
+        )
+        self.assertEqual(
+            self._get_all_completed_exp_ids(self.user_id),
+            [self.EXP_ID_0, self.EXP_ID_1],
+        )
+
     def test_mark_collection_as_completed(self) -> None:
         self.assertEqual(
             self._get_all_completed_collection_ids(self.user_id), []
@@ -934,6 +955,27 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # incomplete list.
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_2, state_name, version
+        )
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id),
+            [self.EXP_ID_0],
+        )
+
+        # Test that a non-existent exploration is not added to the incomplete list.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, 'invalid_exp_id', state_name, version
+        )
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id),
+            [self.EXP_ID_0],
+        )
+
+        # Test that a private exploration is not added to the incomplete list.
+        self.save_new_valid_exploration(
+            'private_exp_id_for_incomplete', self.owner_id
+        )
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, 'private_exp_id_for_incomplete', state_name, version
         )
         self.assertEqual(
             self._get_all_incomplete_exp_ids(self.user_id),
