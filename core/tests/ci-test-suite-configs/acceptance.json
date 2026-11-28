@@ -642,8 +642,8 @@
     },
     {
       "name": "topic-manager/edit-and-republish-the-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-the-skill.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/topic-manager/edit-and-republish-the-skill.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "topic-manager/add-questions-from-topic-editor",
