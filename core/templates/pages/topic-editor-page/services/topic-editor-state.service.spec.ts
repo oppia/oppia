@@ -40,10 +40,7 @@ import {
   StudyGuideBackendDict,
 } from 'domain/topic/study-guide.model';
 import {TopicRightsBackendApiService} from 'domain/topic/topic-rights-backend-api.service';
-import {
-  TopicRights,
-  TopicRightsBackendDict,
-} from 'domain/topic/topic-rights.model';
+import {TopicRights} from 'domain/topic/topic-rights.model';
 import {TopicBackendDict, Topic} from 'domain/topic/topic-object.model';
 import {AlertsService} from 'services/alerts.service';
 import {TopicEditorStateService} from './topic-editor-state.service';
@@ -162,13 +159,15 @@ describe('Topic editor state service', () => {
   }
 
   class MockTopicRightsBackendApiService {
-    fetchTopicRightsAsync(topicId: string): Promise<TopicRightsBackendDict> {
-      return Promise.resolve({
-        published: true,
-        can_publish_topic: true,
-        can_edit_topic: true,
-        can_edit_question: true,
-      });
+    fetchTopicRightsAsync(topicId: string): Promise<TopicRights> {
+      return Promise.resolve(
+        TopicRights.createFromBackendDict({
+          published: true,
+          can_publish_topic: true,
+          can_edit_topic: true,
+          can_edit_question: true,
+        })
+      );
     }
   }
 

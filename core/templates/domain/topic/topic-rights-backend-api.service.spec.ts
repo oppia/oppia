@@ -23,6 +23,10 @@ import {
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {TopicRightsBackendApiService} from 'domain/topic/topic-rights-backend-api.service';
+import {
+  TopicRights,
+  TopicRightsBackendDict,
+} from 'domain/topic/topic-rights.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('Topic rights backend API service', () => {
@@ -33,6 +37,13 @@ describe('Topic rights backend API service', () => {
   let failHandler: jasmine.Spy<jasmine.Func>;
 
   let topicId = '0';
+  let sampleTopicRightsBackendDict: TopicRightsBackendDict = {
+    published: true,
+    can_publish_topic: true,
+    can_edit_topic: true,
+    can_edit_question: true,
+  };
+  let expectedTopicRights: TopicRights;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,6 +57,10 @@ describe('Topic rights backend API service', () => {
 
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
+
+    expectedTopicRights = TopicRights.createFromBackendDict(
+      sampleTopicRightsBackendDict
+    );
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('simple-csrf-token');
@@ -65,11 +80,11 @@ describe('Topic rights backend API service', () => {
       '/rightshandler/get_topic_rights/' + topicId
     );
     expect(req.request.method).toEqual('GET');
-    req.flush({}, {status: 200, statusText: ''});
+    req.flush(sampleTopicRightsBackendDict, {status: 200, statusText: ''});
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(expectedTopicRights);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -90,7 +105,21 @@ describe('Topic rights backend API service', () => {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should successfully publish and unpublish a topic', fakeAsync(() => {
+  it('should successfully publish and unpublish a topic and update cache', fakeAsync(() => {
+    let uncachedTopicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: true,
+      can_edit_topic: true,
+      can_edit_question: true,
+    });
+    topicRightsBackendApiService.cacheTopicRights(
+      topicId,
+      uncachedTopicRights
+    );
+    expect(
+      topicRightsBackendApiService.topicRightsCache[topicId].isPublished()
+    ).toBeFalse();
+
     topicRightsBackendApiService
       .publishTopicAsync(topicId)
       .then(successHandler, failHandler);
@@ -105,6 +134,9 @@ describe('Topic rights backend API service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
+    expect(
+      topicRightsBackendApiService.topicRightsCache[topicId].isPublished()
+    ).toBeTrue();
 
     topicRightsBackendApiService
       .unpublishTopicAsync(topicId)
@@ -120,6 +152,9 @@ describe('Topic rights backend API service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
+    expect(
+      topicRightsBackendApiService.topicRightsCache[topicId].isPublished()
+    ).toBeFalse();
   }));
 
   it('should call the provided fail handler on HTTP failure', fakeAsync(() => {
@@ -156,18 +191,11 @@ describe('Topic rights backend API service', () => {
       '/rightshandler/get_topic_rights/0'
     );
     expect(req.request.method).toEqual('GET');
-    req.flush(
-      {
-        topic_id: '0',
-        topic_is_published: true,
-        manager_ids: ['user_id'],
-      },
-      {status: 200, statusText: ''}
-    );
+    req.flush(sampleTopicRightsBackendDict, {status: 200, statusText: ''});
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(expectedTopicRights);
     expect(failHandler).not.toHaveBeenCalled();
     // It should now be cached.
     expect(topicRightsBackendApiService.isCached(topicId)).toBeTrue();
@@ -178,11 +206,10 @@ describe('Topic rights backend API service', () => {
     expect(topicRightsBackendApiService.isCached(topicId)).toBeFalse();
 
     // Cache a topic rights object.
-    topicRightsBackendApiService.cacheTopicRights(topicId, {
-      topic_id: '0',
-      topic_is_published: true,
-      manager_ids: ['user_id'],
-    });
+    topicRightsBackendApiService.cacheTopicRights(
+      topicId,
+      expectedTopicRights
+    );
 
     // It should now be cached.
     expect(topicRightsBackendApiService.isCached(topicId)).toBeTrue();
@@ -196,11 +223,7 @@ describe('Topic rights backend API service', () => {
     // http://brianmcd.com/2014/03/27/a-tip-for-angular-unit-tests-with-promises.html
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      topic_id: '0',
-      topic_is_published: true,
-      manager_ids: ['user_id'],
-    });
+    expect(successHandler).toHaveBeenCalledWith(expectedTopicRights);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 

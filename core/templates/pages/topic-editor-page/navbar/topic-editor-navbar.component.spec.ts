@@ -32,10 +32,7 @@ import {Change} from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
-import {
-  TopicRightsBackendApiService,
-  TopicRightsBackendResponse,
-} from 'domain/topic/topic-rights-backend-api.service';
+import {TopicRightsBackendApiService} from 'domain/topic/topic-rights-backend-api.service';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {AlertsService} from 'services/alerts.service';
@@ -759,11 +756,7 @@ describe('Topic Editor Navbar', () => {
     });
     componentInstance.showTopicEditOptions = true;
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
-      Promise.resolve({
-        topic_id: 'topic_1',
-        topic_is_published: false,
-        manager_ids: [],
-      })
+      Promise.resolve()
     );
     spyOn(topicEditorStateService, 'setTopicRights');
 
@@ -791,11 +784,7 @@ describe('Topic Editor Navbar', () => {
       can_edit_question: true,
     });
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
-      Promise.resolve({
-        topic_id: 'topic_1',
-        topic_is_published: false,
-        manager_ids: [],
-      })
+      Promise.resolve()
     );
 
     componentInstance.unpublishTopic();
@@ -819,7 +808,7 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(alertsService, 'addWarning');
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
-      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+      Promise.resolve()
     );
     spyOn(topicEditorStateService, 'setTopicRights');
 
@@ -843,11 +832,7 @@ describe('Topic Editor Navbar', () => {
     componentInstance.topicId = 'topic_1';
     componentInstance.topic = topic;
     spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
-      Promise.resolve({
-        topic_id: 'topic_1',
-        topic_is_published: true,
-        manager_ids: [],
-      })
+      Promise.resolve()
     );
     spyOn(alertsService, 'addSuccessMessage');
     componentInstance.topicRights = TopicRights.createFromBackendDict({
@@ -1061,11 +1046,7 @@ describe('Topic Editor Navbar', () => {
     componentInstance.topicId = 'topic_1';
     componentInstance.topic = topic;
     spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
-      Promise.resolve({
-        topic_id: 'topic_1',
-        topic_is_published: true,
-        manager_ids: [],
-      })
+      Promise.resolve()
     );
     spyOn(alertsService, 'addSuccessMessage');
     // Topic is already published.

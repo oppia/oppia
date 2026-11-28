@@ -34,10 +34,7 @@ import {
 } from 'domain/topic/subtopic-page.model';
 import {SkillIdToDescriptionMap} from 'domain/topic/subtopic.model';
 import {TopicRightsBackendApiService} from 'domain/topic/topic-rights-backend-api.service';
-import {
-  TopicRights,
-  TopicRightsBackendDict,
-} from 'domain/topic/topic-rights.model';
+import {TopicRights} from 'domain/topic/topic-rights.model';
 import {Topic, TopicBackendDict} from 'domain/topic/topic-object.model';
 import cloneDeep from 'lodash/cloneDeep';
 import {AlertsService} from 'services/alerts.service';
@@ -299,12 +296,8 @@ export class TopicEditorStateService {
     this._topicRights.copyFromTopicRights(topicRights);
   }
 
-  private _updateTopicRights(
-    newBackendTopicRightsObject: TopicRightsBackendDict
-  ): void {
-    this._setTopicRights(
-      TopicRights.createFromBackendDict(newBackendTopicRightsObject)
-    );
+  private _updateTopicRights(newBackendTopicRightsObject: TopicRights): void {
+    this._setTopicRights(newBackendTopicRightsObject);
   }
 
   private _setCanonicalStorySummaries(
