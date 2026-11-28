@@ -1022,11 +1022,6 @@ export class ExplorationEditor extends BaseUser {
             hidden: true,
           });
         });
-      await this.page.waitForFunction(
-        (selector: string) => document.querySelectorAll(selector).length === 0,
-        {},
-        activeModalBackdropSelector
-      );
     } else {
       await this.clickOnElementWithSelector(addAnotherResponseButton);
       // The waitForNetworkIdle method waits for the response
