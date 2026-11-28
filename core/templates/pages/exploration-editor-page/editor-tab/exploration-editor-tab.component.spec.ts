@@ -65,6 +65,7 @@ import {
 import {Skill} from 'domain/skill/skill.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {AlertsService} from 'services/alerts.service';
+import {ChangeListService} from '../services/change-list.service';
 import {InteractionData} from 'interactions/customization-args-defs';
 
 describe('Exploration editor tab component', () => {
@@ -89,6 +90,7 @@ describe('Exploration editor tab component', () => {
   let versionHistoryService: VersionHistoryService;
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
+  let changeListService: ChangeListService;
   let skillBackendApiService: SkillBackendApiService;
   let alertsService: AlertsService;
 
@@ -233,6 +235,7 @@ describe('Exploration editor tab component', () => {
     );
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     alertsService = TestBed.inject(AlertsService);
+    changeListService = TestBed.inject(ChangeListService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
     spyOn(pageContextService, 'getExplorationId').and.returnValue(
@@ -1397,6 +1400,48 @@ describe('Exploration editor tab component', () => {
     expect(
       versionHistoryBackendApiService.fetchStateVersionHistoryAsync
     ).toHaveBeenCalled();
+  }));
+
+  it('should fetch the version history of a renamed state by its saved name', fakeAsync(() => {
+    stateEditorService.setActiveStateName('First State');
+    spyOn(changeListService, 'getSavedStateName').and.returnValue(
+      'Saved State'
+    );
+    spyOn(
+      versionHistoryBackendApiService,
+      'fetchStateVersionHistoryAsync'
+    ).and.resolveTo(null);
+
+    component.initStateEditor();
+    tick();
+    flush();
+
+    expect(changeListService.getSavedStateName).toHaveBeenCalledWith(
+      'First State'
+    );
+    expect(
+      versionHistoryBackendApiService.fetchStateVersionHistoryAsync
+    ).toHaveBeenCalledWith('explorationId', 'Saved State', 3);
+    expect(component.stateIsNotSavedYet).toBe(false);
+  }));
+
+  it('should not fetch the version history of a state that is not saved yet', fakeAsync(() => {
+    stateEditorService.setActiveStateName('First State');
+    spyOn(changeListService, 'getSavedStateName').and.returnValue(null);
+    spyOn(
+      versionHistoryBackendApiService,
+      'fetchStateVersionHistoryAsync'
+    ).and.resolveTo(null);
+
+    component.initStateEditor();
+    tick();
+    flush();
+
+    expect(
+      versionHistoryBackendApiService.fetchStateVersionHistoryAsync
+    ).not.toHaveBeenCalled();
+    expect(component.stateIsNotSavedYet).toBe(true);
+    expect(component.validationErrorIsShown).toBe(false);
   }));
 
   it('should show error message if the backend api fails', fakeAsync(() => {

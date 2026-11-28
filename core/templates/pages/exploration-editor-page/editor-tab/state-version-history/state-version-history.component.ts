@@ -31,6 +31,7 @@ import {
 })
 export class StateVersionHistoryComponent {
   @Input() validationErrorIsShown!: boolean;
+  @Input() stateIsNotSavedYet: boolean = false;
 
   constructor(
     private versionHistoryService: VersionHistoryService,
