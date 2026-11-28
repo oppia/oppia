@@ -62,7 +62,7 @@
     </div>
 
     <p class="oppia-profile-user-bio e2e-test-profile-bio" tabindex="0">
-      <span *ngIf="userBio" class="oppia-user-bio-text">{{ userBio }}</span>
+      <span *ngIf="userBio" [attr.dir]="'auto'" class="oppia-user-bio-text">{{ userBio }}</span>
       <span *ngIf="!userBio">
         <em>This user has not supplied a bio yet.</em>
       </span>
