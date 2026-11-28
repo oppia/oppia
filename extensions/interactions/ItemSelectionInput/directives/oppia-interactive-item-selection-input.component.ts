@@ -20,7 +20,13 @@
  * followed by the name of the arg.
  */
 
-import {Component, HostListener, Input, OnInit} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnInit,
+} from '@angular/core';
 import {ItemSelectionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
@@ -66,7 +72,8 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private itemSelectionInputRulesService: ItemSelectionInputRulesService,
     private playerPositionService: PlayerPositionService,
-    private playerTranscriptService: PlayerTranscriptService
+    private playerTranscriptService: PlayerTranscriptService,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -193,6 +200,17 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
 
   @HostListener('document:keydown.enter', ['$event'])
   handleEnterKey(event: KeyboardEvent): void {
+    // Only handle Enter presses meant for this interaction. Enter presses on
+    // other elements (e.g. buttons in the exploration editor's modals) must
+    // keep their native behaviour.
+    const target = event.target as Node | null;
+    if (
+      target &&
+      target !== document.body &&
+      !this.elementRef.nativeElement.contains(target)
+    ) {
+      return;
+    }
     event.preventDefault();
     this.submitAnswer();
   }

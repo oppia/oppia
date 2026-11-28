@@ -1468,7 +1468,7 @@ describe('Conversation flow service', () => {
     );
   }));
 
-  it('should set i18nLanguageCode to en if iframe and lang is missing or unsupported', fakeAsync(() => {
+  it('should not override i18nLanguageCode if iframe and lang is missing or unsupported', fakeAsync(() => {
     const card = createCard('', 'TextInput');
     conversationFlowService.displayedCard = card;
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
@@ -1486,9 +1486,7 @@ describe('Conversation flow service', () => {
     conversationFlowService.initializeDirectiveComponents(card, 'focus-label');
     tick(1000);
 
-    expect(i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith(
-      'en'
-    );
+    expect(i18nLanguageCodeService.setI18nLanguageCode).not.toHaveBeenCalled();
   }));
 
   it('should throw when currentState.name is null', () => {

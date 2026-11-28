@@ -24,10 +24,12 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 describe('SidebarStatusService', () => {
   let sss: SidebarStatusService;
   let $window: WindowRef;
+  let originalOverflowY: string;
 
   beforeEach(() => {
     $window = TestBed.inject(WindowRef);
     sss = TestBed.inject(SidebarStatusService);
+    originalOverflowY = $window.nativeWindow.document.body.style.overflowY;
 
     // This approach was choosen because spyOn() doesn't work on properties
     // that doesn't have a get access type.
@@ -42,15 +44,32 @@ describe('SidebarStatusService', () => {
     spyOnProperty($window.nativeWindow, 'innerWidth').and.returnValue(600);
   });
 
+  afterEach(() => {
+    $window.nativeWindow.document.body.style.overflowY = originalOverflowY;
+  });
+
   it('should open the sidebar if its not open', () => {
     sss.openSidebar();
     expect(sss.isSidebarShown()).toBe(true);
   });
 
-  it('should close the sidebar when its open', () => {
+  it('should close the sidebar and restore body scrolling', () => {
     sss.openSidebar();
+    $window.nativeWindow.document.body.style.overflowY = 'hidden';
+
     sss.closeSidebar();
+
     expect(sss.isSidebarShown()).toBe(false);
+    expect($window.nativeWindow.document.body.style.overflowY).toBe('auto');
+  });
+
+  it('should not change scrolling if sidebar is already closed', () => {
+    $window.nativeWindow.document.body.style.overflowY = 'hidden';
+
+    sss.closeSidebar();
+
+    expect(sss.isSidebarShown()).toBe(false);
+    expect($window.nativeWindow.document.body.style.overflowY).toBe('hidden');
   });
 
   it('should toggle the sidebar to open and then close', () => {
@@ -74,8 +93,30 @@ describe('SidebarStatusService', () => {
     sss.toggleHamburgerIconStatus(clickEvent);
     expect(sss.isHamburgerIconclicked()).toBe(true);
     sss.openSidebar();
+    $window.nativeWindow.document.body.style.overflowY = 'hidden';
     sss.onDocumentClick();
     expect(sss.isSidebarShown()).toBe(false);
+    expect($window.nativeWindow.document.body.style.overflowY).toBe('auto');
     expect(sss.isHamburgerIconclicked()).toBe(false);
+  });
+
+  it('should reset hamburger state when the sidebar is closed', () => {
+    const clickEvent = new CustomEvent('click');
+
+    // Open the sidebar via the hamburger icon.
+    sss.toggleHamburgerIconStatus(clickEvent);
+    sss.openSidebar();
+
+    // Close it without a tap outside (e.g. swipe or wide resize).
+    sss.closeSidebar();
+    expect(sss.isHamburgerIconclicked()).toBeFalse();
+
+    // Reopen via the hamburger icon, then tap outside.
+    sss.toggleHamburgerIconStatus(clickEvent);
+    sss.openSidebar();
+    expect(sss.isHamburgerIconclicked()).toBeTrue();
+
+    sss.onDocumentClick();
+    expect(sss.isSidebarShown()).toBeFalse();
   });
 });
