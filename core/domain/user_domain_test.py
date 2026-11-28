@@ -1248,6 +1248,125 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         self.assertListEqual(learner_goals.topic_ids_to_learn, [])
 
 
+class LearnerGoalsValidationTests(test_utils.GenericTestBase):
+    """Tests for the validate() method of the LearnerGoals domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.learner_goals = user_domain.LearnerGoals(
+            'uid_%s' % ('a' * 32), ['topic_id0'], ['topic_id1']
+        )
+
+    def test_validation_passes_for_valid_learner_goals(self) -> None:
+        self.learner_goals.validate()
+
+    def test_validation_passes_with_empty_topic_lists(self) -> None:
+        self.learner_goals.topic_ids_to_learn = []
+        self.learner_goals.topic_ids_to_master = []
+
+        self.learner_goals.validate()
+
+    def test_validation_fails_with_invalid_user_id(self) -> None:
+        self.learner_goals.id = 'invalid_user_id'
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected id to be a valid user ID, received invalid_user_id',
+        ):
+            self.learner_goals.validate()
+
+    def test_validation_fails_with_non_string_user_id(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.learner_goals.id = 123  # type: ignore[assignment]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected id to be a valid user ID, received 123',
+        ):
+            self.learner_goals.validate()
+
+    def test_validation_fails_when_topic_ids_to_learn_is_not_list(
+        self,
+    ) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.learner_goals.topic_ids_to_learn = 'topic_id0'  # type: ignore[assignment]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected topic_ids_to_learn to be a list, received str',
+        ):
+            self.learner_goals.validate()
+
+    def test_validation_fails_when_topic_ids_to_master_is_not_list(
+        self,
+    ) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.learner_goals.topic_ids_to_master = None  # type: ignore[assignment]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected topic_ids_to_master to be a list, received NoneType',
+        ):
+            self.learner_goals.validate()
+
+    def test_validation_fails_with_invalid_topic_id_format(self) -> None:
+        self.learner_goals.topic_ids_to_learn = ['invalid topic id']
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each topic ID in topic_ids_to_learn to be a valid '
+            'entity ID, received invalid topic id',
+        ):
+            self.learner_goals.validate()
+
+    def test_validation_fails_with_non_string_topic_id(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.learner_goals.topic_ids_to_master = [1]  # type: ignore[list-item]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each topic ID in topic_ids_to_master to be a valid '
+            'entity ID, received 1',
+        ):
+            self.learner_goals.validate()
+
+    def test_validation_fails_with_duplicate_topic_ids(self) -> None:
+        self.learner_goals.topic_ids_to_learn = [
+            'topic_id2',
+            'topic_id0',
+            'topic_id2',
+            'topic_id1',
+            'topic_id0',
+        ]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            r'Expected topic_ids_to_learn to have no duplicates, received '
+            r'\[\'topic_id0\', \'topic_id2\'\]',
+        ):
+            self.learner_goals.validate()
+
+    def test_validation_fails_when_topic_is_to_learn_and_master(
+        self,
+    ) -> None:
+        self.learner_goals.topic_ids_to_master = ['topic_id0']
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            r'Expected a topic to not be in both topic_ids_to_learn and '
+            r'topic_ids_to_master, received \[\'topic_id0\'\]',
+        ):
+            self.learner_goals.validate()
+
+
 class UserContributionProficiencyTests(test_utils.GenericTestBase):
     """Testing domain object for user contribution scoring model."""
 
