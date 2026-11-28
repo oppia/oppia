@@ -38,9 +38,9 @@ const actionStatusMessageSelector = '.e2e-test-status-message';
 
 export class TranslationAdmin extends BaseUser {
   /**
-   * Navigates to the contributor dashboard admin page.
+   * Navigates to the contributor dashboard admin page as translation admin.
    */
-  async navigateToContributorDashboardAdminPage(): Promise<void> {
+  async navigateToContributorDashboardAdminPageAsTranslationAdmin(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
   }
 

@@ -17,44 +17,150 @@
  * common to all the users of the contributor dashboard.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {ElementHandle, expect, Locator, Page} from '@playwright/test';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditor} from './exploration-editor';
 
+// Contributor dashboard selectors.
 const contributionTabSelector = '.e2e-test-contribution-tab';
 const activeTabNameSelector = '.e2e-test-active-tab-name';
-const opportunityItemSelector = '.e2e-test-opportunity-list-item';
-const opportunityItemHeadingSelector =
+
+// Contribution opportunities selectors shared by contributor roles.
+export const opportunityItemSelector = '.e2e-test-opportunity-list-item';
+export const opportunityItemHeadingSelector =
   '.e2e-test-opportunity-list-item-heading';
-const opportunitySubHeadingSelector =
+export const opportunitySubHeadingSelector =
   '.e2e-test-opportunity-list-item-subheading';
+export const opportunityTranslateButtonSelector =
+  '.e2e-test-opportunity-list-item-button';
+
+// Contributor dashboard > My Contributions selectors.
 const contributionTabClass = 'e2e-test-contribution-tab';
 const activeElementClass = 'e2e-test-active';
 const activeNavbarButtonClass = 'oppia-contributions-active-navbar';
+
 const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
 const viewDropdownOptionClass = 'e2e-test-mobile-contribution-dropdown-option';
+
+// Contribution dashboard filters.
+const topicSelector = '.e2e-test-topic-selector';
+const selectedTopicSelector = '.e2e-test-topic-selector-selected';
+const topicOptionSelector = '.e2e-test-topic-selector-option';
+
+const mobileElementSelector = '.e2e-test-mobile-element';
+const desktopElementSelector = '.e2e-test-desktop-element';
+
+// Language filter selectors.
+const languageSelector = '.e2e-test-language-selector';
+const selectedLanguageSelector = '.e2e-test-language-selector-selected';
+const featuredLanguageOptionSelector = '.e2e-test-featured-language';
+const languageOptionSelector = '.e2e-test-language-selector-option';
+
+// Badge selectors.
 const desktopBadgeContainerSelector = '.e2e-test-desktop-badge-container';
 const mobileBadgeContainerSelector = '.e2e-test-mobile-badge-container';
 const badgeSelector = '.e2e-test-badge';
 const badgeValueSelector = '.e2e-test-badge-value';
 const badgeCaptionSelector = '.e2e-test-badge-caption';
 const badgeLanguageSelector = '.e2e-test-badge-language';
-const topicSelector = '.e2e-test-topic-selector';
-const selectedTopicSelector = '.e2e-test-topic-selector-selected';
-const topicOptionSelector = '.e2e-test-topic-selector-option';
-const mobileElementSelector = '.e2e-test-mobile-element';
-const desktopElementSelector = '.e2e-test-desktop-element';
+
+// Contribution statistics and review selectors.
+const desktopStatsRowSelector = 'tr';
+const desktopStatsCellSelector = 'td';
+const mobileStatsRowSelector = '.e2e-test-mobile-stats-row';
+const mobileStatsCellSelector = '.e2e-test-mobile-stats-cell';
+const rteEditorBodySelector = '.e2e-test-rte';
+const paginationButtonPreviousSelector = '.e2e-test-pagination-button-previous';
+const paginationButtonNextSelector = '.e2e-test-pagination-button-next';
+const reviewContentContainerSelector = '.e2e-test-review-content-container';
 const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
 const reviewCommentTextareaSelector = '.e2e-test-suggestion-review-message';
 const rteDisplaySelector = '.e2e-test-state-content-display';
 
 export class Contributor extends ExplorationEditor {
   /**
+   * Verifies the enabled state of a review pagination button.
+   */
+  async expectPaginationButtonToBeDisabled(
+    button: 'previous' | 'next',
+    disabled: boolean = true
+  ): Promise<void> {
+    const selector =
+      button === 'previous'
+        ? paginationButtonPreviousSelector
+        : paginationButtonNextSelector;
+    const paginationButton = this.page.locator(selector);
+    await expect(paginationButton).toBeVisible();
+    if (disabled) {
+      await expect(paginationButton).toBeDisabled();
+    } else {
+      await expect(paginationButton).toBeEnabled();
+    }
+  }
+
+  /**
+   * Moves between review cards and waits for the card content to change.
+   */
+  async clickOnPaginationButton(button: 'previous' | 'next'): Promise<void> {
+    const content = this.page.locator(reviewContentContainerSelector);
+    const previousContent = await content.textContent();
+    const selector =
+      button === 'previous'
+        ? paginationButtonPreviousSelector
+        : paginationButtonNextSelector;
+    await this.page.locator(selector).click();
+    await expect(content).not.toHaveText(previousContent ?? '');
+  }
+
+  /**
+   * Types text into the currently focused rich-text editor.
+   *
+   * The translation editor is a contenteditable CKEditor surface, so using
+   * keyboard input keeps Angular's change detection and editor events intact.
+   */
+  async typeTextForRTE(text: string): Promise<void> {
+    const editor = this.page.locator(rteEditorBodySelector).first();
+    await expect(editor).toBeVisible();
+    await editor.click();
+    await this.page.keyboard.type(`${text}\n`);
+    await expect(editor).toContainText(text);
+  }
+
+  /**
+   * Clicks the language filter dropdown.
+   */
+  async clickOnLanguageFilterDropdown(): Promise<void> {
+    await this.clickOnElementWithSelector(languageSelector);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(languageOptionSelector);
+  }
+
+  /**
+   * Selects the given language from the language filter.
+   *
+   * @param {string} language - The language to select.
+   */
+  async selectLanguageFilter(language: string): Promise<void> {
+    await this.clickOnLanguageFilterDropdown();
+
+    const languageOptions = this.page.locator(
+      `${featuredLanguageOptionSelector}, ${languageOptionSelector}`
+    );
+
+    const matchingOption = languageOptions.filter({hasText: language}).first();
+
+    await matchingOption.waitFor({state: 'visible'});
+    await matchingOption.click();
+
+    await this.expectTextContentToContain(selectedLanguageSelector, language);
+  }
+
+  /**
    * Checks if the opportunity is visible and matches the expected values.
    * @param {string} heading - The expected heading of the opportunity.
    * @param {string} subheading - The expected subheading of the opportunity.
    * @param {boolean} visible - Whether the opportunity should be visible or not.
-   * @returns {Promise<ElementHandle | null>} The opportunity element, if found.
+   * @returns {Promise<ElementHandle<Element> | null>} The opportunity element, if found.
    */
   async expectOpportunityToBePresent(
     heading: string,
@@ -393,11 +499,11 @@ export class Contributor extends ExplorationEditor {
     rowValues: (string | null)[]
   ): Promise<void> {
     const rowSelector = this.isViewportAtMobileWidth()
-      ? '.e2e-test-mobile-stats-row'
-      : 'tr';
+      ? mobileStatsRowSelector
+      : desktopStatsRowSelector;
     const cellSelector = this.isViewportAtMobileWidth()
-      ? '.e2e-test-mobile-stats-cell'
-      : 'td';
+      ? mobileStatsCellSelector
+      : desktopStatsCellSelector;
     await this.expectElementToBeVisible(rowSelector);
 
     const tableRows = await this.page.$$(rowSelector);
@@ -413,7 +519,7 @@ export class Contributor extends ExplorationEditor {
 
       let match = true;
       for (let i = 0; i < rowValues.length; i++) {
-        if (!rowValues[i]) {
+        if (rowValues[i] === null) {
           // If row cell from input is null, we skip comparing it.
           continue;
         }
@@ -484,6 +590,41 @@ export class Contributor extends ExplorationEditor {
     await this.expectTextContentToBe(rteDisplaySelector, question);
   }
 }
+
+/**
+ * Returns the opportunity card for the given heading and subheading.
+ *
+ * @param {Page} page - The page.
+ * @param {string} heading - The heading displayed on the opportunity card.
+ * @param {string} subheading - The subheading displayed on the opportunity card.
+ */
+export const getTranslationOpportunityCard = async function (
+  page: Page,
+  heading: string,
+  subheading: string
+): Promise<Locator> {
+  await page
+    .locator(opportunityItemSelector)
+    .first()
+    .waitFor({state: 'visible'});
+
+  const opportunityItem = page
+    .locator(opportunityItemSelector)
+    .filter({
+      has: page
+        .locator(opportunityItemHeadingSelector)
+        .filter({hasText: heading}),
+    })
+    .filter({
+      has: page
+        .locator(opportunitySubHeadingSelector)
+        .filter({hasText: subheading}),
+    })
+    .first();
+
+  await opportunityItem.waitFor({state: 'visible'});
+  return opportunityItem;
+};
 
 export const ContributorFactory = (page: Page): Contributor => {
   return new Contributor(page);
