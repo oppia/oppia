@@ -18,7 +18,9 @@
 
 from __future__ import annotations
 
-from core import feconf
+import datetime
+
+from core import feconf, utils
 from core.domain import (
     collection_domain,
     collection_services,
@@ -28,6 +30,7 @@ from core.domain import (
     rights_domain,
     rights_manager,
     subscription_services,
+    user_domain,
     user_services,
 )
 from core.platform import models
@@ -37,9 +40,11 @@ from typing import Final, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import user_models
+    from mypy_imports import base_models, user_models
 
-(user_models,) = models.Registry.import_models([models.Names.USER])
+(base_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.USER]
+)
 
 COLLECTION_ID: Final = 'col_id'
 COLLECTION_ID_2: Final = 'col_id_2'
@@ -82,19 +87,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             List(str). The list containing all the feedback thread ids to
             which the user is subscribed to.
         """
-        subscriptions_model = user_models.UserSubscriptionsModel.get(
-            user_id, strict=False
-        )
-        # TODO(#15621): The explicit declaration of type for ndb properties
-        # should be removed. Currently, these ndb properties are annotated with
-        # Any return type. Once we have proper return type we can remove this.
-        if subscriptions_model:
-            feedback_thread_ids: List[str] = (
-                subscriptions_model.general_feedback_thread_ids
-            )
-            return feedback_thread_ids
-        else:
-            return []
+        return subscription_services.get_user_subscriptions(
+            user_id
+        ).general_feedback_thread_ids
 
     def _get_exploration_ids_subscribed_to(self, user_id: str) -> List[str]:
         """Returns all the exploration ids of the explorations to which the user
@@ -107,17 +102,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             List(str). The list containing all the exploration ids of the
             explorations to which the user has subscribed to.
         """
-        subscriptions_model = user_models.UserSubscriptionsModel.get(
-            user_id, strict=False
-        )
-        # TODO(#15621): The explicit declaration of type for ndb properties
-        # should be removed. Currently, these ndb properties are annotated with
-        # Any return type. Once we have proper return type we can remove this.
-        if subscriptions_model:
-            exploration_ids: List[str] = subscriptions_model.exploration_ids
-            return exploration_ids
-        else:
-            return []
+        return subscription_services.get_user_subscriptions(
+            user_id
+        ).exploration_ids
 
     def _get_collection_ids_subscribed_to(self, user_id: str) -> List[str]:
         """Returns all the collection ids of the collections to which the user
@@ -130,17 +117,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             List(str). The list containing all the collection ids of the
             collections to which the user has subscribed to.
         """
-        subscriptions_model = user_models.UserSubscriptionsModel.get(
-            user_id, strict=False
-        )
-        # TODO(#15621): The explicit declaration of type for ndb properties
-        # should be removed. Currently, these ndb properties are annotated with
-        # Any return type. Once we have proper return type we can remove this.
-        if subscriptions_model:
-            collection_ids: List[str] = subscriptions_model.collection_ids
-            return collection_ids
-        else:
-            return []
+        return subscription_services.get_user_subscriptions(
+            user_id
+        ).collection_ids
 
     def test_subscribe_to_feedback_thread(self) -> None:
         self.assertEqual(self._get_thread_ids_subscribed_to(USER_ID), [])
@@ -499,17 +478,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             List(str). The list containing all the creator ids the given user
             has subscribed to.
         """
-        subscriptions_model = user_models.UserSubscriptionsModel.get(
-            user_id, strict=False
-        )
-        # TODO(#15621): The explicit declaration of type for ndb properties
-        # should be removed. Currently, these ndb properties are annotated with
-        # Any return type. Once we have proper return type we can remove this.
-        if subscriptions_model:
-            creator_ids: List[str] = subscriptions_model.creator_ids
-            return creator_ids
-        else:
-            return []
+        return subscription_services.get_user_subscriptions(user_id).creator_ids
 
     def test_exception_is_raised_when_user_self_subscribes(self) -> None:
         with self.assertRaisesRegex(
@@ -623,4 +592,164 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             subscription_services.get_all_creators_subscribed_to(USER_ID),
             [self.owner_id, self.owner_2_id],
+        )
+
+
+class UserSubscriptionsGetAndSaveTests(test_utils.GenericTestBase):
+    """Tests for the functions that convert between UserSubscriptionsModel
+    and the UserSubscriptions domain object.
+    """
+
+    def test_get_user_subscriptions_returns_empty_object_for_new_user(
+        self,
+    ) -> None:
+        user_subscriptions = subscription_services.get_user_subscriptions(
+            USER_ID
+        )
+
+        self.assertEqual(user_subscriptions.user_id, USER_ID)
+        self.assertEqual(user_subscriptions.exploration_ids, [])
+        self.assertEqual(user_subscriptions.collection_ids, [])
+        self.assertEqual(user_subscriptions.general_feedback_thread_ids, [])
+        self.assertEqual(user_subscriptions.creator_ids, [])
+        self.assertIsNone(user_subscriptions.last_checked)
+        self.assertIsNone(
+            user_models.UserSubscriptionsModel.get(USER_ID, strict=False)
+        )
+
+    def test_get_user_subscriptions_strict_raises_for_new_user(self) -> None:
+        with self.assertRaisesRegex(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class UserSubscriptionsModel with id %s not found'
+            % USER_ID,
+        ):
+            subscription_services.get_user_subscriptions(USER_ID, strict=True)
+
+    def test_save_and_get_user_subscriptions(self) -> None:
+        last_checked = datetime.datetime(2026, 11, 28)
+        subscription_services.save_user_subscriptions(
+            user_domain.UserSubscriptions(
+                USER_ID,
+                [EXP_ID],
+                [COLLECTION_ID],
+                [FEEDBACK_THREAD_ID],
+                [USER_ID_2],
+                last_checked,
+            )
+        )
+
+        user_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            USER_ID
+        )
+        self.assertEqual(user_subscriptions_model.exploration_ids, [EXP_ID])
+        self.assertEqual(
+            user_subscriptions_model.collection_ids, [COLLECTION_ID]
+        )
+        self.assertEqual(
+            user_subscriptions_model.general_feedback_thread_ids,
+            [FEEDBACK_THREAD_ID],
+        )
+        self.assertEqual(user_subscriptions_model.creator_ids, [USER_ID_2])
+        self.assertEqual(user_subscriptions_model.last_checked, last_checked)
+
+        user_subscriptions = subscription_services.get_user_subscriptions(
+            USER_ID, strict=True
+        )
+        self.assertEqual(
+            user_subscriptions.to_dict(),
+            {
+                'exploration_ids': [EXP_ID],
+                'collection_ids': [COLLECTION_ID],
+                'general_feedback_thread_ids': [FEEDBACK_THREAD_ID],
+                'creator_ids': [USER_ID_2],
+                'last_checked': last_checked,
+            },
+        )
+
+    def test_saving_updates_existing_model(self) -> None:
+        subscription_services.subscribe_to_exploration(USER_ID, EXP_ID)
+        user_subscriptions = subscription_services.get_user_subscriptions(
+            USER_ID
+        )
+
+        user_subscriptions.add_exploration_id(EXP_ID_2)
+        subscription_services.save_user_subscriptions(user_subscriptions)
+
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get(USER_ID).exploration_ids,
+            [EXP_ID, EXP_ID_2],
+        )
+
+    def test_changing_domain_object_does_not_change_model(self) -> None:
+        subscription_services.subscribe_to_exploration(USER_ID, EXP_ID)
+        user_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            USER_ID
+        )
+        user_subscriptions = (
+            subscription_services.get_user_subscriptions_from_model(
+                user_subscriptions_model
+            )
+        )
+
+        user_subscriptions.add_exploration_id(EXP_ID_2)
+
+        self.assertEqual(user_subscriptions_model.exploration_ids, [EXP_ID])
+
+    def test_saving_invalid_subscriptions_raises_and_saves_nothing(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'User %s is not allowed to self subscribe.' % USER_ID,
+        ):
+            subscription_services.save_user_subscriptions(
+                user_domain.UserSubscriptions(
+                    USER_ID, [], [], [], [USER_ID], None
+                )
+            )
+
+        self.assertIsNone(
+            user_models.UserSubscriptionsModel.get(USER_ID, strict=False)
+        )
+
+    def test_save_multiple_user_subscriptions(self) -> None:
+        subscription_services.subscribe_to_exploration(USER_ID, EXP_ID)
+
+        subscription_services.save_multiple_user_subscriptions(
+            [
+                user_domain.UserSubscriptions(
+                    USER_ID, [EXP_ID_2], [], [], [], None
+                ),
+                user_domain.UserSubscriptions(
+                    USER_ID_2, [EXP_ID], [], [], [], None
+                ),
+            ]
+        )
+
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get(USER_ID).exploration_ids,
+            [EXP_ID_2],
+        )
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get(USER_ID_2).exploration_ids,
+            [EXP_ID],
+        )
+
+    def test_get_user_subscriptions_with_exploration_ids(self) -> None:
+        subscription_services.subscribe_to_exploration(USER_ID, EXP_ID)
+        subscription_services.subscribe_to_exploration(USER_ID_2, EXP_ID_2)
+        subscription_services.subscribe_to_collection('user_id_3', 'col_id')
+
+        user_subscriptions_list = (
+            subscription_services.get_user_subscriptions_with_exploration_ids(
+                [EXP_ID, EXP_ID_2]
+            )
+        )
+
+        self.assertItemsEqual(
+            [
+                user_subscriptions.user_id
+                for user_subscriptions in user_subscriptions_list
+            ],
+            [USER_ID, USER_ID_2],
         )
