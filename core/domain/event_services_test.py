@@ -23,12 +23,13 @@ import inspect
 import logging
 import re
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     event_services,
     exp_domain,
     exp_fetchers,
     feedback_services,
+    stats_domain,
     stats_services,
     taskqueue_services,
     user_services,
@@ -250,6 +251,98 @@ class RateExplorationEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.exploration_id, 'exp_id')
         self.assertEqual(model.rating, 3)
         self.assertEqual(model.old_rating, 2)
+        self.assertEqual(
+            model.event_schema_version,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+
+    def test_recording_first_rating_event_has_no_old_rating(self) -> None:
+        event_services.RateExplorationEventHandler.record(
+            'exp_id', 'user_id', 5, None
+        )
+
+        model = stats_models.RateExplorationEventLogEntryModel.get_all().get()
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert model is not None
+        self.assertEqual(model.rating, 5)
+        self.assertIsNone(model.old_rating)
+
+    def test_recording_an_invalid_rating_event_saves_nothing(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected rating to be between 1 and 5 inclusive, received 6',
+        ):
+            event_services.RateExplorationEventHandler.record(
+                'exp_id', 'user_id', 6, None
+            )
+
+        all_models = stats_models.RateExplorationEventLogEntryModel.get_all()
+        self.assertEqual(all_models.count(), 0)
+
+    def test_saving_an_entry_stores_all_of_its_fields(self) -> None:
+        entry = stats_domain.RateExplorationEventLogEntry(
+            feconf.EVENT_TYPE_RATE_EXPLORATION,
+            'exp_id',
+            4,
+            None,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+
+        entity_id = event_services.save_rate_exploration_event_log_entry(
+            entry, 'user_id'
+        )
+
+        model = stats_models.RateExplorationEventLogEntryModel.get(entity_id)
+        self.assertEqual(model.event_type, entry.event_type)
+        self.assertEqual(model.exploration_id, entry.exploration_id)
+        self.assertEqual(model.rating, entry.rating)
+        self.assertIsNone(model.old_rating)
+        self.assertEqual(model.event_schema_version, entry.event_schema_version)
+        self.assertEqual(model.id, entity_id)
+
+    def test_saving_an_invalid_entry_raises_an_error(self) -> None:
+        entry = stats_domain.RateExplorationEventLogEntry(
+            feconf.EVENT_TYPE_RATE_EXPLORATION,
+            'invalid exploration id',
+            4,
+            None,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected exploration_id to match'
+        ):
+            event_services.save_rate_exploration_event_log_entry(
+                entry, 'user_id'
+            )
+
+        all_models = stats_models.RateExplorationEventLogEntryModel.get_all()
+        self.assertEqual(all_models.count(), 0)
+
+    def test_converting_a_model_to_a_domain_object(self) -> None:
+        event_id = stats_models.RateExplorationEventLogEntryModel.create(
+            'exp_id', 'user_id', 3, 2
+        )
+        model = stats_models.RateExplorationEventLogEntryModel.get(event_id)
+
+        entry = event_services.get_rate_exploration_event_log_entry_from_model(
+            model
+        )
+
+        self.assertEqual(
+            entry.to_dict(),
+            {
+                'event_type': feconf.EVENT_TYPE_RATE_EXPLORATION,
+                'exploration_id': 'exp_id',
+                'rating': 3,
+                'old_rating': 2,
+                'event_schema_version': (
+                    feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+                ),
+            },
+        )
+        entry.validate()
 
 
 class StateHitEventHandlerTests(test_utils.GenericTestBase):

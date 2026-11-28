@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 import numbers
+import re
 import sys
 
 from core import feconf, utils
@@ -70,6 +71,12 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 # The maximum size in bytes the answer_details can take in
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
+
+# The smallest and the largest rating that a learner can assign to an
+# exploration. These mirror the values in ALLOWED_RATINGS of rating_services,
+# which cannot be imported here.
+MIN_EXPLORATION_RATING: Final = 1
+MAX_EXPLORATION_RATING: Final = 5
 
 IssuesCustomizationArgsDictType = Dict[
     str, Dict[str, Union[str, int, List[str]]]
@@ -202,6 +209,16 @@ class AggregatedStatsDict(TypedDict):
     num_actual_starts: int
     num_completions: int
     state_stats_mapping: Dict[str, Dict[str, int]]
+
+
+class RateExplorationEventLogEntryDict(TypedDict):
+    """Dictionary representing the RateExplorationEventLogEntry object."""
+
+    event_type: str
+    exploration_id: str
+    rating: int
+    old_rating: Optional[int]
+    event_schema_version: int
 
 
 class ExplorationStats:
@@ -2388,3 +2405,143 @@ class LearnerAnswerInfo:
         """
         learner_answer_info_dict = self.to_dict()
         return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))
+
+
+class RateExplorationEventLogEntry:
+    """Domain object for an event that is triggered when a learner rates an
+    exploration.
+
+    Attributes:
+        event_type: str. The type of the event.
+        exploration_id: str. ID of the exploration that was rated.
+        rating: int. The rating that the learner assigned to the exploration.
+        old_rating: int|None. The rating that the same user assigned previously.
+            It is None when the user rates the exploration for the first time.
+        event_schema_version: int. The version of the event schema that is used
+            to describe the event.
+    """
+
+    def __init__(
+        self,
+        event_type: str,
+        exploration_id: str,
+        rating: int,
+        old_rating: Optional[int],
+        event_schema_version: int,
+    ) -> None:
+        """Initializes a RateExplorationEventLogEntry domain object.
+
+        Args:
+            event_type: str. The type of the event.
+            exploration_id: str. ID of the exploration that was rated.
+            rating: int. The rating that the learner assigned to the
+                exploration.
+            old_rating: int|None. The rating that the same user assigned
+                previously, or None if the user rates the exploration for the
+                first time.
+            event_schema_version: int. The version of the event schema that is
+                used to describe the event.
+        """
+        self.event_type = event_type
+        self.exploration_id = exploration_id
+        self.rating = rating
+        self.old_rating = old_rating
+        self.event_schema_version = event_schema_version
+
+    def to_dict(self) -> RateExplorationEventLogEntryDict:
+        """Returns a dict representation of the RateExplorationEventLogEntry
+        domain object.
+
+        Returns:
+            dict. A dict mapping all the fields of the domain object to their
+            values.
+        """
+        return {
+            'event_type': self.event_type,
+            'exploration_id': self.exploration_id,
+            'rating': self.rating,
+            'old_rating': self.old_rating,
+            'event_schema_version': self.event_schema_version,
+        }
+
+    @staticmethod
+    def _validate_rating(field_name: str, rating: int) -> None:
+        """Checks that the given rating is an int between the smallest and the
+        largest allowed rating. Booleans are rejected, even though they are
+        instances of int in Python.
+
+        Args:
+            field_name: str. The name of the field that is being validated, used
+                in the error messages.
+            rating: int. The rating to validate.
+
+        Raises:
+            ValidationError. The rating is not an int, or it is out of range.
+        """
+        if isinstance(rating, bool) or not isinstance(rating, int):
+            raise utils.ValidationError(
+                'Expected %s to be an int, received %s' % (field_name, rating)
+            )
+        if not MIN_EXPLORATION_RATING <= rating <= MAX_EXPLORATION_RATING:
+            raise utils.ValidationError(
+                'Expected %s to be between %s and %s inclusive, received %s'
+                % (
+                    field_name,
+                    MIN_EXPLORATION_RATING,
+                    MAX_EXPLORATION_RATING,
+                    rating,
+                )
+            )
+
+    def validate(self) -> None:
+        """Validates the RateExplorationEventLogEntry domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the object are invalid.
+        """
+        if not isinstance(self.event_type, str):
+            raise utils.ValidationError(
+                'Expected event_type to be a string, received %s'
+                % self.event_type
+            )
+        if self.event_type != feconf.EVENT_TYPE_RATE_EXPLORATION:
+            raise utils.ValidationError(
+                'Expected event_type to be %s, received %s'
+                % (feconf.EVENT_TYPE_RATE_EXPLORATION, self.event_type)
+            )
+
+        if not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+                'Expected exploration_id to be a string, received %s'
+                % self.exploration_id
+            )
+        if not re.match(constants.ENTITY_ID_REGEX, self.exploration_id):
+            raise utils.ValidationError(
+                'Expected exploration_id to match %s, received %s'
+                % (constants.ENTITY_ID_REGEX, self.exploration_id)
+            )
+
+        self._validate_rating('rating', self.rating)
+        if self.old_rating is not None:
+            self._validate_rating('old_rating', self.old_rating)
+
+        if isinstance(self.event_schema_version, bool) or not isinstance(
+            self.event_schema_version, int
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be an int, received %s'
+                % self.event_schema_version
+            )
+        if not (
+            1
+            <= self.event_schema_version
+            <= feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be between 1 and %s '
+                'inclusive, received %s'
+                % (
+                    feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+                    self.event_schema_version,
+                )
+            )

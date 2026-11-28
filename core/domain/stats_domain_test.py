@@ -22,6 +22,7 @@ import datetime
 import re
 
 from core import feconf, utils
+from core.constants import constants
 from core.domain import exp_domain, stats_domain, stats_services
 from core.platform import models
 from core.tests import test_utils
@@ -3017,3 +3018,167 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.learner_answer_info, 'Expected created_on to be a datetime'
         )
+
+
+class RateExplorationEventLogEntryTests(test_utils.GenericTestBase):
+    """Tests the RateExplorationEventLogEntry domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.entry = stats_domain.RateExplorationEventLogEntry(
+            feconf.EVENT_TYPE_RATE_EXPLORATION,
+            'exp_id',
+            3,
+            2,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+
+    def _assert_entry_validation_error(
+        self, expected_error_substring: str
+    ) -> None:
+        """Checks that validating the entry raises the given error."""
+        with self.assertRaisesRegex(
+            utils.ValidationError, re.escape(expected_error_substring)
+        ):
+            self.entry.validate()
+
+    def test_to_dict(self) -> None:
+        self.assertEqual(
+            self.entry.to_dict(),
+            {
+                'event_type': feconf.EVENT_TYPE_RATE_EXPLORATION,
+                'exploration_id': 'exp_id',
+                'rating': 3,
+                'old_rating': 2,
+                'event_schema_version': (
+                    feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+                ),
+            },
+        )
+
+    def test_validation_passes_for_valid_entries(self) -> None:
+        self.entry.validate()
+
+        # A user who rates an exploration for the first time has no old rating.
+        self.entry.old_rating = None
+        self.entry.validate()
+
+        # The smallest and the largest ratings, and the oldest schema version.
+        self.entry.rating = stats_domain.MIN_EXPLORATION_RATING
+        self.entry.old_rating = stats_domain.MAX_EXPLORATION_RATING
+        self.entry.event_schema_version = 1
+        self.entry.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_event_type_must_be_a_string(self) -> None:
+        self.entry.event_type = 123  # type: ignore[assignment]
+        self._assert_entry_validation_error(
+            'Expected event_type to be a string, received 123'
+        )
+
+    def test_event_type_must_be_the_rate_exploration_event_type(self) -> None:
+        self.entry.event_type = feconf.EVENT_TYPE_SOLUTION_HIT
+        self._assert_entry_validation_error(
+            'Expected event_type to be %s, received %s'
+            % (
+                feconf.EVENT_TYPE_RATE_EXPLORATION,
+                feconf.EVENT_TYPE_SOLUTION_HIT,
+            )
+        )
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_exploration_id_must_be_a_string(self) -> None:
+        self.entry.exploration_id = 123  # type: ignore[assignment]
+        self._assert_entry_validation_error(
+            'Expected exploration_id to be a string, received 123'
+        )
+
+    def test_exploration_id_must_match_the_entity_id_regex(self) -> None:
+        for invalid_exploration_id in (
+            '',
+            'exp id',
+            'exp_id!',
+            'a_very_long_id',
+        ):
+            self.entry.exploration_id = invalid_exploration_id
+            self._assert_entry_validation_error(
+                'Expected exploration_id to match %s, received %s'
+                % (constants.ENTITY_ID_REGEX, invalid_exploration_id)
+            )
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_rating_must_be_an_int(self) -> None:
+        self.entry.rating = '3'  # type: ignore[assignment]
+        self._assert_entry_validation_error(
+            'Expected rating to be an int, received 3'
+        )
+
+    def test_rating_must_not_be_a_bool(self) -> None:
+        self.entry.rating = True
+        self._assert_entry_validation_error(
+            'Expected rating to be an int, received True'
+        )
+
+    def test_rating_must_be_between_the_minimum_and_maximum(self) -> None:
+        for invalid_rating in (-1, 0, 6):
+            self.entry.rating = invalid_rating
+            self._assert_entry_validation_error(
+                'Expected rating to be between 1 and 5 inclusive, received %s'
+                % invalid_rating
+            )
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_old_rating_must_be_an_int_or_none(self) -> None:
+        self.entry.old_rating = '2'  # type: ignore[assignment]
+        self._assert_entry_validation_error(
+            'Expected old_rating to be an int, received 2'
+        )
+
+    def test_old_rating_must_not_be_a_bool(self) -> None:
+        self.entry.old_rating = False
+        self._assert_entry_validation_error(
+            'Expected old_rating to be an int, received False'
+        )
+
+    def test_old_rating_must_be_between_the_minimum_and_maximum(self) -> None:
+        for invalid_rating in (0, 6):
+            self.entry.old_rating = invalid_rating
+            self._assert_entry_validation_error(
+                'Expected old_rating to be between 1 and 5 inclusive, '
+                'received %s' % invalid_rating
+            )
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_event_schema_version_must_be_an_int(self) -> None:
+        self.entry.event_schema_version = '1'  # type: ignore[assignment]
+        self._assert_entry_validation_error(
+            'Expected event_schema_version to be an int, received 1'
+        )
+
+    def test_event_schema_version_must_not_be_a_bool(self) -> None:
+        self.entry.event_schema_version = True
+        self._assert_entry_validation_error(
+            'Expected event_schema_version to be an int, received True'
+        )
+
+    def test_event_schema_version_must_be_a_supported_version(self) -> None:
+        for invalid_version in (
+            0,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION + 1,
+        ):
+            self.entry.event_schema_version = invalid_version
+            self._assert_entry_validation_error(
+                'Expected event_schema_version to be between 1 and %s '
+                'inclusive, received %s'
+                % (feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION, invalid_version)
+            )

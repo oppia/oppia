@@ -310,14 +310,23 @@ class RateExplorationEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(
-        cls, exp_id: str, user_id: str, rating: int, old_rating: int
+        cls,
+        exp_id: str,
+        user_id: str,
+        rating: int,
+        old_rating: Optional[int],
     ) -> None:
         """Perform in-request processing of recording exploration rating
         events.
         """
-        stats_models.RateExplorationEventLogEntryModel.create(
-            exp_id, user_id, rating, old_rating
+        entry = stats_domain.RateExplorationEventLogEntry(
+            feconf.EVENT_TYPE_RATE_EXPLORATION,
+            exp_id,
+            rating,
+            old_rating,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
         )
+        save_rate_exploration_event_log_entry(entry, user_id)
         handle_exploration_rating(exp_id, rating, old_rating)
 
 
@@ -457,6 +466,59 @@ def handle_exploration_rating(
     if exp_summary is not None:
         for user_id in exp_summary.owner_ids:
             _refresh_average_ratings_transactional(user_id, rating, old_rating)
+
+
+def get_rate_exploration_event_log_entry_from_model(
+    model: stats_models.RateExplorationEventLogEntryModel,
+) -> stats_domain.RateExplorationEventLogEntry:
+    """Converts a datastore model for an exploration rating event to the
+    corresponding domain object.
+
+    Args:
+        model: RateExplorationEventLogEntryModel. The datastore model.
+
+    Returns:
+        RateExplorationEventLogEntry. The domain object for the given model.
+    """
+    return stats_domain.RateExplorationEventLogEntry(
+        model.event_type,
+        model.exploration_id,
+        model.rating,
+        model.old_rating,
+        model.event_schema_version,
+    )
+
+
+def save_rate_exploration_event_log_entry(
+    entry: stats_domain.RateExplorationEventLogEntry, user_id: str
+) -> str:
+    """Validates the given domain object for an exploration rating event and
+    saves it to the datastore.
+
+    Args:
+        entry: RateExplorationEventLogEntry. The event to save.
+        user_id: str. ID of the user who rated the exploration. It is only used
+            to generate the ID of the new datastore entity, so it is not a part
+            of the domain object.
+
+    Returns:
+        str. The ID of the new datastore entity.
+    """
+    entry.validate()
+    entity_id = (
+        stats_models.RateExplorationEventLogEntryModel.get_new_event_entity_id(
+            entry.exploration_id, user_id
+        )
+    )
+    stats_models.RateExplorationEventLogEntryModel(
+        id=entity_id,
+        event_type=entry.event_type,
+        exploration_id=entry.exploration_id,
+        rating=entry.rating,
+        old_rating=entry.old_rating,
+        event_schema_version=entry.event_schema_version,
+    ).put()
+    return entity_id
 
 
 @transaction_services.run_in_transaction_wrapper
