@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
@@ -40,11 +41,11 @@ if MYPY:  # pragma: no cover
 
 class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
     """Job that validates translation_counts in
-    ExplorationOpportunitySummaryModel.
+    TranslationOpportunityModel for explorations.
 
     This job computes the true translation counts by looking at
     EntityTranslationsModel and compares it to the translation_counts
-    recorded in ExplorationOpportunitySummaryModel. It returns SUCCESS
+    recorded in TranslationOpportunityModel. It returns SUCCESS
     if all counts match, and logs the mismatches otherwise.
     """
 
@@ -71,7 +72,7 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
         self,
         exploration_id: str,
         opportunity_summary_models_list: Iterable[
-            opportunity_models.ExplorationOpportunitySummaryModel
+            opportunity_models.TranslationOpportunityModel
         ],
         translation_counts_list: Iterable[Tuple[str, int]],
     ) -> Iterable[job_run_result.JobRunResult]:
@@ -80,8 +81,8 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
         Args:
             exploration_id: str. The exploration ID.
             opportunity_summary_models_list:
-                list(ExplorationOpportunitySummaryModel). The list
-                of opportunity summary models for the exploration.
+                list(TranslationOpportunityModel). The list
+                of opportunity models for the exploration.
             translation_counts_list: list(tuple(str, int)). True
                 counts from EntityTranslationsModel.
 
@@ -137,13 +138,19 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
         """
         opportunity_summaries = (
             self.pipeline
-            | 'Get all ExplorationOpportunitySummaryModels'
+            | 'Get all TranslationOpportunityModels'
             >> ndb_io.GetModels(
-                opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+                opportunity_models.TranslationOpportunityModel.get_all()
+            )
+            | 'Filter exploration opportunity models'
+            >> beam.Filter(
+                lambda model: (
+                    model.entity_type == feconf.ENTITY_TYPE_EXPLORATION
+                )
             )
             | 'Key Opportunity by exploration_id'
             >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
-                lambda model: model.id
+                lambda model: model.entity_id
             )
         )
 

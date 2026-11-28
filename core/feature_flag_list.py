@@ -69,9 +69,6 @@ class FeatureNames(enum.Enum):
         'highlight_sentences_during_automatic_voiceover_playback'
     )
     SHOW_RESTRUCTURED_STUDY_GUIDES = 'show_restructured_study_guides'
-    ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
-        'enable_translation_opps_with_new_opp_models'
-    )
     ENABLE_WORKED_EXAMPLES_RTE_COMPONENT = (
         'enable_worked_examples_rte_component'
     )
@@ -145,7 +142,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
-    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.STORY_EDITOR_ARCS,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
@@ -280,13 +276,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             '(the actual content displayed by the study guides will be the '
             'same, just the user interface will be different).',
             feature_flag_domain.ServerMode.PROD,
-        )
-    ),
-    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
-        (
-            'This flag enables the new translation opportunity structure to '
-            'the contributor dashboard.',
-            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (

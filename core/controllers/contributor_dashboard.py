@@ -34,7 +34,6 @@ from core.domain import (
     suggestion_registry,
     suggestion_services,
     topic_fetchers,
-    topic_services,
     translation_domain,
     translation_fetchers,
     translation_services,
@@ -45,7 +44,6 @@ from typing import (
     Dict,
     List,
     Optional,
-    OrderedDict,
     Sequence,
     Tuple,
     TypedDict,
@@ -138,34 +136,19 @@ class ContributionOpportunitiesHandler(
         """
         assert self.normalized_request is not None
         search_cursor = self.normalized_request.get('cursor')
-        language_code = self.normalized_request.get('language_code')
         search_query = self.normalized_request.get('search_query')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
-            skill_opportunities, next_cursor, more = (
+            opportunities, next_cursor, more = (
                 self._get_skill_opportunities_with_corresponding_topic_name(
                     search_cursor, search_query
-                )
-            )
-
-        elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
-            topic_name = self.normalized_request.get('topic_name')
-            if language_code is None:
-                raise self.InvalidInputException
-            translation_opportunities, next_cursor, more = (
-                self._get_translation_opportunity_dicts(
-                    language_code, topic_name, search_cursor
                 )
             )
         else:
             raise self.NotFoundException
 
         self.values = {
-            'opportunities': (
-                skill_opportunities
-                if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL
-                else translation_opportunities
-            ),
+            'opportunities': opportunities,
             'next_cursor': next_cursor,
             'more': more,
         }
@@ -275,49 +258,9 @@ class ContributionOpportunitiesHandler(
 
         return opportunities, cursor, more
 
-    def _get_translation_opportunity_dicts(
-        self,
-        language_code: str,
-        topic_name: Optional[str],
-        search_cursor: Optional[str],
-    ) -> Tuple[
-        List[opportunity_domain.PartialExplorationOpportunitySummaryDict],
-        Optional[str],
-        bool,
-    ]:
-        """Returns a list of translation opportunity dicts.
 
-        Args:
-            language_code: str. The language for which translation opportunities
-                should be fetched.
-            topic_name: str or None. The topic for which translation
-                opportunities should be fetched. If topic_name is None or empty,
-                fetch translation opportunities from all topics.
-            search_cursor: str or None. If provided, the list of returned
-                entities starts from this datastore cursor. Otherwise, the
-                returned entities start from the beginning of the full list of
-                entities.
-
-        Returns:
-            3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of ExplorationOpportunitySummary
-                dicts.
-            cursor: str or None. A query cursor pointing to the next batch of
-                results. If there are no more results, this might be None.
-            more: bool. If True, there are (probably) more results after this
-                batch. If False, there are no further results after this batch.
-        """
-        opportunities, next_cursor, more = (
-            opportunity_services.get_translation_opportunities(
-                language_code, topic_name, search_cursor
-            )
-        )
-        opportunity_dicts = [opp.to_dict() for opp in opportunities]
-        return opportunity_dicts, next_cursor, more
-
-
-class ContributionOpportunitiesHandlerV2NormalizedRequestDict(TypedDict):
-    """Dict representation of ContributionOpportunitiesHandlerV2's
+class TranslationOpportunitiesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of TranslationOpportunitiesHandler's
     normalized_request dictionary.
     """
 
@@ -327,12 +270,12 @@ class ContributionOpportunitiesHandlerV2NormalizedRequestDict(TypedDict):
     entity_type: str
 
 
-class ContributionOpportunitiesHandlerV2(
+class TranslationOpportunitiesHandler(
     base.BaseHandler[
-        Dict[str, str], ContributionOpportunitiesHandlerV2NormalizedRequestDict
+        Dict[str, str], TranslationOpportunitiesHandlerNormalizedRequestDict
     ]
 ):
-    """Provides data for opportunities available in different categories."""
+    """Provides data for translation opportunities."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -363,11 +306,6 @@ class ContributionOpportunitiesHandlerV2(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-            self.user_id,
-        ):
-            raise self.NotFoundException
 
         cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request['language_code']
@@ -375,7 +313,7 @@ class ContributionOpportunitiesHandlerV2(
         entity_type = self.normalized_request.get('entity_type')
 
         opportunities, next_cursor, more = (
-            opportunity_services.get_translation_opportunities_with_new_models(
+            opportunity_services.get_translation_opportunities(
                 entity_type, language_code, topic_name, cursor
             )
         )
@@ -395,151 +333,13 @@ class ReviewableOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     """
 
     topic_name: Optional[str]
-    language_code: str
+    language_code: Optional[str]
+    entity_type: str
 
 
 class ReviewableOpportunitiesHandler(
     base.BaseHandler[
         Dict[str, str], ReviewableOpportunitiesHandlerNormalizedRequestDict
-    ]
-):
-    """Provides opportunities that have translation suggestions in review."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'topic_name': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-            'language_code': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-        }
-    }
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Fetches reviewable translation suggestions."""
-        assert self.normalized_request is not None
-        # Default value is None, since this is a GET request handler, which
-        # means all request parameters come in as strings.
-        topic_name = self.normalized_request.get('topic_name', None)
-        language = self.normalized_request.get('language_code')
-        opportunity_dicts: List[
-            opportunity_domain.PartialExplorationOpportunitySummaryDict
-        ] = []
-        if self.user_id:
-            for opp in self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name, language
-            ):
-                opportunity_dicts.append(opp.to_dict())
-        self.values = {
-            'opportunities': opportunity_dicts,
-        }
-        self.render_json(self.values)
-
-    def _get_reviewable_exploration_opportunity_summaries(
-        self, user_id: str, topic_name: Optional[str], language: Optional[str]
-    ) -> List[opportunity_domain.ExplorationOpportunitySummary]:
-        """Returns exploration opportunity summaries that have translation
-        suggestions that are reviewable by the supplied user. The result is
-        sorted in descending order by topic, story, and story node order.
-
-        Args:
-            user_id: str. The user ID of the user for which to filter
-                translation suggestions.
-            topic_name: str|None. A topic name for which to filter the
-                exploration opportunity summaries. If it is None, all available
-                exploration opportunity summaries will be returned, regardless
-                of the topic.
-            language: str|None. ISO 639-1 language code for which to filter the
-                exploration opportunity summaries. If it is None, all available
-                exploration opportunity summaries will be returned, regardless
-                of the language.
-
-        Returns:
-            list(ExplorationOpportunitySummary). A list of the matching
-            exploration opportunity summaries.
-        """
-        # 1. Fetch the IDs of all published explorations in the topics'
-        #    published stories.
-        # 2. Fetch all suggestions that the user can review, and collect their
-        #    exploration IDs. Filter these IDs to only include published
-        #    explorations in published stories (see step 1).
-        # 3. Fetch all exploration opportunity summaries for the resulting set
-        #    of explorations.
-        # 4. Move any pinned summaries to the top.
-
-        pinned_opportunity_summary = None
-        if topic_name is None:
-            topic_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids()
-            )
-        else:
-            topic = topic_fetchers.get_topic_by_name(topic_name)
-            if topic is None:
-                raise self.InvalidInputException(
-                    'The supplied input topic: %s is not valid' % topic_name
-                )
-            if language and self.user_id:
-                pinned_opportunity_summary = (
-                    opportunity_services.get_pinned_lesson(
-                        self.user_id, language, topic.id
-                    )
-                )
-            topic_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids(
-                    topic_id=topic.id
-                )
-            )
-        in_review_suggestion_target_ids = suggestion_services.get_reviewable_translation_suggestion_target_ids(
-            user_id, language
-        )
-        topic_exp_ids_targeted_by_in_review_suggestions = [
-            exp_id
-            for exp_id in topic_exp_ids
-            if exp_id in in_review_suggestion_target_ids
-        ]
-
-        exp_opp_summaries = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                topic_exp_ids_targeted_by_in_review_suggestions
-            )
-        )
-
-        # If there is a pinned opportunity summary,
-        # add it to the list of opportunities at the top.
-        ordered_exp_opp_summaries = OrderedDict()
-        if pinned_opportunity_summary:
-            pinned_opportunity_id = pinned_opportunity_summary.id
-            exp_opp_summaries.pop(pinned_opportunity_id, None)
-            ordered_exp_opp_summaries[pinned_opportunity_id] = (
-                pinned_opportunity_summary
-            )
-
-        for item in exp_opp_summaries.values():
-            if item is not None:
-                ordered_exp_opp_summaries[item.id] = item
-
-        return list(ordered_exp_opp_summaries.values())
-
-
-class ReviewableOpportunitiesHandlerV2NormalizedRequestDict(TypedDict):
-    """Dict representation of ReviewableOpportunitiesHandlerV2's
-    normalized_request dictionary.
-    """
-
-    topic_name: Optional[str]
-    language_code: Optional[str]
-    entity_type: str
-
-
-class ReviewableOpportunitiesHandlerV2(
-    base.BaseHandler[
-        Dict[str, str], ReviewableOpportunitiesHandlerV2NormalizedRequestDict
     ]
 ):
     """Provides data for reviewable opportunities."""
@@ -570,11 +370,6 @@ class ReviewableOpportunitiesHandlerV2(
     def get(self) -> None:
         """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-            self.user_id,
-        ):
-            raise self.NotFoundException
 
         topic_name = self.normalized_request.get('topic_name', None)
         language = self.normalized_request.get('language_code')
@@ -644,7 +439,7 @@ class ReviewableOpportunitiesHandlerV2(
         opportunities = []
         for entity_type_to_fetch in entity_types_to_fetch:
             opportunities.extend(
-                opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
+                opportunity_services.get_translation_opportunity_cards_by_entity_ids(
                     entity_type_to_fetch,
                     in_review_suggestion_target_ids,
                     language,
@@ -659,8 +454,8 @@ class ReviewableOpportunitiesHandlerV2(
         return filtered_opportunities
 
 
-class TranslatableContentsHandlerV2NormalizedRequestDict(TypedDict):
-    """Dict representation of TranslatableContentsHandlerV2's
+class TranslatableContentsHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of TranslatableContentsHandler's
     normalized_request dictionary.
     """
 
@@ -669,9 +464,9 @@ class TranslatableContentsHandlerV2NormalizedRequestDict(TypedDict):
     entity_id: str
 
 
-class TranslatableContentsHandlerV2(
+class TranslatableContentsHandler(
     base.BaseHandler[
-        Dict[str, str], TranslatableContentsHandlerV2NormalizedRequestDict
+        Dict[str, str], TranslatableContentsHandlerNormalizedRequestDict
     ]
 ):
     """Provides entity content which can be translated in a given language."""
@@ -700,11 +495,6 @@ class TranslatableContentsHandlerV2(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-            self.user_id,
-        ):
-            raise self.NotFoundException
 
         entity_type = self.normalized_request['entity_type']
         entity_id = self.normalized_request['entity_id']
@@ -799,6 +589,8 @@ class TranslatableContentsHandlerV2(
                 'content_type': content.content_type.value,
                 'content_format': content.content_format.value,
                 'content_value': content.content_value,
+                'interaction_id': content.interaction_id,
+                'rule_type': content.rule_type,
                 'grouping_key': (
                     content_id_to_grouping_key.get(content.content_id)
                 ),
@@ -873,195 +665,6 @@ class LessonsPinningHandler(
         self.render_json(self.values)
 
 
-class TranslatableTextHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of TranslatableTextHandler's
-    normalized_request dictionary.
-    """
-
-    language_code: str
-    exp_id: str
-
-
-class TranslatableTextHandler(
-    base.BaseHandler[
-        Dict[str, str], TranslatableTextHandlerNormalizedRequestDict
-    ]
-):
-    """Provides lessons content which can be translated in a given language."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'language_code': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{'id': 'is_supported_audio_language_code'}],
-                }
-            },
-            'exp_id': {'schema': {'type': 'basestring'}},
-        }
-    }
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests.
-
-        Raises:
-            InvalidInputException. The exploration ID is invalid.
-        """
-        assert self.normalized_request is not None
-        language_code = self.normalized_request['language_code']
-        exp_id = self.normalized_request['exp_id']
-
-        exp = exp_fetchers.get_exploration_by_id(exp_id)
-        if not opportunity_services.is_exploration_available_for_contribution(
-            exp_id
-        ):
-            raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
-
-        state_names_to_content_id_mapping = (
-            translation_services.get_translatable_text(exp, language_code)
-        )
-
-        reviewable_language_codes = []
-        if self.user_id:
-            contribution_rights = user_services.get_user_contribution_rights(
-                self.user_id
-            )
-            reviewable_language_codes = (
-                contribution_rights.can_review_translation_for_language_codes
-            )
-        if language_code not in reviewable_language_codes:
-            state_names_to_content_id_mapping = (
-                self._get_state_names_to_not_set_content_id_mapping(
-                    state_names_to_content_id_mapping
-                )
-            )
-        state_names_to_not_in_review_content_id_mapping = self._get_state_names_to_not_in_review_content_id_mapping(
-            state_names_to_content_id_mapping,
-            suggestion_services.get_translation_suggestions_in_review_by_exploration(
-                exp_id, language_code
-            ),
-        )
-        self.values = {
-            'state_names_to_content_id_mapping': (
-                state_names_to_not_in_review_content_id_mapping
-            ),
-            'version': exp.version,
-        }
-
-        self.render_json(self.values)
-
-    def _get_state_names_to_not_set_content_id_mapping(
-        self,
-        state_names_to_content_id_mapping: Dict[
-            str, Dict[str, translation_domain.TranslatableContent]
-        ],
-    ) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
-        """Returns a copy of the supplied state_names_to_content_id_mapping
-        minus any contents of which the data is set of strings.
-
-        Args:
-            state_names_to_content_id_mapping:
-                dict(str, dict(str, TranslatableItem)). A dict whose keys are
-                state names, and whose corresponding values are each dicts
-                mapping content IDs to the corresponding translatable items.
-
-        Returns:
-            dict(str, dict(str, TranslatableItem)). A dict where state_name
-            is the key and a dict with content_id as the key and
-            TranslatableItem as value.
-        """
-        mapping_without_set_data_format = {}
-        for state_name in state_names_to_content_id_mapping:
-            content_id_to_translatable_item = state_names_to_content_id_mapping[
-                state_name
-            ]
-            content_id_to_not_set_translatable_item = {}
-            for (
-                content_id,
-                translatable_item,
-            ) in content_id_to_translatable_item.items():
-                if not translatable_item.is_data_format_list():
-                    content_id_to_not_set_translatable_item[content_id] = (
-                        translatable_item
-                    )
-            if content_id_to_not_set_translatable_item:
-                mapping_without_set_data_format[state_name] = (
-                    content_id_to_not_set_translatable_item
-                )
-        return mapping_without_set_data_format
-
-    def _get_state_names_to_not_in_review_content_id_mapping(
-        self,
-        state_names_to_content_id_mapping: Dict[
-            str, Dict[str, translation_domain.TranslatableContent]
-        ],
-        suggestions: List[suggestion_registry.BaseSuggestion],
-    ) -> Dict[str, Dict[str, translation_domain.TranslatableContentDict]]:
-        """Returns a copy of the supplied state_names_to_content_id_mapping
-        minus any contents found in suggestions.
-
-        Args:
-            state_names_to_content_id_mapping:
-                dict(str, dict(str, TranslatableItem)). A dict whose keys are
-                state names, and whose corresponding values are each dicts
-                mapping content IDs to the corresponding translatable items.
-            suggestions: list(Suggestion). A list of translation suggestions.
-
-        Returns:
-            dict(str, dict(str, TranslatableItem)). A dict where state_name
-            is the key and a dict with content_id as the key and
-            TranslatableItem as value.
-        """
-        final_mapping = {}
-        for state_name in state_names_to_content_id_mapping:
-            content_id_to_translatable_item = dict(
-                state_names_to_content_id_mapping[state_name]
-            )
-            content_id_to_unsubmitted_translatable_item = {}
-            for content_id, item in content_id_to_translatable_item.items():
-                if not self._is_content_in_review(
-                    state_name, content_id, suggestions
-                ):
-                    content_id_to_unsubmitted_translatable_item[content_id] = (
-                        item
-                    )
-            if content_id_to_unsubmitted_translatable_item:
-                final_mapping[state_name] = {
-                    cid: translatable_item.to_dict()
-                    for cid, translatable_item in (
-                        content_id_to_unsubmitted_translatable_item.items()
-                    )
-                }
-        return final_mapping
-
-    def _is_content_in_review(
-        self,
-        state_name: str,
-        content_id: str,
-        suggestions: List[suggestion_registry.BaseSuggestion],
-    ) -> bool:
-        """Returns whether a suggestion exists in suggestions with a
-        change_cmd dict matching the supplied state_name and content_id.
-
-        Args:
-            state_name: str. Exploration state name.
-            content_id: str. Content ID.
-            suggestions: list(Suggestion). A list of translation suggestions.
-
-        Returns:
-            bool. True if suggestion exists in suggestions with a change_cmd
-            dict matching state_name and content_id, False otherwise.
-        """
-        return any(
-            s.change_cmd.state_name == state_name
-            and s.change_cmd.content_id == content_id
-            for s in suggestions
-        )
-
-
 class OpportunitiesCountHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of OpportunitiesCountHandler's
     normalized_request dictionary.
@@ -1130,19 +733,9 @@ class OpportunitiesCountHandler(
             if language_code is None:
                 raise self.InvalidInputException('language_code is required')
 
-            if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-                self.user_id,
-            ):
-                count = opportunity_services.get_translation_opportunities_count_with_new_models(
-                    entity_type, language_code, topic_name
-                )
-            else:
-                count = (
-                    opportunity_services.get_translation_opportunities_count(
-                        language_code, topic_name
-                    )
-                )
+            count = opportunity_services.get_translation_opportunities_count(
+                entity_type, language_code, topic_name
+            )
         else:
             raise self.NotFoundException
 

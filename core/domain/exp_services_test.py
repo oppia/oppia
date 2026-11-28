@@ -33,7 +33,6 @@ from core.domain import (
     exp_services,
     feedback_services,
     fs_services,
-    opportunity_domain,
     opportunity_services,
     param_domain,
     rating_services,
@@ -581,24 +580,24 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         deleted.
         """
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
-        opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.EXP_0_ID,
-            topic_id='topic_id',
-            topic_name='topic_name',
-            story_id='story_id',
-            story_title='story_title',
-            chapter_title='chapter_title',
+        opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_0_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_0_ID,
+            topic_ids=['topic_id'],
             content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 0},
         ).put()
         self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
-        opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.EXP_1_ID,
-            topic_id='topic_id',
-            topic_name='topic_name',
-            story_id='story_id',
-            story_title='story_title',
-            chapter_title='chapter_title',
+        opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=['topic_id'],
             content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 0},
         ).put()
 
         exp_services.delete_explorations(
@@ -607,13 +606,13 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The opportunity model has been purged from the backend.
         self.assertIsNone(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                self.EXP_0_ID
+            opportunity_models.TranslationOpportunityModel.get_by_id(
+                f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_0_ID}'
             )
         )
         self.assertIsNone(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                self.EXP_1_ID
+            opportunity_models.TranslationOpportunityModel.get_by_id(
+                f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}'
             )
         )
 
@@ -9133,19 +9132,17 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
-        opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.EXP_0_ID,
-            topic_id='topic_id',
-            topic_name='topic_name',
-            story_id='story_id',
-            story_title='story_title',
-            chapter_title='chapter_title',
+        opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_0_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_0_ID,
+            topic_ids=['topic_id'],
             content_count=3,
             incomplete_translation_language_codes=[
                 language['id']
                 for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
             ],
-            language_codes_with_assigned_voice_artists=['en'],
+            translation_counts={'hi': 3},
         ).put()
 
         translation_services.add_new_translation(
@@ -9282,13 +9279,13 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
         entity_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch()
         )
-        exp_opportunity_summary: Optional[
-            opportunity_domain.ExplorationOpportunitySummary
-        ] = opportunity_services.get_exploration_opportunity_summary_by_id(
-            self.EXP_0_ID
+        exp_opportunity_model: Optional[
+            opportunity_models.TranslationOpportunityModel
+        ] = opportunity_models.TranslationOpportunityModel.get_by_id(
+            f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_0_ID}'
         )
-        if exp_opportunity_summary is not None:
-            translation_counts = exp_opportunity_summary.translation_counts
+        if exp_opportunity_model is not None:
+            translation_counts = exp_opportunity_model.translation_counts
 
         self.assertEqual(len(entity_translation_models), 2)
         self.assertEqual(len(entity_translation_models[1].translations), 2)
@@ -9306,19 +9303,17 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         revert_to_version = exploration.version
 
-        opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.EXP_0_ID,
-            topic_id='topic_id',
-            topic_name='topic_name',
-            story_id='story_id',
-            story_title='story_title',
-            chapter_title='chapter_title',
+        opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_0_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_0_ID,
+            topic_ids=['topic_id'],
             content_count=3,
             incomplete_translation_language_codes=[
                 language['id']
                 for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
             ],
-            language_codes_with_assigned_voice_artists=['en'],
+            translation_counts={'hi': 3},
         ).put()
 
         translation_services.add_new_translation(
@@ -9476,13 +9471,13 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
         entity_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch()
         )
-        exp_opportunity_summary: Optional[
-            opportunity_domain.ExplorationOpportunitySummary
-        ] = opportunity_services.get_exploration_opportunity_summary_by_id(
-            self.EXP_0_ID
+        exp_opportunity_model: Optional[
+            opportunity_models.TranslationOpportunityModel
+        ] = opportunity_models.TranslationOpportunityModel.get_by_id(
+            f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_0_ID}'
         )
-        if exp_opportunity_summary is not None:
-            translation_counts = exp_opportunity_summary.translation_counts
+        if exp_opportunity_model is not None:
+            translation_counts = exp_opportunity_model.translation_counts
 
         self.assertEqual(len(entity_translation_models), 2)
         self.assertEqual(len(entity_translation_models[1].translations), 2)
@@ -9582,13 +9577,13 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
         entity_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch()
         )
-        exp_opportunity_summary = (
-            opportunity_services.get_exploration_opportunity_summary_by_id(
-                self.EXP_0_ID
+        exp_opportunity_model = (
+            opportunity_models.TranslationOpportunityModel.get_by_id(
+                f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_0_ID}'
             )
         )
-        if exp_opportunity_summary is not None:
-            translation_counts = exp_opportunity_summary.translation_counts
+        if exp_opportunity_model is not None:
+            translation_counts = exp_opportunity_model.translation_counts
 
         self.assertEqual(len(entity_translation_models), 3)
         self.assertEqual(len(entity_translation_models[2].translations), 3)

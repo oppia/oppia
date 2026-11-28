@@ -25,7 +25,6 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    opportunity_services,
     rights_domain,
     rights_manager,
     story_domain,
@@ -432,20 +431,14 @@ class MigrateExplorationJobTests(
         exp_services.publish_exploration_and_update_user_profiles(
             owner_action, self.NEW_EXP_ID
         )
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[],
-            )
+        opportunity_model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.NEW_EXP_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.NEW_EXP_ID,
+            topic_ids=['topic_id_1'],
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={'hi': 1, 'ar': 2},
         )
         opportunity_model.put()
 
@@ -463,32 +456,14 @@ class MigrateExplorationJobTests(
             ]
         )
 
-        updated_opp_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get(
-                self.NEW_EXP_ID
-            )
+        updated_opp_model = opportunity_models.TranslationOpportunityModel.get(
+            f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.NEW_EXP_ID}'
         )
-        updated_opp_summary = (
-            opportunity_services.get_exploration_opportunity_summary_from_model(
-                updated_opp_model
-            )
-        )
-
-        expected_opp_summary_dict = {
-            'id': 'exp_1',
-            'topic_name': 'topic',
-            'chapter_title': 'Title 1',
-            'story_title': 'A story title',
-            'content_count': 4,
-            'translation_counts': {'hi': 0, 'bn': 0},
-            'translation_in_review_counts': {},
-            'reviewer_only_content_count': 0,
-            'is_pinned': False,
-        }
-
+        self.assertEqual(updated_opp_model.content_count, 6)
         self.assertEqual(
-            updated_opp_summary.to_dict(), expected_opp_summary_dict
+            updated_opp_model.translation_counts, {'hi': 0, 'bn': 0}
         )
+        self.assertEqual(updated_opp_model.topic_ids, ['topic_id_1'])
 
         all_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch()
@@ -551,20 +526,14 @@ class MigrateExplorationJobTests(
         exp_services.publish_exploration_and_update_user_profiles(
             owner_action, self.NEW_EXP_ID
         )
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[],
-            )
+        opportunity_model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.NEW_EXP_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.NEW_EXP_ID,
+            topic_ids=['topic_id_1'],
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={'hi': 1, 'ar': 2},
         )
         opportunity_model.put()
 
@@ -638,20 +607,14 @@ class MigrateExplorationJobTests(
         exp_services.publish_exploration_and_update_user_profiles(
             owner_action, self.NEW_EXP_ID
         )
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[],
-            )
+        opportunity_model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.NEW_EXP_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.NEW_EXP_ID,
+            topic_ids=['topic_id_1'],
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={'hi': 1, 'ar': 2},
         )
         opportunity_model.put()
 
@@ -901,20 +864,14 @@ class AuditExplorationMigrationJobTests(
         exp_services.publish_exploration_and_update_user_profiles(
             owner_action, self.NEW_EXP_ID
         )
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[],
-            )
+        opportunity_model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.NEW_EXP_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.NEW_EXP_ID,
+            topic_ids=['topic_id_1'],
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={'hi': 1, 'ar': 2},
         )
         opportunity_model.put()
 
@@ -932,32 +889,12 @@ class AuditExplorationMigrationJobTests(
             ]
         )
 
-        updated_opp_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get(
-                self.NEW_EXP_ID
-            )
+        updated_opp_model = opportunity_models.TranslationOpportunityModel.get(
+            f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.NEW_EXP_ID}'
         )
-        updated_opp_summary = (
-            opportunity_services.get_exploration_opportunity_summary_from_model(
-                updated_opp_model
-            )
-        )
-
-        expected_opp_summary_dict = {
-            'id': 'exp_1',
-            'topic_name': 'topic',
-            'chapter_title': 'Title 1',
-            'story_title': 'A story title',
-            'content_count': 4,
-            'translation_counts': {'hi': 0},
-            'translation_in_review_counts': {},
-            'reviewer_only_content_count': 0,
-            'is_pinned': False,
-        }
-
-        self.assertEqual(
-            updated_opp_summary.to_dict(), expected_opp_summary_dict
-        )
+        self.assertEqual(updated_opp_model.content_count, 6)
+        self.assertEqual(updated_opp_model.translation_counts, {'hi': 0})
+        self.assertEqual(updated_opp_model.topic_ids, ['topic_id_1'])
 
     def test_unmigrated_invalid_published_exp_raise_error(self) -> None:
         exp_model = exp_models.ExplorationModel(
@@ -1011,20 +948,14 @@ class AuditExplorationMigrationJobTests(
         exp_services.publish_exploration_and_update_user_profiles(
             owner_action, self.NEW_EXP_ID
         )
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[],
-            )
+        opportunity_model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.NEW_EXP_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.NEW_EXP_ID,
+            topic_ids=['topic_id_1'],
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={'hi': 1, 'ar': 2},
         )
         opportunity_model.put()
 

@@ -683,13 +683,13 @@ class ComputeTranslationsWithInvalidContentIds(beam.DoFn):  # type: ignore[misc]
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class ComputeUpdatedExpOpportunityModel(beam.DoFn):  # type: ignore[misc]
-    """DoFn to compute updated exp opportunity model."""
+    """DoFn to compute updated translation opportunity model."""
 
     def process(
         self,
         entity_translation_model: translation_models.EntityTranslationsModel,
-    ) -> Iterable[opportunity_models.ExplorationOpportunitySummaryModel]:
-        """Compute exploration opportunity model with updated translation
+    ) -> Iterable[opportunity_models.TranslationOpportunityModel]:
+        """Compute translation opportunity model with updated translation
         count for an updated entity translation model.
 
         Args:
@@ -697,25 +697,24 @@ class ComputeUpdatedExpOpportunityModel(beam.DoFn):  # type: ignore[misc]
                 translation model.
 
         Yields:
-            ExplorationOpportunitySummaryModel. An exploration opportunity
+            TranslationOpportunityModel. A translation opportunity
             model with updated translation count.
         """
         with datastore_services.get_ndb_context():
-            exp_opportunity_model = (
-                opportunity_models.ExplorationOpportunitySummaryModel.get(
-                    entity_translation_model.entity_id
-                )
+            opp_id = f'{entity_translation_model.entity_type}.{entity_translation_model.entity_id}'
+            opportunity_model = (
+                opportunity_models.TranslationOpportunityModel.get(opp_id)
             )
 
             new_translation_count = len(
                 entity_translation_model.translations.keys()
             )
 
-            exp_opportunity_model.translation_counts[
+            opportunity_model.translation_counts[
                 entity_translation_model.language_code
             ] = new_translation_count
 
-            yield exp_opportunity_model
+            yield opportunity_model
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -744,15 +743,10 @@ class GetLatestModel(beam.DoFn):  # type: ignore[misc]
         """
         with datastore_services.get_ndb_context():
             entity_id, entity_translation_models = element
-            version_list = list(
-                model.entity_version for model in entity_translation_models
+            latest_model = max(
+                entity_translation_models,
+                key=lambda model: int(model.entity_version),
             )
-            latest_version = max(version_list)
-            latest_model = entity_translation_models[0]
-            for model in entity_translation_models:
-                if model.entity_version == latest_version:
-                    latest_model = model
-                    break
 
             yield (entity_id, latest_model)
 

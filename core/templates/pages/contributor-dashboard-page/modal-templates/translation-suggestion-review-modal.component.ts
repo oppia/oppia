@@ -295,18 +295,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id
     );
-    if (
-      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
-        .isEnabled
-    ) {
-      this.subheading =
-        `${this.activeContribution.details.topic_name} / ` +
-        `${this.activeContribution.details.entity_description}`;
+    const details = this.activeContribution.details;
+    if (details.entity_description) {
+      this.subheading = `${details.topic_name} / ${details.entity_description}`;
+    } else if (details.story_title && details.chapter_title) {
+      this.subheading = `${details.topic_name} / ${details.story_title} / ${details.chapter_title}`;
     } else {
-      this.subheading =
-        `${this.activeContribution.details.topic_name} / ` +
-        `${this.activeContribution.details.story_title} / ` +
-        `${this.activeContribution.details.chapter_title}`;
+      this.subheading = `${details.topic_name} / ${details.chapter_title || ''}`;
     }
 
     this.isLastItem = this.remainingContributionIds.length === 0;
@@ -774,14 +769,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   get chapterTitle(): string {
-    if (
-      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
-        .isEnabled &&
-      this.activeContribution.details
-    ) {
-      return this.activeContribution.details.entity_description || '';
+    if (this.activeContribution.details) {
+      return (
+        this.activeContribution.details.entity_description ||
+        this.activeContribution.details.chapter_title ||
+        ''
+      );
     }
-    return this.activeContribution.details?.chapter_title || '';
+    return '';
   }
 
   doesTranslationContainTags(): boolean {

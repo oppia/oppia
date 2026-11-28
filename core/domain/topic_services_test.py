@@ -2699,12 +2699,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Removed %s from uncategorized skill ids' % self.skill_id_1,
         )
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_add_and_delete_uncategorized_skill_with_new_models(self) -> None:
+    def test_add_and_delete_uncategorized_skill(self) -> None:
         self.save_new_skill(
             'skill_id_3', self.user_id_admin, description='Skill 3'
         )
@@ -2731,12 +2726,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.content_count, 1)
         self.assertEqual(model.translation_counts, {})
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_delete_uncategorized_skill_when_skill_in_another_topic_with_new_models(
+    def test_delete_uncategorized_skill_when_skill_in_another_topic(
         self,
     ) -> None:
         topic_id_2 = topic_fetchers.get_new_topic_id()
@@ -2913,12 +2903,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_delete_topic_with_new_models(self) -> None:
+    def test_delete_topic_updates_translation_opportunities(self) -> None:
         topic_id_2 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id_2,

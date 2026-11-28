@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -170,7 +170,7 @@ describe('Translation Submitter', function () {
 
     await translationSubmitter.expectOpportunityToBePresent(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
 
     // Check if pagination works properly.
@@ -188,7 +188,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectPaginationButtonToBeVisible('previous');
     await translationSubmitter.expectOpportunityToBePresent(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem',
+      'Exploration - Fractions',
       false
     );
 
@@ -200,15 +200,19 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
     await translationSubmitter.expectOpportunityToBePresent(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
   });
 
   it('should be able to use RTE', async function () {
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
+
+    // Skip Exploration Title and Objective cards to reach state content RTE.
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
 
     // Bold Text.
     await translationSubmitter.clickOnRTEOptionContainingTitle('बोल्ड');
@@ -320,6 +324,8 @@ describe('Translation Submitter', function () {
   });
 
   it('should be able to submit the translation', async function () {
+    // Submitting the translation saves the suggestion for review. On the final
+    // card, clicking "Save and close" saves the translation and closes the modal.
     await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
@@ -344,7 +350,7 @@ describe('Translation Submitter', function () {
     // Check for awaiting review.
     await translationSubmitter.expectContributionStatusToBe(
       'बोल्ड टेक्स्ट इटैलिक टेक्स्...',
-      'Fractions / The Picnic',
+      'Fractions / Cutting the Pies',
       'Awaiting review'
     );
   });

@@ -99,14 +99,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_model.update_timestamps()
             suggestion_model.put()
             opportunity_model = self.create_model(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                chapter_title='irelevant',
+                opportunity_models.TranslationOpportunityModel,
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=1,
-                story_id='irelevant',
-                story_title='irelevant',
-                topic_name='irelevant',
+                incomplete_translation_language_codes=[],
+                translation_counts={},
             )
             opportunity_model.update_timestamps()
             opportunity_model.put()
@@ -181,14 +181,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.update_timestamps()
         suggestion_model.put()
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()
@@ -231,14 +231,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_model.update_timestamps()
             suggestion_model.put()
             opportunity_model = self.create_model(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                chapter_title='irelevant',
+                opportunity_models.TranslationOpportunityModel,
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=1,
-                story_id='irelevant',
-                story_title='irelevant',
-                topic_name='irelevant',
+                incomplete_translation_language_codes=[],
+                translation_counts={},
             )
             opportunity_model.update_timestamps()
             opportunity_model.put()
@@ -317,14 +317,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_model.update_timestamps()
             suggestion_model.put()
             opportunity_model = self.create_model(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                chapter_title='irelevant',
+                opportunity_models.TranslationOpportunityModel,
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=1,
-                story_id='irelevant',
-                story_title='irelevant',
-                topic_name='irelevant',
+                incomplete_translation_language_codes=[],
+                translation_counts={},
             )
             opportunity_model.update_timestamps()
             opportunity_model.put()
@@ -402,14 +402,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_model.update_timestamps()
             suggestion_model.put()
             opportunity_model = self.create_model(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                chapter_title='irelevant',
+                opportunity_models.TranslationOpportunityModel,
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=1,
-                story_id='irelevant',
-                story_title='irelevant',
-                topic_name='irelevant',
+                incomplete_translation_language_codes=[],
+                translation_counts={},
             )
             opportunity_model.update_timestamps()
             opportunity_model.put()
@@ -488,14 +488,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_model.update_timestamps()
             suggestion_model.put()
             opportunity_model = self.create_model(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                chapter_title='irelevant',
+                opportunity_models.TranslationOpportunityModel,
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=1,
-                story_id='irelevant',
-                story_title='irelevant',
-                topic_name='irelevant',
+                incomplete_translation_language_codes=[],
+                translation_counts={},
             )
             opportunity_model.update_timestamps()
             opportunity_model.put()
@@ -660,14 +660,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             first_suggestion_model.update_timestamps()
             first_suggestion_model.put()
             opportunity_model = self.create_model(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                chapter_title='irelevant',
+                opportunity_models.TranslationOpportunityModel,
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=1,
-                story_id='irelevant',
-                story_title='irelevant',
-                topic_name='irelevant',
+                incomplete_translation_language_codes=[],
+                translation_counts={},
             )
             opportunity_model.update_timestamps()
             opportunity_model.put()
@@ -793,14 +793,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             opportunity_model = self.create_model(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                chapter_title='irelevant',
+                opportunity_models.TranslationOpportunityModel,
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=1,
-                story_id='irelevant',
-                story_title='irelevant',
-                topic_name='irelevant',
+                incomplete_translation_language_codes=[],
+                translation_counts={},
             )
             opportunity_model.update_timestamps()
             opportunity_model.put()
@@ -1285,14 +1285,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         mocked_now = datetime.datetime(2025, 1, 7)
         with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             opportunity_model = self.create_model(
-                opportunity_models.ExplorationOpportunitySummaryModel,
-                id=self.EXP_1_ID,
-                topic_id=self.TOPIC_1_ID,
-                chapter_title='irelevant',
+                opportunity_models.TranslationOpportunityModel,
+                id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                topic_ids=[self.TOPIC_1_ID],
                 content_count=1,
-                story_id='irelevant',
-                story_title='irelevant',
-                topic_name='irelevant',
+                incomplete_translation_language_codes=[],
+                translation_counts={},
             )
             opportunity_model.update_timestamps()
             opportunity_model.put()
@@ -1464,14 +1464,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.update_timestamps()
         suggestion_model.put()
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()
@@ -1518,14 +1518,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.update_timestamps()
         suggestion_model.put()
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()
@@ -1566,14 +1566,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.update_timestamps()
         suggestion_model.put()
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()
@@ -1621,14 +1621,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.update_timestamps()
         suggestion_model.put()
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()
@@ -1676,14 +1676,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.update_timestamps()
         suggestion_model.put()
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()
@@ -1732,14 +1732,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.update_timestamps()
         suggestion_model.put()
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()
@@ -1839,14 +1839,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         first_suggestion_model.update_timestamps()
         first_suggestion_model.put()
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()
@@ -1904,14 +1904,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
     def test_creates_multiple_stats_models_from_multiple_users(self) -> None:
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()
@@ -2237,14 +2237,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
     def test_creates_stats_model_from_multiple_suggestions(self) -> None:
         opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
+            opportunity_models.TranslationOpportunityModel,
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{self.EXP_1_ID}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_1_ID,
+            topic_ids=[self.TOPIC_1_ID],
             content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant',
+            incomplete_translation_language_codes=[],
+            translation_counts={},
         )
         opportunity_model.update_timestamps()
         opportunity_model.put()

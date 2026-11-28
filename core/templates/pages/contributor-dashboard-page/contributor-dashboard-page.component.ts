@@ -28,7 +28,6 @@ import {ContributionAndReviewService} from './services/contribution-and-review.s
 import {ContributionOpportunitiesService} from './services/contribution-opportunities.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {LocalStorageService} from 'services/local-storage.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {UserService} from 'services/user.service';
@@ -68,7 +67,6 @@ export class ContributorDashboardPageComponent implements OnInit {
     private focusManagerService: FocusManagerService,
     private languageUtilService: LanguageUtilService,
     private localStorageService: LocalStorageService,
-    private platformFeatureService: PlatformFeatureService,
     private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
     private urlInterpolationService: UrlInterpolationService,
@@ -122,11 +120,9 @@ export class ContributorDashboardPageComponent implements OnInit {
       'translate_content';
 
     return (
-      (this.activeTabName === 'translateTextTab' ||
-        ((this.activeTabName === 'myContributionTab' || !this.activeTabName) &&
-          userIsViewingTranslationSuggestions)) &&
-      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
-        .isEnabled
+      this.activeTabName === 'translateTextTab' ||
+      ((this.activeTabName === 'myContributionTab' || !this.activeTabName) &&
+        userIsViewingTranslationSuggestions)
     );
   }
 

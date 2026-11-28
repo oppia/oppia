@@ -774,7 +774,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # any language code other than english (what the dummy explorations
         # were written in) can be tested here.
         translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', '', None)
+            opportunity_services.get_translation_opportunities(
+                feconf.ENTITY_TYPE_EXPLORATION, 'hi', '', None
+            )
         )
         self.assertEqual(len(translation_opportunities), 3)
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
@@ -839,7 +841,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # any language code other than english (what the dummy explorations
         # were written in) can be tested here.
         translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', '', None)
+            opportunity_services.get_translation_opportunities(
+                feconf.ENTITY_TYPE_EXPLORATION, 'hi', '', None
+            )
         )
         self.assertEqual(len(translation_opportunities), 3)
         self.logout()
@@ -1497,7 +1501,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+            opportunity_models.TranslationOpportunityModel.get_all()
         )
 
         self.assertEqual(len(all_opportunity_models), 1)
@@ -1519,7 +1523,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(result, {'opportunities_count': 1})
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+            opportunity_models.TranslationOpportunityModel.get_all()
         )
 
         self.assertEqual(len(all_opportunity_models), 1)

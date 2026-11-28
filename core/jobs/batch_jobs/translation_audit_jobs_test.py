@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_audit_jobs
 from core.jobs.types import job_run_result
@@ -40,18 +41,14 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
 
     def test_matches_exactly(self) -> None:
         exp_id = 'exp_1'
-        summary_model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=exp_id,
-            topic_id='topic1',
-            topic_name='Topic 1',
-            story_id='story_1',
-            story_title='Story 1',
-            chapter_title='Chapter 1',
+        summary_model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{exp_id}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=exp_id,
+            topic_ids=['topic1'],
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5, 'es': 10},
-            language_codes_needing_voice_artists=[],
-            language_codes_with_assigned_voice_artists=[],
         )
         summary_model.update_timestamps()
         summary_model.put()
@@ -88,18 +85,14 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
 
     def test_mismatch(self) -> None:
         exp_id = 'exp_2'
-        summary_model_2 = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=exp_id,
-            topic_id='topic1',
-            topic_name='Topic 1',
-            story_id='story_1',
-            story_title='Story 1',
-            chapter_title='Chapter 1',
+        summary_model_2 = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{exp_id}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=exp_id,
+            topic_ids=['topic1'],
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 6},
-            language_codes_needing_voice_artists=[],
-            language_codes_with_assigned_voice_artists=[],
         )
         summary_model_2.update_timestamps()
         summary_model_2.put()
@@ -150,18 +143,14 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
         mismatch.
         """
         exp_id = 'exp_extra_lang'
-        summary_model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=exp_id,
-            topic_id='topic1',
-            topic_name='Topic 1',
-            story_id='story_1',
-            story_title='Story 1',
-            chapter_title='Chapter 1',
+        summary_model = opportunity_models.TranslationOpportunityModel(
+            id=f'{feconf.ENTITY_TYPE_EXPLORATION}.{exp_id}',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=exp_id,
+            topic_ids=['topic1'],
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 3},
-            language_codes_needing_voice_artists=[],
-            language_codes_with_assigned_voice_artists=[],
         )
         summary_model.update_timestamps()
         summary_model.put()

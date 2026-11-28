@@ -23,20 +23,19 @@
  * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit?gid=659609865#gid=659609865
  */
 
-import testConstants from '../../../utilities/common/test-constants';
-import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../utilities/common/test-constants';
+import {UserFactory} from '../../utilities/common/user-factory';
 import {
   Contributor,
   CONTENT_TYPE_FILTER,
-} from '../../../utilities/user/contributor';
-import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../../utilities/user/logged-in-user';
-import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
-import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
-import {TopicManager} from '../../../utilities/user/topic-manager';
-import {TranslationReviewer} from '../../../utilities/user/translation-reviewer';
-import {TranslationSubmitter} from '../../../utilities/user/translation-submitter';
+} from '../../utilities/user/contributor';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {TopicManager} from '../../utilities/user/topic-manager';
+import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
+import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 
@@ -75,7 +74,6 @@ describe('Logged-out User', function () {
     ExplorationEditor &
     TopicManager &
     LoggedInUser;
-  let releaseCoordinator: ReleaseCoordinator;
   let explorationId: string;
 
   beforeAll(async function () {
@@ -93,15 +91,6 @@ describe('Logged-out User', function () {
       'curriculumAdm',
       'curriculumAdm@example.com',
       [ROLES.CURRICULUM_ADMIN]
-    );
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'releaseCoordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
-
-    await releaseCoordinator.enableFeatureFlag(
-      'enable_translation_opps_with_new_opp_models'
     );
 
     explorationId = await curriculumAdm.setUpCuratedLessonWithSkill({
