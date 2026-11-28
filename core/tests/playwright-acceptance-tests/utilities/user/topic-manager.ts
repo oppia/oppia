@@ -63,6 +63,7 @@ const modalDiv = 'div.modal-content';
 const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
+const navigationContainerSelector = '.e2e-test-mobile-navigation-bar-container';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
 const topicsTab = 'a.e2e-test-topics-tab';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
@@ -176,6 +177,19 @@ const addStudyGuideSectionModalSaveButton =
   '.e2e-test-add-study-guide-section-modal-save-button';
 const studyGuideSectionTileSelector = (sectionIndex: number): string =>
   `.e2e-test-study-guide-section-${sectionIndex}`;
+const addMisconceptionHeaderSelector =
+  '.e2e-test-oppia-misconception-card-header';
+const addButtonSelector = '.e2e-test-add-misconception-modal-button';
+const nameFieldSelector = '.e2e-test-misconception-name-field';
+const optionalMisconceptionToggle = '.e2e-test-misconception-optional-check';
+const saveMisconceptionButton = '.e2e-test-confirm-add-misconception-button';
+const addMisconceptionModalSelector = '.e2e-test-add-misconception-modal';
+const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
+const commitMessageInputSelector = '.e2e-test-commit-message-input';
+const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const skillSaveModalSelector = '.oppia-skill-editor-save-modal';
+const mobileSkillNavToggle = '.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const mobileSaveSkillChanges = '.e2e-test-mobile-save-skill-changes';
 
 export class TopicManager extends BaseUser {
   /**
@@ -1055,6 +1069,89 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(skillEditorCollapsibleCard);
 
     expect(this.page.url()).toContain('/skill_editor/');
+  }
+
+  /**
+   * Adds a misconception in the skill editor.
+   * @param {string} misconceptionName - The name of the misconception.
+   * @param {string} notes - Notes for question creators.
+   * @param {string} feedback - Feedback for the misconception.
+   * @param {boolean} optional - Whether the misconception is optional.
+   */
+  async addMisconception(
+    misconceptionName: string,
+    notes: string,
+    feedback: string,
+    optional: boolean = false
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isAddButtonVisible = await this.page
+        .locator(addButtonSelector)
+        .isVisible();
+      if (!isAddButtonVisible) {
+        await this.clickOnElementWithSelector(addMisconceptionHeaderSelector);
+      }
+    }
+    await this.clickOnElementWithSelector(addButtonSelector);
+    await this.expectElementToBeVisible(addMisconceptionModalSelector);
+    await this.typeInInputField(nameFieldSelector, misconceptionName);
+
+    await this.typeInInputField(
+      '.e2e-test-notes-textarea div.e2e-test-rte',
+      notes
+    );
+    await this.typeInInputField(
+      '.e2e-test-feedback-textarea div.e2e-test-rte',
+      feedback
+    );
+
+    if (optional) {
+      await this.clickOnElementWithSelector(optionalMisconceptionToggle);
+    }
+
+    await this.clickOnElementWithSelector(saveMisconceptionButton);
+    await this.expectElementToBeVisible(addMisconceptionModalSelector, false);
+    showMessage(`Misconception "${misconceptionName}" added successfully.`);
+  }
+
+  /**
+   * Publishes an updated skill.
+   * @param {string} updateMessage - The commit message for the update.
+   */
+  async publishUpdatedSkill(updateMessage: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      if (
+        !(await this.isElementVisible(navigationContainerSelector, true, 5000))
+      ) {
+        await this.expectElementToBeVisible(mobileOptionsSelector);
+        await this.clickOnElementWithSelector(mobileOptionsSelector);
+      }
+      const toggles = this.page.locator(mobileSkillNavToggle);
+      if ((await toggles.count()) > 1) {
+        await toggles.nth(1).click();
+      } else {
+        await toggles.first().click();
+      }
+      await this.expectElementToBeVisible(mobileSaveSkillChanges);
+      await this.clickOnElementWithSelector(mobileSaveSkillChanges);
+    } else {
+      await this.clickOnElementWithSelector(saveOrPublishSkillSelector);
+    }
+
+    await this.expectElementToBeVisible(commitMessageInputSelector);
+    await this.typeInInputField(commitMessageInputSelector, updateMessage);
+    await this.expectElementToBeVisible(closeSaveModalButtonSelector);
+    await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
+    await this.expectElementToBeVisible(skillSaveModalSelector, false);
+    await this.expectToastMessage('Changes Saved.');
+    showMessage('Skill updated successfully.');
+  }
+
+  /**
+   * Navigates to the topics and skills dashboard page.
+   */
+  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
   }
 
   /**

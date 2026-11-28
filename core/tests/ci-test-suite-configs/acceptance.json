@@ -122,8 +122,8 @@
     },
     {
       "name": "exploration-editor/manage-exploration-misconceptions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-editor/modify-translations-through-modal",

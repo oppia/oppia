@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {Page, ElementHandle, expect} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -238,6 +238,29 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
 } as const;
 
 const addTitleBar = 'input#explorationTitle';
+
+const multipleChoiceInteractionButton =
+  'div.e2e-test-interaction-tile-MultipleChoiceInput';
+const addSkillButton = 'button.e2e-test-add-skill-button';
+const skillSelectionItem = '.e2e-test-skills-list-item';
+const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
+const deleteSkillButton = 'i.skill-delete-button';
+const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
+const removeSkillModalHeaderSelector =
+  '.e2e-test-delete-state-skill-modal-header';
+const skillSelectModalSelector = '.skill-select-modal';
+const responseGroupDiv = '.e2e-test-response-tab';
+const toggleResponseTab = '.e2e-test-response-tab-toggle';
+const activeTabClass = 'e2e-test-active-tab';
+const misconceptionDiv = '.misconception-list-item';
+const optionalMisconceptionDiv = '.optional-misconception-list-item';
+const optionalMisconceptionOptionsButton =
+  '.optional-misconception-options-button';
+const misconceptionApplicableToggle =
+  '.e2e-test-misconception-applicable-toggle';
+const misconceptionTitle = '.e2e-test-misconception-title';
+const misconceptionEditorTab = '.e2e-test-open-misconception-editor';
+const leaveTranslationsAsIsButton = '.e2e-test-leave-translations-as-is';
 
 export class ExplorationEditor extends BaseUser {
   /**
@@ -984,6 +1007,43 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Dismisses the lost changes modal or version mismatch modal if present.
+   * @param {number} timeoutMs - Timeout in milliseconds to wait for modal.
+   */
+  async dismissLostChangesModalIfExists(timeoutMs: number = 0): Promise<void> {
+    try {
+      let lostModal = await this.page.$(
+        'oppia-lost-changes-modal, .e2e-test-lost-changes-modal'
+      );
+      if (!lostModal && timeoutMs > 0) {
+        lostModal = await this.page
+          .waitForSelector(
+            'oppia-lost-changes-modal, .e2e-test-lost-changes-modal',
+            {timeout: timeoutMs, state: 'visible'}
+          )
+          .catch(() => null);
+      }
+      if (lostModal) {
+        const closeBtn = await this.page.$(
+          'oppia-lost-changes-modal button.btn-secondary, .e2e-test-discard-lost-changes-button'
+        );
+        if (closeBtn) {
+          await this.clickOnElement(closeBtn);
+          await this.page
+            .waitForSelector('.modal-dialog', {
+              state: 'hidden',
+              timeout: 5000,
+            })
+            .catch(() => {});
+          await this.waitForPageToFullyLoad();
+        }
+      }
+    } catch {
+      // If modal is not present or already closed, proceed.
+    }
+  }
+
+  /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
    * @param {boolean} retry - Whether to retry navigation if it fails (default: true).
@@ -1049,10 +1109,16 @@ export class ExplorationEditor extends BaseUser {
         `Could not find clickable background for card: ${cardName}`
       );
     }
-    await nodeBackground.evaluate(el =>
-      el.scrollIntoView({block: 'center', inline: 'center'})
-    );
-    await this.clickOnElement(nodeBackground);
+    await this.dismissLostChangesModalIfExists();
+    await nodeBackground.evaluate((el: Element) => {
+      el.scrollIntoView({block: 'center', inline: 'center'});
+      if (typeof (el as HTMLElement).click === 'function') {
+        (el as HTMLElement).click();
+      }
+      el.dispatchEvent(
+        new MouseEvent('click', {bubbles: true, cancelable: true})
+      );
+    });
 
     const headingName = !cardName.trimEnd().endsWith('...')
       ? cardName
@@ -1063,7 +1129,8 @@ export class ExplorationEditor extends BaseUser {
           const element = document.querySelector(selector);
           return element?.textContent?.includes(value);
         },
-        {selector: currentCardNameContainerSelector, value: headingName}
+        {selector: currentCardNameContainerSelector, value: headingName},
+        {timeout: 10000}
       );
     } catch (error) {
       if (retry) {
@@ -2062,14 +2129,301 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(addResponseOptionButton);
     }
 
-    const responseInputs = await this.page.$$(stateContentInputField);
+    const responseInputs = this.page.locator(
+      `.e2e-test-interaction-editor ${stateContentInputField}`
+    );
+    await expect(responseInputs).toHaveCount(options.length);
     for (let i = 0; i < options.length; i++) {
-      await responseInputs[i].type(`${options[i]}`);
+      const input = responseInputs.nth(i);
+      await input.click();
+      await input.pressSequentially(options[i]);
+      await this.page.keyboard.press('Tab');
     }
 
+    await this.expectElementToBeVisible(
+      `${saveInteractionButton}:not([disabled])`
+    );
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.expectElementToBeVisible(addInteractionModalSelector, false);
     showMessage('Multiple Choice interaction has been added successfully.');
+  }
+
+  /**
+   * Adds a skill to the current state card in the exploration editor.
+   * @param {string} skillName - Name of the skill to be linked to state.
+   */
+  async addSkillToState(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isAddSkillVisible = await this.page
+        .locator(addSkillButton)
+        .isVisible();
+      if (!isAddSkillVisible) {
+        await this.clickOnElementWithSelector(mobileToggleSkillCard);
+      }
+    }
+    await this.clickOnElementWithSelector(addSkillButton);
+    await this.expectElementToBeVisible(skillSelectModalSelector);
+    await this.typeInInputField(skillNameInput, skillName);
+    await this.clickOnElementWithSelector(skillSelectionItem);
+    await this.clickOnElementWithSelector(confirmSkillButton);
+    await this.expectElementToBeVisible(skillSelectModalSelector, false);
+    await expect(this.page.locator('.skill-link')).toContainText(skillName);
+    showMessage(`Skill "${skillName}" added to state successfully.`);
+  }
+
+  /**
+   * Removes the attached skill from the current state card.
+   */
+  async removeSkillFromState(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isDeleteSkillVisible = await this.page
+        .locator(deleteSkillButton)
+        .isVisible();
+      if (!isDeleteSkillVisible) {
+        await this.clickOnElementWithSelector(mobileToggleSkillCard);
+      }
+    }
+    await this.clickOnElementWithSelector(deleteSkillButton);
+    await this.expectElementToBeVisible(removeSkillModalHeaderSelector);
+    await this.clickOnElementWithText('Delete skill');
+    await this.expectElementToBeVisible(removeSkillModalHeaderSelector, false);
+    showMessage('Skill removed from state successfully.');
+  }
+
+  /**
+   * Verifies if a misconception is present on the page.
+   * @param {string} misconceptionName - The name of the misconception to verify.
+   * @param {boolean} isPresent - Whether the misconception is expected to be present.
+   */
+  async verifyMisconceptionPresentForState(
+    misconceptionName: string,
+    isPresent: boolean
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isResponseVisible = await this.page
+        .locator(responseGroupDiv)
+        .first()
+        .isVisible();
+      if (!isResponseVisible) {
+        await this.clickOnElementWithSelector(toggleResponseTab);
+      }
+    }
+
+    const misconceptionLocator = this.page.locator(misconceptionDiv);
+    if (isPresent) {
+      await expect(
+        misconceptionLocator.filter({hasText: misconceptionName}).first()
+      ).toBeVisible({timeout: 10000});
+      showMessage(`Verified misconception "${misconceptionName}" is present.`);
+    } else {
+      await expect(
+        misconceptionLocator.filter({hasText: misconceptionName})
+      ).toHaveCount(0);
+      showMessage(`Verified misconception "${misconceptionName}" is absent.`);
+    }
+  }
+
+  /**
+   * Toggles the applicability status of an optional misconception.
+   * @param {string} misconceptionName - The name of the misconception to be toggled.
+   */
+  async toggleMisconceptionApplicableStatus(
+    misconceptionName: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isResponseVisible = await this.page
+        .locator(responseGroupDiv)
+        .first()
+        .isVisible();
+      if (!isResponseVisible) {
+        await this.clickOnElementWithSelector(toggleResponseTab);
+      }
+    }
+
+    const optionalItem = this.page
+      .locator(optionalMisconceptionDiv)
+      .filter({hasText: misconceptionName})
+      .first();
+    await expect(optionalItem).toBeVisible();
+
+    const optionsBtn = optionalItem.locator(optionalMisconceptionOptionsButton);
+    await optionsBtn.click();
+
+    const toggleBtn = optionalItem.locator(misconceptionApplicableToggle);
+    await expect(toggleBtn).toBeVisible();
+    await toggleBtn.click();
+    showMessage(`Toggled applicable status for "${misconceptionName}".`);
+  }
+
+  /**
+   * Verifies whether a given optional misconception is applicable or not.
+   * @param {string} misconceptionName - The name of the misconception to be verified.
+   * @param {boolean} isApplicable - The expected applicability status of the misconception.
+   */
+  async verifyOptionalMisconceptionApplicableStatus(
+    misconceptionName: string,
+    isApplicable: boolean
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isResponseVisible = await this.page
+        .locator(responseGroupDiv)
+        .first()
+        .isVisible();
+      if (!isResponseVisible) {
+        await this.clickOnElementWithSelector(toggleResponseTab);
+      }
+    }
+
+    const optionalItem = this.page
+      .locator(optionalMisconceptionDiv)
+      .filter({hasText: misconceptionName})
+      .first();
+    await expect(optionalItem).toBeVisible();
+
+    if (!isApplicable) {
+      await expect(optionalItem).toHaveClass(
+        /optional-misconception-list-no-action/
+      );
+    } else {
+      await expect(optionalItem).not.toHaveClass(
+        /optional-misconception-list-no-action/
+      );
+    }
+    showMessage(
+      `Verified misconception "${misconceptionName}" is ${isApplicable ? '' : 'not '}applicable.`
+    );
+  }
+
+  /**
+   * Tags an answer group with a misconception in the exploration editor.
+   * @param {number} responseIndex - Index of the response tab.
+   * @param {string} misconceptionName - Name of the misconception to tag.
+   * @param {boolean} isOptional - Whether the misconception is optional.
+   */
+  async tagAnswerGroupWithMisconception(
+    responseIndex: number,
+    misconceptionName: string,
+    isOptional: boolean
+  ): Promise<void> {
+    const expectedTitle = !isOptional
+      ? misconceptionName
+      : `(Optional) ${misconceptionName}`;
+
+    if (this.isViewportAtMobileWidth()) {
+      const isResponseVisible = await this.page
+        .locator(responseGroupDiv)
+        .first()
+        .isVisible();
+      if (!isResponseVisible) {
+        await this.clickOnElementWithSelector(toggleResponseTab);
+      }
+    }
+
+    const responseTabs = this.page.locator(responseGroupDiv);
+    await expect(responseTabs.first()).toBeVisible();
+    const responseTab = responseTabs.nth(responseIndex);
+    const classes = await responseTab.getAttribute('class');
+    if (!classes?.includes(activeTabClass)) {
+      await responseTab.click();
+    }
+
+    await this.clickOnElementWithText('Tag with misconception');
+
+    const misconceptionTitles = this.page.locator(misconceptionTitle);
+    await expect(misconceptionTitles.first()).toBeVisible();
+    const count = await misconceptionTitles.count();
+    let clicked = false;
+    for (let i = 0; i < count; i++) {
+      const title = (await misconceptionTitles.nth(i).textContent())?.trim();
+      if (title === expectedTitle) {
+        await misconceptionTitles.nth(i).click();
+        clicked = true;
+        break;
+      }
+    }
+    if (!clicked) {
+      throw new Error(
+        `Misconception with title "${expectedTitle}" not found to tag.`
+      );
+    }
+
+    await this.clickOnElementWithText('Done');
+
+    const leaveAsIsBtn = this.page.locator(leaveTranslationsAsIsButton);
+    try {
+      await leaveAsIsBtn.waitFor({state: 'visible', timeout: 5000});
+      await leaveAsIsBtn.click();
+      await leaveAsIsBtn.waitFor({state: 'hidden'});
+    } catch {
+      // Modal didn't appear.
+    }
+    showMessage(
+      `Tagged response group ${responseIndex} with misconception "${misconceptionName}".`
+    );
+  }
+
+  /**
+   * Replace a tagged misconception for a response group with a new one.
+   * @param {number} responseIndex - Index of the response group.
+   * @param {string} misconceptionName - Name of the new misconception.
+   * @param {boolean} isOptional - Whether the new misconception is optional.
+   */
+  async changeTaggedAnswerGroupMisconception(
+    responseIndex: number,
+    misconceptionName: string,
+    isOptional: boolean
+  ): Promise<void> {
+    const expectedTitle = !isOptional
+      ? misconceptionName
+      : `(Optional) ${misconceptionName}`;
+
+    if (this.isViewportAtMobileWidth()) {
+      const isResponseVisible = await this.page
+        .locator(responseGroupDiv)
+        .first()
+        .isVisible();
+      if (!isResponseVisible) {
+        await this.clickOnElementWithSelector(toggleResponseTab);
+      }
+    }
+
+    const responseTabs = this.page.locator(responseGroupDiv);
+    await expect(responseTabs.first()).toBeVisible();
+    await responseTabs.nth(responseIndex).click();
+
+    await this.clickOnElementWithSelector(misconceptionEditorTab);
+
+    const misconceptionTitles = this.page.locator(misconceptionTitle);
+    await expect(misconceptionTitles.first()).toBeVisible();
+    const count = await misconceptionTitles.count();
+    let clicked = false;
+    for (let i = 0; i < count; i++) {
+      const title = (await misconceptionTitles.nth(i).textContent())?.trim();
+      if (title === expectedTitle) {
+        await misconceptionTitles.nth(i).click();
+        clicked = true;
+        break;
+      }
+    }
+    if (!clicked) {
+      throw new Error(
+        `Misconception with title "${expectedTitle}" not found to change.`
+      );
+    }
+
+    await this.clickOnElementWithText('Save Misconception');
+
+    const leaveAsIsBtn = this.page.locator(leaveTranslationsAsIsButton);
+    try {
+      await leaveAsIsBtn.waitFor({state: 'visible', timeout: 5000});
+      await leaveAsIsBtn.click();
+      await leaveAsIsBtn.waitFor({state: 'hidden'});
+    } catch {
+      // Modal didn't appear.
+    }
+    showMessage(
+      `Changed tagged misconception on response group ${responseIndex} to "${misconceptionName}".`
+    );
   }
 
   /**

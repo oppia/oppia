@@ -1,7 +1,7 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use explorationEditor file except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -13,17 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for translation modification modal in exploration editor.
+ * @fileoverview Acceptance Test for misconception management in exploration editor.
  */
+
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import {TopicManager} from '../../utilities/user/topic-manager';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 const INTRODUCTION_CARD_CONTENT: string =
@@ -39,19 +38,17 @@ enum CARD_NAME {
   FINAL_CARD = 'Final Card',
 }
 
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /Occurred at http:\/\/localhost:8181\/story_editor\/[a-zA-Z0-9]+\/.*Cannot read properties of undefined \(reading 'getStory'\)/,
-  /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
-  new RegExp('Invalid active state name: null'),
-]);
+test.describe.configure({mode: 'serial'});
 
-describe('Exploration Editor', function () {
-  let explorationEditor: ExplorationEditor & TopicManager;
-  let curriculumAdmin: CurriculumAdmin & TopicManager;
+test.describe('Exploration Editor', function () {
+  let explorationEditor: ExplorationEditor;
+  let curriculumAdmin: CurriculumAdmin;
   let releaseCoordinator: ReleaseCoordinator;
   let explorationId: string | null;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(600000);
+
     // We assign curriculum admin privileges to the exploration editor in
     // order to provide the ability to link particular state cards of
     // explorations with skills, which will often be repeated to test
@@ -59,16 +56,19 @@ describe('Exploration Editor', function () {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
+      browser,
       [ROLES.RELEASE_COORDINATOR]
     );
 
@@ -146,7 +146,7 @@ describe('Exploration Editor', function () {
     }
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one', true);
 
     await curriculumAdmin.createSubtopicForTopic(
       'Test Subtopic 1',
@@ -193,114 +193,88 @@ describe('Exploration Editor', function () {
       explorationId,
       'Test Topic 1'
     );
-    // We set an increased custom timeout since the setup takes too long unlike other specs.
-  }, 400000);
+  });
 
-  it(
-    'should show the relevant linked misconception in state editor.',
-    async function () {
-      await explorationEditor.page.bringToFront();
-      // We reload the page here and elsewhere in order to fetch the curated version of the
-      // exploration since it isn't curated by default on initialization.
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION
-      );
-      await explorationEditor.addSkillToState('Test Skill 1');
-      await explorationEditor.verifyMisconceptionPresentForState(
-        'Addition Misconception',
-        true
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should show the relevant linked misconception in state editor.', async function () {
+    await explorationEditor.page.bringToFront();
+    // We reload the page here and elsewhere in order to fetch the curated version of the
+    // exploration since it isn't curated by default on initialization.
+    await explorationEditor.reloadPage();
+    await explorationEditor.dismissLostChangesModalIfExists(3000);
+    await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
+    await explorationEditor.addSkillToState('Test Skill 1');
+    await explorationEditor.verifyMisconceptionPresentForState(
+      'Addition Misconception',
+      true
+    );
+  });
 
-  it(
-    'should allow user to mark misconceptions as inapplicable.',
-    async function () {
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION
-      );
-      await explorationEditor.toggleMisconceptionApplicableStatus(
-        'Subtraction Misconception'
-      );
-      await explorationEditor.verifyOptionalMisconceptionApplicableStatus(
-        'Subtraction Misconception',
-        false
-      );
-      await explorationEditor.toggleMisconceptionApplicableStatus(
-        'Subtraction Misconception'
-      );
-      await explorationEditor.verifyOptionalMisconceptionApplicableStatus(
-        'Subtraction Misconception',
-        true
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should allow user to mark misconceptions as inapplicable.', async function () {
+    await explorationEditor.reloadPage();
+    await explorationEditor.dismissLostChangesModalIfExists(3000);
+    await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
+    await explorationEditor.toggleMisconceptionApplicableStatus(
+      'Subtraction Misconception'
+    );
+    await explorationEditor.verifyOptionalMisconceptionApplicableStatus(
+      'Subtraction Misconception',
+      false
+    );
+    await explorationEditor.toggleMisconceptionApplicableStatus(
+      'Subtraction Misconception'
+    );
+    await explorationEditor.verifyOptionalMisconceptionApplicableStatus(
+      'Subtraction Misconception',
+      true
+    );
+  });
 
-  it(
-    'should tag answer group with misconception.',
-    async function () {
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION
-      );
-      await explorationEditor.tagAnswerGroupWithMisconception(
-        1,
-        'Addition Misconception',
-        false
-      );
-      await explorationEditor.verifyMisconceptionPresentForState(
-        'Addition Misconception',
-        false
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should tag answer group with misconception.', async function () {
+    await explorationEditor.reloadPage();
+    await explorationEditor.dismissLostChangesModalIfExists(3000);
+    await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
+    await explorationEditor.tagAnswerGroupWithMisconception(
+      1,
+      'Addition Misconception',
+      false
+    );
+    await explorationEditor.verifyMisconceptionPresentForState(
+      'Addition Misconception',
+      false
+    );
+  });
 
-  it(
-    'should change tagged misconception for response group',
-    async function () {
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION
-      );
-      await explorationEditor.changeTaggedAnswerGroupMisconception(
-        1,
-        'Subtraction Misconception',
-        true
-      );
-      await explorationEditor.verifyMisconceptionPresentForState(
-        'Addition Misconception',
-        true
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should change tagged misconception for response group', async function () {
+    await explorationEditor.reloadPage();
+    await explorationEditor.dismissLostChangesModalIfExists(3000);
+    await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
+    await explorationEditor.changeTaggedAnswerGroupMisconception(
+      1,
+      'Subtraction Misconception',
+      true
+    );
+    await explorationEditor.verifyMisconceptionPresentForState(
+      'Addition Misconception',
+      true
+    );
+  });
 
-  it(
-    'should not display misconceptions after skill is removed from state.',
-    async function () {
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION
-      );
-      await explorationEditor.removeSkillFromState();
-      await explorationEditor.verifyMisconceptionPresentForState(
-        'Addition Misconception',
-        false
-      );
-      await explorationEditor.verifyMisconceptionPresentForState(
-        'Subtraction Misconception',
-        false
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should not display misconceptions after skill is removed from state.', async function () {
+    await explorationEditor.reloadPage();
+    await explorationEditor.dismissLostChangesModalIfExists(3000);
+    await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
+    await explorationEditor.removeSkillFromState();
+    await explorationEditor.verifyMisconceptionPresentForState(
+      'Addition Misconception',
+      false
+    );
+    await explorationEditor.verifyMisconceptionPresentForState(
+      'Subtraction Misconception',
+      false
+    );
+  });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

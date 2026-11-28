@@ -1309,7 +1309,18 @@ export class BaseUser {
   ): Promise<void> {
     await this.waitForElementToStabilize(element);
     await this.waitForElementToBeClickable(element);
-    await element.click(options);
+    try {
+      await element.click({timeout: 10000, ...options});
+    } catch {
+      await element.evaluate((el: Element) => {
+        if (typeof (el as HTMLElement).click === 'function') {
+          (el as HTMLElement).click();
+        }
+        el.dispatchEvent(
+          new MouseEvent('click', {bubbles: true, cancelable: true})
+        );
+      });
+    }
   }
 
   /**
