@@ -161,7 +161,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                     )
                 ),
             )
-            skill_opportunity.validate()
+            skill_opportunity.validate(strict=True)
             with datastore_services.get_ndb_context():
                 opportunity_model = opportunity_models.SkillOpportunityModel(
                     id=skill_opportunity.id,

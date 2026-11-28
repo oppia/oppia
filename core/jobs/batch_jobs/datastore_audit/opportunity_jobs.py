@@ -55,12 +55,12 @@ if MYPY:  # pragma: no cover
 
 
 class GroupedQuestionLinksDict(TypedDict):
-    """Dictionary representing QuestionSkillLinkModels and QuestionModels joined
-    by question ID.
+    """Dictionary representing QuestionSkillLinkModels and question existence
+    markers joined by question ID.
     """
 
     links: Iterable[question_models.QuestionSkillLinkModel]
-    questions: Iterable[question_models.QuestionModel]
+    questions: Iterable[None]
 
 
 class GroupedSkillOpportunityDict(TypedDict):
@@ -102,12 +102,14 @@ class SkillOpportunityModelValidationJob(
                 skill_models.SkillModel.get_all(include_deleted=False)
             )
         )
-        question_models_pcoll = (
+        question_ids_by_id = (
             self.pipeline
             | 'Get all non-deleted QuestionModels'
             >> ndb_io.GetModels(
                 question_models.QuestionModel.get_all(include_deleted=False)
             )
+            | 'Map QuestionModels to (id, None)'
+            >> beam.Map(lambda question_model: (question_model.id, None))
         )
         question_skill_link_models_pcoll = (
             self.pipeline
@@ -140,17 +142,10 @@ class SkillOpportunityModelValidationJob(
                 lambda link_model: link_model.question_id
             )
         )
-        questions_by_id = (
-            question_models_pcoll
-            | 'Key QuestionModels by id'
-            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
-                lambda question_model: question_model.id
-            )
-        )
         valid_linked_question_ids_by_skill_id = (
             {
                 'links': links_by_question_id,
-                'questions': questions_by_id,
+                'questions': question_ids_by_id,
             }
             | 'Join links with questions by question_id' >> beam.CoGroupByKey()
             | 'Extract valid (skill_id, question_id) pairs'
