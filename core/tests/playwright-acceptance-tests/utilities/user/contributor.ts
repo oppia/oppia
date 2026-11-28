@@ -67,48 +67,10 @@ export class Contributor extends ExplorationEditor {
     // timeout, we still check the list below.
     await this.isElementVisible(opportunityItemSelector);
 
-    // Sometimes, the opportunities refresh after they have been loaded.
-    // This causes the older nodes to get detached from the DOM. So, we
-    // ensure that the opportunity list hasn't changed for 200 ms.
-    let previousElementIds: string[] = [];
-    let opportunityItemListChanged = true;
-
-    // TODO(#23395): Currently, the opportunity list is refreshed after the
-    // page is loaded. This causes the test to fail. We are using a workaround
-    // for now, by waiting for the opportunity list to be loaded.
-    // Once the issue is fixed, remove the following do-while loop.
-    do {
-      await this.page.waitForTimeout(200);
-
-      let currentElementIds: string[];
-      try {
-        currentElementIds = await this.page.evaluate((selector: string) => {
-          const elements = document.querySelectorAll(selector);
-          return Array.from(elements).map((el, index) => {
-            return el.textContent?.trim() || `element-${index}`;
-          });
-        }, opportunityItemSelector);
-      } catch (error) {
-        // The page may still be navigating (e.g. after using the navbar to
-        // open the contributor dashboard), which destroys the execution
-        // context. In that case, we check the list again in the next
-        // iteration.
-        showMessage(`Opportunity list is not ready yet: ${error}`);
-        previousElementIds = [];
-        continue;
-      }
-
-      opportunityItemListChanged =
-        previousElementIds.length !== currentElementIds.length ||
-        !previousElementIds.every(
-          (id, index) => id === currentElementIds[index]
-        );
-
-      previousElementIds = currentElementIds;
-    } while (opportunityItemListChanged);
+    const opportunityItems = await this.page.$$(opportunityItemSelector);
 
     // Handle the case where no opportunity is present.
-    if (previousElementIds.length === 0) {
+    if (opportunityItems.length === 0) {
       if (visible) {
         throw new Error(
           `Opportunity for ${heading} in ${subheading} not found.`
@@ -121,7 +83,6 @@ export class Contributor extends ExplorationEditor {
     }
 
     // Get the opportunity item element.
-    const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
       const opportunityItemHeading = await opportunityItemElement.evaluate(
         (el: Element, sel: string) =>

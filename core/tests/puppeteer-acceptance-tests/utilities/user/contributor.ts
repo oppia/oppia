@@ -146,12 +146,11 @@ export class Contributor extends ExplorationEditor {
   }
 
   /**
-   * Waits until the opportunity list has finished loading and its contents
-   * are stable. While the list is loading, its items are hidden and
-   * placeholder items are shown instead, so callers must not scan the list
-   * before it has settled.
+   * Waits until the opportunity list has finished loading. While the list is
+   * loading, its items are hidden and placeholder items are shown instead, so
+   * callers must not scan the list before it has loaded.
    */
-  private async waitForOpportunityListToStabilize(): Promise<void> {
+  private async waitForOpportunityListToLoad(): Promise<void> {
     // Wait for the list to finish loading: the loading placeholder is
     // hidden once the opportunity items have been rendered.
     await this.page.waitForFunction(
@@ -166,37 +165,6 @@ export class Contributor extends ExplorationEditor {
       {timeout: 30000},
       opportunityLoadingPlaceholderSelector
     );
-
-    // Sometimes, the opportunities refreshes after they have been loaded.
-    // This causes problem that older node gets detached from the DOM.
-    // So, we are ensuring that the opportunity list hasn't been changed
-    // for 200 ms.
-    let previousElementIds: string[] = [];
-    let opportunityItemListChanged = true;
-    const stabilizationTimeout = Date.now() + 30000;
-
-    // TODO(#23395): Currently, the opportunity list is refreshed after the
-    // page is loaded. This causes the test to fail. We are using a workaround
-    // for now, by waiting for the opportunity list to be loaded.
-    // Once the issue is fixed, remove the following do-while loop.
-    do {
-      await this.page.waitForTimeout(200);
-
-      const currentElementIds = await this.page.evaluate((selector: string) => {
-        const elements = document.querySelectorAll(selector);
-        return Array.from(elements).map((el, index) => {
-          return el.textContent?.trim() || `element-${index}`;
-        });
-      }, opportunityItemSelector);
-
-      opportunityItemListChanged =
-        previousElementIds.length !== currentElementIds.length ||
-        !previousElementIds.every(
-          (id, index) => id === currentElementIds[index]
-        );
-
-      previousElementIds = currentElementIds;
-    } while (opportunityItemListChanged && Date.now() < stabilizationTimeout);
   }
 
   /**
@@ -253,8 +221,8 @@ export class Contributor extends ExplorationEditor {
     await this.page.waitForNetworkIdle();
 
     // Handle the case where no translation opportunity is expected.
+    await this.waitForOpportunityListToLoad();
     if (!visible) {
-      await this.waitForOpportunityListToStabilize();
       const opportunityItemElement = await this.findOpportunityItem(
         heading,
         subheading
@@ -275,21 +243,12 @@ export class Contributor extends ExplorationEditor {
       return null;
     }
 
-    // The opportunity list can be refreshed after it has been rendered (see
-    // #23395), so a single scan may run against a stale list that does not
-    // contain the target opportunity yet. Keep scanning until the target
-    // opportunity shows up.
-    const scanningTimeout = Date.now() + 30000;
-    while (Date.now() < scanningTimeout) {
-      await this.waitForOpportunityListToStabilize();
-      const opportunityItemElement = await this.findOpportunityItem(
-        heading,
-        subheading
-      );
-      if (opportunityItemElement !== null) {
-        return opportunityItemElement;
-      }
-      await this.page.waitForTimeout(200);
+    const opportunityItemElement = await this.findOpportunityItem(
+      heading,
+      subheading
+    );
+    if (opportunityItemElement !== null) {
+      return opportunityItemElement;
     }
 
     let opportunityHeadings: string[] = [];

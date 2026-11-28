@@ -261,6 +261,11 @@ export class OpportunitiesListComponent {
     if (!this.loadOpportunities) {
       return;
     }
+    // Wait for the active topic to be set, since the list reloads when it
+    // changes. Otherwise the list is loaded twice (#23395).
+    if (!this.translationTopicService.getActiveTopicName()) {
+      return;
+    }
 
     this.opportunities = [];
     this.more = true;
