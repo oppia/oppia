@@ -435,9 +435,8 @@ def get_rubrics_of_skills(
     ] = {}
 
     for skill in skills:
-        if skill is not None:
-            rubric_dicts = [rubric.to_dict() for rubric in skill.rubrics]
-            skill_id_to_rubrics_dict[skill.id] = rubric_dicts
+        rubric_dicts = [rubric.to_dict() for rubric in skill.rubrics]
+        skill_id_to_rubrics_dict[skill.id] = rubric_dicts
 
     deleted_skill_ids = []
     for skill_id in skill_ids:
@@ -464,10 +463,9 @@ def get_descriptions_of_skills(
     skill_id_to_description_dict: Dict[str, str] = {}
 
     for skill_summary in skill_summaries:
-        if skill_summary is not None:
-            skill_id_to_description_dict[skill_summary.id] = (
-                skill_summary.description
-            )
+        skill_id_to_description_dict[skill_summary.id] = (
+            skill_summary.description
+        )
 
     deleted_skill_ids = []
     for skill_id in skill_ids:
@@ -970,22 +968,21 @@ def apply_change_list(
                         update_all_questions_merged_cmd.new_value
                     )
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
-                if (
+                assert (
                     change.property_name
                     == skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION
-                ):
-                    # Here we use cast because this 'if'
-                    # condition forces change to have type
-                    # UpdateSkillContentsPropertyExplanationCmd.
-                    update_explanation_cmd = cast(
-                        skill_domain.UpdateSkillContentsPropertyExplanationCmd,
-                        change,
-                    )
-                    explanation = state_domain.SubtitledHtml.from_dict(
-                        update_explanation_cmd.new_value
-                    )
-                    explanation.validate()
-                    skill.update_explanation(explanation)
+                )
+                # Here we use cast because the assert above forces change
+                # to have type UpdateSkillContentsPropertyExplanationCmd.
+                update_explanation_cmd = cast(
+                    skill_domain.UpdateSkillContentsPropertyExplanationCmd,
+                    change,
+                )
+                explanation = state_domain.SubtitledHtml.from_dict(
+                    update_explanation_cmd.new_value
+                )
+                explanation.validate()
+                skill.update_explanation(explanation)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 # Here we use cast because we are narrowing down the type from
                 # SkillChange to a specific change command.
@@ -1254,10 +1251,9 @@ def update_skill(
                 content_count,
                 translation_counts,
             )
-            if updated_opp_models:
-                opp_model_cls = opportunity_models.TranslationOpportunityModel
-                opp_model_cls.update_timestamps_multi(updated_opp_models)
-                opp_model_cls.put_multi(updated_opp_models)
+            opp_model_cls = opportunity_models.TranslationOpportunityModel
+            opp_model_cls.update_timestamps_multi(updated_opp_models)
+            opp_model_cls.put_multi(updated_opp_models)
 
     misconception_is_deleted = any(
         change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
