@@ -103,7 +103,6 @@ var reloadCollectionButton = '.e2e-test-reload-collection-button';
 
 var roleOptionLabels = {
   ADMIN: 'curriculum admin',
-  BLOG_ADMIN: 'blog admin',
   COLLECTION_EDITOR: 'collection editor',
   MODERATOR: 'moderator',
 };
@@ -251,10 +250,6 @@ module.exports = async (browser, context) => {
       await createCollections(context, page);
     } else if (context.url.includes('explore/0')) {
       await createExplorations(context, page);
-    } else if (context.url.includes('blog-dashboard')) {
-      await setRole(page, 'BLOG_ADMIN');
-    } else if (context.url.includes('blog-admin')) {
-      await setRole(page, 'BLOG_ADMIN');
     }
   }
   if (process.env.LIGHTHOUSE_SKIP_LOGIN !== '1') {

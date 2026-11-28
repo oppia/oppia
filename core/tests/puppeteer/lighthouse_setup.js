@@ -170,6 +170,7 @@ var cookieBannerAcceptButton = '.e2e-test-oppia-cookie-banner-accept-button';
 
 var roleOptionLabels = {
   ADMIN: 'curriculum admin',
+  BLOG_ADMIN: 'blog admin',
   COLLECTION_EDITOR: 'collection editor',
   FULL_USER: 'full user',
   RELEASE_COORDINATOR: 'release coordinator',
@@ -1481,12 +1482,15 @@ const setRoles = async function (browser, page, roles) {
 
 const shard2Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
-  // Shard 2 audits the release-coordinator role-gated page and the
-  // contributor-admin-dashboard (translation admin) page, so only these two
-  // roles are assigned. Its data generation uses the admin activities tab,
-  // which the CI super-admin user can access without an additional role.
+  // Shard 2 audits the release-coordinator, contributor-admin-dashboard
+  // and blog-author-profile pages. The blog admin role is required for
+  // the generated blog post author's profile to pass access validation.
   await logStep('assigning roles', () =>
-    setRoles(browser, page, ['RELEASE_COORDINATOR', 'TRANSLATION_ADMIN'])
+    setRoles(browser, page, [
+      'RELEASE_COORDINATOR',
+      'TRANSLATION_ADMIN',
+      'BLOG_ADMIN',
+    ])
   );
   await logStep('exploration editor setup', () =>
     getExplorationEditorUrl(browser, page)
