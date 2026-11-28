@@ -626,6 +626,9 @@ p:last-child {
   padding: 10px 15px;
   position: relative;
 }
+.oppia-focus-indicator-links a:focus-visible {
+  outline: 2px solid rgb(23, 23, 255);
+}
 .oppia-activity-summary-tile a:focus,
 .oppia-activity-summary-tile-mobile a:focus {
   box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);

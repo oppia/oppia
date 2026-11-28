@@ -16,7 +16,7 @@
  * @fileoverview Component for the error 404 page.
  */
 
-import {Component, OnInit, OnDestroy, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -27,10 +27,6 @@ import {PageTitleService} from 'services/page-title.service';
   selector: 'oppia-error-404-page',
   templateUrl: './error-404-page.component.html',
   styleUrls: ['./error-404-page.component.css'],
-  // Links in the I18N_ERROR_NEXT_STEPS translation are injected via
-  // [innerHTML] so they don't get the emulated encapsulation attribute.
-  // We need ViewEncapsulation.None because component styles can't reach them.
-  encapsulation: ViewEncapsulation.None,
 })
 export class Error404PageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
