@@ -205,6 +205,39 @@ def update_learner_group(
     return get_learner_group_from_model(learner_group_model)
 
 
+def get_missing_subtopic_page_ids(subtopic_page_ids: List[str]) -> List[str]:
+    """Returns the subtopic page ids whose topic or subtopic does not exist.
+
+    Args:
+        subtopic_page_ids: list(str). The subtopic page ids to check. Each
+            subtopic page id is represented as a topicId:subtopicId string.
+
+    Returns:
+        list(str). The given subtopic page ids, in the same order, that do not
+        refer to an existing subtopic of an existing topic.
+    """
+    if not subtopic_page_ids:
+        return []
+
+    topic_ids = sorted(
+        {
+            subtopic_page_id.split(':')[0]
+            for subtopic_page_id in subtopic_page_ids
+        }
+    )
+    existing_subtopic_page_ids = {
+        '%s:%s' % (topic.id, subtopic.id)
+        for topic in topic_fetchers.get_topics_by_ids(topic_ids)
+        if topic is not None
+        for subtopic in topic.subtopics
+    }
+    return [
+        subtopic_page_id
+        for subtopic_page_id in subtopic_page_ids
+        if subtopic_page_id not in existing_subtopic_page_ids
+    ]
+
+
 def is_user_facilitator(user_id: str, group_id: str) -> bool:
     """Checks if the user is a facilitator of the leaner group.
 
