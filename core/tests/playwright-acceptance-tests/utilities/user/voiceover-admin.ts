@@ -246,6 +246,21 @@ export class VoiceoverAdmin extends BaseUser {
     );
     await this.expectElementToBeVisible(addNewLanguageAccentButtonSelector);
   }
+
+  /**
+   * Grant a user voiceover-submitter access to an exploration.
+   * @param {string} explorationId - The exploration ID.
+   * @param {string} voiceArtistUsername - The username to grant access to.
+   */
+  async addVoiceoverArtistToExplorationWithID(
+    explorationId: string,
+    voiceArtistUsername: string
+  ): Promise<void> {
+    await this.goto(`${testConstants.URLs.BaseURL}/create/${explorationId}#/`);
+    await new ExplorationEditorUtils(this).dismissWelcomeModal(false);
+    await this.navigateToExplorationSettingsTab();
+    await this.addVoiceoverArtistsToExploration([voiceArtistUsername]);
+  }
 }
 
 export let VoiceoverAdminFactory = (page: Page): VoiceoverAdmin => {

@@ -27,6 +27,7 @@ const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
 const toastMessageSelector = '.e2e-test-toast-message';
+const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
@@ -622,6 +623,32 @@ export class BaseUser {
       );
       throw newError;
     }
+  }
+
+  /**
+   * Verifies the title of a visible modal.
+   * @param expectedTitle - The expected modal title.
+   */
+  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToContain(
+      commonModalTitleSelector,
+      expectedTitle
+    );
+  }
+
+  /**
+   * Checks if the upload error message contains the expected text.
+   * @param expectedErrorMessage - The expected upload error message.
+   */
+  async expectUploadErrorMessageToBe(
+    expectedErrorMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(uploadErrorMessageDivSelector);
+    await this.expectTextContentToContain(
+      uploadErrorMessageDivSelector,
+      expectedErrorMessage
+    );
   }
 
   /**
