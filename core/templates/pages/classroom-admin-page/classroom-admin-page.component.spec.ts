@@ -568,6 +568,7 @@ describe('Classroom Admin Page component ', () => {
       classroomBackendApiService,
       'updateClassroomDataAsync'
     ).and.returnValue(Promise.reject());
+    spyOn(component, 'getAllTopicsToClassroomRelation');
 
     component.tempClassroomData.setClassroomName('Discrete maths');
 
@@ -575,6 +576,8 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     expect(component.tempClassroomData).toEqual(component.classroomData);
+    expect(component.getAllTopicsToClassroomRelation).toHaveBeenCalled();
+    expect(component.classroomDataSaveInProgress).toBe(false);
   }));
 
   it(
@@ -602,11 +605,13 @@ describe('Classroom Admin Page component ', () => {
         componentInstance: {},
         result: Promise.resolve(),
       } as NgbModalRef);
+      spyOn(component, 'getAllTopicsToClassroomRelation');
 
       component.closeClassroomConfigEditor();
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
+      expect(component.getAllTopicsToClassroomRelation).toHaveBeenCalled();
       expect(component.classroomEditorMode).toBe(false);
       expect(component.classroomViewerMode).toBe(true);
       expect(component.classroomDataIsChanged).toBe(false);
@@ -1246,6 +1251,55 @@ describe('Classroom Admin Page component ', () => {
       expect(component.topicDependencyIsLoaded).toBe(false);
     })
   );
+
+  it('should show a deleted topic once in the available topics', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {},
+      result: Promise.resolve(),
+    } as NgbModalRef);
+
+    component.topicIdsToTopicName = {topicid1: 'topic1'};
+    component.topicNameToPrerequisiteTopicNames = {topic1: []};
+    component.topicNames = ['topic1'];
+    component.topicsToClassroomRelation = cloneDeep(
+      dummyTopicToClassroomRelations
+    );
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      {
+        ...dummyClassroomDict,
+        topicIdToPrerequisiteTopicIds: {topicid1: []},
+      }
+    );
+    component.classroomData = cloneDeep(component.tempClassroomData);
+
+    component.deleteTopic('topic1');
+    tick();
+
+    expect(component.topicsToClassroomRelation.length).toEqual(3);
+    expect(
+      component.filteredTopicsToClassroomRelation.map(value => value.topic_name)
+    ).toEqual(['topic1', 'topic2', 'topic3']);
+  }));
+
+  it('should not change the available topics if topic deletion is cancelled', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {},
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.topicIdsToTopicName = {topicid1: 'topic1'};
+    component.topicNameToPrerequisiteTopicNames = {topic1: []};
+    component.topicsToClassroomRelation = cloneDeep(
+      dummyTopicToClassroomRelations
+    );
+
+    component.deleteTopic('topic1');
+    tick();
+
+    expect(component.topicsToClassroomRelation).toEqual(
+      dummyTopicToClassroomRelations
+    );
+  }));
 
   it('should be able to handle rejection handler on topic deletion modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
