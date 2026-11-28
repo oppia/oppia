@@ -1504,6 +1504,30 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'Missing key in handler args: version.',
         )
 
+    def test_exp_maybe_leave_handler_rejects_empty_state_name(self) -> None:
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': '',
+            'version': 1,
+        }
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(self.user_id),
+            [],
+        )
+        self.logout()
+
     def test_exp_incomplete_event_handler(self) -> None:
         """Test handler for leaving an exploration incomplete."""
 

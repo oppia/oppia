@@ -137,3 +137,109 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
             'updated %s is greater than the time when job was run'
             % last_updated,
         )
+
+
+class ExpUserLastPlaythroughErrorTestBase(
+    base_validation_errors_test.AuditErrorsTestBase
+):
+    """Base class for tests of ExpUserLastPlaythroughModel errors."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.model = user_models.ExpUserLastPlaythroughModel(
+            id='user_id.other_exp_id',
+            user_id='user_id',
+            exploration_id='exp_id',
+            last_played_exp_version=3,
+            last_played_state_name='Introduction',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+        )
+
+
+class InvalidExpUserLastPlaythroughIdErrorTests(
+    ExpUserLastPlaythroughErrorTestBase
+):
+
+    def test_message(self) -> None:
+        error = user_validation_errors.InvalidExpUserLastPlaythroughIdError(
+            self.model
+        )
+
+        self.assertEqual(
+            error.stderr,
+            'InvalidExpUserLastPlaythroughIdError in '
+            'ExpUserLastPlaythroughModel(id="user_id.other_exp_id"): id '
+            'should be "user_id.exp_id", i.e. "[user_id].[exploration_id]"',
+        )
+
+
+class LastPlayedExpVersionTooHighErrorTests(
+    ExpUserLastPlaythroughErrorTestBase
+):
+
+    def test_message(self) -> None:
+        error = user_validation_errors.LastPlayedExpVersionTooHighError(
+            self.model, 2
+        )
+
+        self.assertEqual(
+            error.stderr,
+            'LastPlayedExpVersionTooHighError in '
+            'ExpUserLastPlaythroughModel(id="user_id.other_exp_id"): '
+            'last_played_exp_version 3 is greater than the current version 2 '
+            'of exploration exp_id',
+        )
+
+
+class LastPlayedExpVersionNotFoundErrorTests(
+    ExpUserLastPlaythroughErrorTestBase
+):
+
+    def test_message(self) -> None:
+        error = user_validation_errors.LastPlayedExpVersionNotFoundError(
+            self.model
+        )
+
+        self.assertEqual(
+            error.stderr,
+            'LastPlayedExpVersionNotFoundError in '
+            'ExpUserLastPlaythroughModel(id="user_id.other_exp_id"): version 3 '
+            'of exploration exp_id could not be found',
+        )
+
+
+class LastPlayedStateNotInExplorationErrorTests(
+    ExpUserLastPlaythroughErrorTestBase
+):
+
+    def test_message(self) -> None:
+        error = user_validation_errors.LastPlayedStateNotInExplorationError(
+            self.model
+        )
+
+        self.assertEqual(
+            error.stderr,
+            'LastPlayedStateNotInExplorationError in '
+            'ExpUserLastPlaythroughModel(id="user_id.other_exp_id"): '
+            'last_played_state_name "Introduction" is not a state of version '
+            '3 of exploration exp_id',
+        )
+
+
+class ExplorationNotMarkedIncompleteErrorTests(
+    ExpUserLastPlaythroughErrorTestBase
+):
+
+    def test_message(self) -> None:
+        error = user_validation_errors.ExplorationNotMarkedIncompleteError(
+            self.model
+        )
+
+        self.assertEqual(
+            error.stderr,
+            'ExplorationNotMarkedIncompleteError in '
+            'ExpUserLastPlaythroughModel(id="user_id.other_exp_id"): '
+            'exploration exp_id is not in the incomplete explorations of user '
+            'user_id',
+        )
