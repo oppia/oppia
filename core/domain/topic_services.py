@@ -840,14 +840,15 @@ def apply_change_list(
         if study_guide_id in modified_study_guides:
             return study_guide_id
 
-        # Try to fetch existing study guide.
+        # Try to fetch existing study guide. The fetch is strict, so it
+        # raises instead of returning None when the guide doesn't exist.
         try:
-            existing_study_guide = study_guide_services.get_study_guide_by_id(
-                topic_id, subtopic_id
+            modified_study_guides[study_guide_id] = (
+                study_guide_services.get_study_guide_by_id(
+                    topic_id, subtopic_id
+                )
             )
-            if existing_study_guide is not None:
-                modified_study_guides[study_guide_id] = existing_study_guide
-                return study_guide_id
+            return study_guide_id
         except Exception:
             # Study guide doesn't exist, which is also acceptable.
             pass
@@ -1391,11 +1392,14 @@ def _save_topic(
         if skill.id in topic.uncategorized_skill_ids:
             location = 'uncategorized skills'
         else:
-            location = 'an unknown location'
-            for subtopic in topic.subtopics:
-                if skill.id in subtopic.skill_ids:
-                    location = 'subtopic \'%s\'' % subtopic.title
-                    break
+            # The skill comes from topic.get_all_skill_ids(), so if it isn't
+            # uncategorized, it belongs to one of the subtopics.
+            subtopic = next(
+                subtopic
+                for subtopic in topic.subtopics
+                if skill.id in subtopic.skill_ids
+            )
+            location = 'subtopic \'%s\'' % subtopic.title
         raise utils.ValidationError(
             'The skill \'%s\' in %s has a superseding skill \'%s\''
             % (skill.id, location, skill.superseding_skill_id)
@@ -1460,7 +1464,7 @@ def update_topic_and_subtopic_pages(
         updated_subtopic_pages_dict,
         updated_study_guides_dict,
         deleted_subtopic_ids,
-        newly_created_subtopic_ids,
+        unused_newly_created_subtopic_ids,
         updated_subtopic_pages_change_cmds_dict,
         updated_study_guides_change_cmds_dict,
     ) = apply_change_list(topic_id, change_list, committer_id)
@@ -1483,18 +1487,19 @@ def update_topic_and_subtopic_pages(
     _save_topic(committer_id, updated_topic, commit_message, change_list)
     # The following loop deletes those subtopic pages that are already in the
     # datastore, which are supposed to be deleted in the current changelist.
+    # A deleted subtopic can't also be newly created here, since
+    # apply_change_list() raises an error for that case.
     for subtopic_id in deleted_subtopic_ids:
-        if subtopic_id not in newly_created_subtopic_ids:
-            if not feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-                committer_id,
-            ):
-                subtopic_page_services.delete_subtopic_page(
-                    committer_id, topic_id, subtopic_id
-                )
-            study_guide_services.delete_study_guide(
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+            committer_id,
+        ):
+            subtopic_page_services.delete_subtopic_page(
                 committer_id, topic_id, subtopic_id
             )
+        study_guide_services.delete_study_guide(
+            committer_id, topic_id, subtopic_id
+        )
 
     for (
         subtopic_page_id,
@@ -1963,7 +1968,7 @@ def delete_topic(
     # Delete the summary of the topic (regardless of whether
     # force_deletion is True or not).
     delete_topic_summary(topic_id)
-    topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+    topic = topic_fetchers.get_topic_by_id(topic_id)
 
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
@@ -2011,12 +2016,11 @@ def delete_topic(
         feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
-        if topic is not None:
-            topic_skills = topic.get_all_skill_ids()
-            if topic_skills:
-                opportunity_services.remove_topic_from_translation_opportunities(
-                    topic_id, {feconf.ENTITY_TYPE_SKILL: topic_skills}
-                )
+        topic_skills = topic.get_all_skill_ids()
+        if topic_skills:
+            opportunity_services.remove_topic_from_translation_opportunities(
+                topic_id, {feconf.ENTITY_TYPE_SKILL: topic_skills}
+            )
 
 
 def delete_topic_summary(topic_id: str) -> None:

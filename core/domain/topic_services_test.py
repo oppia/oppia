@@ -28,6 +28,7 @@ from core.domain import (
     exp_services,
     feature_flag_services,
     fs_services,
+    opportunity_services,
     question_domain,
     question_services,
     rights_manager,
@@ -4894,6 +4895,403 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             )
 
         self.assertEqual(topic_ids, [])
+
+    def test_update_subtopic_page_written_translations_leaves_page_as_is(
+        self,
+    ) -> None:
+        page_before = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 1
+        )
+        changelist = [
+            subtopic_page_domain.SubtopicPageChange(
+                {
+                    'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                    'property_name': (
+                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS
+                    ),
+                    'old_value': {'translations_mapping': {}},
+                    'new_value': {'translations_mapping': {'content': {}}},
+                    'subtopic_id': 1,
+                }
+            )
+        ]
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            changelist,
+            'Updated written translations.',
+        )
+
+        page_after = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 1
+        )
+        self.assertEqual(
+            page_after.page_contents.to_dict(),
+            page_before.page_contents.to_dict(),
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
+    def test_update_study_guide_sections_heading_leaves_guide_as_is(
+        self,
+    ) -> None:
+        guide_before = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 1
+        )
+        changelist = [
+            study_guide_domain.StudyGuideChange(
+                {
+                    'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                    'property_name': (
+                        study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS_HEADING
+                    ),
+                    'old_value': '',
+                    'new_value': 'New heading',
+                    'subtopic_id': 1,
+                }
+            )
+        ]
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            changelist,
+            'Updated study guide heading.',
+        )
+
+        guide_after = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 1
+        )
+        self.assertEqual(
+            [section.to_dict() for section in guide_after.sections],
+            [section.to_dict() for section in guide_before.sections],
+        )
+
+    def test_update_topic_story_references_property_leaves_topic_as_is(
+        self,
+    ) -> None:
+        topic_before = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        no_references: List[str] = []
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                    'property_name': (
+                        topic_domain.TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES
+                    ),
+                    'old_value': no_references,
+                    'new_value': no_references,
+                }
+            )
+        ]
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            changelist,
+            'Updated story references.',
+        )
+
+        topic_after = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            [
+                reference.to_dict()
+                for reference in topic_after.canonical_story_references
+            ],
+            [
+                reference.to_dict()
+                for reference in topic_before.canonical_story_references
+            ],
+        )
+        self.assertEqual(topic_after.version, topic_before.version + 1)
+
+    def test_update_topic_ignores_command_without_handler(self) -> None:
+        topic_before = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': (
+                        topic_domain.CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION
+                    ),
+                    'from_version': 1,
+                    'to_version': 1,
+                }
+            )
+        ]
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            changelist,
+            'Migrated story references.',
+        )
+
+        topic_after = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic_after.version, topic_before.version + 1)
+        self.assertEqual(topic_after.name, topic_before.name)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
+    def test_update_subtopic_title_with_restructured_study_guides(
+        self,
+    ) -> None:
+        guide_before = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 1
+        )
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                    'property_name': topic_domain.SUBTOPIC_PROPERTY_TITLE,
+                    'old_value': 'Title',
+                    'new_value': 'New Title',
+                    'subtopic_id': 1,
+                }
+            )
+        ]
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            changelist,
+            'Updated subtopic title.',
+        )
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.subtopics[0].title, 'New Title')
+        # With restructured study guides, the guide heading is not synced
+        # from the subtopic title.
+        guide_after = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 1
+        )
+        self.assertEqual(guide_after.to_dict(), guide_before.to_dict())
+
+    def test_update_and_delete_subtopic_in_one_changelist(self) -> None:
+        changelist: List[
+            Union[
+                topic_domain.TopicChange,
+                subtopic_page_domain.SubtopicPageChange,
+            ]
+        ] = [
+            subtopic_page_domain.SubtopicPageChange(
+                {
+                    'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                    'property_name': (
+                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+                    ),
+                    'old_value': {'html': '', 'content_id': 'content'},
+                    'new_value': {
+                        'html': '<p>New Value</p>',
+                        'content_id': 'content',
+                    },
+                    'subtopic_id': 1,
+                }
+            ),
+            topic_domain.TopicChange(
+                {'cmd': topic_domain.CMD_DELETE_SUBTOPIC, 'subtopic_id': 1}
+            ),
+        ]
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            changelist,
+            'Updated and deleted a subtopic.',
+        )
+
+        # The updated page and study guide are not saved again after the
+        # subtopic is deleted.
+        self.assertIsNone(
+            subtopic_page_services.get_subtopic_page_by_id(
+                self.TOPIC_ID, 1, strict=False
+            )
+        )
+        self.assertIsNone(
+            study_guide_services.get_study_guide_by_id(
+                self.TOPIC_ID, 1, strict=False
+            )
+        )
+
+    def test_superseding_skill_error_names_the_subtopic_that_has_it(
+        self,
+    ) -> None:
+        self.save_new_skill('supersede3', self.user_id)
+        self.save_new_skill('has_superseding3', self.user_id)
+        topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic(
+            1, 'First', [], 'image.svg', '#FFFFFF', None, 'first-subtopic'
+        )
+        subtopic_2 = topic_domain.Subtopic(
+            2,
+            'Second',
+            ['has_superseding3'],
+            'image.svg',
+            '#FFFFFF',
+            None,
+            'second-subtopic',
+        )
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='topic-supersede3',
+            description='desc',
+            url_fragment='supersede-three',
+            subtopics=[subtopic_1, subtopic_2],
+            next_subtopic_id=3,
+        )
+        skill_services.update_skill(
+            self.user_id,
+            'has_superseding3',
+            [
+                skill_domain.SkillChange(
+                    {
+                        'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                        'property_name': (
+                            skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                        ),
+                        'old_value': '',
+                        'new_value': 'supersede3',
+                    }
+                )
+            ],
+            'Merging skill.',
+        )
+        update_changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                    'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                    'old_value': 'desc',
+                    'new_value': 'updated desc',
+                }
+            )
+        ]
+
+        with self.assertRaisesRegex(
+            Exception,
+            'The skill \'has_superseding3\' in subtopic \'Second\' '
+            'has a superseding skill \'supersede3\'',
+        ):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, update_changelist, 'Update topic.'
+            )
+
+    def test_unpublish_story_moves_its_chapters_back_to_draft(self) -> None:
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_1, ['exp_1']
+        )
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        self.assertEqual(
+            story.story_contents.nodes[0].status,
+            constants.STORY_NODE_STATUS_PUBLISHED,
+        )
+
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        self.assertEqual(
+            story.story_contents.nodes[0].status,
+            constants.STORY_NODE_STATUS_DRAFT,
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+        ]
+    )
+    def test_republish_story_that_still_has_published_chapters(self) -> None:
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_1, ['exp_1']
+        )
+        # With serial chapter launch, unpublishing the story keeps its
+        # chapters published.
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        self.assertEqual(
+            story.story_contents.nodes[0].status,
+            constants.STORY_NODE_STATUS_PUBLISHED,
+        )
+
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertTrue(topic.canonical_story_references[0].story_is_published)
+
+    def test_delete_topic_with_subtopic_without_study_guide(self) -> None:
+        # We create the topic and subtopic this way so that no study guide
+        # is created.
+        topic_id = topic_fetchers.get_new_topic_id()
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'Dummy Topic 2', 'dummy-topic-two', 'description', 'fragm'
+        )
+        topic.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
+        topic.update_meta_tag_content('dummy-meta')
+        topic_services.save_new_topic(self.user_id, topic)
+        subtopic_page_services.save_subtopic_page(
+            self.user_id,
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id
+            ),
+            'Added subtopic',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': 1,
+                        'title': 'Dummy Subtopic Title',
+                        'url_fragment': 'dummy-fragment',
+                    }
+                )
+            ],
+        )
+        self.assertFalse(
+            study_guide_services.does_study_guide_model_exist(topic_id, 1)
+        )
+
+        topic_services.delete_topic(self.user_id_admin, topic_id)
+
+        self.assertIsNone(
+            topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        )
+        self.assertIsNone(
+            subtopic_page_services.get_subtopic_page_by_id(
+                topic_id, 1, strict=False
+            )
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_delete_topic_without_skills_with_new_models(self) -> None:
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='Topic Without Skills',
+            description='Description',
+            url_fragment='topic-no-skills',
+        )
+
+        with self.swap_with_call_counter(
+            opportunity_services, 'remove_topic_from_translation_opportunities'
+        ) as remove_topic_counter:
+            topic_services.delete_topic(self.user_id_admin, topic_id)
+
+        self.assertEqual(remove_topic_counter.times_called, 0)
+        self.assertIsNone(
+            topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        )
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
