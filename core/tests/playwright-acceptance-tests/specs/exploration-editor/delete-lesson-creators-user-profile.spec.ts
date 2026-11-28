@@ -19,28 +19,34 @@
  * LC.9: Delete lesson creator's user profile.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {
   ExplorationEditor,
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
-describe('Lesson Creator Profile Deletion', function () {
-  let expEditor1!: ExplorationEditor & LoggedInUser;
-  let expEditor2!: ExplorationEditor & LoggedInUser;
-  let positiveNumbersExpId!: string;
-  let negativeNumbersExpId!: string;
-  let wholeNumbersExpId!: string;
+test.describe.configure({mode: 'serial'});
 
-  beforeAll(async function () {
+test.describe('Lesson Creator Profile Deletion', function () {
+  let expEditor1: ExplorationEditor & LoggedInUser;
+  let expEditor2: ExplorationEditor & LoggedInUser & CurriculumAdmin;
+  let positiveNumbersExpId: string;
+  let negativeNumbersExpId: string;
+  let wholeNumbersExpId: string;
+
+  test.beforeAll(async function ({browser}) {
     expEditor1 = await UserFactory.createNewUser(
       'expEditor1',
-      'expEditor1@example.com'
+      'expEditor1@example.com',
+      browser
     );
     expEditor2 = await UserFactory.createNewUser(
       'expEditor2',
-      'expEditor2@example.com'
+      'expEditor2@example.com',
+      browser
     );
 
     await expEditor1.navigateToCreatorDashboardPage();
@@ -79,34 +85,35 @@ describe('Lesson Creator Profile Deletion', function () {
     wholeNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Draft that will be deleted.');
     await expEditor1.saveExplorationDraft();
-  }, 600000);
+  });
 
-  it('should trigger draft exploration deletion and preserve correct ownership after account deletion', async function () {
-    // TODO(#25058): Add explicit CUJ steps in this test body for expEditor1
-    // to create an exploration, navigate to Settings, and add expEditor2 as
-    // manager once issue #25058 is fixed.
-    // 1. Account Deletion.
-    await expEditor1.navigateToPreferencesPage();
-    await expEditor1.deleteAccount();
-    await expEditor1.confirmAccountDeletion('expEditor1');
+  test(
+    'should trigger draft exploration deletion and preserve correct ownership ' +
+      'after account deletion',
+    async function () {
+      // 1. Account Deletion.
+      await expEditor1.navigateToPreferencesPageUsingProfileDropdown();
+      await expEditor1.deleteAccount();
+      await expEditor1.confirmAccountDeletion('expEditor1');
 
-    // 2. Verify account deletion removes expEditor1 draft explorations.
-    await expEditor2.navigateToExplorationEditor(wholeNumbersExpId);
-    await expEditor2.expectErrorPage(404);
+      // 2. Verify account deletion removes expEditor1 draft explorations.
+      await expEditor2.navigateToExplorationEditor(wholeNumbersExpId);
+      await expEditor2.expectErrorPage(404);
 
-    // 3. Verify ownership and access permissions for published explorations.
-    await expEditor2.navigateToExplorationEditor(negativeNumbersExpId);
-    await expEditor2.dismissWelcomeModal();
-    await expEditor2.navigateToSettingsTab();
-    await expEditor2.expectExplorationToBeCommunityOwned(
-      'This exploration is public and community-editable.  It is available in the Oppia library.'
-    );
-    await expEditor2.navigateToExplorationEditor(positiveNumbersExpId);
-    await expEditor2.navigateToSettingsTab();
-    await expEditor2.expectUserToBeExplorationManager('expEditor2');
-  }, 600000);
+      // 3. Verify ownership and access permissions for published explorations.
+      await expEditor2.navigateToExplorationEditor(negativeNumbersExpId);
+      await expEditor2.dismissWelcomeModal();
+      await expEditor2.navigateToSettingsTab();
+      await expEditor2.expectExplorationToBeCommunityOwned(
+        'This exploration is public and community-editable.  It is available in the Oppia library.'
+      );
+      await expEditor2.navigateToExplorationEditor(positiveNumbersExpId);
+      await expEditor2.navigateToSettingsTab();
+      await expEditor2.expectUserToBeExplorationManager('expEditor2');
+    }
+  );
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

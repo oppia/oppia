@@ -43,6 +43,15 @@ const languageDropdownValueSelector =
   'mat-select.e2e-test-exploration-language-select .mat-select-value';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
+const editRoleButton = '.e2e-test-edit-roles';
+const editRolesButtonContainer = '.oppia-edit-roles-btn-container';
+const addUsernameInputBox = '#newMemberUsername';
+const addRoleDropdown = 'mat-select.e2e-test-role-select';
+const saveRoleButton = 'button.e2e-test-save-role';
+const rolesHeaderSelector = '.e2e-test-roles-header';
+const rolesContentSelector = '.e2e-test-roles-content';
+const ownersListSelector = '.e2e-test-owner-role-names';
+const communityOwnedMessageSelector = '.e2e-test-is-community-owned';
 
 const addInteractionModalSelector = 'customize-interaction-body-container';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
@@ -2183,6 +2192,119 @@ export class ExplorationEditor extends BaseUser {
       );
     }
     showMessage(`Solutions contain "${expectedSolution}".`);
+  }
+
+  /**
+   * Fetches the exploration ID from the current URL of the exploration editor page.
+   * The exploration ID is the string after '/create/' in the URL.
+   */
+  async getExplorationId(): Promise<string> {
+    const url = this.page.url();
+    const match = url.match(/\/create\/(.*?)(\/|#|$)/);
+    if (!match) {
+      throw new Error(
+        'Exploration ID not found in the URL. ' +
+          `Ensure you are on the exploration editor page. Found URL: ${url}`
+      );
+    }
+    return match[1];
+  }
+
+  /**
+   * Opens the roles form in the Settings tab.
+   */
+  async openRolesForm(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expandSettingsTabSection('Roles');
+    }
+    await this.expectElementToBeVisible(rolesHeaderSelector);
+    await this.expectElementToBeVisible(editRolesButtonContainer);
+    await this.clickOnElementWithSelector(editRoleButton);
+
+    const isFormOpen = await this.page
+      .waitForSelector(addUsernameInputBox, {state: 'visible', timeout: 5000})
+      .then(() => true)
+      .catch(() => false);
+
+    if (!isFormOpen) {
+      await this.page.locator(editRoleButton).click({force: true});
+      await this.expectElementToBeVisible(addUsernameInputBox);
+    }
+    showMessage('Roles form is opened successfully.');
+  }
+
+  /**
+   * Assigns a role of manager to a user after the roles form is open.
+   * @param {string} username - The username of the user to assign the manager role to.
+   */
+  async assignUserToManagerRoleAfterFormOpen(username: string): Promise<void> {
+    await this.expectElementToBeVisible(addUsernameInputBox);
+    await this.clickOnElementWithSelector(addUsernameInputBox);
+    await this.typeInInputField(addUsernameInputBox, username);
+    await this.clickOnElementWithSelector(addRoleDropdown);
+    await this.selectMatOption('Manager (can edit permissions)');
+    await this.waitForElementToStabilize(saveRoleButton);
+    const rightsResponsePromise = this.page.waitForResponse(
+      response =>
+        response.url().includes('/createhandler/rights/') &&
+        response.status() === 200,
+      {timeout: 60000}
+    );
+    await this.clickOnElementWithSelector(saveRoleButton);
+    await rightsResponsePromise;
+    await this.expectElementToBeVisible(saveRoleButton, false);
+    await this.waitForPageToFullyLoad();
+    showMessage(
+      `${username} has been added as manager role (after form open).`
+    );
+  }
+
+  /**
+   * Verifies that the specified user is listed as a manager of the exploration.
+   * @param {string} username - The expected manager username.
+   * @param {number} timeout - The maximum time to wait for the element in milliseconds.
+   */
+  async expectUserToBeExplorationManager(
+    username: string,
+    timeout: number = 60000
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expandSettingsTabSection('Roles');
+    }
+    await this.expectElementToBeVisible(rolesContentSelector);
+    await this.expectElementToBeVisible(
+      `${ownersListSelector}:has-text("${username}")`,
+      true,
+      this.page,
+      timeout
+    );
+    showMessage(`User ${username} is listed as a manager of this exploration.`);
+  }
+
+  /**
+   * Verifies that the exploration is community-owned in the Settings tab.
+   * @param {string} expectedCommunityOwnedMessage - The expected text.
+   */
+  async expectExplorationToBeCommunityOwned(
+    expectedCommunityOwnedMessage: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expandSettingsTabSection('Permissions');
+    }
+    await this.expectElementToBeVisible(communityOwnedMessageSelector);
+    const text = await this.page
+      .locator(communityOwnedMessageSelector)
+      .innerText();
+    const cleanActual = text.replace(/\s+/g, ' ').trim();
+    const cleanExpected = expectedCommunityOwnedMessage
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!cleanActual.includes(cleanExpected)) {
+      throw new Error(
+        `Expected community-owned message to contain "${expectedCommunityOwnedMessage}", but got: "${text}"`
+      );
+    }
+    showMessage('Exploration is verified to be community-owned.');
   }
 }
 
