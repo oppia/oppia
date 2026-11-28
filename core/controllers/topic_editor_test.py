@@ -1002,6 +1002,14 @@ class TopicEditorTests(
 
         self.logout()
 
+    def test_editable_topic_handler_get_without_deleted_skills(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id)
+        )
+        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+        self.logout()
+
     def test_editable_topic_handler_put_fails_with_long_commit_message(
         self,
     ) -> None:
