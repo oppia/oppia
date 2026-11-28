@@ -47,7 +47,7 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
     },
     crossOriginAttribute: true,
     reporters: ['progress', 'coverage-istanbul'],
-    // Angular 11 natively uses `karma-coverage-istanbul-reporter` for code coverage
+    // Angular 12 natively uses `karma-coverage-istanbul-reporter` for code coverage
     // via the `@angular-devkit/build-angular` plugin. This configuration explicitly directs the output
     // to the parent directory to maintain compatibility with existing CI scripts.
     // Also note: In angular.json, `"sourceRoot": ""` allows the Angular CLI to discover files in `core/`

@@ -29,6 +29,7 @@
     "core/templates/components/code-mirror/diff_match_patch.d.ts",
     "core/templates/pages/topic-editor-page/topic-editor-page.constants.ts",
     "core/tests/karma.conf.ts",
+    "webpack.config.js",
     "core/tests/protractor-browserstack.conf.js",
     "data/README.md",
     "data/voiceovers/README.md",
