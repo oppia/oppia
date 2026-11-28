@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 
 from typing import Dict, List, TypedDict
 
@@ -149,11 +149,15 @@ class CloudTaskRun:
                 'exception_messages_for_failed_runs'
             ],
             current_retry_attempt=cloud_task_run_dict['current_retry_attempt'],
-            last_updated=datetime.datetime.fromisoformat(
-                cloud_task_run_dict['last_updated']
+            last_updated=utils.normalize_datetime_to_utc(
+                datetime.datetime.fromisoformat(
+                    cloud_task_run_dict['last_updated']
+                )
             ),
-            created_on=datetime.datetime.fromisoformat(
-                cloud_task_run_dict['created_on']
+            created_on=utils.normalize_datetime_to_utc(
+                datetime.datetime.fromisoformat(
+                    cloud_task_run_dict['created_on']
+                )
             ),
             additional_contextual_information=cloud_task_run_dict.get(
                 'additional_contextual_information', {}
