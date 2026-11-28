@@ -41,9 +41,13 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Question} from 'domain/question/question.model';
-const questionDict = {
+const questionDict: QuestionBackendDict = {
   id: 'question_id',
   question_state_data: {
+    classifier_model_id: null,
+    card_is_checkpoint: false,
+    linked_skill_id: null,
+    inapplicable_skill_misconception_ids: [],
     content: {
       html: 'Question 1',
       content_id: 'content_1',
@@ -61,6 +65,7 @@ const questionDict = {
             labelled_as_correct: true,
             param_changes: [],
             refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
           rule_specs: [
             {
@@ -68,6 +73,8 @@ const questionDict = {
               inputs: {x: 10},
             },
           ],
+          training_data: [],
+          tagged_skill_misconception_id: null,
         },
       ],
       confirmed_unclassified_answers: [],
@@ -88,6 +95,8 @@ const questionDict = {
         },
         param_changes: [],
         labelled_as_correct: false,
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
       },
       hints: [
         {
@@ -108,24 +117,21 @@ const questionDict = {
       id: 'TextInput',
     },
     param_changes: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {
-        content_1: {},
-      },
-    },
-    written_translations: {
-      translations_mapping: {
-        content_1: {},
-      },
-    },
     solicit_answer_details: false,
   },
   language_code: 'en',
+  question_state_data_schema_version: 45,
+  version: 1,
+  linked_skill_ids: [],
+  inapplicable_skill_misconception_ids: [],
+  next_content_id_index: 0,
 };
 
 class MockQuestionBackendApiService {
-  async fetchQuestionsAsync() {
-    return Promise.resolve([questionDict as unknown as QuestionBackendDict]);
+  async fetchQuestionsAsync(): Promise<Question[]> {
+    return Promise.resolve([
+      Question.createFromBackendDict(questionDict as QuestionBackendDict),
+    ]);
   }
 }
 
@@ -181,46 +187,24 @@ describe('Skill Preview Tab Component', () => {
     }).compileComponents();
   }));
 
-  let questionDict1 = {
-    question_state_data: {
-      content: {
-        html: 'question1',
-      },
-      interaction: {
-        id: 'TextInput',
-      },
-    },
-  } as QuestionBackendDict;
-  let questionDict2 = {
-    question_state_data: {
-      content: {
-        html: 'question2',
-      },
-      interaction: {
-        id: 'ItemSelectionInput',
-      },
-    },
-  } as QuestionBackendDict;
-  let questionDict3 = {
-    question_state_data: {
-      content: {
-        html: 'question3',
-      },
-      interaction: {
-        id: 'NumericInput',
-      },
-    },
-  } as QuestionBackendDict;
-  let questionDict4 = {
-    question_state_data: {
-      content: {
-        html: 'question4',
-      },
-      interaction: {
-        id: 'MultipleChoiceInput',
-      },
-    },
-  } as QuestionBackendDict;
+  const createTestQuestion = (
+    contentHtml: string,
+    interactionId:
+      | 'TextInput'
+      | 'ItemSelectionInput'
+      | 'NumericInput'
+      | 'MultipleChoiceInput'
+  ): Question => {
+    let q = Question.createDefaultQuestion(['skill_1']);
+    q.getStateData().content.html = contentHtml;
+    q.getStateData().interaction.id = interactionId;
+    return q;
+  };
+
+  let question1 = createTestQuestion('question1', 'TextInput');
+  let question2 = createTestQuestion('question2', 'ItemSelectionInput');
+  let question3 = createTestQuestion('question3', 'NumericInput');
+  let question4 = createTestQuestion('question4', 'MultipleChoiceInput');
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SkillPreviewTabComponent);
@@ -334,37 +318,32 @@ describe('Skill Preview Tab Component', () => {
   });
 
   it('should filter the questions', () => {
-    component.questionDicts = [
-      questionDict1,
-      questionDict2,
-      questionDict3,
-      questionDict4,
-    ];
+    component.questions = [question1, question2, question3, question4];
 
     component.questionTextFilter = 'question1';
     component.applyFilters();
-    expect(component.displayedQuestions).toEqual([questionDict1]);
+    expect(component.displayedQuestions).toEqual([question1]);
 
     component.questionTextFilter = 'question3';
     component.applyFilters();
-    expect(component.displayedQuestions).toEqual([questionDict3]);
+    expect(component.displayedQuestions).toEqual([question3]);
 
     component.questionTextFilter = '';
     component.interactionFilter = 'Item Selection';
     component.applyFilters();
-    expect(component.displayedQuestions).toEqual([questionDict2]);
+    expect(component.displayedQuestions).toEqual([question2]);
 
     component.interactionFilter = 'Numeric Input';
     component.applyFilters();
-    expect(component.displayedQuestions).toEqual([questionDict3]);
+    expect(component.displayedQuestions).toEqual([question3]);
 
     component.interactionFilter = 'Multiple Choice';
     component.applyFilters();
-    expect(component.displayedQuestions).toEqual([questionDict4]);
+    expect(component.displayedQuestions).toEqual([question4]);
 
     component.interactionFilter = 'Text Input';
     component.applyFilters();
-    expect(component.displayedQuestions).toEqual([questionDict1]);
+    expect(component.displayedQuestions).toEqual([question1]);
   });
 
   it('should trigger feedback when an answer is submitted', fakeAsync(() => {

@@ -18,7 +18,7 @@
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {QuestionBackendDict, Question} from 'domain/question/question.model';
+import {Question} from 'domain/question/question.model';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
@@ -58,8 +58,8 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   questionsFetched!: boolean;
   skill!: Skill;
   htmlData!: string;
-  questionDicts!: QuestionBackendDict[];
-  displayedQuestions!: QuestionBackendDict[];
+  questions!: Question[];
+  displayedQuestions!: Question[];
   displayCardIsInitialized: boolean = false;
   ALLOWED_QUESTION_INTERACTIONS: string[] = [];
   QUESTION_COUNT: number = 20;
@@ -95,9 +95,9 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       .fetchQuestionsAsync([this.skillId], this.QUESTION_COUNT, false)
       .then(response => {
         this.questionsFetched = true;
-        this.questionDicts = response;
+        this.questions = response;
         this.displayedQuestions = response;
-        if (this.questionDicts.length) {
+        if (this.questions.length) {
           this.selectQuestionToPreview(0);
         }
       });
@@ -115,9 +115,9 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    this.displayedQuestions = this.questionDicts.filter(questionDict => {
-      var contentData = questionDict.question_state_data.content.html;
-      var interactionType = questionDict.question_state_data.interaction.id;
+    this.displayedQuestions = this.questions.filter(question => {
+      var contentData = question.getStateData().content.html;
+      var interactionType = question.getStateData().interaction.id;
       var htmlContentIsMatching = Boolean(
         contentData
           .toLowerCase()
@@ -165,7 +165,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.questionPlayerEngineService.clearQuestions();
     this.displayCardIsInitialized = false;
     this.questionPlayerEngineService.init(
-      [Question.createFromBackendDict(this.displayedQuestions[index])],
+      [this.displayedQuestions[index]],
       this.initializeQuestionCard.bind(this),
       () => {}
     );

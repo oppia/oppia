@@ -23,18 +23,18 @@
               <div (click)="selectQuestionToPreview(idx)">
                 <div class="question-data">
                   <oppia-rte-output-display class="question-text"
-                                            [rteString]="question.question_state_data.content.html">
+                                            [rteString]="question.getStateData().content.html">
                   </oppia-rte-output-display>
-                  <span *ngIf="question.question_state_data.interaction.id==='TextInput'">
+                  <span *ngIf="question.getStateData().interaction.id==='TextInput'">
                     {{"Text Input"}}
                   </span>
-                  <span *ngIf="question.question_state_data.interaction.id==='ItemSelectionInput'">
+                  <span *ngIf="question.getStateData().interaction.id==='ItemSelectionInput'">
                     {{"Item Selection"}}
                   </span>
-                  <span *ngIf="question.question_state_data.interaction.id==='MultipleChoiceInput'">
+                  <span *ngIf="question.getStateData().interaction.id==='MultipleChoiceInput'">
                     {{"Multiple Choice"}}
                   </span>
-                  <span *ngIf="question.question_state_data.interaction.id==='NumericInput'">
+                  <span *ngIf="question.getStateData().interaction.id==='NumericInput'">
                     {{"Numeric Input"}}
                   </span>
                 </div>

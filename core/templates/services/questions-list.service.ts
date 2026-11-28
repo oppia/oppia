@@ -103,14 +103,10 @@ export class QuestionsListService {
       return this.questionBackendApiService
         .fetchQuestionSummariesAsync(skillId, this._nextOffsetForQuestions)
         .then(response => {
-          let questionSummaries = response.questionSummaries.map(summary => {
-            return QuestionSummaryForOneSkill.createFromBackendDict(summary);
-          });
-
           this._changeNextQuestionsOffset(resetHistory);
           this._setMoreQuestionsAvailable(response.more);
           this._setQuestionSummariesForOneSkill(
-            questionSummaries,
+            response.questionSummaries,
             resetHistory
           );
         });
