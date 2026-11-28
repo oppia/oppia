@@ -41,7 +41,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import yaml
-from typing import Any, Dict, Final, List, Tuple, Union, cast
+from typing import Any, Dict, Final, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -616,6 +616,9 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             logged_out_learner_progress_object.to_dict(),
             logged_out_learner_progress_dict,
         )
+
+    def test_validation_passes_for_valid_properties(self) -> None:
+        self.transient_checkpoint_url.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
@@ -1328,6 +1331,13 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         d_state.update_card_is_checkpoint(True)
         self.exploration.validate()
+
+        # Strict validation also accepts the exploration, because no checkpoint
+        # can be bypassed.
+        self.exploration.title = 'A title'
+        self.exploration.category = 'A category'
+        self.exploration.objective = 'An objective'
+        self.exploration.validate(strict=True)
 
         # Modifying the graph to add another EndExploration state.
         #                ┌────────────────┐
@@ -3556,6 +3566,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.tags = ['computer science', 'analysis', 'a b c']
         exploration.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_non_string_title(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.title = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected title to be a string, received 0'
+        ):
+            exploration.validate()
+
     def test_title_category_and_objective_validation(self) -> None:
         """Test that titles, categories and objectives are validated only in
         'strict' mode.
@@ -3699,6 +3720,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ),
             'math',
         )
+
+    def test_get_content_html_with_unknown_metadata_content_id(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        # An unknown content id with the metadata prefix falls back to the
+        # state lookup, which fails when the state does not exist.
+        with self.assertRaisesRegex(
+            ValueError, 'State Invalid state does not exist'
+        ):
+            exploration.get_content_html('Invalid state', 'exploration_unknown')
 
     def test_is_demo_property(self) -> None:
         """Test the is_demo property."""
@@ -4211,6 +4242,56 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'but it does not exist in this exploration',
         ):
             exploration.validate()
+
+    def test_validation_passes_with_declared_param_in_answer_group(
+        self,
+    ) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id',
+            'user@example.com',
+            title='',
+            category='',
+            objective='',
+            end_state_name='End',
+        )
+        exploration.param_specs = {
+            'ParamChange': param_domain.ParamSpec('UnicodeString')
+        }
+        param_changes = [
+            param_domain.ParamChange(
+                'ParamChange',
+                'RandomSelector',
+                {'list_of_values': ['1', '2'], 'parse_with_jinja': False},
+            )
+        ]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name,
+                None,
+                state_domain.SubtitledHtml('feedback_1', 'Feedback'),
+                False,
+                param_changes,
+                None,
+                None,
+            ),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test'],
+                        }
+                    },
+                )
+            ],
+            [],
+            None,
+        )
+        exploration.init_state.update_interaction_answer_groups(
+            [state_answer_group]
+        )
+        exploration.validate()
 
     def test_verify_all_states_reachable(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -4863,6 +4944,39 @@ title: Title
         )
 
 
+class CleanMathExpressionTests(test_utils.GenericTestBase):
+    """Tests for the clean_math_expression function."""
+
+    def test_trig_function_powers_are_moved_to_the_end(self) -> None:
+        self.assertEqual(
+            exp_domain.clean_math_expression('sin^2(x)'), '(sin(x))^2'
+        )
+
+    def test_parentheses_are_added_to_trig_functions(self) -> None:
+        self.assertEqual(exp_domain.clean_math_expression('cosA'), 'cos(A)')
+
+    def test_unicode_characters_are_replaced_with_text(self) -> None:
+        self.assertEqual(
+            exp_domain.clean_math_expression('√(x)\xb7α'),
+            'sqrt(x)*alpha',
+        )
+
+    def test_inverse_trig_functions_are_renamed(self) -> None:
+        self.assertEqual(
+            exp_domain.clean_math_expression('asin(x)+acos(x)+atan(x)'),
+            'arcsin(x)+arccos(x)+arctan(x)',
+        )
+
+    def test_comma_is_replaced_by_decimal_point_only_between_digits(
+        self,
+    ) -> None:
+        self.assertEqual(exp_domain.clean_math_expression('3,5'), '3.5')
+        self.assertEqual(exp_domain.clean_math_expression('x,y'), 'x,y')
+
+    def test_cdot_is_replaced_with_multiplication_sign(self) -> None:
+        self.assertEqual(exp_domain.clean_math_expression('2\\cdot3'), '2*3')
+
+
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -5239,6 +5353,25 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             self.exp_summary.is_solely_owned_by_user(self.owner_id)
         )
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
+
+    def test_to_metadata_dict(self) -> None:
+        self.assertEqual(
+            self.exp_summary.to_metadata_dict(),
+            {
+                'id': 'eid',
+                'title': self.exp_summary.title,
+                'objective': self.exp_summary.objective,
+            },
+        )
+
+    def test_does_user_have_any_role(self) -> None:
+        self.assertTrue(self.exp_summary.does_user_have_any_role(self.owner_id))
+        self.assertTrue(self.exp_summary.does_user_have_any_role('editor_id'))
+        self.assertTrue(
+            self.exp_summary.does_user_have_any_role('voice_artist_id')
+        )
+        self.assertTrue(self.exp_summary.does_user_have_any_role('viewer_id'))
+        self.assertFalse(self.exp_summary.does_user_have_any_role('other_id'))
 
     def test_is_solely_owned_by_user_other_users(self) -> None:
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('editor_id'))
@@ -19666,6 +19799,421 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 2, change_list_4
         )
         self.assertEqual(changes_are_not_mergeable_2, False)
+
+
+class MathInteractionRulesMigrationUnitTests(test_utils.GenericTestBase):
+    """Tests the removal of deprecated rules from math interactions when
+    migrating states from schema version 49 to 50.
+    """
+
+    def test_deprecated_rules_and_empty_answer_groups_are_removed(self) -> None:
+        # Here we use type Any because the states dict only has the keys that
+        # the conversion method reads, so it cannot be typed as a full state
+        # dict.
+        states: Dict[str, Any] = {
+            'State A': {
+                'interaction': {
+                    'id': 'AlgebraicExpressionInput',
+                    'answer_groups': [
+                        {
+                            'rule_specs': [
+                                {'rule_type': 'ContainsSomeOf', 'inputs': {}},
+                                {'rule_type': 'IsEquivalentTo', 'inputs': {}},
+                            ]
+                        },
+                        {
+                            'rule_specs': [
+                                {'rule_type': 'OmitsSomeOf', 'inputs': {}}
+                            ]
+                        },
+                    ],
+                    'customization_args': {
+                        'customOskLetters': {'value': ['x']}
+                    },
+                }
+            }
+        }
+
+        # Here we use cast because the minimal states dict above does not have
+        # every key of a state dict, and this is done to avoid the mypy type
+        # check failure.
+        typed_states = cast(Dict[str, state_domain.StateDict], states)
+        # Here we call a private conversion method directly because the public
+        # migration path needs a full exploration YAML for a single branch.
+        converted_states = exp_domain.Exploration._convert_states_v49_dict_to_v50_dict(  # pylint: disable=protected-access
+            typed_states
+        )
+
+        interaction = converted_states['State A']['interaction']
+        # The group that only had deprecated rules is dropped, and the other
+        # group keeps only its non-deprecated rule.
+        self.assertEqual(
+            interaction['answer_groups'],
+            [{'rule_specs': [{'rule_type': 'IsEquivalentTo', 'inputs': {}}]}],
+        )
+        self.assertEqual(
+            interaction['customization_args'],
+            {'allowedVariables': {'value': ['x']}},
+        )
+
+
+class HtmlChoicesToContentIdsMigrationUnitTests(test_utils.GenericTestBase):
+    """Tests the migration of choice-based interactions from html strings to
+    content ids when migrating states from schema version 41 to 42.
+    """
+
+    # Here we use type Any because the rule specs of these states are minimal
+    # dicts that only have the keys that the conversion method reads.
+    def _migrate(
+        self, interaction_id: str, rule_specs: List[Dict[str, Any]]
+    ) -> state_domain.InteractionInstanceDict:
+        """Migrates a single state that has no solution and returns its
+        interaction.
+        """
+        # Here we use type Any because the states dict only has the keys that
+        # the conversion method reads, so it cannot be typed as a full state
+        # dict.
+        states: Dict[str, Any] = {
+            'State': {
+                'interaction': {
+                    'id': interaction_id,
+                    'solution': None,
+                    'answer_groups': [{'rule_specs': rule_specs}],
+                    'customization_args': {'choices': {'value': []}},
+                }
+            }
+        }
+        # Here we use cast because the minimal states dict above does not have
+        # every key of a state dict, and this is done to avoid the mypy type
+        # check failure.
+        typed_states = cast(Dict[str, state_domain.StateDict], states)
+        # Here we call a private conversion method directly because the public
+        # migration path needs a full exploration YAML for a single branch.
+        converted_states = exp_domain.Exploration._convert_states_v41_dict_to_v42_dict(  # pylint: disable=protected-access
+            typed_states
+        )
+        return converted_states['State']['interaction']
+
+    def test_item_selection_state_without_solution_is_migrated(self) -> None:
+        interaction = self._migrate('ItemSelectionInput', [])
+
+        self.assertIsNone(interaction['solution'])
+
+    def test_drag_and_drop_state_without_solution_is_migrated(self) -> None:
+        interaction = self._migrate('DragAndDropSortInput', [])
+
+        self.assertIsNone(interaction['solution'])
+
+    def test_drag_and_drop_rule_with_unrecognized_type_is_left_unchanged(
+        self,
+    ) -> None:
+        rule_specs = [{'rule_type': 'UnrecognizedRule', 'inputs': {'x': 'a'}}]
+
+        interaction = self._migrate('DragAndDropSortInput', rule_specs)
+
+        self.assertEqual(
+            interaction['answer_groups'][0]['rule_specs'],
+            [{'rule_type': 'UnrecognizedRule', 'inputs': {'x': 'a'}}],
+        )
+
+
+class DragAndDropInputFixUnitTests(test_utils.GenericTestBase):
+    """Tests the fixes applied to DragAndDropSortInput interactions."""
+
+    def test_valid_rules_are_kept_when_state_has_an_empty_choice(self) -> None:
+        rule_specs = [
+            {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {'x': 'ca_choices_1', 'y': 'ca_choices_2'},
+            },
+            {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {'x': 'ca_choices_1', 'y': 1},
+            },
+            # Rules of any other type are not touched by this fix.
+            {
+                'rule_type': 'UnrecognizedRule',
+                'inputs': {'x': 'ca_choices_1'},
+            },
+        ]
+        # Here we use type Any because the state dict only has the keys that the
+        # fix reads, so it cannot be typed as a full state dict.
+        state_dict: Dict[str, Any] = {
+            'interaction': {
+                'answer_groups': [
+                    {
+                        'outcome': {'dest': 'Another state'},
+                        'rule_specs': copy.deepcopy(rule_specs),
+                    }
+                ],
+                'customization_args': {
+                    'allowMultipleItemsInSamePosition': {'value': True},
+                    'choices': {
+                        'value': [
+                            {'content_id': 'ca_choices_0', 'html': ''},
+                            {'content_id': 'ca_choices_1', 'html': '<p>a</p>'},
+                            {'content_id': 'ca_choices_2', 'html': '<p>b</p>'},
+                        ]
+                    },
+                },
+                'solution': None,
+            }
+        }
+
+        # Here we use cast because the minimal state dict above does not have
+        # every key of a state dict, and this is done to avoid the mypy type
+        # check failure.
+        typed_state_dict = cast(state_domain.StateDict, state_dict)
+        # Here we call a private method directly because reaching these
+        # branches through the public migration path needs a full exploration
+        # YAML for each of them.
+        exp_domain.Exploration._fix_drag_and_drop_input_interaction(  # pylint: disable=protected-access
+            typed_state_dict, 'State'
+        )
+
+        self.assertEqual(
+            state_dict['interaction']['answer_groups'][0]['rule_specs'],
+            rule_specs,
+        )
+
+    def test_empty_choices_are_removed_from_rules_when_solution_is_absent(
+        self,
+    ) -> None:
+        empty_choices: List[state_domain.SubtitledHtmlDict] = [
+            {'content_id': 'ca_choices_0', 'html': ''}
+        ]
+        rule_value_x = [['ca_choices_0', 'ca_choices_1'], ['ca_choices_2']]
+
+        exp_domain.Exploration._update_rule_value_having_empty_choices(  # pylint: disable=protected-access
+            empty_choices, rule_value_x, None
+        )
+
+        self.assertEqual(rule_value_x, [['ca_choices_1'], ['ca_choices_2']])
+
+
+class ExplorationChangeMergeVerifierUnitTests(test_utils.GenericTestBase):
+    """Tests the ExplorationChangeMergeVerifier class directly, without going
+    through the exploration services.
+    """
+
+    STATE_NAME: Final = 'Introduction'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.old_exploration = (
+            exp_domain.Exploration.create_default_exploration('eid')
+        )
+        self.old_exploration.states[self.STATE_NAME].interaction.id = (
+            'TextInput'
+        )
+        self.current_exploration = copy.deepcopy(self.old_exploration)
+
+    def _edit_state_property(
+        self, property_name: str
+    ) -> exp_domain.ExplorationChange:
+        """Returns a change that edits the given property of the state."""
+        return exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': self.STATE_NAME,
+                'property_name': property_name,
+                'new_value': None,
+                'old_value': None,
+            }
+        )
+
+    def _rename_state(
+        self, old_name: str, new_name: str
+    ) -> exp_domain.ExplorationChange:
+        """Returns a change that renames a state."""
+        return exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': old_name,
+                'new_state_name': new_name,
+            }
+        )
+
+    def _change_interaction_id_in_current_exploration(self) -> None:
+        """Makes the current exploration use a different interaction than the
+        old one.
+        """
+        self.current_exploration.states[self.STATE_NAME].interaction.id = (
+            'Continue'
+        )
+
+    def _is_mergeable(
+        self,
+        backend_changes: List[exp_domain.ExplorationChange],
+        frontend_changes: List[exp_domain.ExplorationChange],
+        changed_translations: Optional[Dict[str, List[str]]] = None,
+    ) -> Tuple[bool, bool]:
+        """Runs the mergeability check and returns its result."""
+        verifier = exp_domain.ExplorationChangeMergeVerifier(backend_changes)
+        # The verifier does not populate changed_translations by itself, so the
+        # tests set it directly.
+        for state_name, content_ids in (changed_translations or {}).items():
+            verifier.changed_translations[state_name].update(content_ids)
+        return verifier.is_change_list_mergeable(
+            frontend_changes, self.old_exploration, self.current_exploration
+        )
+
+    def _delete_state(self, state_name: str) -> exp_domain.ExplorationChange:
+        """Returns a change that deletes a state."""
+        return exp_domain.ExplorationChange(
+            {'cmd': exp_domain.CMD_DELETE_STATE, 'state_name': state_name}
+        )
+
+    def test_deleting_a_state_records_its_original_name(self) -> None:
+        verifier = exp_domain.ExplorationChangeMergeVerifier(
+            [self._delete_state(self.STATE_NAME)]
+        )
+        self.assertEqual(verifier.deleted_state_names, [self.STATE_NAME])
+
+    def test_deleting_a_renamed_state_records_its_name_before_renaming(
+        self,
+    ) -> None:
+        verifier = exp_domain.ExplorationChangeMergeVerifier(
+            [
+                self._rename_state(self.STATE_NAME, 'Renamed state'),
+                self._delete_state('Renamed state'),
+            ]
+        )
+        self.assertEqual(verifier.deleted_state_names, [self.STATE_NAME])
+
+    def test_renaming_a_state_already_renamed_in_backend_is_not_mergeable(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self._is_mergeable(
+                [self._rename_state(self.STATE_NAME, 'Renamed state')],
+                [self._rename_state(self.STATE_NAME, 'Another name')],
+            ),
+            (False, False),
+        )
+
+    def test_content_change_with_changed_translations_is_not_mergeable(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self._is_mergeable(
+                [self._edit_state_property('hints')],
+                [self._edit_state_property('content')],
+                {self.STATE_NAME: ['content']},
+            ),
+            (False, False),
+        )
+
+    def test_interaction_id_change_with_conflicting_changes_is_not_mergeable(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self._is_mergeable(
+                [self._edit_state_property('widget_customization_args')],
+                [self._edit_state_property('widget_id')],
+            ),
+            (False, False),
+        )
+
+    def test_cust_args_change_is_mergeable_when_interaction_id_differs(
+        self,
+    ) -> None:
+        self._change_interaction_id_in_current_exploration()
+        self.assertEqual(
+            self._is_mergeable(
+                [], [self._edit_state_property('widget_customization_args')]
+            ),
+            (True, False),
+        )
+
+    def test_cust_args_change_with_conflicting_changes_is_not_mergeable(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self._is_mergeable(
+                [self._edit_state_property('answer_groups')],
+                [self._edit_state_property('widget_customization_args')],
+            ),
+            (False, False),
+        )
+
+    def test_cust_args_change_with_changed_translations_is_not_mergeable(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self._is_mergeable(
+                [self._edit_state_property('hints')],
+                [self._edit_state_property('widget_customization_args')],
+                {self.STATE_NAME: ['widget_customization_args']},
+            ),
+            (False, False),
+        )
+
+    def test_answer_groups_change_is_mergeable_when_interaction_id_differs(
+        self,
+    ) -> None:
+        self._change_interaction_id_in_current_exploration()
+        self.assertEqual(
+            self._is_mergeable(
+                [], [self._edit_state_property('answer_groups')]
+            ),
+            (True, False),
+        )
+
+    def test_answer_groups_change_with_changed_translations_is_not_mergeable(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self._is_mergeable(
+                [self._edit_state_property('hints')],
+                [self._edit_state_property('answer_groups')],
+                {self.STATE_NAME: ['answer_groups']},
+            ),
+            (False, False),
+        )
+
+    def test_default_outcome_change_with_conflicting_changes_is_not_mergeable(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self._is_mergeable(
+                [self._edit_state_property('default_outcome')],
+                [self._edit_state_property('default_outcome')],
+            ),
+            (False, False),
+        )
+
+    def test_solution_change_is_mergeable_when_interaction_id_differs(
+        self,
+    ) -> None:
+        self._change_interaction_id_in_current_exploration()
+        self.assertEqual(
+            self._is_mergeable([], [self._edit_state_property('solution')]),
+            (True, False),
+        )
+
+    def test_solution_change_with_changed_translations_is_not_mergeable(
+        self,
+    ) -> None:
+        self.assertEqual(
+            self._is_mergeable(
+                [self._edit_state_property('hints')],
+                [self._edit_state_property('solution')],
+                {self.STATE_NAME: ['solution']},
+            ),
+            (False, False),
+        )
+
+    def test_solicit_answer_details_change_when_interaction_id_differs(
+        self,
+    ) -> None:
+        self._change_interaction_id_in_current_exploration()
+        self.assertEqual(
+            self._is_mergeable(
+                [], [self._edit_state_property('solicit_answer_details')]
+            ),
+            (True, False),
+        )
 
 
 class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):

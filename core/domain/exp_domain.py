@@ -2244,29 +2244,32 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         continue
                     curr_state_name = curr_queue[0]
                     curr_queue = curr_queue[1:]
-                    if not curr_state_name in processed_state_names:
-                        processed_state_names.add(curr_state_name)
-                        curr_state = new_states[curr_state_name]
+                    # A state is added to the queue only if it is neither in the
+                    # queue nor already processed, so every state that reaches
+                    # this point has not been processed yet.
+                    assert curr_state_name not in processed_state_names
+                    processed_state_names.add(curr_state_name)
+                    curr_state = new_states[curr_state_name]
 
-                        # We do not need to check if the current state is
-                        # terminal or not before getting all outcomes, as when
-                        # we find a terminal state in an outcome, we break out
-                        # of the for loop and raise a validation error.
-                        all_outcomes = curr_state.interaction.get_all_outcomes()
-                        for outcome in all_outcomes:
-                            dest_state = outcome.dest
-                            # Ruling out the possibility of None for mypy type
-                            # checking, because above we are already validating
-                            # if outcome exists then it should have destination.
-                            assert dest_state is not None
-                            if self.states[dest_state].interaction.is_terminal:
-                                excluded_state_is_bypassable = True
-                                break
-                            if (
-                                dest_state not in curr_queue
-                                and dest_state not in processed_state_names
-                            ):
-                                curr_queue.append(dest_state)
+                    # We do not need to check if the current state is
+                    # terminal or not before getting all outcomes, as when
+                    # we find a terminal state in an outcome, we break out
+                    # of the for loop and raise a validation error.
+                    all_outcomes = curr_state.interaction.get_all_outcomes()
+                    for outcome in all_outcomes:
+                        dest_state = outcome.dest
+                        # Ruling out the possibility of None for mypy type
+                        # checking, because above we are already validating
+                        # if outcome exists then it should have destination.
+                        assert dest_state is not None
+                        if self.states[dest_state].interaction.is_terminal:
+                            excluded_state_is_bypassable = True
+                            break
+                        if (
+                            dest_state not in curr_queue
+                            and dest_state not in processed_state_names
+                        ):
+                            curr_queue.append(dest_state)
                     if excluded_state_is_bypassable:
                         raise utils.ValidationError(
                             'Cannot make %s a checkpoint as it is bypassable'
@@ -2362,28 +2365,31 @@ class Exploration(translation_domain.BaseTranslatableObject):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if not curr_state_name in processed_queue:
-                processed_queue.append(curr_state_name)
+            # A state is added to the queue only if it is neither in the queue
+            # nor already processed, so every state that reaches this point has
+            # not been processed yet.
+            assert curr_state_name not in processed_queue
+            processed_queue.append(curr_state_name)
 
-                curr_state = self.states[curr_state_name]
+            curr_state = self.states[curr_state_name]
 
-                if not curr_state.interaction.is_terminal:
-                    all_outcomes = curr_state.interaction.get_all_outcomes()
-                    for outcome in all_outcomes:
-                        dest_state = outcome.dest
-                        dest_if_stuck_state = outcome.dest_if_really_stuck
-                        if (
-                            dest_state is not None
-                            and dest_state not in curr_queue
-                            and dest_state not in processed_queue
-                        ):
-                            curr_queue.append(dest_state)
-                        if (
-                            dest_if_stuck_state is not None
-                            and dest_if_stuck_state not in curr_queue
-                            and dest_if_stuck_state not in processed_queue
-                        ):
-                            curr_queue.append(dest_if_stuck_state)
+            if not curr_state.interaction.is_terminal:
+                all_outcomes = curr_state.interaction.get_all_outcomes()
+                for outcome in all_outcomes:
+                    dest_state = outcome.dest
+                    dest_if_stuck_state = outcome.dest_if_really_stuck
+                    if (
+                        dest_state is not None
+                        and dest_state not in curr_queue
+                        and dest_state not in processed_queue
+                    ):
+                        curr_queue.append(dest_state)
+                    if (
+                        dest_if_stuck_state is not None
+                        and dest_if_stuck_state not in curr_queue
+                        and dest_if_stuck_state not in processed_queue
+                    ):
+                        curr_queue.append(dest_if_stuck_state)
 
         if len(self.states) != len(processed_queue):
             unseen_states = sorted(
@@ -2413,19 +2419,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if not curr_state_name in processed_queue:
-                processed_queue.append(curr_state_name)
+            # A state is added to the queue only if it is neither in the queue
+            # nor already processed, so every state that reaches this point has
+            # not been processed yet.
+            assert curr_state_name not in processed_queue
+            processed_queue.append(curr_state_name)
 
-                for state_name, state in self.states.items():
-                    if (
-                        state_name not in curr_queue
-                        and state_name not in processed_queue
-                    ):
-                        all_outcomes = state.interaction.get_all_outcomes()
-                        for outcome in all_outcomes:
-                            if outcome.dest == curr_state_name:
-                                curr_queue.append(state_name)
-                                break
+            for state_name, state in self.states.items():
+                if (
+                    state_name not in curr_queue
+                    and state_name not in processed_queue
+                ):
+                    all_outcomes = state.interaction.get_all_outcomes()
+                    for outcome in all_outcomes:
+                        if outcome.dest == curr_state_name:
+                            curr_queue.append(state_name)
+                            break
 
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
@@ -2857,13 +2866,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             choices: List[state_domain.SubtitledHtmlDict],
         ) -> List[List[str]]: ...
 
-        # Here we use MyPy ignore because MyPy expects a return value in
-        # every condition when we define a return type but here we are
-        # returning only in if-else conditions and we are not returning
-        # when none of the condition matches which causes MyPy to throw
-        # a 'Missing return statement' error. Thus to avoid the error,
-        # we used ignore here.
-        def migrate_rule_inputs_and_answers(  # type: ignore[return]
+        def migrate_rule_inputs_and_answers(
             new_type: str,
             value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict],
@@ -2918,8 +2921,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     )
                     for html in set_of_content_ids
                 ]
-            elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here we use cast because this 'elif' condition forces value
+            else:
+                # The only remaining type that this function is called with is
+                # 'ListOfSetsOfTranslatableHtmlContentIds'.
+                assert new_type == 'ListOfSetsOfTranslatableHtmlContentIds'
+                # Here we use cast because this 'else' condition forces value
                 # to have type List[List[str]].
                 list_of_set_of_content_ids = cast(List[List[str]], value)
                 return [
@@ -3902,46 +3908,42 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         empty_ans_groups = []
         for rule_to_remove in rules_to_remove_with_try_again_dest_node:
-            removed_try_again_rule = False
-            for answer_group in reversed(answer_groups):
-                for rule_spec in reversed(answer_group['rule_specs']):
-                    if (
-                        rule_spec == rule_to_remove
-                        and answer_group['outcome']['dest'] == state_name
-                    ):
-                        removed_try_again_rule = True
-                        answer_group['rule_specs'].remove(rule_to_remove)
-                        break
-
+            # Every rule to remove was seen earlier in an answer group that
+            # points back to the same state, so a matching answer group always
+            # exists.
+            matching_answer_group = next(
+                answer_group
+                for answer_group in reversed(answer_groups)
                 if (
-                    len(answer_group['rule_specs']) == 0
-                    and answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-                if removed_try_again_rule:
-                    break
+                    rule_to_remove in answer_group['rule_specs']
+                    and answer_group['outcome']['dest'] == state_name
+                )
+            )
+            matching_answer_group['rule_specs'].remove(rule_to_remove)
+            if (
+                len(matching_answer_group['rule_specs']) == 0
+                and matching_answer_group not in empty_ans_groups
+            ):
+                empty_ans_groups.append(matching_answer_group)
 
         for rule_to_remove in rules_to_remove_with_diff_dest_node:
-            removed_dest_rule = False
-            for answer_group in reversed(answer_groups):
-                for rule_spec in reversed(answer_group['rule_specs']):
-                    if (
-                        rule_spec == rule_to_remove
-                        and answer_group['outcome']['dest'] != state_name
-                    ):
-                        removed_dest_rule = True
-                        answer_group['rule_specs'].remove(rule_to_remove)
-                        break
-
+            # Every rule to remove was seen earlier in an answer group that
+            # points to a different state, so a matching answer group always
+            # exists.
+            matching_answer_group = next(
+                answer_group
+                for answer_group in reversed(answer_groups)
                 if (
-                    len(answer_group['rule_specs']) == 0
-                    and answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-                if removed_dest_rule:
-                    break
+                    rule_to_remove in answer_group['rule_specs']
+                    and answer_group['outcome']['dest'] != state_name
+                )
+            )
+            matching_answer_group['rule_specs'].remove(rule_to_remove)
+            if (
+                len(matching_answer_group['rule_specs']) == 0
+                and matching_answer_group not in empty_ans_groups
+            ):
+                empty_ans_groups.append(matching_answer_group)
 
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
