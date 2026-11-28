@@ -56,7 +56,6 @@ import {DiagnosticTestPlayerEngineService} from '../../services/diagnostic-test-
 import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
-import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {LoaderService} from '../../../../services/loader.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {MessengerService} from '../../../../services/messenger.service';
@@ -131,7 +130,6 @@ describe('New Conversation skin component', () => {
   let explorationInitializationService: ExplorationInitializationService;
   let guestCollectionProgressService: GuestCollectionProgressService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
   let mobileMenuService: MobileMenuService;
   let imagePreloaderService: ImagePreloaderService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
@@ -503,7 +501,6 @@ describe('New Conversation skin component', () => {
     hintsAndSolutionManagerService = TestBed.inject(
       HintsAndSolutionManagerService
     );
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
     explorationInitializationService = TestBed.inject(
@@ -811,14 +808,6 @@ describe('New Conversation skin component', () => {
 
     componentInstance._editorPreviewMode = true;
     expect(componentInstance.isInPreviewMode).toBe(true);
-  });
-
-  it('should report whether the skin should open in a new window', () => {
-    componentInstance.isIframed = false;
-    expect(componentInstance.openInNewWindow).toBe(false);
-
-    componentInstance.isIframed = true;
-    expect(componentInstance.openInNewWindow).toBe(true);
   });
 
   it('should initialize component', fakeAsync(() => {
@@ -2352,6 +2341,56 @@ describe('New Conversation skin component', () => {
     expect(componentInstance.isSupplementalNavShown()).toBeFalse();
   });
 
+  describe('isSubmitButtonShown', () => {
+    beforeEach(() => {
+      spyOn(
+        conversationFlowService,
+        'getAnswerIsBeingProcessed'
+      ).and.returnValue(false);
+      componentInstance.continueToReviseStateButtonIsVisible = false;
+    });
+
+    it('should show Submit for an incomplete card', () => {
+      spyOn(componentInstance, 'getDisplayedCard').and.returnValue(
+        displayedCard
+      );
+      spyOn(displayedCard, 'isCompleted').and.returnValue(false);
+
+      expect(componentInstance.isSubmitButtonShown()).toBeTrue();
+    });
+
+    it('should hide Submit for a completed card', () => {
+      spyOn(componentInstance, 'getDisplayedCard').and.returnValue(
+        displayedCard
+      );
+      spyOn(displayedCard, 'isCompleted').and.returnValue(true);
+
+      expect(componentInstance.isSubmitButtonShown()).toBeFalse();
+    });
+
+    it('should hide Submit while the continue-to-revise button is visible', () => {
+      spyOn(componentInstance, 'getDisplayedCard').and.returnValue(
+        displayedCard
+      );
+      spyOn(displayedCard, 'isCompleted').and.returnValue(false);
+      componentInstance.continueToReviseStateButtonIsVisible = true;
+
+      expect(componentInstance.isSubmitButtonShown()).toBeFalse();
+    });
+
+    it('should hide Submit while an answer is being processed', () => {
+      (
+        conversationFlowService.getAnswerIsBeingProcessed as jasmine.Spy
+      ).and.returnValue(true);
+      spyOn(componentInstance, 'getDisplayedCard').and.returnValue(
+        displayedCard
+      );
+      spyOn(displayedCard, 'isCompleted').and.returnValue(false);
+
+      expect(componentInstance.isSubmitButtonShown()).toBeFalse();
+    });
+  });
+
   it('should call changeDetectorRef.detectChanges if submitButtonIsDisabled changes in ngAfterViewChecked', () => {
     spyOn(componentInstance, 'isSubmitButtonDisabled').and.returnValues(
       false,
@@ -2380,11 +2419,6 @@ describe('New Conversation skin component', () => {
       true
     );
     expect(componentInstance.getAnswerIsBeingProcessed()).toBeTrue();
-  });
-
-  it('should get is in story mode', () => {
-    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
-    expect(componentInstance.getIsInStoryMode()).toBeTrue();
   });
 
   it('should get exploration link', () => {
@@ -2442,40 +2476,6 @@ describe('New Conversation skin component', () => {
     expect(
       componentInstance.isDisplayedCardCompletedInPrevSession()
     ).toBeTrue();
-  });
-
-  it('should get recommended exp title translation key', () => {
-    spyOn(
-      i18nLanguageCodeService,
-      'getExplorationTranslationKey'
-    ).and.returnValue('key');
-    expect(
-      componentInstance.getRecommendedExpTitleTranslationKey('expId')
-    ).toBe('key');
-  });
-
-  it('should check if hacky exp title translation is displayed', () => {
-    spyOn(
-      componentInstance,
-      'getRecommendedExpTitleTranslationKey'
-    ).and.returnValue('key');
-    spyOn(
-      i18nLanguageCodeService,
-      'isHackyTranslationAvailable'
-    ).and.returnValue(true);
-
-    const currentLangSpy = spyOn(
-      i18nLanguageCodeService,
-      'isCurrentLanguageEnglish'
-    ).and.returnValue(false);
-    expect(
-      componentInstance.isHackyExpTitleTranslationDisplayed('expId')
-    ).toBeTrue();
-
-    currentLangSpy.and.returnValue(true);
-    expect(
-      componentInstance.isHackyExpTitleTranslationDisplayed('expId')
-    ).toBeFalse();
   });
 
   it('should call skipCurrentQuestion and update next card', () => {

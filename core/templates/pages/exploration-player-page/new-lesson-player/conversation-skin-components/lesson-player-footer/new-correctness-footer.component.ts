@@ -18,9 +18,19 @@
 
 import {Component} from '@angular/core';
 
+// The look of each piece (shape, colour, direction, speed...) is derived in the
+// stylesheet from its position among its siblings, so this only controls how
+// many pieces are rendered.
+const CONFETTI_PIECE_COUNT = 100;
+
 @Component({
   selector: 'oppia-new-correctness-footer',
   templateUrl: './new-correctness-footer.component.html',
   styleUrls: ['./new-correctness-footer.component.css'],
 })
-export class NewCorrectnessFooterComponent {}
+export class NewCorrectnessFooterComponent {
+  confettiPieces: number[] = Array.from(
+    {length: CONFETTI_PIECE_COUNT},
+    (_, index) => index
+  );
+}

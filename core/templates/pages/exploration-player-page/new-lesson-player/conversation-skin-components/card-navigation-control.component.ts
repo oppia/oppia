@@ -23,6 +23,7 @@ import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';
+import {MobileMenuService} from '../../services/mobile-menu.service';
 
 @Component({
   selector: 'oppia-card-navigation-control',
@@ -49,7 +50,8 @@ export class CardNavigationControlComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
     private pageContextService: PageContextService,
-    private conversationFlowService: ConversationFlowService
+    private conversationFlowService: ConversationFlowService,
+    private mobileMenuService: MobileMenuService
   ) {}
 
   ngOnChanges(): void {
@@ -92,5 +94,9 @@ export class CardNavigationControlComponent {
 
   moveBackByOneCard(): void {
     this.conversationFlowService.moveBackByOneCard();
+  }
+
+  getSidebarIsExpanded(): boolean {
+    return this.mobileMenuService.getSidebarIsExpanded();
   }
 }

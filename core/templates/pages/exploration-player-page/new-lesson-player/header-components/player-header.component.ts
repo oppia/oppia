@@ -18,13 +18,12 @@
 
 import {Component} from '@angular/core';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
-import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {MobileMenuService} from '../../services/mobile-menu.service';
+import {PlayerTopicNameService} from '../../services/player-topic-name.service';
 import {Router} from '@angular/router';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
@@ -69,7 +68,7 @@ export class PlayerHeaderComponent {
     private capitalizePipe: CapitalizePipe,
     private urlService: UrlService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
-    private topicViewerBackendApiService: TopicViewerBackendApiService,
+    private playerTopicNameService: PlayerTopicNameService,
     private mobileMenuService: MobileMenuService,
     private router: Router,
     private windowRef: WindowRef,
@@ -126,10 +125,10 @@ export class PlayerHeaderComponent {
       this.classroomUrlFragment =
         this.urlService.getClassroomUrlFragmentFromLearnerUrl();
 
-      this.topicViewerBackendApiService
-        .fetchTopicDataAsync(this.topicUrlFragment, this.classroomUrlFragment)
-        .then((readOnlyTopic: ReadOnlyTopic) => {
-          this.topicName = readOnlyTopic.getTopicName();
+      this.playerTopicNameService
+        .getTopicNameAsync(this.topicUrlFragment, this.classroomUrlFragment)
+        .then((topicName: string) => {
+          this.topicName = topicName;
           this.statsReportingService.setTopicName(this.topicName);
           this.siteAnalyticsService.registerCuratedLessonStarted(
             this.topicName,

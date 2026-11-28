@@ -248,4 +248,47 @@ describe('InteractiveTextInputComponent', () => {
       currentInteractionService.updateCurrentAnswer
     ).not.toHaveBeenCalled();
   });
+
+  describe('registered validity function', () => {
+    let validityFn: () => boolean;
+
+    beforeEach(() => {
+      spyOn(
+        currentInteractionService,
+        'registerCurrentInteraction'
+      ).and.callFake((submitFn, validateFn) => {
+        validityFn = validateFn;
+      });
+      component.ngOnInit();
+    });
+
+    it('should be false for an empty answer', () => {
+      component.answer = '';
+      expect(validityFn()).toBeFalse();
+    });
+
+    it('should be false for a whitespace-only answer', () => {
+      component.answer = '   ';
+      expect(validityFn()).toBeFalse();
+    });
+
+    it('should be true for a non-empty answer', () => {
+      component.answer = 'abc';
+      expect(validityFn()).toBeTrue();
+    });
+  });
+
+  it('should not submit a whitespace-only answer', () => {
+    spyOn(currentInteractionService, 'onSubmit');
+    spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(
+      true
+    );
+
+    component.submitAnswer('   ');
+
+    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(component.errorMessageI18nKey).toEqual(
+      'I18N_INTERACTIONS_INPUT_NO_RESPONSE'
+    );
+  });
 });
