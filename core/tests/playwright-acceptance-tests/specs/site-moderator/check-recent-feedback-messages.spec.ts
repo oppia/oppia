@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,25 +19,33 @@
  * SM.MP.02 Check recent feedback messages.
  */
 
+import {test} from '@playwright/test';
 import {showMessage} from '../../utilities/common/show-message';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Moderator} from '../../utilities/user/moderator';
 
-describe('Site Moderator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Site Moderator', function () {
   let siteModerator: Moderator;
   let explorationId: string;
+  let explorationId2: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(500000); // Setup takes longer than the default timeout.
+
     siteModerator = await UserFactory.createNewUser(
       'siteModerator',
       'site_moderator@example.com',
+      browser,
       [testConstants.Roles.MODERATOR]
     );
 
     const explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -53,7 +61,7 @@ describe('Site Moderator', function () {
       'Test Exploration Goal',
       'Algebra'
     );
-    await explorationEditor.playExploration(explorationId);
+    await explorationEditor.playExplorationAsLoggedInUser(explorationId);
     await explorationEditor.giveFeedback('It was good');
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -63,21 +71,20 @@ describe('Site Moderator', function () {
       'End Exploration'
     );
     await explorationEditor.saveExplorationDraft();
-    await explorationEditor.publishExplorationWithMetadata(
+    explorationId2 = await explorationEditor.publishExplorationWithMetadata(
       'Test Exploration Title 2',
       'Test Exploration Goal 2',
       'Algebra'
     );
-    await explorationEditor.playExploration(explorationId);
+    await explorationEditor.playExplorationAsLoggedInUser(explorationId2);
     await explorationEditor.giveFeedback('Needs some improvement');
   });
 
-  it('should be able to validate feedback entries', async function () {
+  test('should be able to validate feedback entries', async function () {
     await siteModerator.navigateToModeratorPage();
     await siteModerator.navigateToRecentFeedbackMessagesTab();
     await siteModerator.expectScreenshotToMatch(
-      'moderatorPageRecentFeedbackMessagesTab',
-      __dirname
+      'moderatorPageRecentFeedbackMessagesTab'
     );
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
@@ -99,7 +106,7 @@ describe('Site Moderator', function () {
     );
   });
 
-  it('should be able to click on feedback links', async function () {
+  test('should be able to click on feedback links', async function () {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping the test and make the test to run in mobile viewport as well.
@@ -114,7 +121,7 @@ describe('Site Moderator', function () {
     await siteModerator.expectToBeOnFeedbackTab();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
