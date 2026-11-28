@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,29 +19,34 @@
  * EC. Settings.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
-describe('Exploration Editor', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     // Create guest users.
     const guestUser1 = await UserFactory.createNewUser(
       'guestUser1',
-      'guest_user1@example.com'
+      'guest_user1@example.com',
+      browser
     );
     await guestUser1.closeBrowser();
-
     const guestUser2 = await UserFactory.createNewUser(
       'guestUser2',
-      'guest_user2@example.com'
+      'guest_user2@example.com',
+      browser
     );
     await guestUser2.closeBrowser();
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -62,7 +67,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.saveExplorationDraft();
   });
 
-  it('should be able to change basic settings', async function () {
+  test('should be able to change basic settings', async function () {
     await explorationEditor.navigateToSettingsTab();
     await explorationEditor.openExplorationControlDropdown();
 
@@ -93,25 +98,24 @@ describe('Exploration Editor', function () {
     await explorationEditor.closePreviewSummary();
   });
 
-  it('should be able to change advanced settings', async function () {
+  test('should be able to change advanced settings', async function () {
     await explorationEditor.enableAutomaticTextToSpeech();
   });
 
-  it('should be able to change roles settings', async function () {
+  test('should be able to change roles settings', async function () {
     await explorationEditor.assignUserToCollaboratorRole('guestUser1');
     await explorationEditor.assignUserToPlaytesterRole('guestUser2');
   });
 
-  it('should be able to change exploration control settings', async function () {
+  test('should be able to change exploration control settings', async function () {
     await explorationEditor.saveExplorationDraft();
     await explorationEditor.clickOnDeleteExplorationButton();
     await explorationEditor.isTextPresentOnPage('Delete Exploration');
     await explorationEditor.confirmDeleteExplorationButton();
-
     await explorationEditor.expectToBeInCreatorDashboard();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
