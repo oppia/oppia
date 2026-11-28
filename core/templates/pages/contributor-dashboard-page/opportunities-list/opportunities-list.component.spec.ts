@@ -96,6 +96,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -106,6 +107,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -116,6 +118,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -126,6 +129,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -136,6 +140,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -146,6 +151,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -156,6 +162,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -166,6 +173,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -176,6 +184,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -186,6 +195,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -196,6 +206,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -206,6 +217,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -216,6 +228,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -226,6 +239,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -236,6 +250,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -246,6 +261,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 30,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
     ];
@@ -259,6 +275,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -269,6 +286,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -279,6 +297,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 30,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -289,6 +308,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -299,6 +319,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -309,6 +330,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -319,6 +341,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -329,6 +352,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -339,6 +363,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -349,6 +374,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
     ];
@@ -406,6 +432,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
           {
@@ -416,6 +443,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
           {
@@ -426,6 +454,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
           {
@@ -436,6 +465,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
           {
@@ -446,6 +476,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
           {
@@ -456,6 +487,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
           {
@@ -466,6 +498,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
           {
@@ -476,6 +509,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
           {
@@ -486,6 +520,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
           {
@@ -496,6 +531,7 @@ describe('Opportunities List Component', () => {
             inReviewCount: 20,
             totalCount: 100,
             translationsCount: 50,
+            topicId: 'topic_id_1',
             topicName: 'Topic 1',
           },
         ]);
@@ -895,7 +931,7 @@ describe('Opportunities List Component', () => {
 
       component.unpinOpportunity({
         explorationId: component.opportunities[0].id as string,
-        topicName: component.opportunities[0].topicName,
+        topicId: component.opportunities[0].topicId as string,
       });
       tick();
 
@@ -919,6 +955,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -929,6 +966,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -939,6 +977,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -949,6 +988,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -959,6 +999,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -969,6 +1010,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -979,6 +1021,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -989,6 +1032,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -999,6 +1043,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1009,6 +1054,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1019,6 +1065,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1029,6 +1076,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1039,6 +1087,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1049,6 +1098,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1059,6 +1109,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1069,6 +1120,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 30,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
     ];
@@ -1082,6 +1134,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1092,6 +1145,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1102,6 +1156,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 30,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1112,6 +1167,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1122,6 +1178,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1132,6 +1189,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1142,6 +1200,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1152,6 +1211,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1162,6 +1222,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
       {
@@ -1172,6 +1233,7 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       },
     ];
@@ -1232,22 +1294,28 @@ describe('Opportunities List Component', () => {
       tick();
       mockReloadOpportunitiesEventEmitter.emit();
       tick();
-      const updatedData = {explorationId: 'id1', topicName: 'Topic 1'};
+      // An opportunity is only matched when its topic ID matches too.
+      component.pinOpportunity({explorationId: 'id1', topicId: 'other_topic'});
+      expect(
+        component.opportunities.some(opportunity => opportunity.isPinned)
+      ).toBe(false);
+
+      const updatedData = {explorationId: 'id1', topicId: 'topic_id_1'};
       component.pinOpportunity(updatedData);
 
       expect(component.opportunities[0].isPinned).toBe(true);
       // Ensure the pinned opportunity is at the top of the list.
       expect(component.opportunities[0].id).toBe('id1');
-      expect(component.opportunities[0].topicName).toBe('Topic 1');
+      expect(component.opportunities[0].topicId).toBe('topic_id_1');
 
-      component.pinOpportunity({explorationId: 'id2', topicName: 'Topic 1'});
+      component.pinOpportunity({explorationId: 'id2', topicId: 'topic_id_1'});
 
       // Pin an opportunity that is not visible (to hit indexInVisible === -1).
       component.visibleOpportunities = [];
-      component.pinOpportunity({explorationId: 'id3', topicName: 'Topic 1'});
+      component.pinOpportunity({explorationId: 'id3', topicId: 'topic_id_1'});
 
-      // Pin an opportunity with same id but different topic name (to cover the || branch).
-      component.pinOpportunity({explorationId: 'id3', topicName: 'Topic 2'});
+      // Pin an opportunity with same id but different topic ID (to cover the || branch).
+      component.pinOpportunity({explorationId: 'id3', topicId: 'topic_id_2'});
     }));
 
     it('should unpin an opportunity', fakeAsync(() => {
@@ -1261,7 +1329,7 @@ describe('Opportunities List Component', () => {
       tick();
       mockReloadOpportunitiesEventEmitter.emit();
       tick();
-      const updatedData = {explorationId: 'id1', topicName: 'Topic 1'};
+      const updatedData = {explorationId: 'id1', topicId: 'topic_id_1'};
       component.pinOpportunity(updatedData);
 
       expect(component.opportunities[0].isPinned).toBe(true);
@@ -1271,8 +1339,8 @@ describe('Opportunities List Component', () => {
         component.opportunities[component.opportunities.length - 1].id
       ).toBe('id1');
       expect(
-        component.opportunities[component.opportunities.length - 1].topicName
-      ).toBe('Topic 1');
+        component.opportunities[component.opportunities.length - 1].topicId
+      ).toBe('topic_id_1');
     }));
 
     it(
@@ -1281,7 +1349,7 @@ describe('Opportunities List Component', () => {
       () => {
         const updatedData = {
           explorationId: 'id1',
-          topicName: 'topic',
+          topicId: 'topic_id',
         };
         spyOn(component, 'pinOpportunity').and.callThrough();
 
@@ -1300,7 +1368,7 @@ describe('Opportunities List Component', () => {
       () => {
         const updatedData = {
           explorationId: 'id1',
-          topicName: 'topic',
+          topicId: 'topic_id',
         };
         spyOn(component, 'unpinOpportunity').and.callThrough();
 

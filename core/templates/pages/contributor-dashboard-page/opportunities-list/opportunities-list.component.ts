@@ -60,12 +60,12 @@ export class OpportunitiesListComponent {
   @Output() clickActionButton: EventEmitter<string> = new EventEmitter();
 
   @Output() clickPinButton: EventEmitter<{
-    topic_name: string;
+    topic_id: string;
     exploration_id: string;
   }> = new EventEmitter();
 
   @Output() clickUnpinButton: EventEmitter<{
-    topic_name: string;
+    topic_id: string;
     exploration_id: string;
   }> = new EventEmitter();
 
@@ -191,7 +191,7 @@ export class OpportunitiesListComponent {
     const indexToModify = this.opportunities.findIndex(
       opportunity =>
         opportunity.id === updatedData.explorationId &&
-        opportunity.topicName === updatedData.topicName
+        opportunity.topicId === updatedData.topicId
     );
 
     if (indexToModify !== -1) {
@@ -201,7 +201,7 @@ export class OpportunitiesListComponent {
         opportunity =>
           opportunity.isPinned &&
           (opportunity.id !== updatedData.explorationId ||
-            opportunity.topicName !== updatedData.topicName)
+            opportunity.topicId !== updatedData.topicId)
       );
 
       if (previouslyPinnedIndex !== -1) {
@@ -218,7 +218,7 @@ export class OpportunitiesListComponent {
       const indexInVisible = this.visibleOpportunities.findIndex(
         opportunity =>
           opportunity.id === updatedData.explorationId &&
-          opportunity.topicName === updatedData.topicName
+          opportunity.topicId === updatedData.topicId
       );
 
       if (indexInVisible !== -1) {
@@ -232,7 +232,7 @@ export class OpportunitiesListComponent {
     const indexToModify = this.opportunities.findIndex(
       opportunity =>
         opportunity.id === updatedData.explorationId &&
-        opportunity.topicName === updatedData.topicName
+        opportunity.topicId === updatedData.topicId
     );
 
     if (indexToModify !== -1) {
@@ -247,7 +247,7 @@ export class OpportunitiesListComponent {
       const indexInVisible = this.visibleOpportunities.findIndex(
         opportunity =>
           opportunity.id === updatedData.explorationId &&
-          opportunity.topicName === updatedData.topicName
+          opportunity.topicId === updatedData.topicId
       );
 
       if (indexInVisible !== -1) {
