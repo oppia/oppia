@@ -16,8 +16,6 @@
  * @fileoverview Tests that translatable text backend api works correctly.
  */
 
-// @ts-nocheck
-
 import {HttpErrorResponse} from '@angular/common/http';
 import {
   HttpClientTestingModule,
@@ -249,18 +247,15 @@ describe('TranslateTextBackendApiService', () => {
   });
 
   describe('suggestTranslatedTextAsync', () => {
-    class MockReaderObject {
-      result = 'data:image/png;base64,imageBlob1';
-      onload: () => string;
-      constructor() {
-        this.onload = () => {
-          return 'Fake onload executed';
-        };
+    class MockReaderObject extends FileReader {
+      get result(): string {
+        return 'data:image/png;base64,imageBlob1';
       }
 
-      readAsDataURL(file: Blob) {
-        this.onload();
-        return 'The file is loaded';
+      readAsDataURL(file: Blob): void {
+        if (this.onload) {
+          this.onload(new ProgressEvent('load') as ProgressEvent<FileReader>);
+        }
       }
     }
     let successHandler: jasmine.Spy<jasmine.Func>;

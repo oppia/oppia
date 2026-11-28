@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for TranslationModalComponent.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -32,7 +30,11 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModal,
+  NgbActiveModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {
@@ -46,6 +48,7 @@ import {
   ImageLocalStorageService,
   ImagesData,
 } from 'services/image-local-storage.service';
+import {CustomizationArgsForRteType} from 'services/rte-helper-modal.component';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {TranslateTextService} from '../services/translate-text.service';
@@ -63,7 +66,10 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {UnicodeSchema} from 'services/schema-default-value.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {
+  FetchExplorationBackendResponse,
+  ReadOnlyExplorationBackendApiService,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 
 enum ExpansionTabType {
@@ -150,7 +156,7 @@ describe('Translation Modal Component', () => {
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   let wds: WindowDimensionsService;
   let ngbModal: NgbModal;
-  let mockModalRef: MockConfirmTranslationExitModal;
+  let mockModalRef: NgbModalRef;
   let mockWindow: {
     addEventListener: jasmine.Spy;
     removeEventListener: jasmine.Spy;
@@ -182,6 +188,85 @@ describe('Translation Modal Component', () => {
       rule_type: null,
     };
   };
+  const createSampleReadOnlyExplorationBackendResponse = (
+    initStateName: string = 'stateName1'
+  ): FetchExplorationBackendResponse => {
+    return {
+      exploration_id: '0',
+      is_logged_in: true,
+      session_id: 'KERH',
+      draft_change_list_id: 0,
+      displayable_language_codes: [],
+      exploration: {
+        init_state_name: initStateName,
+        param_changes: [],
+        param_specs: {},
+        states: {},
+        title: 'Exploration',
+        language_code: 'en',
+        next_content_id_index: 5,
+        objective: 'To learn',
+      },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: initStateName,
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        edits_allowed: true,
+      },
+      version: 1,
+      can_edit: true,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: true,
+      record_playthrough_probability: 1,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
+      most_recently_reached_checkpoint_state_name: 'State A',
+      most_recently_reached_checkpoint_exp_version: 1,
+    };
+  };
+  const sampleCustomizationArgs: CustomizationArgsForRteType = {
+    heading: 'Sample Header',
+    content: 'You have opened the collapsible block.',
+    filepath: '',
+    caption: '',
+    alt: '',
+    url: '',
+    text: 'concept card',
+    math_content: {
+      raw_latex: '',
+      svg_filename: '',
+    },
+    skill_id: '',
+    tab_contents: [
+      {
+        title: 'Hint introduction',
+        content:
+          'This set of tabs shows some hints. Click on the other tabs to' +
+          ' display the relevant hints.',
+      },
+      {
+        title: 'Hint 1',
+        content: 'This is a first hint.',
+      },
+    ],
+    video_id: '',
+    start: 0,
+    end: 0,
+    autoplay: false,
+    question: 'Sample Question',
+    answer: '',
+  };
 
   beforeEach(waitForAsync(() => {
     mockPlatformFeatureService = new MockPlatformFeatureService();
@@ -190,9 +275,9 @@ describe('Translation Modal Component', () => {
       ['fetchExplorationAsync']
     );
     readOnlyExplorationBackendApiService.fetchExplorationAsync.and.returnValue(
-      Promise.resolve({
-        exploration: {init_state_name: 'stateName1', states: {}},
-      })
+      Promise.resolve(
+        createSampleReadOnlyExplorationBackendResponse('stateName1')
+      )
     );
     computeGraphService = jasmine.createSpyObj('ComputeGraphService', [
       'computeBfsTraversalOfStates',
@@ -201,7 +286,12 @@ describe('Translation Modal Component', () => {
       'stateName1',
       'stateName2',
     ]);
-    mockModalRef = new MockConfirmTranslationExitModal();
+    mockModalRef = {
+      componentInstance: {},
+      result: Promise.resolve(),
+      close: () => {},
+      dismiss: () => {},
+    } as NgbModalRef;
     mockWindow = {
       addEventListener: jasmine.createSpy('addEventListener'),
       removeEventListener: jasmine.createSpy('removeEventListener'),
@@ -337,12 +427,17 @@ describe('Translation Modal Component', () => {
     tick();
 
     // Check initial state.
-    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+    expect(component.hasAltTextModalBeenOpened).toBe(false);
 
     // Call the intercepted function with a non-image component.
     // eslint-disable-next-line dot-notation
-    component['rteHelperService'].openCustomizationModal(false, 'link', [], {});
-    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+    component['rteHelperService'].openCustomizationModal(
+      false,
+      'link',
+      [],
+      sampleCustomizationArgs
+    );
+    expect(component.hasAltTextModalBeenOpened).toBe(false);
 
     // Call the intercepted function with the 'image' component.
     // eslint-disable-next-line dot-notation
@@ -350,9 +445,9 @@ describe('Translation Modal Component', () => {
       false,
       'image',
       [],
-      {}
+      sampleCustomizationArgs
     );
-    expect(component.hasAltTextModalBeenOpened).toBeTrue();
+    expect(component.hasAltTextModalBeenOpened).toBe(true);
   }));
 
   it('should wrap text with ellipsis when text is too long', () => {
@@ -1337,7 +1432,7 @@ describe('Translation Modal Component', () => {
         spyOn(translateTextService, 'getTextToTranslate').and.returnValue({
           text: 'next text',
           more: true,
-          status: 'active',
+          status: 'pending',
           translation: '',
           dataFormat: 'html',
           contentType: 'content',
@@ -1616,7 +1711,7 @@ describe('Translation Modal Component', () => {
         spyOn(translateTextService, 'getTextToTranslate').and.returnValue({
           text: 'next text',
           more: true,
-          status: 'active',
+          status: 'pending',
           translation: '',
           dataFormat: 'html',
           contentType: 'content',
@@ -1648,7 +1743,7 @@ describe('Translation Modal Component', () => {
           'getActiveLanguageDirection'
         ).and.returnValue('rtl');
         // MathFormulaDetectionService will be called here. We just need to mock it if we injected it, but it's easier to just check the result since we didn't mock it.
-        expect(component.isFormulaAsText('3 + 6 = 9')).toBeTrue();
+        expect(component.isFormulaAsText('3 + 6 = 9')).toBe(true);
       });
 
       it('should return false when language direction is not rtl, even if formula exists', () => {
@@ -1656,7 +1751,7 @@ describe('Translation Modal Component', () => {
           translationLanguageService,
           'getActiveLanguageDirection'
         ).and.returnValue('ltr');
-        expect(component.isFormulaAsText('3 + 6 = 9')).toBeFalse();
+        expect(component.isFormulaAsText('3 + 6 = 9')).toBe(false);
       });
     });
 
@@ -1740,11 +1835,11 @@ describe('Translation Modal Component', () => {
 
     describe('toggleMathWarning', () => {
       it('should toggle mathWarningIsMinimized', () => {
-        expect(component.mathWarningIsMinimized).toBeFalse();
+        expect(component.mathWarningIsMinimized).toBe(false);
         component.toggleMathWarning();
-        expect(component.mathWarningIsMinimized).toBeTrue();
+        expect(component.mathWarningIsMinimized).toBe(true);
         component.toggleMathWarning();
-        expect(component.mathWarningIsMinimized).toBeFalse();
+        expect(component.mathWarningIsMinimized).toBe(false);
       });
     });
   });
@@ -1880,13 +1975,13 @@ describe('Translation Modal Component', () => {
 
       component.generateTranslation();
 
-      expect(component.isGeneratingTranslation).toBeTrue();
+      expect(component.isGeneratingTranslation).toBe(true);
       flushMicrotasks();
 
       expect(
         translateTextBackendApiService.getMachineTranslationAsync
       ).toHaveBeenCalledWith('hello', 'en', 'es');
-      expect(component.isGeneratingTranslation).toBeFalse();
+      expect(component.isGeneratingTranslation).toBe(false);
       expect(component.activeWrittenTranslation).toBe('<p>hola</p>');
     }));
 
@@ -1901,13 +1996,13 @@ describe('Translation Modal Component', () => {
 
       component.generateTranslation();
 
-      expect(component.isGeneratingTranslation).toBeTrue();
+      expect(component.isGeneratingTranslation).toBe(true);
       flushMicrotasks();
 
       expect(
         translateTextBackendApiService.getMachineTranslationAsync
       ).toHaveBeenCalledWith('hello', 'en', 'es');
-      expect(component.isGeneratingTranslation).toBeFalse();
+      expect(component.isGeneratingTranslation).toBe(false);
     }));
 
     it('should not generate translation if already generating', () => {
@@ -1930,29 +2025,27 @@ describe('Translation Modal Component', () => {
       expect(
         translateTextBackendApiService.getMachineTranslationAsync
       ).not.toHaveBeenCalled();
-      expect(component.isGeneratingTranslation).toBeFalse();
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.isGeneratingTranslation).toBe(false);
+      expect(component.hasIncompleteTranslationError).toBe(false);
     });
 
     it('should open unedited confirmation modal if translation is auto-generated and unedited', fakeAsync(() => {
       spyOn(translateTextService, 'suggestTranslatedText').and.callFake(
         (
-          _translationHtml,
-          _languageCode,
-          _imagesData,
-          _dataFormat,
-          successCallback,
-          _errorCallback
+          _translationHtml: string | string[],
+          _languageCode: string,
+          _imagesData: ImagesData[],
+          _dataFormat: string,
+          successCallback: () => void,
+          _errorCallback: (reason: string) => void
         ) => {
           successCallback();
         }
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: {},
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      });
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.resolve(),
+      } as NgbModalRef);
 
       component.isTranslationAutoGenerated = true;
       component.activeWrittenTranslation = 'unchanged translation';
@@ -1974,12 +2067,10 @@ describe('Translation Modal Component', () => {
 
     it('should not suggest translated text if unedited confirmation modal is cancelled', fakeAsync(() => {
       spyOn(translateTextService, 'suggestTranslatedText');
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: {},
-          result: Promise.reject(),
-        } as NgbModalRef;
-      });
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.reject(),
+      } as NgbModalRef);
 
       component.isTranslationAutoGenerated = true;
       component.activeWrittenTranslation = 'unchanged translation';
@@ -2002,14 +2093,15 @@ describe('Translation Modal Component', () => {
     it('should update translated text and open unedited confirmation modal if modifyTranslationOpportunity is present', fakeAsync(() => {
       component.modifyTranslationOpportunity = {
         id: '1',
+        contentId: 'content_0',
         heading: 'Heading',
         subheading: 'subheading',
-        progressPercentage: '20',
-        actionButtonTitle: 'Action Button',
-        inReviewCount: 12,
-        totalCount: 50,
-        translationsCount: 20,
-        reviewerOnlyContentCount: 0,
+        textToTranslate: 'Text',
+        currentContentTranslation: TranslatedContent.createFromBackendDict({
+          content_value: 'Current translated content.',
+          content_format: 'html',
+          needs_update: false,
+        }),
       };
       // This throws "Type 'null' is not assignable to type
       // 'ExplorationOpportunitySummary'". We need to suppress this error
@@ -2018,12 +2110,10 @@ describe('Translation Modal Component', () => {
       component.opportunity = null;
 
       spyOn(activeModal, 'close');
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: {},
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      });
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.resolve(),
+      } as NgbModalRef);
 
       component.isTranslationAutoGenerated = true;
       component.activeWrittenTranslation = 'unchanged translation';
@@ -2049,12 +2139,12 @@ describe('Translation Modal Component', () => {
       fakeAsync(() => {
         spyOn(translateTextService, 'suggestTranslatedText').and.callFake(
           (
-            _translationHtml,
-            _languageCode,
-            _imagesData,
-            _dataFormat,
-            successCallback,
-            _errorCallback
+            _translationHtml: string | string[],
+            _languageCode: string,
+            _imagesData: ImagesData[],
+            _dataFormat: string,
+            successCallback: () => void,
+            _errorCallback: (reason: string) => void
           ) => {
             successCallback();
           }
@@ -2087,14 +2177,15 @@ describe('Translation Modal Component', () => {
       fakeAsync(() => {
         component.modifyTranslationOpportunity = {
           id: '1',
+          contentId: 'content_0',
           heading: 'Heading',
           subheading: 'subheading',
-          progressPercentage: '20',
-          actionButtonTitle: 'Action Button',
-          inReviewCount: 12,
-          totalCount: 50,
-          translationsCount: 20,
-          reviewerOnlyContentCount: 0,
+          textToTranslate: 'Text',
+          currentContentTranslation: TranslatedContent.createFromBackendDict({
+            content_value: 'Current translated content.',
+            content_format: 'html',
+            needs_update: false,
+          }),
         };
         // This throws "Type 'null' is not assignable to type
         // 'ExplorationOpportunitySummary'". We need to suppress this error
@@ -2128,7 +2219,7 @@ describe('Translation Modal Component', () => {
   describe('isTranslationEdited', () => {
     it('should return false when translation was not auto-generated', () => {
       component.isTranslationAutoGenerated = false;
-      expect(component.isTranslationEdited()).toBeFalse();
+      expect(component.isTranslationEdited()).toBe(false);
     });
 
     it('should return true when translation format is not string (e.g. array)', () => {
@@ -2137,7 +2228,7 @@ describe('Translation Modal Component', () => {
         'item1',
         'item2',
       ] as unknown as string;
-      expect(component.isTranslationEdited()).toBeTrue();
+      expect(component.isTranslationEdited()).toBe(true);
     });
 
     it(
@@ -2150,7 +2241,7 @@ describe('Translation Modal Component', () => {
         // normalize() helper and the return false at line 631-632.
         component.activeWrittenTranslation = '<p>hello world</p>';
         component.autoGeneratedTranslation = 'hello world';
-        expect(component.isTranslationEdited()).toBeFalse();
+        expect(component.isTranslationEdited()).toBe(false);
       }
     );
 
@@ -2159,7 +2250,7 @@ describe('Translation Modal Component', () => {
       component.activeWrittenTranslation = '<p>completely different</p>';
       component.autoGeneratedTranslation = '<p>original auto text</p>';
       // Covers the return true at line 635.
-      expect(component.isTranslationEdited()).toBeTrue();
+      expect(component.isTranslationEdited()).toBe(true);
     });
   });
 });
