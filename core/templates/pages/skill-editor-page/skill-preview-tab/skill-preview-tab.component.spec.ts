@@ -877,6 +877,50 @@ describe('Skill Preview Tab Component', () => {
     expect(component.questionDicts).toEqual(fullPageOfQuestions);
   }));
 
+  it('should stay on the applied page when the next page is empty and the count becomes known', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fullPageOfQuestions = new Array(component.QUESTION_COUNT).fill(
+      questionDict1
+    );
+    let resolvePageOne: (value: QuestionBackendDict[]) => void = () => {};
+    const pageOnePromise = new Promise<QuestionBackendDict[]>(resolve => {
+      resolvePageOne = resolve;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(Promise.resolve(fullPageOfQuestions), pageOnePromise);
+    let resolveCount: (value: number) => void = () => {};
+    const countPromise = new Promise<number>(resolve => {
+      resolveCount = resolve;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(countPromise);
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    // Next is still enabled because the count request is pending, and the
+    // count resolves while the page 1 request is in flight.
+    component.nextPage();
+    resolveCount(component.QUESTION_COUNT);
+    flushMicrotasks();
+
+    resolvePageOne([]);
+    flushMicrotasks();
+
+    // The empty page 1 must not replace page 0 or leave "Page 2" displayed,
+    // even though the total page count was already known when it arrived.
+    expect(component.currentPage).toBe(0);
+    expect(component.questionDicts).toEqual(fullPageOfQuestions);
+    expect(component.displayedQuestions).toEqual(fullPageOfQuestions);
+    expect(component.questionsFetched).toBe(true);
+    expect(component.totalPageCount).toBe(1);
+    expect(component.totalPageCountIsKnown).toBe(true);
+  }));
+
   it('should finish loading when the first page is empty and the count is unknown', fakeAsync(() => {
     spyOn(component, 'selectQuestionToPreview');
     spyOn(mockQuestionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
@@ -978,4 +1022,49 @@ describe('Skill Preview Tab Component', () => {
       fixture.nativeElement.querySelector('.no-questions-message')
     ).toBeNull();
   });
+
+  it('should show a message when the skill has no questions', fakeAsync(() => {
+    spyOn(mockQuestionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
+      Promise.resolve([])
+    );
+    mockQuestionBackendApiService.totalQuestionCount = 0;
+
+    fixture.detectChanges();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    const noQuestionsMessage = fixture.nativeElement.querySelector(
+      '.no-questions-message'
+    );
+    expect(noQuestionsMessage).not.toBeNull();
+    expect(noQuestionsMessage.textContent.trim()).toBe(
+      component.PREVIEW_MESSAGES.NO_QUESTIONS_TO_DISPLAY
+    );
+    expect(
+      fixture.nativeElement.querySelector('.preview-empty-message')
+    ).not.toBeNull();
+  }));
+
+  it('should show a message when the first page is empty and the count is unknown', fakeAsync(() => {
+    spyOn(mockQuestionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
+      Promise.resolve([])
+    );
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(new Promise<number>(() => {}));
+
+    fixture.detectChanges();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(component.questionsFetched).toBe(true);
+    const noQuestionsMessage = fixture.nativeElement.querySelector(
+      '.no-questions-message'
+    );
+    expect(noQuestionsMessage).not.toBeNull();
+    expect(noQuestionsMessage.textContent.trim()).toBe(
+      component.PREVIEW_MESSAGES.NO_QUESTIONS_TO_DISPLAY
+    );
+  }));
 });

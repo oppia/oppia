@@ -75,7 +75,10 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   // when the count request fails, in which case the end of the list is
   // detected from a page response that is shorter than a full page.
   totalPageCountIsKnown: boolean = false;
-  displayedQuestions!: QuestionBackendDict[];
+  // Questions matching the active filters. It starts empty rather than
+  // undefined so the template can compare its length before the first page
+  // has been fetched (for example when a skill has no questions).
+  displayedQuestions: QuestionBackendDict[] = [];
   displayCardIsInitialized: boolean = false;
   ALLOWED_QUESTION_INTERACTIONS: string[] = [];
   QUESTION_COUNT: number = 20;
@@ -150,30 +153,43 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
         if (requestId !== this.latestFetchRequestId) {
           return;
         }
+        // A non-initial page with no questions does not exist. This is
+        // recovered regardless of whether the total page count is known,
+        // because the count request can resolve while this fetch is still
+        // pending; only when the count is unknown does the empty response
+        // also establish the count. The applied page and its questions stay
+        // displayed instead of being replaced by an empty list.
+        if (response.length === 0 && page > 0) {
+          // The requested index is only an exact page count when the page
+          // right before it is known to exist. Otherwise the page between
+          // the last applied page and this one was never applied, so its
+          // existence is unconfirmed and must not be counted. Leaving the
+          // count unknown keeps the end of the list detected by a later
+          // response instead of freezing a count that is too high.
+          if (
+            !this.totalPageCountIsKnown &&
+            this.highestAppliedPage >= page - 1
+          ) {
+            this.totalPageCount = page;
+            this.totalPageCountIsKnown = true;
+          }
+          this.currentPage = this.appliedPage;
+          // The request completed, so stop showing the loading state even
+          // though the requested page has no questions.
+          this.questionsFetched = true;
+          return;
+        }
         // When the total page count is unknown, a response with fewer
-        // questions than requested marks the end of the list. An empty
-        // response means the requested page does not exist, so keep showing
-        // the last applied page and exclude the requested page from the count.
+        // questions than requested marks the end of the list.
         if (
           !this.totalPageCountIsKnown &&
           response.length < this.QUESTION_COUNT
         ) {
           if (response.length === 0) {
-            // The requested index is only an exact page count when the page
-            // right before it is known to exist. Otherwise the page between
-            // the last applied page and this one was never applied, so its
-            // existence is unconfirmed and must not be counted. Leaving the
-            // count unknown keeps the end of the list detected by a later
-            // response instead of freezing a count that is too high.
-            if (this.highestAppliedPage >= page - 1) {
-              this.totalPageCount = page;
-              this.totalPageCountIsKnown = true;
-            }
-            this.currentPage = this.appliedPage;
-            // The request completed, so stop showing the loading state even
-            // though the requested page has no questions. The empty response
-            // is not assigned to questionDicts, so questions from the last
-            // applied page stay displayed.
+            // An empty first page means the skill has no questions, so the
+            // total page count is exactly zero.
+            this.totalPageCount = 0;
+            this.totalPageCountIsKnown = true;
             this.questionsFetched = true;
             return;
           }
