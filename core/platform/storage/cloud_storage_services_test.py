@@ -26,7 +26,6 @@ from typing import Dict, List, Optional
 
 
 class MockClient:
-
     def __init__(self) -> None:
         self.buckets: Dict[str, MockBucket] = {}
 
@@ -61,7 +60,6 @@ class MockClient:
 
 
 class MockBucket:
-
     def __init__(self) -> None:
         self.blobs: Dict[str, MockBlob] = {}
 
@@ -113,7 +111,6 @@ class MockBucket:
 
 
 class MockBlob:
-
     __slots__ = ('filepath', 'raw_bytes', 'content_type', 'deleted')
 
     def __init__(self, filepath: str) -> None:
@@ -148,7 +145,6 @@ class MockBlob:
 
 
 class CloudStorageServicesTests(test_utils.TestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.client = MockClient()
@@ -262,9 +258,12 @@ class CloudStorageServicesTests(test_utils.TestBase):
     ) -> None:
         non_existent_source_path = 'path/to/file.txt'
 
-        with self.get_bucket_swap, self.assertRaisesRegex(
-            ValueError,
-            'Source asset does not exist at %s.' % non_existent_source_path,
+        with (
+            self.get_bucket_swap,
+            self.assertRaisesRegex(
+                ValueError,
+                'Source asset does not exist at %s.' % non_existent_source_path,
+            ),
         ):
             cloud_storage_services.copy(
                 'bucket_1', non_existent_source_path, 'other/path/to/file.txt'

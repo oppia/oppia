@@ -45,7 +45,6 @@ class NoOpJob(base_jobs.JobBase):
 
 
 class BeamJobServicesTests(test_utils.TestBase):
-
     def test_gets_jobs_from_registry(self) -> None:
         beam_jobs = beam_job_services.get_beam_jobs()
         self.assertItemsEqual(
@@ -54,7 +53,6 @@ class BeamJobServicesTests(test_utils.TestBase):
 
 
 class BeamJobRunServicesTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self._id_iter = (str(i) for i in itertools.count())
@@ -409,7 +407,6 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
 
 class GetBeamJobRunResultTests(test_utils.GenericTestBase):
-
     def test_get_beam_run_result(self) -> None:
         beam_job_models.BeamJobRunResultModel(
             job_id='123', stdout='abc', stderr='def'

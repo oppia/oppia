@@ -1245,9 +1245,7 @@ def update_skill(
             translation_counts = translation_services.get_translation_counts(
                 feconf.TranslatableEntityType.SKILL, skill
             )
-            compute_models_fn = (
-                opportunity_services.compute_translation_opportunity_models_with_updated_entity
-            )
+            compute_models_fn = opportunity_services.compute_translation_opportunity_models_with_updated_entity
             updated_opp_models = compute_models_fn(
                 feconf.ENTITY_TYPE_SKILL,
                 skill.id,
@@ -1617,9 +1615,9 @@ def get_multi_users_skills_mastery(
         if skill_mastery_model is None:
             degrees_of_masteries[user_id][skill_id] = None
         else:
-            degrees_of_masteries[user_id][
-                skill_id
-            ] = skill_mastery_model.degree_of_mastery
+            degrees_of_masteries[user_id][skill_id] = (
+                skill_mastery_model.degree_of_mastery
+            )
 
     return degrees_of_masteries
 

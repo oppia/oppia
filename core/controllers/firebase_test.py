@@ -50,23 +50,26 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
     def test_get_request_forwarded_to_firebase_proxy(self) -> None:
         url = '/__/auth'
         params = {'param_1': 'value_1', 'param_2': 'value_2'}
-        with self.swap(
-            firebase,
-            'FIREBASE_DOMAINS',
-            {'localhost': self.MOCK_FIREBASE_DOMAIN},
-        ), self.swap_with_checks(
-            requests,
-            'request',
-            lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
-            [('GET', f'{self.MOCK_FIREBASE_DOMAIN}{url}')],
-            [
-                {
-                    'params': params,
-                    'timeout': firebase.TIMEOUT_SECS,
-                    'data': None,
-                    'headers': {'Host': 'localhost:80'},
-                }
-            ],
+        with (
+            self.swap(
+                firebase,
+                'FIREBASE_DOMAINS',
+                {'localhost': self.MOCK_FIREBASE_DOMAIN},
+            ),
+            self.swap_with_checks(
+                requests,
+                'request',
+                lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
+                [('GET', f'{self.MOCK_FIREBASE_DOMAIN}{url}')],
+                [
+                    {
+                        'params': params,
+                        'timeout': firebase.TIMEOUT_SECS,
+                        'data': None,
+                        'headers': {'Host': 'localhost:80'},
+                    }
+                ],
+            ),
         ):
             response = self.get_json(url, params)
             self.assertDictEqual(response, {'key': 'val'})
@@ -80,23 +83,26 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
             'Content-Length': '20',
         }
         payload = {'payload': 'value'}
-        with self.swap(
-            firebase,
-            'FIREBASE_DOMAINS',
-            {'localhost': self.MOCK_FIREBASE_DOMAIN},
-        ), self.swap_with_checks(
-            requests,
-            'request',
-            lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
-            [('POST', f'{self.MOCK_FIREBASE_DOMAIN}{url}')],
-            [
-                {
-                    'data': payload,
-                    'params': {},
-                    'headers': headers,
-                    'timeout': firebase.TIMEOUT_SECS,
-                }
-            ],
+        with (
+            self.swap(
+                firebase,
+                'FIREBASE_DOMAINS',
+                {'localhost': self.MOCK_FIREBASE_DOMAIN},
+            ),
+            self.swap_with_checks(
+                requests,
+                'request',
+                lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
+                [('POST', f'{self.MOCK_FIREBASE_DOMAIN}{url}')],
+                [
+                    {
+                        'data': payload,
+                        'params': {},
+                        'headers': headers,
+                        'timeout': firebase.TIMEOUT_SECS,
+                    }
+                ],
+            ),
         ):
             response = self.post_task(url, payload, headers)
 

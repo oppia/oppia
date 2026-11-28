@@ -380,8 +380,6 @@ def choose_service_account_id_for_job(
                 f'{job_class.__name__} does not need a custom service account, '
                 'so the Compute Engine default service account will be assumed'
             )
-            email = (
-                app_identity_services.get_compute_engine_default_service_account_email()
-            )
+            email = app_identity_services.get_compute_engine_default_service_account_email()
             logging.info('%s: %s' % (message, email) if email else message)
             return None

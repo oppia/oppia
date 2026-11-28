@@ -955,7 +955,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with unittest.mock.patch.object(
             topic_fetchers, 'get_topic_by_name', return_value=mock_topic
         ):
-
             # 1. Test pinning exploration with default entity type.
             request_dict = {
                 'topic_id': topic_id,
@@ -1057,7 +1056,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with unittest.mock.patch.object(
             topic_fetchers, 'get_topic_by_name', return_value=mock_topic
         ):
-
             request_dict = {
                 'topic_id': topic_id,
                 'language_code': language_code,
@@ -1620,7 +1618,6 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'get_translatable_text',
             return_value=mock_get_translatable_text_return_value,
         ):
-
             # Send a GET request to retrieve the content.
             output = self.get_json(
                 '/gettranslatabletexthandler',

@@ -335,7 +335,9 @@ def _compute_incomplete_translation_languages(
     return sorted(list(incomplete_translation_language_codes))
 
 
-def get_entity_by_type_and_id(entity_type: str, entity_id: str) -> Union[
+def get_entity_by_type_and_id(
+    entity_type: str, entity_id: str
+) -> Union[
     exp_domain.Exploration,
     story_domain.Story,
     skill_domain.Skill,

@@ -53,9 +53,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
 ):
     """Tests for IdentifyExplorationsWithDuplicateContentIdsJob."""
 
-    JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
-    )
+    JOB_CLASS = delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
 
     def test_identify_job_with_no_duplicates(self) -> None:
         """Test that the job finds no duplicates when there are none."""
@@ -109,9 +107,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 ):
     """Tests for FixExplorationsWithDuplicateContentIdsJob."""
 
-    JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob
-    )
+    JOB_CLASS = delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob
 
     def test_fix_job_with_no_duplicates(self) -> None:
         """Test that the job does nothing when there are no duplicates."""
@@ -414,8 +410,10 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         """Test that solution IDs regenerate with solution_* prefix."""
         content_id_generator = translation_domain.ContentIdGenerator(12)
 
-        regenerated_content_id = delete_duplicate_content_ids_jobs._generate_matching_content_id(  # pylint: disable=protected-access
-            'solution_11', content_id_generator
+        regenerated_content_id = (
+            delete_duplicate_content_ids_jobs._generate_matching_content_id(  # pylint: disable=protected-access
+                'solution_11', content_id_generator
+            )
         )
 
         self.assertEqual(regenerated_content_id, 'solution_12')
@@ -426,8 +424,10 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         """Test that customization arg IDs preserve their arg-name prefix."""
         content_id_generator = translation_domain.ContentIdGenerator(7)
 
-        regenerated_content_id = delete_duplicate_content_ids_jobs._generate_matching_content_id(  # pylint: disable=protected-access
-            'ca_choices_6', content_id_generator
+        regenerated_content_id = (
+            delete_duplicate_content_ids_jobs._generate_matching_content_id(  # pylint: disable=protected-access
+                'ca_choices_6', content_id_generator
+            )
         )
 
         self.assertEqual(regenerated_content_id, 'ca_choices_7')
@@ -437,8 +437,10 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
     ) -> None:
         """Test that short customization arg IDs fallback properly."""
         content_id_generator = translation_domain.ContentIdGenerator(5)
-        regenerated_content_id = delete_duplicate_content_ids_jobs._generate_matching_content_id(  # pylint: disable=protected-access
-            'ca_2', content_id_generator
+        regenerated_content_id = (
+            delete_duplicate_content_ids_jobs._generate_matching_content_id(  # pylint: disable=protected-access
+                'ca_2', content_id_generator
+            )
         )
         self.assertEqual(regenerated_content_id, 'ca_5')
 
@@ -446,8 +448,10 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         """Test that unknown IDs default to regular content_* IDs."""
         content_id_generator = translation_domain.ContentIdGenerator(4)
 
-        regenerated_content_id = delete_duplicate_content_ids_jobs._generate_matching_content_id(  # pylint: disable=protected-access
-            'unexpected_format', content_id_generator
+        regenerated_content_id = (
+            delete_duplicate_content_ids_jobs._generate_matching_content_id(  # pylint: disable=protected-access
+                'unexpected_format', content_id_generator
+            )
         )
 
         self.assertEqual(regenerated_content_id, 'content_4')
@@ -458,9 +462,7 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
 ):
     """Tests for IdentifyExplorationsWithDuplicateContentIdsJob in audit mode."""
 
-    JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
-    )
+    JOB_CLASS = delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
 
     def test_audit_identify_job_with_duplicates(self) -> None:
         """Test that the audit job correctly identifies duplicates."""
@@ -503,9 +505,7 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
 ):
     """Tests for AuditFixExplorationsWithDuplicateContentIdsJob."""
 
-    JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.AuditFixExplorationsWithDuplicateContentIdsJob
-    )
+    JOB_CLASS = delete_duplicate_content_ids_jobs.AuditFixExplorationsWithDuplicateContentIdsJob
 
     def test_audit_fix_job_with_duplicates(self) -> None:
         """Test that the audit fix job shows what would be fixed."""

@@ -32,7 +32,6 @@ from typing import Dict, Generator, List, Optional
 
 
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
-
     @contextlib.contextmanager
     def sys_real_prefix_context(
         self,
@@ -164,9 +163,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_install_dev_dependencies(self) -> None:
 
-        def mock_run(
-            *_args: str, **_kwargs: str
-        ) -> None:  # pylint: disable=unused-argument
+        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
             pass
 
         run_swap = self.swap_with_checks(
@@ -193,9 +190,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_uninstall_dev_dependencies(self) -> None:
 
-        def mock_run(
-            *_args: str, **_kwargs: str
-        ) -> None:  # pylint: disable=unused-argument
+        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
             pass
 
         run_swap = self.swap_with_checks(
@@ -215,9 +210,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_compile_pip_requirements_no_change(self) -> None:
 
-        def mock_run(
-            *_args: str, **_kwargs: str
-        ) -> None:  # pylint: disable=unused-argument
+        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
             pass
 
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
@@ -269,9 +262,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_compile_pip_requirements_change(self) -> None:
 
-        def mock_run(
-            *_args: str, **_kwargs: str
-        ) -> None:  # pylint: disable=unused-argument
+        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
             pass
 
         counter = []

@@ -604,9 +604,10 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_role_notification_email(
                 'dummy', 'dummy', 'dummy', 'dummy', 'dummy'
             )
@@ -1916,11 +1917,14 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         feedback = self._get_lesson_feedback()
         mock_send_email = mock.Mock()
 
-        with self.swap(
-            email_manager,
-            '_send_email',
-            mock_send_email,
-        ), self.can_not_send_feedback_email_ctx:
+        with (
+            self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ),
+            self.can_not_send_feedback_email_ctx,
+        ):
             email_manager.send_feedback_submission_email(feedback)
 
         mock_send_email.assert_not_called()
@@ -1963,8 +1967,11 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         )
 
         with (
-            topic_ids_swap
-        ), classroom_swap, send_email_swap, self.can_send_feedback_email_ctx:
+            topic_ids_swap,
+            classroom_swap,
+            send_email_swap,
+            self.can_send_feedback_email_ctx,
+        ):
             email_manager.send_feedback_submission_email(feedback)
 
         mock_get_topic_ids.assert_called_once_with('exp_id')
@@ -2050,11 +2057,14 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         )
         mock_send_email = mock.Mock()
 
-        with self.swap(
-            email_manager,
-            '_send_email',
-            mock_send_email,
-        ), self.can_send_feedback_email_ctx:
+        with (
+            self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ),
+            self.can_send_feedback_email_ctx,
+        ):
             email_manager.send_feedback_submission_email(feedback)
 
         email_body = self._assert_feedback_email_is_sent(
@@ -2092,11 +2102,14 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         )
         mock_send_email = mock.Mock()
 
-        with self.swap(
-            email_manager,
-            '_send_email',
-            mock_send_email,
-        ), self.can_send_feedback_email_ctx:
+        with (
+            self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ),
+            self.can_send_feedback_email_ctx,
+        ):
             email_manager.send_feedback_submission_email(feedback)
 
         email_body = self._assert_feedback_email_is_sent(
@@ -2124,11 +2137,14 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         feedback = self._get_platform_feedback('invalid-dashboard')
         mock_send_email = mock.Mock()
 
-        with self.swap(
-            email_manager,
-            '_send_email',
-            mock_send_email,
-        ), self.can_send_feedback_email_ctx:
+        with (
+            self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ),
+            self.can_send_feedback_email_ctx,
+        ):
             with self.assertRaisesRegex(
                 utils.InvalidInputException,
                 'Invalid destination dashboard: invalid-dashboard',
@@ -2146,11 +2162,14 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         feedback = self._get_lesson_feedback()
         mock_send_email = mock.Mock()
 
-        with self.swap(
-            email_manager,
-            '_send_email',
-            mock_send_email,
-        ), self.can_not_send_feedback_email_ctx:
+        with (
+            self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ),
+            self.can_not_send_feedback_email_ctx,
+        ):
             email_manager.send_feedback_status_change_email(
                 feedback,
                 self.user.user_id,
@@ -2213,11 +2232,14 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         feedback = self._get_lesson_feedback()
         mock_send_email = mock.Mock()
 
-        with self.swap(
-            email_manager,
-            '_send_email',
-            mock_send_email,
-        ), self.can_not_send_feedback_email_ctx:
+        with (
+            self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ),
+            self.can_not_send_feedback_email_ctx,
+        ):
             email_manager.send_feedback_reply_email(
                 feedback,
                 'Thanks for the suggestion.',
@@ -2275,9 +2297,10 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_feedback_submission_email(mock.Mock())
             email_manager.send_feedback_status_change_email(
                 mock.Mock(), 'dummy'
@@ -2296,7 +2319,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
 
 
 class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -2446,9 +2468,10 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_feedback_message_email(
                 'dummy', {'dummy': mock.Mock()}
             )
@@ -2572,9 +2595,10 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_suggestion_email(
                 'dummy', 'dummy', 'dummy', [mock.Mock()]
             )
@@ -2696,9 +2720,10 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_emails_to_subscribers('dummy', 'dummy', 'dummy')
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -2824,9 +2849,10 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_instant_feedback_message_email(
                 'dummy', 'dummy', 'dummy', 'dummy', 'dummy', 'dummy', 'dummy'
             )
@@ -3005,9 +3031,10 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_flag_exploration_email(
                 'dummy', 'dummy', 'dummy', 'dummy'
             )
@@ -3118,9 +3145,10 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_mail_to_onboard_new_reviewers('dummy', 'dummy')
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -3198,9 +3226,10 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_mail_to_notify_users_to_review('dummy', 'dummy')
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -3631,9 +3660,10 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_mail_to_notify_contributor_ranking_achievement(
                 mock.Mock()
             )
@@ -5790,9 +5820,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [mock.Mock()], [mock.Mock()]
             )
@@ -6695,8 +6726,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         # method by assuming that 'sent_email_models' is an instance of list.
         # So, to avoid error we used assertion here.
         assert isinstance(sent_email_models, list)
-        email_sort_fn: Callable[[email_models.SentEmailModel], str] = (
-            lambda m: (m.html_body if isinstance(m.html_body, str) else '')
+        email_sort_fn: Callable[[email_models.SentEmailModel], str] = lambda m: (
+            m.html_body if isinstance(m.html_body, str) else ''
         )
         sent_email_models.sort(key=email_sort_fn)
         sent_email_model = sent_email_models[0]
@@ -6859,9 +6890,10 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
                 [mock.Mock()],
                 [mock.Mock()],
@@ -6929,10 +6961,12 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
-        translation_suggestion = self._create_translation_suggestion_in_lang_with_html_and_datetime(  # pylint: disable=line-too-long
-            'en',
-            '<p>What is the meaning of life?</p>',
-            self.mocked_review_submission_datetime,
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(  # pylint: disable=line-too-long
+                'en',
+                '<p>What is the meaning of life?</p>',
+                self.mocked_review_submission_datetime,
+            )
         )
         self.reviewable_suggestion_email_info = suggestion_services.create_reviewable_suggestion_email_info_from_suggestion(
             translation_suggestion
@@ -7147,9 +7181,10 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_reviewer_notifications(mock.Mock(), mock.Mock())
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -8047,8 +8082,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         # So, to avoid error we used assertion here.
         assert isinstance(sent_email_models, list)
         self.assertEqual(len(sent_email_models), 2)
-        email_sort_fn: Callable[[email_models.SentEmailModel], str] = (
-            lambda m: (m.html_body if isinstance(m.html_body, str) else '')
+        email_sort_fn: Callable[[email_models.SentEmailModel], str] = lambda m: (
+            m.html_body if isinstance(m.html_body, str) else ''
         )
         sent_email_models.sort(key=email_sort_fn)
         sent_email_model = sent_email_models[1]
@@ -8082,9 +8117,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [mock.Mock()],
                 [mock.Mock()],
@@ -8181,15 +8217,15 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_account_deleted_email('dummy', 'dummy')
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
 class EmailPreferencesTests(test_utils.EmailTestBase):
-
     def test_can_users_receive_thread_email(self) -> None:
         gae_ids = ('someUser1', 'someUser2')
         exp_id = 'someExploration'
@@ -8392,9 +8428,10 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             res_get_moderator_unpublish_exploration_email = (
                 email_manager.get_moderator_unpublish_exploration_email()
             )
@@ -8884,9 +8921,10 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_email_to_new_cd_user(
                 'dummy', 'dummy', mock.Mock()
             )
@@ -8947,9 +8985,10 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_not_mergeable_change_list_to_admin_for_review(
                 'dummy', 1, 1, [mock.Mock()]
             )
@@ -9174,9 +9213,10 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
 
-        with self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
-        ), self.capture_logging(min_level=logging.ERROR) as logs:
+        with (
+            self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False),
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
             email_manager.send_reminder_mail_to_notify_curriculum_admins(
                 [mock.Mock()], [mock.Mock()]
             )
@@ -9589,26 +9629,32 @@ class EmailManagerCoverageTests(test_utils.EmailTestBase):
         mock_settings = mock.Mock()
         mock_settings.username = 'dummy_username'
 
-        with self.swap(
-            user_services,
-            'get_users_email_preferences',
-            lambda user_ids, **kwargs: [mock_prefs] * len(user_ids),
-        ), self.swap(
-            user_services,
-            'get_email_preferences',
-            lambda *args, **kwargs: mock_prefs,
-        ), self.swap(
-            user_services,
-            'get_users_settings',
-            lambda user_ids, **kwargs: [mock_settings] * len(user_ids),
-        ), self.swap(
-            subscription_services,
-            'get_all_subscribers_of_creator',
-            lambda *args, **kwargs: ['subscriber_1'],
-        ), self.swap(
-            user_services,
-            'get_usernames',
-            lambda *args, **kwargs: ['subscriber_username'],
+        with (
+            self.swap(
+                user_services,
+                'get_users_email_preferences',
+                lambda user_ids, **kwargs: [mock_prefs] * len(user_ids),
+            ),
+            self.swap(
+                user_services,
+                'get_email_preferences',
+                lambda *args, **kwargs: mock_prefs,
+            ),
+            self.swap(
+                user_services,
+                'get_users_settings',
+                lambda user_ids, **kwargs: [mock_settings] * len(user_ids),
+            ),
+            self.swap(
+                subscription_services,
+                'get_all_subscribers_of_creator',
+                lambda *args, **kwargs: ['subscriber_1'],
+            ),
+            self.swap(
+                user_services,
+                'get_usernames',
+                lambda *args, **kwargs: ['subscriber_username'],
+            ),
         ):
             email_manager.send_emails_to_subscribers(
                 'creator_id', 'exp_id', 'exp_title'
@@ -9642,14 +9688,17 @@ class EmailManagerCoverageTests(test_utils.EmailTestBase):
                 None,
             )
 
-        with self.swap(
-            topic_services,
-            'get_topic_ids_for_exploration_id',
-            lambda x: ['dummy'],
-        ), self.swap(
-            classroom_config_services,
-            'get_classroom_by_topic_id',
-            lambda x: None,
+        with (
+            self.swap(
+                topic_services,
+                'get_topic_ids_for_exploration_id',
+                lambda x: ['dummy'],
+            ),
+            self.swap(
+                classroom_config_services,
+                'get_classroom_by_topic_id',
+                lambda x: None,
+            ),
         ):
             getattr(email_manager, '_get_classroom_feedback_recipient_email')(
                 'exp_id'
@@ -9666,12 +9715,17 @@ class EmailManagerCoverageTests(test_utils.EmailTestBase):
         }
         email_manager.NEW_CD_USER_EMAIL_DATA['DUMMY'] = dummy_data
         try:
-            with self.swap(
-                user_services,
-                'get_email_preferences',
-                lambda *args, **kwargs: mock_prefs,
-            ), self.swap(
-                user_services, 'get_username', lambda *args, **kwargs: 'dummy'
+            with (
+                self.swap(
+                    user_services,
+                    'get_email_preferences',
+                    lambda *args, **kwargs: mock_prefs,
+                ),
+                self.swap(
+                    user_services,
+                    'get_username',
+                    lambda *args, **kwargs: 'dummy',
+                ),
             ):
                 email_manager.send_email_to_new_cd_user(
                     'recipient_id', 'DUMMY', None

@@ -1783,7 +1783,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
-
     def test_loading_and_validation_and_deletion_of_demo_explorations(
         self,
     ) -> None:
@@ -1888,8 +1887,7 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
 
     def test_cannot_load_yaml_with_no_schema_version(self) -> None:
         yaml_with_no_schema_version = (
-            (
-                """
+            """
         author_notes: ''
         auto_tts_enabled: true
         blurb: ''
@@ -1993,14 +1991,12 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
         tags: []
         title: Title
         """
-            )
-            % (
-                self.INTRO_AUDIO_FILE,
-                self.ANSWER_GROUP_AUDIO_FILE,
-                self.DEFAULT_OUTCOME_AUDIO_FILE,
-                self.HINT_AUDIO_FILE,
-                self.SOLUTION_AUDIO_FILE,
-            )
+        ) % (
+            self.INTRO_AUDIO_FILE,
+            self.ANSWER_GROUP_AUDIO_FILE,
+            self.DEFAULT_OUTCOME_AUDIO_FILE,
+            self.HINT_AUDIO_FILE,
+            self.SOLUTION_AUDIO_FILE,
         )
 
         with self.assertRaisesRegex(
@@ -2288,7 +2284,6 @@ class GetContentUpdatesFromCmdEditStatePropertyChangeTests(
 
 
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
-
     def test_get_image_filenames_from_exploration(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category'
@@ -2639,8 +2634,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
         'caption-with-value="&quot;&quot;"\n        filepath-with-value="'
         '&quot;abc.png&quot;"></oppia-noninteractive-image>'
     )
-    SAMPLE_YAML_CONTENT: str = (
-        """author_notes: ''
+    SAMPLE_YAML_CONTENT: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Algebra
@@ -2727,15 +2721,13 @@ states_schema_version: %d
 tags: []
 title: A title
 version: 2
-"""
-        % (
-            feconf.DEFAULT_INIT_STATE_NAME,
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            DUMMY_IMAGE_TAG,
-            feconf.CURRENT_STATE_SCHEMA_VERSION,
-        )
+""" % (
+        feconf.DEFAULT_INIT_STATE_NAME,
+        exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+        feconf.DEFAULT_INIT_STATE_NAME,
+        feconf.DEFAULT_INIT_STATE_NAME,
+        DUMMY_IMAGE_TAG,
+        feconf.CURRENT_STATE_SCHEMA_VERSION,
     )
 
     UPDATED_YAML_CONTENT = """author_notes: ''
@@ -3284,8 +3276,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """
 
     _SAMPLE_INIT_STATE_CONTENT: str = (
-        (
-            """card_is_checkpoint: true
+        """card_is_checkpoint: true
 classifier_model_id: null
 content:
   content_id: content_0
@@ -3320,9 +3311,7 @@ linked_skill_id: null
 param_changes: []
 solicit_answer_details: false
 """
-        )
-        % (feconf.DEFAULT_INIT_STATE_NAME)
-    )
+    ) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT: Final = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
@@ -4780,9 +4769,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_variable_types(self) -> None:
         """Test that parameters in rules must have the correct type."""
-        self.interaction_answer_groups[0]['rule_specs'][0]['inputs'][
-            'x'
-        ] = 'abc'
+        self.interaction_answer_groups[0]['rule_specs'][0]['inputs']['x'] = (
+            'abc'
+        )
         with self.assertRaisesRegex(
             Exception,
             'Value has the wrong type. It should be a NonnegativeInt. '
@@ -5614,8 +5603,9 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         change_list_swap = self.swap_to_always_return(
             exp_services, 'apply_change_list', value=v1_exploration
         )
-        with change_list_swap, self.assertRaisesRegex(
-            Exception, 'version 1, which is too old'
+        with (
+            change_list_swap,
+            self.assertRaisesRegex(Exception, 'version 1, which is too old'),
         ):
             exp_services.update_exploration(
                 second_committer_id, self.EXP_0_ID, None, 'commit_message'
@@ -7476,8 +7466,7 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     NEW_EXP_ID: Final = 'exp_id1'
 
     UPGRADED_EXP_YAML: Final = (
-        (
-            """author_notes: ''
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7552,13 +7541,11 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """
-        )
-        % (
-            feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
-            feconf.CURRENT_STATE_SCHEMA_VERSION,
-        )
+    ) % (
+        feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
+        exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+        feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
+        feconf.CURRENT_STATE_SCHEMA_VERSION,
     )
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -7738,10 +7725,13 @@ title: Old Title
             exp_services, 'apply_change_list', _mock_apply_change_list
         )
 
-        with fetch_swap, self.assertRaisesRegex(
-            Exception,
-            'Unexpected error: trying to update version 1 of exploration '
-            'from version 2. Please reload the page and try again.',
+        with (
+            fetch_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'Unexpected error: trying to update version 1 of exploration '
+                'from version 2. Please reload the page and try again.',
+            ),
         ):
             exp_services.update_exploration(
                 'user_id',
@@ -10972,8 +10962,7 @@ class LoggedOutUserProgressUpdateTests(test_utils.GenericTestBase):
     EXP_ID: Final = 'exp_id0'
     UNIQUE_PROGRESS_URL_ID: Final = 'pid123'
 
-    SAMPLE_EXPLORATION_YAML: str = (
-        """
+    SAMPLE_EXPLORATION_YAML: str = """
 author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -11127,7 +11116,6 @@ states_schema_version: 42
 tags: []
 title: Title
 """
-    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -11365,8 +11353,7 @@ class SyncLoggedInAndLoggedOutProgressTests(test_utils.GenericTestBase):
     EXP_ID: Final = 'exp_id0'
     UNIQUE_PROGRESS_URL_ID: Final = 'pid123'
 
-    SAMPLE_EXPLORATION_YAML: str = (
-        """
+    SAMPLE_EXPLORATION_YAML: str = """
 author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -11554,7 +11541,6 @@ states_schema_version: 42
 tags: []
 title: Title
 """
-    )
 
     def setUp(self) -> None:
         super().setUp()

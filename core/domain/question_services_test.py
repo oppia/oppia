@@ -170,12 +170,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         questions = question_services.get_questions_by_skill_ids(
             2, ['skill_1', 'skill_2'], True
         )
-        sort_fn: Callable[[question_domain.Question], float] = (
-            lambda question: (
-                question.last_updated.timestamp()
-                if question.last_updated
-                else 0
-            )
+        sort_fn: Callable[[question_domain.Question], float] = lambda question: (
+            question.last_updated.timestamp() if question.last_updated else 0
         )
         questions.sort(key=sort_fn)
 
@@ -279,12 +275,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         questions = question_services.get_questions_by_skill_ids(
             4, ['skill_1', 'skill_2'], False
         )
-        sort_fn: Callable[[question_domain.Question], float] = (
-            lambda question: (
-                question.last_updated.timestamp()
-                if question.last_updated
-                else 0
-            )
+        sort_fn: Callable[[question_domain.Question], float] = lambda question: (
+            question.last_updated.timestamp() if question.last_updated else 0
         )
         questions.sort(key=sort_fn)
 
@@ -774,7 +766,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             Exception, 'Expected a commit message, received none.'
         ):
             question_services.update_question(
-                self.editor_id, self.question_id, change_list, None  # type: ignore[arg-type]
+                self.editor_id,
+                self.question_id,
+                change_list,
+                None,  # type: ignore[arg-type]
             )
 
     def test_cannot_update_question_with_no_change_list(self) -> None:
@@ -1707,7 +1702,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
-
     def test_migrate_question_state_from_v29_to_latest(self) -> None:
         answer_group = {
             'outcome': {

@@ -48,8 +48,7 @@ class RemoveProfilePictureFieldJob(base_jobs.JobBase):
             user_model: UserSettingsModel. The updated user settings model.
         """
         if (
-            'profile_picture_data_url'
-            in user_model._properties  # pylint: disable=protected-access
+            'profile_picture_data_url' in user_model._properties  # pylint: disable=protected-access
         ):
             del user_model._properties[  # pylint: disable=protected-access
                 'profile_picture_data_url'

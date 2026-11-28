@@ -128,7 +128,6 @@ class BazModel(base_models.BaseModel):
 
 
 class AuditsExistingTests(test_utils.TestBase):
-
     def tearDown(self) -> None:
         super().tearDown()
         MockAuditsExisting.clear()
@@ -241,7 +240,6 @@ class MockRelationshipsOf(validation_decorators.RelationshipsOf):
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-
     def tearDown(self) -> None:
         super().tearDown()
         MockRelationshipsOf.clear()

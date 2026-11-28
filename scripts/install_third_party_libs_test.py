@@ -443,8 +443,13 @@ class SetupTests(test_utils.GenericTestBase):
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4, micro=12)
         )
-        with print_swap, uname_swap, version_swap, self.assertRaisesRegex(
-            Exception, 'No suitable python version found.'
+        with (
+            print_swap,
+            uname_swap,
+            version_swap,
+            self.assertRaisesRegex(
+                Exception, 'No suitable python version found.'
+            ),
         ):
             install_third_party_libs.test_python_version()
         self.assertEqual(print_arr, [])
@@ -641,9 +646,13 @@ class SetupTests(test_utils.GenericTestBase):
 
         with self.test_py_swap, os_name_swap:
             with self.rename_swap, self.exists_false_swap:
-                with self.assertRaisesRegex(
-                    Exception, 'System\'s Operating System is not compatible.'
-                ), self.is_x64_architecture_true_swap:
+                with (
+                    self.assertRaisesRegex(
+                        Exception,
+                        'System\'s Operating System is not compatible.',
+                    ),
+                    self.is_x64_architecture_true_swap,
+                ):
                     install_third_party_libs.main()
 
     def test_if_node_is_already_installed_then_skip_installation(self) -> None:
@@ -709,8 +718,9 @@ class SetupTests(test_utils.GenericTestBase):
         os_name_swap = self.swap(common, 'OS_NAME', 'Solaris')
 
         with self.exists_false_swap, self.is_x64_architecture_true_swap:
-            with os_name_swap, self.assertRaisesRegex(
-                Exception, 'Unsupported OS'
+            with (
+                os_name_swap,
+                self.assertRaisesRegex(Exception, 'Unsupported OS'),
             ):
                 install_third_party_libs.install_playwright_node()
 
@@ -833,9 +843,7 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
         def mock_close(unused_self: str) -> None:
             self.check_function_calls['close_is_called'] = True
 
-        def mock_copytree(
-            unused_src: str, unused_dst: str
-        ) -> None:  # pylint: disable=unused-argument
+        def mock_copytree(unused_src: str, unused_dst: str) -> None:  # pylint: disable=unused-argument
             self.check_function_calls['copytree_is_called'] = True
 
         def mock_isdir(path: str) -> bool:

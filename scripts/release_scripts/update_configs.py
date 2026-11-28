@@ -97,12 +97,13 @@ def apply_changes_based_on_config(
             for (line_number, line) in enumerate(local_lines)
             if line.startswith(match_result.group(1))
         ]
-        assert (
-            len(matching_local_line_numbers) == 1
-        ), 'Could not find correct number of lines in %s matching: %s, %s' % (
-            local_filename,
-            config_line,
-            matching_local_line_numbers,
+        assert len(matching_local_line_numbers) == 1, (
+            'Could not find correct number of lines in %s matching: %s, %s'
+            % (
+                local_filename,
+                config_line,
+                matching_local_line_numbers,
+            )
         )
         local_line_numbers.append(matching_local_line_numbers[0])
 
@@ -185,7 +186,7 @@ def verify_config_files(
     ) as app_yaml_file:
         app_yaml_contents = app_yaml_file.read()
 
-    if 'Access-Control-Allow-Origin: \"*\"' in app_yaml_contents:
+    if 'Access-Control-Allow-Origin: "*"' in app_yaml_contents:
         raise Exception(
             '\'Access-Control-Allow-Origin: "*"\' must be updated to '
             'a specific origin before deployment.'

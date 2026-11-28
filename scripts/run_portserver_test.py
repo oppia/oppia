@@ -408,9 +408,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         class FailingMockSocket(MockSocket):
             """Socket that fails while invoking bind()."""
 
-            def bind(
-                self, *unused_args: str
-            ) -> None:  # pylint: disable=missing-docstring
+            def bind(self, *unused_args: str) -> None:  # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
         def dummy_handler(data: bytes) -> bytes:

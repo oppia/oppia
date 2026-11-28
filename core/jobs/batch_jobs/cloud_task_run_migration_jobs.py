@@ -201,9 +201,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
             for (
                 language_accent_code,
                 content_status_map,
-            ) in (
-                voiceover_regeneration_task_mapping_model.language_accent_to_content_status_map.items()
-            ):
+            ) in voiceover_regeneration_task_mapping_model.language_accent_to_content_status_map.items():
                 for content_id, status in content_status_map.items():
                     if (
                         status

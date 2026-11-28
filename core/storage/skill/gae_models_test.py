@@ -34,7 +34,6 @@ if MYPY:  # pragma: no cover
 
 
 class SkillSnapshotContentModelTests(test_utils.GenericTestBase):
-
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             skill_models.SkillSnapshotContentModel.get_deletion_policy(),

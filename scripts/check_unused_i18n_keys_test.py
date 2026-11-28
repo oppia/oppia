@@ -132,9 +132,13 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
             expected_args=[(self.en_json_path,)],
         )
 
-        with exists_swap, self.assertRaisesRegex(
-            Exception,
-            'File %s does not exist.' % self.en_json_path.replace('\\', '\\\\'),
+        with (
+            exists_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'File %s does not exist.'
+                % self.en_json_path.replace('\\', '\\\\'),
+            ),
         ):
             check_unused_i18n_keys.check_unused_keys()
 

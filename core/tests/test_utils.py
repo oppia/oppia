@@ -1468,7 +1468,9 @@ class TestBase(unittest.TestCase):
             # because of this, MyPy throws a '"Callable" has no attribute
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             self.assertEqual(
-                new_function_with_checks.call_num > 0, called, msg=msg  # type: ignore[attr-defined]
+                new_function_with_checks.call_num > 0,  # type: ignore[attr-defined]
+                called,
+                msg=msg,
             )
             pretty_unused_args: List[str] = []
 
@@ -2162,8 +2164,7 @@ class GenericTestBase(AppEngineTestBase):
     # utils.dict_from_yaml can isolate differences quickly.
 
     SAMPLE_YAML_CONTENT: str = (
-        (
-            """author_notes: ''
+        """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -2235,14 +2236,12 @@ tags: []
 title: Title
 version: 1
 """
-        )
-        % (
-            feconf.DEFAULT_INIT_STATE_NAME,
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.CURRENT_STATE_SCHEMA_VERSION,
-        )
+    ) % (
+        feconf.DEFAULT_INIT_STATE_NAME,
+        exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+        feconf.DEFAULT_INIT_STATE_NAME,
+        feconf.DEFAULT_INIT_STATE_NAME,
+        feconf.CURRENT_STATE_SCHEMA_VERSION,
     )
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
@@ -2752,7 +2751,6 @@ version: 1
         # source directory instead of the compiled build output since the build
         # output is not available during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
-
             if http_method == 'GET':
                 response = self.testapp.get(
                     url, params=params, expect_errors=True

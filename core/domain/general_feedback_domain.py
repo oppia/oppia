@@ -264,8 +264,8 @@ class LessonFeedback:
             latest_response_text = self.response_list[-1]['response_text']
             latest_response_preview = latest_response_text
             if len(latest_response_preview) > 100:
-                latest_response_preview = '%s...' % (
-                    latest_response_preview[:97]
+                latest_response_preview = (
+                    '%s...' % (latest_response_preview[:97])
                 )
         return {
             'id': self.id,

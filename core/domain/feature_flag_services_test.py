@@ -339,8 +339,9 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             self._swap_feature_flags_list()
         )
         with swap_all_feature_flags, swap_all_feature_names_set:
-            with self.swap_name_to_description_feature_stage_dict, self.swap(
-                constants, 'DEV_MODE', True
+            with (
+                self.swap_name_to_description_feature_stage_dict,
+                self.swap(constants, 'DEV_MODE', True),
             ):
                 self.assertEqual(
                     feature_services.evaluate_all_feature_flag_configs(
@@ -506,8 +507,11 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
         with swap_all_feature_flags, self.swap(constants, 'DEV_MODE', False):
             with swap_name_to_description_feature_stage_registry_dict:
-                with swap_all_feature_names_set, self.swap(
-                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
+                with (
+                    swap_all_feature_names_set,
+                    self.swap(
+                        feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
+                    ),
                 ):
                     self.assertTrue(
                         feature_services.is_feature_flag_enabled(
@@ -526,8 +530,11 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
         with swap_all_feature_flags, self.swap(constants, 'DEV_MODE', False):
             with swap_name_to_description_feature_stage_registry_dict:
-                with swap_all_feature_names_set, self.swap(
-                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
+                with (
+                    swap_all_feature_names_set,
+                    self.swap(
+                        feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
+                    ),
                 ):
                     self.assertFalse(
                         feature_services.is_feature_flag_enabled(
@@ -546,8 +553,11 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
         with swap_all_feature_flags, self.swap(constants, 'DEV_MODE', False):
             with swap_name_to_description_feature_stage_registry_dict:
-                with swap_all_feature_names_set, self.swap(
-                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
+                with (
+                    swap_all_feature_names_set,
+                    self.swap(
+                        feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
+                    ),
                 ):
                     self.assertFalse(
                         feature_services.is_feature_flag_enabled(
@@ -566,8 +576,11 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
         with swap_all_feature_flags, self.swap(constants, 'DEV_MODE', False):
             with swap_name_to_description_feature_stage_registry_dict:
-                with swap_all_feature_names_set, self.swap(
-                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
+                with (
+                    swap_all_feature_names_set,
+                    self.swap(
+                        feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
+                    ),
                 ):
                     self.assertTrue(
                         feature_services.is_feature_flag_enabled(

@@ -146,9 +146,7 @@ FEATURE_NAMES_MODEL_FILEPATH: Final = os.path.join(
 )
 MODULE_IMPORT_REGEX: Final = r"""import\(\s*'(pages/[^']+)'\s*\)"""
 FEATURE_NAMES_MEMBERS_REGEX: Final = r"""(\w+)\s*=\s*'([^']+)'"""
-ROUTE_KEY_REGEX: Final = (
-    r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
-)
+ROUTE_KEY_REGEX: Final = r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
 ROUTES_WITH_NO_STANDALONE_PAGE_REGEX: Final = (
     r'"ROUTES_WITH_NO_STANDALONE_PAGE"\s*:\s*\[([^\]]*)\]'
 )

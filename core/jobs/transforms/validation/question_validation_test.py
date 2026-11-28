@@ -39,7 +39,6 @@ if MYPY:  # pragma: no cover
 class ValidateQuestionSnapshotMetadataModelTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_validate_change_domain_implemented(self) -> None:
         invalid_commit_cmd_model = (
             question_models.QuestionSnapshotMetadataModel(
@@ -233,7 +232,6 @@ class ValidateQuestionSnapshotMetadataModelTests(
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-
     def test_question_skill_link_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
@@ -268,7 +266,6 @@ class RelationshipsOfTests(test_utils.TestBase):
 class ValidateQuestionCommitLogEntryModelTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_validate_question_model(self) -> None:
         invalid_commit_cmd_model = question_models.QuestionCommitLogEntryModel(
             id='question_123',

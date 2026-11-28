@@ -23,7 +23,6 @@ from typing import Final
 
 
 class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
-
     EXP_ID_1: Final = 'exp_id_1'
     EXP_ID_2: Final = 'exp_id_2'
     EXP_ID_3: Final = 'exp_id_3'

@@ -493,7 +493,6 @@ def mark_exploration_as_incomplete(
         exploration_id not in exploration_ids
         and exploration_id not in subscribed_exploration_ids
     ):
-
         if exploration_id not in incomplete_activities.exploration_ids:
             incomplete_activities.add_exploration_id(exploration_id)
 

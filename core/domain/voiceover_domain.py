@@ -164,9 +164,9 @@ class EntityVoiceovers:
                     else state_domain.Voiceover.from_dict(voiceover_dict)
                 )
 
-                content_id_to_voiceovers[content_id][
-                    voiceover_type.value
-                ] = voiceover
+                content_id_to_voiceovers[content_id][voiceover_type.value] = (
+                    voiceover
+                )
 
         return cls(
             entity_voiceovers_dict['entity_id'],
@@ -302,9 +302,9 @@ class EntityVoiceovers:
         if content_id not in self.voiceovers_mapping:
             self.add_new_content_id_without_voiceovers(content_id)
 
-        self.voiceovers_mapping[content_id][
-            voiceover_type.value
-        ] = voiceovers_mapping
+        self.voiceovers_mapping[content_id][voiceover_type.value] = (
+            voiceovers_mapping
+        )
 
     def remove_voiceover(
         self, content_id: str, voiceover_type: feconf.VoiceoverType

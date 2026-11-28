@@ -895,13 +895,15 @@ class FirebaseAdminSdkStub:
                     page_list, page_index + 1
                 )
             )
-            page.iterate_all = lambda: (
-                # Here we use MyPy ignore because we are depending on fragile
-                # private methods intentionally to reduce the maintenance burden
-                # in this stub.
-                firebase_auth.ExportedUserRecord(user._data)  # type: ignore[attr-defined]  # pylint: disable=protected-access
-                for user in itertools.chain.from_iterable(
-                    page_list[page_index:]
+            page.iterate_all = (
+                lambda: (
+                    # Here we use MyPy ignore because we are depending on fragile
+                    # private methods intentionally to reduce the maintenance burden
+                    # in this stub.
+                    firebase_auth.ExportedUserRecord(user._data)  # type: ignore[attr-defined]  # pylint: disable=protected-access
+                    for user in itertools.chain.from_iterable(
+                        page_list[page_index:]
+                    )
                 )
             )
         else:
@@ -958,7 +960,6 @@ class FirebaseAdminSdkStub:
 
 
 class EstablishFirebaseConnectionTests(test_utils.TestBase):
-
     APP = object()
 
     def test_initializes_when_connection_does_not_exist(self) -> None:
@@ -1136,7 +1137,6 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
 
 
 class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
-
     def test_updates_user_successfully(self) -> None:
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id='aid').put()
         self.firebase_sdk_stub.create_user('aid')
@@ -1208,7 +1208,6 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 
 
 class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL)
@@ -1252,7 +1251,6 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
 
 class DestroyAuthSessionTests(FirebaseAuthServicesTestBase):
-
     def test_deletes_cookie_from_response(self) -> None:
         res = self.create_response(session_cookie='abc')
         self.assert_matches_regexps(
@@ -1267,7 +1265,6 @@ class DestroyAuthSessionTests(FirebaseAuthServicesTestBase):
 
 
 class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
-
     def test_returns_none_when_cookie_is_missing(self) -> None:
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
         id_token = self.firebase_sdk_stub.mock_encoded_user_claims(self.AUTH_ID)
@@ -1410,7 +1407,6 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
 
 class GenericAssociationTests(FirebaseAuthServicesTestBase):
-
     def test_get_association_that_is_present(self) -> None:
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid')
@@ -1673,7 +1669,6 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
 
 class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
-
     USER_ID = 'uid'
     AUTH_ID = 'sub'
     EMAIL = 'user@example.com'
@@ -1719,7 +1714,6 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
 
 
 class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
-
     EMAIL = 'some@email.com'
     USERNAME = 'username'
     AUTH_ID = 'authid'

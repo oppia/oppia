@@ -230,9 +230,7 @@ class TranslationOpportunityJobTestBase(
 class BackfillExplorationTranslationOpportunityModelJobTests(
     TranslationOpportunityJobTestBase
 ):
-    JOB_CLASS = (
-        translation_opportunity_backfill_jobs.BackfillExplorationTranslationOpportunityModelJob
-    )
+    JOB_CLASS = translation_opportunity_backfill_jobs.BackfillExplorationTranslationOpportunityModelJob
 
     def test_creates_translation_opportunity_model(self) -> None:
         self.assert_job_output_is(
@@ -529,9 +527,9 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
         rights_manager.create_new_exploration_rights(exp_id, self.author_id)
 
         exploration = exp_domain.Exploration.create_default_exploration(exp_id)
-        exploration.states[feconf.DEFAULT_INIT_STATE_NAME].content.html = (
-            '<p>HTML Content</p>'
-        )
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME
+        ].content.html = '<p>HTML Content</p>'
         default_outcome = exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME
         ].interaction.default_outcome
@@ -795,9 +793,7 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
 ):
     """Tests for AuditBackfillExplorationTranslationOpportunityModelJob."""
 
-    JOB_CLASS = (
-        translation_opportunity_backfill_jobs.AuditBackfillExplorationTranslationOpportunityModelJob
-    )
+    JOB_CLASS = translation_opportunity_backfill_jobs.AuditBackfillExplorationTranslationOpportunityModelJob
 
     def test_empty_job_output(self) -> None:
         # Here we use cast because we are narrowing down the type of models.
@@ -853,9 +849,9 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
 
     def test_audit_identifies_matching_model(self) -> None:
         exp_model = exp_models.ExplorationModel.get_by_id(self.exp_id)
-        exp_model.states[feconf.DEFAULT_INIT_STATE_NAME]['content'][
-            'html'
-        ] = '<p>Content</p>'
+        exp_model.states[feconf.DEFAULT_INIT_STATE_NAME]['content']['html'] = (
+            '<p>Content</p>'
+        )
         exp_model.update_timestamps()
         exp_model.commit(
             self.author_id,
@@ -1346,9 +1342,7 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
 class AuditBackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
     """Tests for AuditBackfillSkillOpportunityModelJob."""
 
-    JOB_CLASS = (
-        translation_opportunity_backfill_jobs.AuditBackfillSkillOpportunityModelJob
-    )
+    JOB_CLASS = translation_opportunity_backfill_jobs.AuditBackfillSkillOpportunityModelJob
 
     def _put_skill_opportunity(
         self,

@@ -37,7 +37,6 @@ if MYPY:  # pragma: no cover
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):
-
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.StateCounterModel.get_deletion_policy(),

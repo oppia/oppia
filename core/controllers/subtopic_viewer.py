@@ -105,9 +105,7 @@ class SubtopicPageDataHandler(
         elif len(topic.subtopics) > 1:
             prev_subtopic_dict = topic.subtopics[index - 1].to_dict()
         study_guide_sections_dicts_list = []
-        subtopic_page_contents_dict: (
-            subtopic_page_domain.SubtopicPageContentsDict
-        ) = {
+        subtopic_page_contents_dict: subtopic_page_domain.SubtopicPageContentsDict = {
             'subtitled_html': {'content_id': '', 'html': ''},
             'recorded_voiceovers': {'voiceovers_mapping': {}},
             'written_translations': {'translations_mapping': {}},

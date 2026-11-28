@@ -107,13 +107,17 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
             )
         )
 
-        invalid_user_thread_logs = invalid_user_threads | 'Log invalid user threads' >> beam.Map(
-            lambda model: job_run_result.JobRunResult.as_stdout(
-                (
-                    'GeneralFeedbackThreadUserModel with non-existent thread: '
-                    f'id={model.id}, '
-                    f'thread_id={model.thread_id}, '
-                    f'user_id={model.user_id}'
+        invalid_user_thread_logs = (
+            invalid_user_threads
+            | 'Log invalid user threads'
+            >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stdout(
+                    (
+                        'GeneralFeedbackThreadUserModel with non-existent thread: '
+                        f'id={model.id}, '
+                        f'thread_id={model.thread_id}, '
+                        f'user_id={model.user_id}'
+                    )
                 )
             )
         )

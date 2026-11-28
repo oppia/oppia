@@ -528,9 +528,9 @@ def scrub_all_unscrubbed_expiring_reports(scrubbed_by: str) -> None:
         scrub_single_app_feedback_report(report, scrubbed_by)
 
 
-def get_all_expiring_reports_to_scrub() -> (
-    List[app_feedback_report_domain.AppFeedbackReport]
-):
+def get_all_expiring_reports_to_scrub() -> List[
+    app_feedback_report_domain.AppFeedbackReport
+]:
     """Fetches the reports that are expiring and must be scrubbed.
 
     Returns:
@@ -669,9 +669,9 @@ def save_feedback_report_to_storage(
     model_entity.put()
 
 
-def get_all_filter_options() -> (
-    List[app_feedback_report_domain.AppFeedbackReportFilter]
-):
+def get_all_filter_options() -> List[
+    app_feedback_report_domain.AppFeedbackReportFilter
+]:
     """Fetches all the possible values that moderators can filter reports or
     tickets by.
 

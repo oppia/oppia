@@ -212,9 +212,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
 
     def _get_sample_version_data(
         self,
-    ) -> (
-        certificate_assessment_domain.CertificateAssessmentAttemptVersionDataDict
-    ):
+    ) -> certificate_assessment_domain.CertificateAssessmentAttemptVersionDataDict:
         """Returns sample version_data for use in tests."""
         return {
             'certificate_id': 'cert_abc123',
@@ -365,13 +363,17 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
             utils, 'convert_to_hash', lambda *args, **kwargs: 'duplicate-id'
         )
 
-        with self.assertRaisesRegex(
-            Exception,
-            (
-                'The id generator for CertificateAssessmentAttemptModel '
-                'is producing too many collisions.'
+        with (
+            self.assertRaisesRegex(
+                Exception,
+                (
+                    'The id generator for CertificateAssessmentAttemptModel '
+                    'is producing too many collisions.'
+                ),
             ),
-        ), get_by_id_swap, convert_to_hash_swap:
+            get_by_id_swap,
+            convert_to_hash_swap,
+        ):
             certificate_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_id_1',
                 certificate_id='cert_abc123',

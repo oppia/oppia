@@ -39,9 +39,7 @@ class AuditNonExistentThreadsMessagesJobTest(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
         audit_non_existent_threads_messages_jobs.AuditNonExistentThreadsMessagesJob
-    ] = (
-        audit_non_existent_threads_messages_jobs.AuditNonExistentThreadsMessagesJob
-    )
+    ] = audit_non_existent_threads_messages_jobs.AuditNonExistentThreadsMessagesJob
 
     def test_empty_datastore(self) -> None:
         self.assert_job_output_is([])
@@ -163,9 +161,7 @@ class RemoveNonExistentThreadsMessagesJobTest(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
         audit_non_existent_threads_messages_jobs.RemoveNonExistentThreadsMessagesJob
-    ] = (
-        audit_non_existent_threads_messages_jobs.RemoveNonExistentThreadsMessagesJob
-    )
+    ] = audit_non_existent_threads_messages_jobs.RemoveNonExistentThreadsMessagesJob
 
     def test_cleanup_removes_invalid_messages_and_user_models(self) -> None:
         thread = self.create_model(

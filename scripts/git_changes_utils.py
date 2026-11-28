@@ -155,10 +155,10 @@ def get_local_git_repository_remote_name() -> str:
             '1. Run the command \'git remote -v\'\n'
             '2a. If \'origin\' is listed in the command output, then run the '
             'command \'git remote set-url origin '
-            '\"The URL of your fork of Oppia GitHub repository\"\'\n'
+            '"The URL of your fork of Oppia GitHub repository"\'\n'
             '2b. If \'origin\' is not listed in the command output, then run '
             'the command \'git remote add origin '
-            '\"The URL of your fork of Oppia GitHub repository\"\'\n'
+            '"The URL of your fork of Oppia GitHub repository"\'\n'
         )
 
     if remote_num > 1:

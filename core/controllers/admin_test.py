@@ -1685,10 +1685,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
 
         topic_similarities_data = (
-            'Art,Biology,Chemistry\n'
-            '1.0,0.2,0.1\n'
-            '0.2,1.0,0.8\n'
-            '0.1,0.8,1.0'
+            'Art,Biology,Chemistry\n1.0,0.2,0.1\n0.2,1.0,0.8\n0.1,0.8,1.0'
         )
 
         self.post_json(
@@ -2076,9 +2073,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
-        platform_parameter_registry.Registry.parameter_registry[
-            param.name
-        ] = None  # type: ignore[assignment]
+        platform_parameter_registry.Registry.parameter_registry[param.name] = (
+            None  # type: ignore[assignment]
+        )
         response = self.post_json(
             '/adminhandler',
             {
@@ -2437,9 +2434,11 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        generated_question_suggestions = suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
-            self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+        generated_question_suggestions = (
+            suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
+                self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            )
         )
         self.assertEqual(len(generated_question_suggestions), 12)
         self.logout()
@@ -2473,9 +2472,11 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        generated_question_suggestions = suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
-            self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+        generated_question_suggestions = (
+            suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
+                self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            )
         )
         self.assertNotEqual(len(generated_question_suggestions), 12)
         self.logout()
@@ -2503,9 +2504,11 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        generated_question_suggestions = suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
-            self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+        generated_question_suggestions = (
+            suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
+                self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            )
         )
         self.assertNotEqual(len(generated_question_suggestions), 12)
         self.logout()

@@ -460,12 +460,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ]
     FIRST_CONTRIBUTION_DATE: Final = datetime.datetime(2021, 5, 20)
     LAST_CONTRIBUTION_DATE: Final = datetime.datetime(2022, 5, 20)
-    PROFILE_PICTURE_DATA_PNG: Final = (
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D'  # pylint: disable=line-too-long
-    )
-    PROFILE_PICTURE_DATA_WEBP: Final = (
-        'data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoHAAYAAgA0JaQAAv%2B5x9YuAAD%2B%2B0nD9oP5zmavp/Nyl8%2Bf/REL9weER482Ugrc/6dmq28Kx1pj/se/CsMAAAAA'  # pylint: disable=line-too-long
-    )
+    PROFILE_PICTURE_DATA_PNG: Final = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D'  # pylint: disable=line-too-long
+    PROFILE_PICTURE_DATA_WEBP: Final = 'data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoHAAYAAgA0JaQAAv%2B5x9YuAAD%2B%2B0nD9oP5zmavp/Nyl8%2Bf/REL9weER482Ugrc/6dmq28Kx1pj/se/CsMAAAAA'  # pylint: disable=line-too-long
     LESSON_FEEDBACK_ID_1 = 'lesson_feedback_id_1'
     PARENT_FEEDBACK_ID_1 = 'parent_feedback_id_1'
     LESSON_FEEDBACK_TEXT_1 = 'lesson_feedback_text_1'
@@ -1227,8 +1223,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         """Setup for nonexistent user test of export_data functionality."""
         with self.assertRaisesRegex(
             user_models.UserSettingsModel.EntityNotFoundError,
-            'Entity for class UserSettingsModel with id fake_user_id '
-            'not found',
+            'Entity for class UserSettingsModel with id fake_user_id not found',
         ):
             takeout_service.export_data_for_user('fake_user_id')
 
@@ -1256,9 +1251,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         exploration_data: Dict[
             str, Dict[str, Union[str, int, Dict[str, str]]]
         ] = {}
-        general_feedback_message_data: Dict[str, Dict[str, Union[int, str]]] = (
-            {}
-        )
+        general_feedback_message_data: Dict[
+            str, Dict[str, Union[int, str]]
+        ] = {}
         general_feedback_thread_data: Dict[str, Dict[str, Union[int, str]]] = {}
         general_feedback_thread_user_data: Dict[str, Dict[str, List[int]]] = {}
         general_suggestion_data: Dict[str, Dict[str, Union[int, str]]] = {}
@@ -1313,9 +1308,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_contrib_proficiency_data: Dict[
             str, Dict[str, Union[int, bool]]
         ] = {}
-        expected_contribution_rights_data: Dict[str, Union[bool, List[str]]] = (
-            {}
-        )
+        expected_contribution_rights_data: Dict[
+            str, Union[bool, List[str]]
+        ] = {}
 
         expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {}
         expected_collection_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1334,9 +1329,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_question_contribution_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
-        expected_question_review_stats: Dict[str, Dict[str, Dict[str, str]]] = (
-            {}
-        )
+        expected_question_review_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_translation_submitter_total_contribution_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
@@ -1354,13 +1349,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_exploration_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = (
-            {}
-        )
+        expected_exploration_rights_sm: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_exploration_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_platform_parameter_sm: Dict[str, Dict[str, Dict[str, str]]] = (
-            {}
-        )
+        expected_platform_parameter_sm: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_certificate_assessment_offering_sm: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
@@ -1624,9 +1619,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             renamed_export_keys = model.get_field_names_for_takeout()
             exported_field_names = []
             field_used_as_key_for_takeout_dict = None
-            for (
-                field_name
-            ) in model._properties:  # pylint: disable=protected-access
+            for field_name in model._properties:  # pylint: disable=protected-access
                 if (
                     export_policy[field_name]
                     == base_models.EXPORT_POLICY.EXPORTED
@@ -1867,8 +1860,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_general_feedback_message_data = {
-            thread_id
-            + '.0': {
+            thread_id + '.0': {
                 'thread_id': thread_id,
                 'message_id': 0,
                 'updated_status': self.THREAD_STATUS,
@@ -1876,8 +1868,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'text': self.MESSAGE_TEXT,
                 'received_via_email': self.MESSAGE_RECEIEVED_VIA_EMAIL,
             },
-            thread_id
-            + '.1': {
+            thread_id + '.1': {
                 'thread_id': thread_id,
                 'message_id': 1,
                 'updated_status': self.THREAD_STATUS,
@@ -2216,8 +2207,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_question_contribution_stats_data = {
-            '%s.%s'
-            % (self.USER_ID_1, self.TOPIC_ID_1): {
+            '%s.%s' % (self.USER_ID_1, self.TOPIC_ID_1): {
                 'topic_id': self.TOPIC_ID_1,
                 'submitted_questions_count': (self.SUBMITTED_QUESTIONS_COUNT),
                 'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
@@ -2233,8 +2223,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_question_review_stats_data = {
-            '%s.%s'
-            % (self.USER_ID_1, self.TOPIC_ID_1): {
+            '%s.%s' % (self.USER_ID_1, self.TOPIC_ID_1): {
                 'topic_id': self.TOPIC_ID_1,
                 'reviewed_questions_count': (self.REVIEWED_QUESTIONS_COUNT),
                 'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
@@ -2250,8 +2239,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_translation_submitter_total_contribution_stats_data = {
-            '%s.%s'
-            % (self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
+            '%s.%s' % (self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
                 'topic_ids_with_translation_submissions': (
                     self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
@@ -2289,8 +2277,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_translation_reviewer_total_contribution_stats_data = {
-            '%s.%s'
-            % (self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
+            '%s.%s' % (self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
                 'topic_ids_with_translation_reviews': (
                     self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
@@ -2319,8 +2306,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_question_submitter_total_contribution_stats_data = {
-            '%s'
-            % (self.USER_ID_1): {
+            '%s' % (self.USER_ID_1): {
                 'topic_ids_with_question_submissions': (
                     self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS
                 ),
@@ -2342,8 +2328,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_question_reviewer_total_contribution_stats_data = {
-            '%s'
-            % (self.USER_ID_1): {
+            '%s' % (self.USER_ID_1): {
                 'topic_ids_with_question_reviews': (
                     self.TOPIC_IDS_WITH_QUESTION_REVIEWS
                 ),
@@ -2362,8 +2347,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {
-            '%s_%s'
-            % (self.SUGGESTION_LANGUAGE_CODE, self.TOPIC_ID_1): {
+            '%s_%s' % (self.SUGGESTION_LANGUAGE_CODE, self.TOPIC_ID_1): {
                 'opportunity_id': self.EXPLORATION_IDS[0],
             }
         }

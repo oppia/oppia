@@ -2225,12 +2225,12 @@ class Topic:
             Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        self.subtopics[subtopic_index].thumbnail_filename = (
-            new_thumbnail_filename
-        )
-        self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
-            new_thumbnail_size
-        )
+        self.subtopics[
+            subtopic_index
+        ].thumbnail_filename = new_thumbnail_filename
+        self.subtopics[
+            subtopic_index
+        ].thumbnail_size_in_bytes = new_thumbnail_size
 
     def update_subtopic_url_fragment(
         self, subtopic_id: int, new_url_fragment: str
@@ -2266,9 +2266,9 @@ class Topic:
             Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        self.subtopics[subtopic_index].thumbnail_bg_color = (
-            new_thumbnail_bg_color
-        )
+        self.subtopics[
+            subtopic_index
+        ].thumbnail_bg_color = new_thumbnail_bg_color
 
     def rearrange_skill_in_subtopic(
         self, subtopic_id: int, from_index: int, to_index: int

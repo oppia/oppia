@@ -436,9 +436,7 @@ class VoiceoverSynthesisByAccentJobRunTests(
 
     JOB_CLASS: Type[
         synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentJob
-    ] = (
-        synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentJob
-    )
+    ] = synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentJob
 
     def test_empty_storage(self) -> None:
         self._set_language_accent_code('en-US')

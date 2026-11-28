@@ -468,8 +468,8 @@ def managed_ng_build(
             )
         )
 
-        read_line_func: Callable[[], Optional[bytes]] = (
-            lambda: proc.stdout.readline() or None
+        read_line_func: Callable[[], Optional[bytes]] = lambda: (
+            proc.stdout.readline() or None
         )
         if watch_mode:
             for line in iter(read_line_func, None):

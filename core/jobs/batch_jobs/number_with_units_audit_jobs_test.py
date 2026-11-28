@@ -44,7 +44,6 @@ MalformedStateDict = Dict[str, object]
 
 
 class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         number_with_units_audit_jobs.FindNumberWithUnitsRuleUnitsJob
     ] = number_with_units_audit_jobs.FindNumberWithUnitsRuleUnitsJob

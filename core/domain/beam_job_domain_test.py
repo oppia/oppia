@@ -25,7 +25,6 @@ from core.tests import test_utils
 
 
 class BeamJobTests(test_utils.TestBase):
-
     NOW = utils.get_current_utc_datetime()
 
     def test_usage(self) -> None:
@@ -42,7 +41,6 @@ class BeamJobTests(test_utils.TestBase):
 
 
 class BeamJobRunTests(test_utils.TestBase):
-
     NOW = utils.get_current_utc_datetime()
 
     def test_usage(self) -> None:
@@ -122,7 +120,6 @@ class BeamJobRunTests(test_utils.TestBase):
 
 
 class AggregateBeamJobRunResultTests(test_utils.TestBase):
-
     def test_usage(self) -> None:
         result = beam_job_domain.AggregateBeamJobRunResult('abc', '123')
 

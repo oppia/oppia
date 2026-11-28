@@ -35,7 +35,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class ChangeUserNullBiosToEmptyStringJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         user_bios_change_jobs.ChangeUserNullBiosToEmptyStringJob
     ] = user_bios_change_jobs.ChangeUserNullBiosToEmptyStringJob

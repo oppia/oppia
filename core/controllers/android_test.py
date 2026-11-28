@@ -509,8 +509,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=400,
                 )['error'],
-                'Version and language code must be specified '
-                'for translation',
+                'Version and language code must be specified for translation',
             )
 
     def test_get_exploration_translation_without_version_fails(self) -> None:
@@ -524,8 +523,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=400,
                 )['error'],
-                'Version and language code must be specified '
-                'for translation',
+                'Version and language code must be specified for translation',
             )
 
     def test_get_exploration_translation_returns_correct_json(self) -> None:

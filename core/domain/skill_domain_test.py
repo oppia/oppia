@@ -200,9 +200,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-image>',
             },
         )
-        versioned_skill_contents['skill_contents']['explanation'][
-            'html'
-        ] = '<p><span>Test&nbsp;</span></p>'
+        versioned_skill_contents['skill_contents']['explanation']['html'] = (
+            '<p><span>Test&nbsp;</span></p>'
+        )
         self.skill.update_skill_contents_from_model(
             versioned_skill_contents, versioned_skill_contents['schema_version']
         )
@@ -265,9 +265,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         )
         self.skill.validate()
         self.assertEqual(versioned_misconceptions['schema_version'], 4)
-        versioned_misconceptions['misconceptions'][0][
-            'feedback'
-        ] = '<span>feedback&nbsp;</span>'
+        versioned_misconceptions['misconceptions'][0]['feedback'] = (
+            '<span>feedback&nbsp;</span>'
+        )
         self.skill.update_misconceptions_from_model(
             versioned_misconceptions, versioned_misconceptions['schema_version']
         )
@@ -471,7 +471,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             ValueError, 'must_be_addressed should be a bool value'
         ):
             self.skill.update_misconception_must_be_addressed(
-                0, must_be_addressed  # type: ignore[arg-type]
+                0,
+                must_be_addressed,  # type: ignore[arg-type]
             )
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -1027,7 +1028,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
 
 class SkillChangeTests(test_utils.GenericTestBase):
-
     def test_skill_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'
@@ -1302,7 +1302,6 @@ class SkillChangeTests(test_utils.GenericTestBase):
 
 
 class SkillSummaryTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         current_time = utils.get_current_utc_datetime()
@@ -1386,7 +1385,6 @@ class SkillSummaryTests(test_utils.GenericTestBase):
 
 
 class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         current_time = utils.get_current_utc_datetime()
@@ -1422,7 +1420,6 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
 
 
 class TopicAssignmentTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.topic_assignments = skill_domain.TopicAssignment(
@@ -1442,7 +1439,6 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
 
 
 class CategorizedSkillsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.categorized_skills = skill_domain.CategorizedSkills()
@@ -1524,7 +1520,6 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
 
 
 class ShortSkillSummaryTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.skill_summary = skill_domain.SkillSummary(

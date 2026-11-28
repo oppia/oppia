@@ -23,7 +23,6 @@ from typing import Any, Dict, List, Tuple
 
 
 class PayloadValidationUnitTests(test_utils.GenericTestBase):
-
     def test_invalid_args_raises_exceptions(self) -> None:
         # List of 3-tuples, where the first element is an invalid argument dict,
         # the second element is a schema dict and the third element

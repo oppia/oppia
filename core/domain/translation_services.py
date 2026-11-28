@@ -268,7 +268,6 @@ def compute_translation_related_changes_upon_revert(
     new_translation_models = []
     translation_counts = {}
     for entity_translation in language_code_to_entity_translation.values():
-
         translation_counts[entity_translation.language_code] = (
             reverted_exploration.get_translation_count(entity_translation)
         )
@@ -563,9 +562,9 @@ def get_up_to_date_translation(
     return None
 
 
-def get_featured_translation_languages() -> (
-    List[translation_domain.FeaturedTranslationLanguageDict]
-):
+def get_featured_translation_languages() -> List[
+    translation_domain.FeaturedTranslationLanguageDict
+]:
     """Returns the configured featured ('Most needed') translation languages.
 
     Falls back to the initial default configuration defined in

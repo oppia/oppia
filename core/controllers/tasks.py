@@ -492,9 +492,7 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             # its status immediately. Instead, wait until all child processes
             # have completed. The final status will be set at the end of the
             # parent task.
-            if (
-                cloud_task_run_domain_instance.is_voiceover_regeneration_parent_task()
-            ):
+            if cloud_task_run_domain_instance.is_voiceover_regeneration_parent_task():
                 return
 
             updated_cloud_task_run_domain_instance = (

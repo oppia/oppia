@@ -67,9 +67,9 @@ class ExplorationEndStateNormalizationJobTests(job_test_utils.JobTestBase):
         self.assertIsNotNone(exploration_model)
         assert exploration_model is not None
 
-        exploration_model.states['Introduction']['content'][
-            'html'
-        ] = self.JOB_CLASS.DEFAULT_TERMINAL_STATE_CONTENT_WITHOUT_P_TAG
+        exploration_model.states['Introduction']['content']['html'] = (
+            self.JOB_CLASS.DEFAULT_TERMINAL_STATE_CONTENT_WITHOUT_P_TAG
+        )
         exploration_model.update_timestamps(update_last_updated_time=False)
         datastore_services.put_multi([exploration_model])
 
@@ -86,9 +86,7 @@ class ExplorationEndStateNormalizationJobTests(job_test_utils.JobTestBase):
 class ExplorationEndStateNormalizationAuditJobTests(job_test_utils.JobTestBase):
     """Tests for ExplorationEndStateNormalizationAuditJob."""
 
-    JOB_CLASS = (
-        exp_end_state_normalization_jobs.ExplorationEndStateNormalizationAuditJob
-    )
+    JOB_CLASS = exp_end_state_normalization_jobs.ExplorationEndStateNormalizationAuditJob
 
     def test_audit_job_reports_updates_without_saving_models(self) -> None:
         """Tests that audit job reports matching explorations but does not update them."""
@@ -101,9 +99,7 @@ class ExplorationEndStateNormalizationAuditJobTests(job_test_utils.JobTestBase):
         self.assertIsNotNone(exploration_model)
         assert exploration_model is not None
 
-        exploration_model.states['Introduction']['content'][
-            'html'
-        ] = (
+        exploration_model.states['Introduction']['content']['html'] = (
             exp_end_state_normalization_jobs.ExplorationEndStateNormalizationJob.DEFAULT_TERMINAL_STATE_CONTENT_WITHOUT_P_TAG
         )
         exploration_model.update_timestamps(update_last_updated_time=False)

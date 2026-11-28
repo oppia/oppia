@@ -311,7 +311,6 @@ class VoiceoverSynthesisByAccentJob(base_jobs.JobBase):
 
         for language_code, accent_mapping in language_codes_mapping.items():
             for accent_code, is_autogeneratable in accent_mapping.items():
-
                 # Getting the language code for which to generate voiceovers.
                 if (
                     is_autogeneratable

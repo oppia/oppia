@@ -446,7 +446,6 @@ class VoiceoverSynthesisBaseClass(
 
 
 class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
-
     JOB_CLASS: Type[voiceover_synthesis_jobs.VoiceoverSynthesisJob] = (
         voiceover_synthesis_jobs.VoiceoverSynthesisJob
     )
@@ -575,7 +574,6 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
 
 
 class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
-
     JOB_CLASS: Type[voiceover_synthesis_jobs.VoiceoverSynthesisAuditJob] = (
         voiceover_synthesis_jobs.VoiceoverSynthesisAuditJob
     )

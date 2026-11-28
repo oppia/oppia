@@ -24,7 +24,6 @@ from core.tests import test_utils
 
 
 class OppiaRootPageTests(test_utils.GenericTestBase):
-
     def test_oppia_root_page(self) -> None:
         """Tests access to the unified entry page."""
         for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():

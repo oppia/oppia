@@ -379,9 +379,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}">'
             '</oppia-noninteractive-math>'
         )
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {'translations_mapping': {'content1': {}, 'feedback_1': {}}}
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
+            'translations_mapping': {'content1': {}, 'feedback_1': {}}
+        }
         recorded_voiceovers = {
             'voiceovers_mapping': {
                 'content': {
@@ -439,14 +439,14 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-svgdiagram>'
         )
         expected_html_content = (
-            '<oppia-noninteractive-image alt-with-value=\'\"Image\"\''
+            '<oppia-noninteractive-image alt-with-value=\'"Image"\''
             ' caption-with-value="&amp;quot;&amp;quot;" '
-            'filepath-with-value=\'\"img1.svg\"\'>'
+            'filepath-with-value=\'"img1.svg"\'>'
             '</oppia-noninteractive-image>'
         )
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {'translations_mapping': {'content1': {}, 'feedback_1': {}}}
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
+            'translations_mapping': {'content1': {}, 'feedback_1': {}}
+        }
         recorded_voiceovers = {
             'voiceovers_mapping': {
                 'content': {
@@ -499,9 +499,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         expected_html_content = '<p>1 × 3 😕 😊</p>'
         html_content = '<p>1 Ã— 3 ðŸ˜• ðŸ˜Š</p>'
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {'translations_mapping': {'content1': {}, 'feedback_1': {}}}
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
+            'translations_mapping': {'content1': {}, 'feedback_1': {}}
+        }
         recorded_voiceovers = {
             'voiceovers_mapping': {
                 'content': {

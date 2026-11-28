@@ -617,16 +617,14 @@ def main(args: Optional[List[str]] = None) -> None:
                 else:
                     print('')
                     print(
-                        '-----------------------------------------------'
-                        '-------'
+                        '------------------------------------------------------'
                     )
                     print(
                         'WARNING : each test_target should point to the '
                         'test file.'
                     )
                     print(
-                        '-----------------------------------------------'
-                        '-------'
+                        '------------------------------------------------------'
                     )
                     print('')
                     time.sleep(3)
@@ -724,9 +722,7 @@ def main(args: Optional[List[str]] = None) -> None:
             '+----------------------------------------------------------------+'
         )
         print(
-            '|-------- '
-            'SUMMARY OF THE FILES WITH INCOMPLETE COVERAGE '
-            '---------|'
+            '|-------- SUMMARY OF THE FILES WITH INCOMPLETE COVERAGE ---------|'
         )
         print(
             '+----------------------------------------------------------------+'
@@ -749,8 +745,7 @@ def main(args: Optional[List[str]] = None) -> None:
             print('')
 
             print(
-                'For more information, please see our '
-                'backend tests wiki page:'
+                'For more information, please see our backend tests wiki page:'
             )
             print(
                 '    https://github.com/oppia/oppia/wiki/Backend-tests'

@@ -26,14 +26,12 @@ import apache_beam as beam
 
 
 class FlushCacheTests(job_test_utils.PipelinedTestBase):
-
     def test_cache_is_flushed(self) -> None:
         items = [1] * 100
 
         called_functions = {'flush_caches': False}
 
         class MockMemoryCachingServices:
-
             @staticmethod
             def flush_caches() -> None:
                 """Flush cache."""

@@ -381,8 +381,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, False
         )
 
-        with self.print_swap, self.assertRaisesRegex(
-            Exception, 'Some internal error.'
+        with (
+            self.print_swap,
+            self.assertRaisesRegex(Exception, 'Some internal error.'),
         ):
             run_backend_tests.check_test_results(tasks, task_to_taskspec)
 
@@ -569,9 +570,13 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         swap_path_exists = self.swap(os.path, 'exists', mock_path_exists)
 
-        with swap_path_exists, self.assertRaisesRegex(
-            Exception,
-            'Directory %s does not exist.' % common.DIRS_TO_ADD_TO_SYS_PATH[0],
+        with (
+            swap_path_exists,
+            self.assertRaisesRegex(
+                Exception,
+                'Directory %s does not exist.'
+                % common.DIRS_TO_ADD_TO_SYS_PATH[0],
+            ),
         ):
             run_backend_tests.main(args=[])
 
@@ -666,8 +671,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         with swapcheck_coverage, self.swap_cloud_datastore_emulator:
             with self.swap_redis_server, swap_check_results:
-                with self.swap_execute_task, self.assertRaisesRegex(
-                    Exception, 'WARNING: No tests were run.'
+                with (
+                    self.swap_execute_task,
+                    self.assertRaisesRegex(
+                        Exception, 'WARNING: No tests were run.'
+                    ),
                 ):
                     run_backend_tests.main(
                         args=[
@@ -715,8 +723,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_execute_task, self.swap_redis_server, swap_check_results:
-            with self.swap_cloud_datastore_emulator, self.assertRaisesRegex(
-                Exception, 'Task execution failed.'
+            with (
+                self.swap_cloud_datastore_emulator,
+                self.assertRaisesRegex(Exception, 'Task execution failed.'),
             ):
                 run_backend_tests.main(args=[])
 
@@ -866,8 +875,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         )
 
         with get_remote_name_swap, self.swap_redis_server:
-            with self.swap_cloud_datastore_emulator, self.assertRaisesRegex(
-                SystemExit, 'Error: No remote repository found.'
+            with (
+                self.swap_cloud_datastore_emulator,
+                self.assertRaisesRegex(
+                    SystemExit, 'Error: No remote repository found.'
+                ),
             ):
                 run_backend_tests.main(
                     args=['--run_on_changed_files_in_branch']
@@ -913,8 +925,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             'Failed to combine coverage because subprocess failed.'
             '\n%s' % failed_process_output
         )
-        with swap_subprocess_run, self.assertRaisesRegex(
-            RuntimeError, error_msg
+        with (
+            swap_subprocess_run,
+            self.assertRaisesRegex(RuntimeError, error_msg),
         ):
             run_backend_tests.check_coverage(True)
 
@@ -937,8 +950,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             'Failed to calculate coverage because subprocess failed. '
             '%s' % failed_process_output
         )
-        with swap_subprocess_run, self.assertRaisesRegex(
-            RuntimeError, error_msg
+        with (
+            swap_subprocess_run,
+            self.assertRaisesRegex(RuntimeError, error_msg),
         ):
             run_backend_tests.check_coverage(True)
 

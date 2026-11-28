@@ -258,8 +258,12 @@ class PrePushHookTests(test_utils.GenericTestBase):
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
         with (
-            islink_swap
-        ), exists_swap, subprocess_swap, symlink_swap, self.print_swap:
+            islink_swap,
+            exists_swap,
+            subprocess_swap,
+            symlink_swap,
+            self.print_swap,
+        ):
             pre_push_hook.install_hook()
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue(
@@ -647,9 +651,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_install_hook() -> None:
             check_function_calls['install_hook_is_called'] = True
 
-        with self.swap(
-            pre_push_hook, 'install_hook', mock_install_hook
-        ), self.swap_check_backend_python_libs:
+        with (
+            self.swap(pre_push_hook, 'install_hook', mock_install_hook),
+            self.swap_check_backend_python_libs,
+        ):
             pre_push_hook.main(args=['--install'])
 
     def test_main_without_install_arg_and_errors(self) -> None:

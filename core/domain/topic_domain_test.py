@@ -1603,7 +1603,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
 
 class TopicChangeTests(test_utils.GenericTestBase):
-
     def test_topic_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'
@@ -1877,7 +1876,6 @@ class TopicChangeTests(test_utils.GenericTestBase):
 
 
 class TopicRightsChangeTests(test_utils.GenericTestBase):
-
     def test_topic_rights_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'
@@ -1921,10 +1919,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
     def test_topic_rights_change_object_with_invalid_role(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
-            (
-                'Value for old_role in cmd change_role: '
-                'invalid is not allowed'
-            ),
+            ('Value for old_role in cmd change_role: invalid is not allowed'),
         ):
             topic_domain.TopicRightsChange(
                 {
@@ -1991,7 +1986,6 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
 
 
 class TopicSummaryTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         current_time = utils.get_current_utc_datetime()
@@ -2112,8 +2106,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_negative_canonical_story_count(self) -> None:
         self.topic_summary.canonical_story_count = -1
         self._assert_validation_error(
-            'Expected canonical_story_count to be non-negative, '
-            'received \'-1\''
+            'Expected canonical_story_count to be non-negative, received \'-1\''
         )
 
     def test_validation_fails_with_negative_additional_story_count(
@@ -2167,7 +2160,6 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
 
 class TopicRightsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup('a@example.com', 'A')

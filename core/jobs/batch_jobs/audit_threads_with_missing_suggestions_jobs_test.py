@@ -43,9 +43,7 @@ class AuditThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
         audit_threads_with_missing_suggestions_jobs.AuditThreadsWithMissingSuggestionsJob
-    ] = (
-        audit_threads_with_missing_suggestions_jobs.AuditThreadsWithMissingSuggestionsJob
-    )
+    ] = audit_threads_with_missing_suggestions_jobs.AuditThreadsWithMissingSuggestionsJob
 
     def test_empty_datastore(self) -> None:
         self.assert_job_output_is([])
@@ -143,9 +141,7 @@ class FixThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
         audit_threads_with_missing_suggestions_jobs.FixThreadsWithMissingSuggestionsJob
-    ] = (
-        audit_threads_with_missing_suggestions_jobs.FixThreadsWithMissingSuggestionsJob
-    )
+    ] = audit_threads_with_missing_suggestions_jobs.FixThreadsWithMissingSuggestionsJob
 
     def test_fix_unsets_has_suggestion_flag(self) -> None:
         invalid_thread = self.create_model(
