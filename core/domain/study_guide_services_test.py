@@ -159,6 +159,31 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(study_guide_none)
 
+    def test_get_multiple_study_guides_by_ids_and_version(self) -> None:
+        study_guides = (
+            study_guide_services.get_multiple_study_guides_by_ids_and_version(
+                [
+                    (self.study_guide_id, None),
+                    (self.study_guide_id, 1),
+                    (self.study_guide_id, 999),
+                    ('nonexistent_topic_id-1', None),
+                ]
+            )
+        )
+
+        self.assertEqual(len(study_guides), 4)
+        latest_study_guide = study_guides[0]
+        pinned_study_guide = study_guides[1]
+        assert latest_study_guide is not None
+        assert pinned_study_guide is not None
+        self.assertEqual(latest_study_guide.version, 1)
+        self.assertEqual(pinned_study_guide.version, 1)
+        self.assertEqual(
+            latest_study_guide.to_dict(), pinned_study_guide.to_dict()
+        )
+        self.assertIsNone(study_guides[2])
+        self.assertIsNone(study_guides[3])
+
     def test_get_study_guides_with_ids(self) -> None:
         subtopic_ids = [self.subtopic_id]
         study_guides = study_guide_services.get_study_guides_with_ids(

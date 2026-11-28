@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core.constants import constants
 from core.domain import (
@@ -35,18 +37,22 @@ from core.tests import test_utils
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
+        datastore_services,
         secrets_services,
+        subtopic_models,
         translation_models,
         voiceover_models,
     )
 
+datastore_services = models.Registry.import_datastore_services()
 secrets_services = models.Registry.import_secrets_services()
 
 (
+    subtopic_models,
     translation_models,
     voiceover_models,
 ) = models.Registry.import_models(
-    [models.Names.TRANSLATION, models.Names.VOICEOVER]
+    [models.Names.SUBTOPIC, models.Names.TRANSLATION, models.Names.VOICEOVER]
 )
 
 
@@ -930,6 +936,91 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 ),
                 [{'id': 'nonexistent_skill_id', 'version': 1, 'payload': None}],
             )
+
+    def test_latest_study_guide_version_is_always_downloadable(self) -> None:
+        study_guide = self.save_new_study_guide(1, 'user_id', 'topic_id')
+        # Simulate the main model moving ahead of its snapshots (e.g. after a
+        # partially-completed non-transactional write). Version 2 has no
+        # snapshot, so it cannot be fetched by its version number.
+        study_guide_model = subtopic_models.StudyGuideModel.get('topic_id-1')
+        study_guide_model.version = 2
+        study_guide_model.update_timestamps()
+        datastore_services.put_multi([study_guide_model])
+
+        with self.secrets_swap, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
+            # The latest version must not be reported as version 2, since
+            # requesting version 2 explicitly would fail.
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=subtopic_with_study_guide&'
+                    'activities_data=[{"id": "topic_id-1"}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200,
+                ),
+                [{'id': 'topic_id-1', 'version': None, 'payload': None}],
+            )
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=subtopic_with_study_guide&'
+                    'activities_data=[{"id": "topic_id-1", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200,
+                ),
+                [
+                    {
+                        'id': 'topic_id-1',
+                        'version': 1,
+                        'payload': study_guide.to_dict(),
+                    }
+                ],
+            )
+
+        self.assertEqual(
+            logs,
+            [
+                'Android requested subtopic_with_study_guide topic_id-1 at '
+                'version latest, but it could not be found.'
+            ],
+        )
+
+    def test_missing_pinned_version_logs_error(self) -> None:
+        self.save_new_skill('skill_id', 'user_id')
+        with self.secrets_swap, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=skill&'
+                    'activities_data=[{"id": "skill_id", "version": 5}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200,
+                ),
+                [{'id': 'skill_id', 'version': 5, 'payload': None}],
+            )
+
+        self.assertEqual(
+            logs,
+            [
+                'Android requested skill skill_id at version 5, but it could '
+                'not be found.'
+            ],
+        )
+
+    def test_available_versions_do_not_log_errors(self) -> None:
+        self.save_new_skill('skill_id', 'user_id')
+        with self.secrets_swap, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
+            self.get_json(
+                '/android_data?activity_type=skill&'
+                'activities_data=[{"id": "skill_id", "version": 1}]',
+                headers={'X-ApiKey': 'secret'},
+                expected_status_int=200,
+            )
+
+        self.assertEqual(logs, [])
 
     def test_get_nonexistent_translation_returns_empty_payload(self) -> None:
         """Test requesting nonexistent translation returns empty payload."""
