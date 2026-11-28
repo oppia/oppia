@@ -65,6 +65,12 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   // a fetch response actually replaces questionDicts, so a failed request can
   // be rolled back to the page whose questions are still shown.
   appliedPage: number = 0;
+  // The highest page index whose questions have been applied, or -1 when no
+  // page has been applied yet. An empty response only proves that every page
+  // before the requested one exists when the requested page directly follows
+  // a page confirmed this way. A page requested in between may have been
+  // skipped (for example by two quick Next clicks), so it is not counted.
+  highestAppliedPage: number = -1;
   // Whether totalPageCount reflects the real number of pages. It stays false
   // when the count request fails, in which case the end of the list is
   // detected from a page response that is shorter than a full page.
@@ -79,6 +85,13 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     MULTIPLE_CHOICE: 'Multiple Choice',
     NUMERIC_INPUT: 'Numeric Input',
     ITEM_SELECTION: 'Item Selection',
+  };
+  // Messages shown when the preview tab has nothing to show. Keeping them
+  // here means the wording is defined once and reused by the template and
+  // the tests.
+  PREVIEW_MESSAGES = {
+    NO_QUESTION_SELECTED: 'No question selected.',
+    NO_QUESTIONS_TO_DISPLAY: 'There are no questions to display',
   };
 
   directiveSubscriptions = new Subscription();
@@ -140,14 +153,22 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
         // When the total page count is unknown, a response with fewer
         // questions than requested marks the end of the list. An empty
         // response means the requested page does not exist, so keep showing
-        // the last applied page and clamp the page count to exclude it.
+        // the last applied page and exclude the requested page from the count.
         if (
           !this.totalPageCountIsKnown &&
           response.length < this.QUESTION_COUNT
         ) {
-          this.totalPageCountIsKnown = true;
           if (response.length === 0) {
-            this.totalPageCount = page;
+            // The requested index is only an exact page count when the page
+            // right before it is known to exist. Otherwise the page between
+            // the last applied page and this one was never applied, so its
+            // existence is unconfirmed and must not be counted. Leaving the
+            // count unknown keeps the end of the list detected by a later
+            // response instead of freezing a count that is too high.
+            if (this.highestAppliedPage >= page - 1) {
+              this.totalPageCount = page;
+              this.totalPageCountIsKnown = true;
+            }
             this.currentPage = this.appliedPage;
             // The request completed, so stop showing the loading state even
             // though the requested page has no questions. The empty response
@@ -157,6 +178,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
             return;
           }
           this.totalPageCount = page + 1;
+          this.totalPageCountIsKnown = true;
         }
         this.questionsFetched = true;
         this.questionDicts = response;
@@ -164,12 +186,19 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
         // request rolls back here instead of to a page whose fetch never
         // completed.
         this.appliedPage = page;
+        this.highestAppliedPage = Math.max(this.highestAppliedPage, page);
         // Re-apply the active text and interaction filters to the newly
         // fetched page before selecting a question to preview, so the filters
         // stay applied on every page.
         this.applyFilters();
         if (this.displayedQuestions.length) {
           this.selectQuestionToPreview(0);
+        } else {
+          // The accepted page has no questions matching the active filters.
+          // Invalidate any preview left over from the previously applied
+          // page, so the pane does not keep showing a question that is no
+          // longer in the list.
+          this.displayCardIsInitialized = false;
         }
       })
       .catch(() => {

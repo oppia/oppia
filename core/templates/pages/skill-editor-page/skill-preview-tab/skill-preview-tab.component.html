@@ -19,6 +19,10 @@
                 </option>
               </select>
             </div>
+            <div *ngIf="displayedQuestions.length === 0"
+                 class="no-questions-message e2e-test-no-questions-message">
+              {{ PREVIEW_MESSAGES.NO_QUESTIONS_TO_DISPLAY }}
+            </div>
             <div *ngFor="let question of displayedQuestions; index as idx" class="question-list-item e2e-test-preview-question">
               <div (click)="selectQuestionToPreview(idx)">
                 <div class="question-data">
@@ -77,7 +81,7 @@
       </div>
       <div class="skill-question-container">
         <div><span class="headings">Preview</span></div>
-        <div class="preview-box" *ngIf="displayCardIsInitialized">
+        <div class="preview-box" *ngIf="displayCardIsInitialized; else noQuestionSelected">
           <oppia-tutor-card [displayedCard]="displayedCard"
                             [avatarImageIsShown]="false">
           </oppia-tutor-card>
@@ -93,6 +97,11 @@
             </div>
           </div>
         </div>
+        <ng-template #noQuestionSelected>
+          <div class="preview-box preview-empty-message e2e-test-no-question-selected">
+            {{ PREVIEW_MESSAGES.NO_QUESTION_SELECTED }}
+          </div>
+        </ng-template>
       </div>
     </div>
   </div>

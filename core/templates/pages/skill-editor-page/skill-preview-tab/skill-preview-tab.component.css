@@ -122,6 +122,19 @@
   padding: 30px 0;
 }
 
+.no-questions-message {
+  color: #757575;
+  font-size: 14px;
+  font-style: italic;
+  padding: 12px 0;
+}
+
+.preview-empty-message {
+  color: #757575;
+  font-size: 16px;
+  padding-top: 40px;
+}
+
 .content-text-box {
   border-bottom: 2px solid #707070;
   margin-bottom: 15px;
