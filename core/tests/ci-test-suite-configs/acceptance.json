@@ -287,8 +287,8 @@
     },
     {
       "name": "logged-out-user/browse-and-search-for-lessons-in-community-library",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/browse-and-search-for-lessons-in-community-library.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/browse-and-search-for-lessons-in-community-library.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration",
