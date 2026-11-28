@@ -4442,8 +4442,11 @@ export class ExplorationEditor extends BaseUser {
 
       const newCardOptionValue = await this.page.$eval(
         destinationWhenStuckSelectorDropdown,
-        (select: HTMLSelectElement) => {
-          const option = Array.from(select.options).find(
+        (element: Element) => {
+          if (!(element instanceof HTMLSelectElement)) {
+            return null;
+          }
+          const option = Array.from(element.options).find(
             opt => opt.text.trim() === 'A New Card Called...'
           );
           return option ? option.value : null;
