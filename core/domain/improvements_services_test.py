@@ -592,6 +592,24 @@ class PutTasksTests(ImprovementsServicesTestBase):
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
 
+    def test_put_validates_tasks_and_puts_nothing_if_one_is_invalid(
+        self,
+    ) -> None:
+        valid_task = self._new_open_task(state_name='Start')
+        invalid_task = self._new_open_task(state_name='End')
+        invalid_task.task_type = 'unknown_task'
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid task_type: unknown_task'
+        ):
+            improvements_services.put_tasks([valid_task, invalid_task])
+
+        self.assertIsNone(
+            improvements_models.ExplorationStatsTaskEntryModel.get_by_id(
+                valid_task.task_id
+            )
+        )
+
 
 class ApplyChangesToModelTests(ImprovementsServicesTestBase):
     """Unit tests for the apply_changes_to_model function."""

@@ -19,11 +19,29 @@
 from __future__ import annotations
 
 import datetime
+import re
 
 from core import feconf, utils
 from core.constants import constants
 
-from typing import Optional, TypedDict
+from typing import Final, Optional, TypedDict
+
+# The values a TaskEntry may take for each of its enumerated fields. These
+# mirror the `choices` declared on ExplorationStatsTaskEntryModel, and are
+# built from constants here so that the domain layer does not import storage.
+ALLOWED_ENTITY_TYPES: Final = (constants.TASK_ENTITY_TYPE_EXPLORATION,)
+ALLOWED_TARGET_TYPES: Final = (constants.TASK_TARGET_TYPE_STATE,)
+ALLOWED_TASK_TYPES: Final = (
+    constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+    constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+    constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+    constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+)
+ALLOWED_STATUSES: Final = (
+    constants.TASK_STATUS_OPEN,
+    constants.TASK_STATUS_OBSOLETE,
+    constants.TASK_STATUS_RESOLVED,
+)
 
 
 class TaskEntryDict(TypedDict):
@@ -147,6 +165,84 @@ class TaskEntry:
             self.entity_id,
             self.entity_version,
         )
+
+    def validate(self) -> None:
+        """Validates the properties of the TaskEntry.
+
+        composite_entity_id and task_id are not checked here: both are derived
+        from the fields below, so they cannot drift from them within the
+        domain object. Their stored copies are checked by the Beam audit jobs.
+
+        Raises:
+            ValidationError. One or more attributes of the TaskEntry are
+                invalid.
+        """
+        if self.entity_type not in ALLOWED_ENTITY_TYPES:
+            raise utils.ValidationError(
+                'Invalid entity_type: %s, expected one of %s.'
+                % (self.entity_type, ALLOWED_ENTITY_TYPES)
+            )
+
+        if not re.match(constants.ENTITY_ID_REGEX, self.entity_id):
+            raise utils.ValidationError(
+                'Invalid entity_id: %s.' % self.entity_id
+            )
+
+        if self.entity_version < 1:
+            raise utils.ValidationError(
+                'Expected entity_version to be at least 1, received %s.'
+                % self.entity_version
+            )
+
+        if self.task_type not in ALLOWED_TASK_TYPES:
+            raise utils.ValidationError(
+                'Invalid task_type: %s, expected one of %s.'
+                % (self.task_type, ALLOWED_TASK_TYPES)
+            )
+
+        if self.target_type not in ALLOWED_TARGET_TYPES:
+            raise utils.ValidationError(
+                'Invalid target_type: %s, expected one of %s.'
+                % (self.target_type, ALLOWED_TARGET_TYPES)
+            )
+
+        if not self.target_id:
+            raise utils.ValidationError('Expected target_id to be non-empty.')
+
+        if self.issue_description is not None and not self.issue_description:
+            raise utils.ValidationError(
+                'Expected issue_description to be None or non-empty.'
+            )
+
+        if self.status not in ALLOWED_STATUSES:
+            raise utils.ValidationError(
+                'Invalid status: %s, expected one of %s.'
+                % (self.status, ALLOWED_STATUSES)
+            )
+
+        if self.status == constants.TASK_STATUS_RESOLVED:
+            if self.resolver_id is None:
+                raise utils.ValidationError(
+                    'Expected a resolved task to have a resolver_id.'
+                )
+            # Wipeout replaces resolver_id with a pseudonymous ID, so those
+            # must stay valid for the task to be saved again.
+            if not utils.is_user_id_valid(
+                self.resolver_id, allow_pseudonymous_id=True
+            ):
+                raise utils.ValidationError(
+                    'Invalid resolver_id: %s.' % self.resolver_id
+                )
+            if self.resolved_on is None:
+                raise utils.ValidationError(
+                    'Expected a resolved task to have a resolved_on time.'
+                )
+        else:
+            if self.resolver_id is not None or self.resolved_on is not None:
+                raise utils.ValidationError(
+                    'Expected a task with status %s to have no resolver_id '
+                    'or resolved_on.' % self.status
+                )
 
     def to_dict(self) -> TaskEntryDict:
         """Returns a dict-representation of the task.
