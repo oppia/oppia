@@ -2108,7 +2108,7 @@ def _save_skill_opportunities(
     """
     skill_opportunity_models = []
     for skill_opportunity in skill_opportunities:
-        skill_opportunity.validate()
+        skill_opportunity.validate(strict=True)
         model = opportunity_models.SkillOpportunityModel(
             id=skill_opportunity.id,
             skill_description=skill_opportunity.skill_description,
