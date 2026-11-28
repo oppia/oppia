@@ -271,6 +271,10 @@ class BaseHandler(
         # request payload errors with ValueError: Invalid boundary in multipart
         # form: b''. This is done to gather sufficient data to help debug the
         # error if it arises in the future.
+        # Malformed JSON is recorded here instead of raised. Handler
+        # construction runs before dispatch(), so an exception from __init__
+        # never reaches BaseHandler.handle_exception and webapp2 returns 500.
+        self.payload_is_malformed = False
         try:
             payload_json_string = self.request.get('payload')
         except ValueError as e:
@@ -279,7 +283,11 @@ class BaseHandler(
         # TODO(#13155): Remove the if-else part once all the handlers have had
         # schema validation implemented.
         if payload_json_string:
-            self.payload = json.loads(payload_json_string)
+            try:
+                self.payload = json.loads(payload_json_string)
+            except json.JSONDecodeError:
+                self.payload = None
+                self.payload_is_malformed = True
         else:
             self.payload = None
         self.iframed = False
@@ -383,6 +391,9 @@ class BaseHandler(
     def dispatch(self) -> None:
         """Overrides dispatch method in webapp2 superclass.
 
+        A payload that is not valid JSON is rejected with status 400 before
+        the handler method runs.
+
         Raises:
             Exception. The CSRF token is missing.
             UnauthorizedUserException. The CSRF token is invalid.
@@ -464,6 +475,13 @@ class BaseHandler(
 
         schema_validation_succeeded = True
         try:
+            # Raising in __init__ would skip handle_exception and surface as a
+            # 500. The payload is cleared there, so the CSRF check above does
+            # not run, and the request is rejected here as invalid input.
+            if self.payload_is_malformed:
+                raise self.InvalidInputException(
+                    'Invalid payload: the payload must be valid JSON.'
+                )
             self.validate_and_normalize_args()
 
         # TODO(#13155): Remove NotImplementedError once all the handlers

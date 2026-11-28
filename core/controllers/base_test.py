@@ -2510,6 +2510,51 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             )
 
 
+class MalformedPayloadTests(test_utils.GenericTestBase):
+    """Tests that a malformed JSON payload results in a 400, not a 500."""
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Mock handler that accepts POST requests."""
+
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+        # Here we use MyPy ignore because the signature of 'post' method does
+        # not match with the signature of super class's (BaseHandler) 'post'
+        # method, and this happens because all handler methods in the main
+        # codebase have decorators which modify the function signature
+        # accordingly, but these methods in base_test.py do not.
+        def post(self) -> None:  # type: ignore[override]
+            """Handles POST requests."""
+            self.render_json({})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+                debug=feconf.DEBUG,
+            )
+        )
+
+    def test_malformed_payload_returns_400(self) -> None:
+        # The token is intentionally invalid. Rejection must happen before the
+        # CSRF check, so this request is a 400 rather than a 401.
+        with self.swap(self, 'testapp', self.testapp):
+            response = self.post_json(
+                '/mock',
+                {'payload': '1}', 'csrf_token': 'token'},
+                use_payload=False,
+                expected_status_int=400,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Invalid payload: the payload must be valid JSON.',
+        )
+        self.assertEqual(response['status_code'], 400)
+
+
 class MockUploadHandlerNormalizedPayloadDict(TypedDict):
     """Type for the MockUploadHandler's normalized_payload
     dictionary.
