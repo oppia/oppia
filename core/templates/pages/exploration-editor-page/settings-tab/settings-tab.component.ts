@@ -21,6 +21,7 @@ import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
+import isEmpty from 'lodash/isEmpty';
 import {DeleteExplorationModalComponent} from './templates/delete-exploration-modal.component';
 import {RemoveRoleConfirmationModalComponent} from './templates/remove-role-confirmation-modal.component';
 import {ModeratorUnpublishExplorationModalComponent} from './templates/moderator-unpublish-exploration-modal.component';
@@ -756,10 +757,16 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   isTitlePresent(): boolean {
-    return (this.explorationTitleService.savedMemento as string).length > 0;
+    return !isEmpty(this.explorationTitleService.savedMemento);
   }
 
   onRolesFormUsernameBlur(): void {
+    if (!this.isTitlePresent()) {
+      this.rolesSaveButtonEnabled = false;
+      this.errorMessage = 'Please provide a title before inviting.';
+      return;
+    }
+
     this.rolesSaveButtonEnabled = true;
     this.errorMessage = '';
 

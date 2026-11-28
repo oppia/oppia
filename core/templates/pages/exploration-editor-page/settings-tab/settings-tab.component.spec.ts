@@ -1242,6 +1242,37 @@ describe('Settings Tab Component', () => {
     );
   });
 
+  it('should disable save button and show error message on username blur when exploration title is empty', () => {
+    component.openEditRolesForm();
+    component.newMemberUsername = 'validUser';
+    component.newMemberRole = {name: 'Manager', value: 'owner'};
+    component.rolesSaveButtonEnabled = true;
+    explorationTitleService.init('');
+
+    component.onRolesFormUsernameBlur();
+
+    expect(component.rolesSaveButtonEnabled).toBe(false);
+    expect(component.errorMessage).toBe(
+      'Please provide a title before inviting.'
+    );
+  });
+
+  it('should enable save button on username blur when valid title and username are present', () => {
+    component.openEditRolesForm();
+    component.newMemberUsername = 'validUser';
+    component.newMemberRole = {name: 'Manager', value: 'owner'};
+    component.rolesSaveButtonEnabled = false;
+    explorationTitleService.init('Valid Exploration Title');
+    spyOn(explorationRightsService, 'checkUserAlreadyHasRoles').and.returnValue(
+      false
+    );
+
+    component.onRolesFormUsernameBlur();
+
+    expect(component.rolesSaveButtonEnabled).toBe(true);
+    expect(component.errorMessage).toBe('');
+  });
+
   it('should disable save button when adding same role to existing users.', () => {
     component.openEditRolesForm();
     component.rolesSaveButtonEnabled = true;

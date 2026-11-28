@@ -50,6 +50,17 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.updateCardContent('Introduction to positive numbers');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await expEditor1.saveExplorationDraft();
+
+    await expEditor1.navigateToSettingsTab();
+    await expEditor1.openRolesForm();
+    await expEditor1.enterUsernameAndBlurInRolesForm('expEditor2');
+    await expEditor1.expectSaveRoleButtonToBeDisabled(true);
+    await expEditor1.expectRolesWarningMessageToBe(
+      'Please provide a title before inviting.'
+    );
+    await expEditor1.closeRolesForm();
+    await expEditor1.navigateToEditorTab();
+
     await expEditor1.publishExplorationWithMetadata(
       'Positive Numbers',
       'This exploration teaches students about positive numbers and their properties.',
@@ -82,9 +93,6 @@ describe('Lesson Creator Profile Deletion', function () {
   }, 600000);
 
   it('should trigger draft exploration deletion and preserve correct ownership after account deletion', async function () {
-    // TODO(#25058): Add explicit CUJ steps in this test body for expEditor1
-    // to create an exploration, navigate to Settings, and add expEditor2 as
-    // manager once issue #25058 is fixed.
     // 1. Account Deletion.
     await expEditor1.navigateToPreferencesPage();
     await expEditor1.deleteAccount();
