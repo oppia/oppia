@@ -97,7 +97,7 @@ export default {
     Volunteer: 'http://localhost:8181/volunteer',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     WikiPrivilegesToFirebaseAccount:
-      'https://github.com/oppia/oppia/wiki/#2-add-custom-claims-to-a-firebase-account',
+      'https://github.com/oppia/oppia/wiki/How-to-access-Oppia-webpages#method-b--grant-super-admin-via-firebase-emulator-explicit',
     Preferences: 'http://localhost:8181/preferences',
     ProfilePagePrefix: 'http://localhost:8181/profile',
     OppiaAnnounceGoogleGroup: 'https://groups.google.com/g/oppia-announce',

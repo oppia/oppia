@@ -81,7 +81,7 @@ SHARDS_SPEC_PATH: Final = os.path.join(
     os.getcwd(), 'scripts', 'backend_test_shards.json'
 )
 SHARDS_WIKI_LINK: Final = (
-    'https://github.com/oppia/oppia/wiki/Writing-backend-tests#common-errors'
+    'https://github.com/oppia/oppia/wiki/Backend-tests#common-errors'
 )
 _LOAD_TESTS_DIR: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'load_tests'
@@ -102,7 +102,7 @@ Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
 IMPORTANT: Only one of --test_path, --test_targets, --run_on_changed_files,
 and --test_shard should be specified.
-"""
+""",
 )
 
 _EXCLUSIVE_GROUP: Final = _PARSER.add_mutually_exclusive_group()
