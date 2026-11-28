@@ -157,8 +157,8 @@
     },
     {
       "name": "lesson-creator/check-improvements-tab",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/check-improvements-tab.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/lesson-creator/check-improvements-tab.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "lesson-creator/create-a-basic-exploration",
