@@ -77,8 +77,8 @@
     },
     {
       "name": "interested-parent/check-the-tos-and-privacy-pages",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/check-the-tos-and-privacy-pages.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-parent/check-the-tos-and-privacy-pages.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-parent/download-the-android-app",
