@@ -713,7 +713,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         errors_while_voiceover_regeneration = voiceover_regeneration_services.regenerate_voiceovers_of_exploration(
             'exp_id',
             2,
-            # Here use cast because this test intentionally passes a
+            # Here we use cast because this test intentionally passes a
             # non-string value to verify rule-input content is skipped.
             cast(
                 Dict[str, str],
