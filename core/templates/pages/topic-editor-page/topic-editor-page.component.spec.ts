@@ -162,6 +162,46 @@ describe('Topic editor page', () => {
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
   });
 
+  it('should render accessible editor navigation buttons', () => {
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'loadTopic').and.stub();
+    component.validationIssues = [];
+    component.prepublishValidationIssues = [];
+    component.warningsAreShown = false;
+    component.topic = topic;
+    spyOn(component, 'getActiveTabName').and.returnValue('main');
+    spyOn(component, 'isInTopicEditorTabs').and.returnValue(true);
+    const navigationSpy0 = spyOn(component, 'selectMainTab');
+    const navigationSpy1 = spyOn(component, 'selectQuestionsTab');
+    const navigationSpy2 = spyOn(component, 'openTopicViewer');
+
+    fixture.detectChanges();
+
+    const element: HTMLElement = fixture.nativeElement;
+    const navigation = element.querySelector('ul.navbar-icons');
+    expect(navigation).not.toBeNull();
+
+    const buttons = element.querySelectorAll<HTMLButtonElement>(
+      'ul.navbar-icons > li > button.navbar-tab'
+    );
+    expect(buttons.length).toBe(3);
+
+    expect(buttons[0].type).toBe('button');
+    expect(buttons[0].getAttribute('aria-label')).toBe('Main Editor');
+    buttons[0].click();
+    expect(navigationSpy0).toHaveBeenCalledTimes(1);
+
+    expect(buttons[1].type).toBe('button');
+    expect(buttons[1].getAttribute('aria-label')).toBe('Question editor');
+    buttons[1].click();
+    expect(navigationSpy1).toHaveBeenCalledTimes(1);
+
+    expect(buttons[2].type).toBe('button');
+    expect(buttons[2].getAttribute('aria-label')).toBe('Preview button');
+    buttons[2].click();
+    expect(navigationSpy2).toHaveBeenCalledTimes(1);
+  });
+
   it(
     'should load topic based on its id on url when component is initialized' +
       ' and set page title',

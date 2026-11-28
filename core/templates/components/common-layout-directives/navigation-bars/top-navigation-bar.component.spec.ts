@@ -508,6 +508,57 @@ describe('TopNavigationBarComponent', () => {
     expect(languageChangeElement).toBeTruthy();
   });
 
+  it('should include the visible language in the desktop accessible name', () => {
+    component.pageIsIframed = true;
+    fixture.detectChanges();
+
+    component.windowIsNarrow = false;
+    component.currentLanguageText = 'English';
+    fixture.detectChanges();
+
+    const languageButton = fixture.debugElement.query(
+      By.css('.oppia-language-dropdown-button')
+    ).nativeElement as HTMLButtonElement;
+
+    expect(languageButton.getAttribute('aria-label')).toBe(
+      'English: I18N_TOPNAV_LANGUAGE_SELECTOR_ARIA_LABEL'
+    );
+  });
+
+  it('should include the visible language code in the mobile accessible name', () => {
+    component.pageIsIframed = true;
+    fixture.detectChanges();
+
+    component.windowIsNarrow = true;
+    component.currentLanguageCode = 'en';
+    fixture.detectChanges();
+
+    const languageButton = fixture.debugElement.query(
+      By.css('.oppia-language-dropdown-button')
+    ).nativeElement as HTMLButtonElement;
+
+    expect(languageButton.getAttribute('aria-label')).toBe(
+      'en: I18N_TOPNAV_LANGUAGE_SELECTOR_ARIA_LABEL'
+    );
+  });
+
+  it('should provide an accessible name when the language text is unavailable', () => {
+    component.pageIsIframed = true;
+    fixture.detectChanges();
+
+    component.windowIsNarrow = false;
+    component.currentLanguageText = '';
+    fixture.detectChanges();
+
+    const languageButton = fixture.debugElement.query(
+      By.css('.oppia-language-dropdown-button')
+    ).nativeElement as HTMLButtonElement;
+
+    expect(languageButton.getAttribute('aria-label')).toBe(
+      'I18N_TOPNAV_LANGUAGE_SELECTOR_ARIA_LABEL'
+    );
+  });
+
   it('should emit language change event when URL contains lesson', () => {
     const langCode = 'hi';
     spyOn(urlService, 'getPathname').and.returnValue('/lesson/1');

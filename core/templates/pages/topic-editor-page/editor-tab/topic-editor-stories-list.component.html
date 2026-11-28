@@ -34,9 +34,13 @@
         </a>
       </td>
       <td>
-        <a (click)="deleteCanonicalStory(summary.getId())" tabindex="0" (keydown.enter)="deleteCanonicalStory(summary.getId())" aria-label="Delete story" class="list-summary text-center">
-          <span class="fas fa-trash-alt e2e-test-delete-story-button" *ngIf="topicRights.canEditTopic()"></span>
-        </a>
+        <button *ngIf="topicRights.canEditTopic()"
+                type="button"
+                (click)="deleteCanonicalStory(summary.getId())"
+                aria-label="Delete story"
+                class="list-summary text-center delete-story-button">
+          <span class="fas fa-trash-alt e2e-test-delete-story-button" aria-hidden="true"></span>
+        </button>
       </td>
     </tr>
   </tbody>
@@ -110,9 +114,13 @@
         </a>
       </td>
       <td class="delete-story-icon">
-        <a (click)="deleteCanonicalStory(summary.getId())" class="story-list-summary text-center">
-          <span class="fas fa-trash-alt" *ngIf="topicRights.canEditTopic()"></span>
-        </a>
+        <button *ngIf="topicRights.canEditTopic()"
+                type="button"
+                (click)="deleteCanonicalStory(summary.getId())"
+                aria-label="Delete story"
+                class="story-list-summary text-center delete-story-button">
+          <span class="fas fa-trash-alt" aria-hidden="true"></span>
+        </button>
       </td>
     </tr>
   </tbody>

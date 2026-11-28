@@ -55,6 +55,16 @@ describe('Rubrics Editor Component', () => {
     expect(componentInstance).toBeDefined();
   });
 
+  it('should provide an accessible name for the difficulty dropdown', () => {
+    fixture.detectChanges();
+
+    const element: HTMLElement = fixture.nativeElement;
+    const dropdown = element.querySelector('select.rubric-options');
+
+    expect(dropdown).not.toBeNull();
+    expect(dropdown?.getAttribute('aria-label')).toBe('Rubric difficulty');
+  });
+
   it('should be editable', () => {
     expect(componentInstance.isEditable()).toBeTrue();
   });

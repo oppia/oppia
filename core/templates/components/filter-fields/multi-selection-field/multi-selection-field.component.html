@@ -1,6 +1,6 @@
 <mat-form-field class="oppia-chip-list" appearance="fill">
   <mat-label>{{ label }}</mat-label>
-  <mat-chip-list #chipList aria-label="Multiple selection field" role="listbox">
+  <mat-chip-list #chipList aria-label="Multiple selection field">
     <mat-chip *ngFor="let selection of selections"
               class="e2e-test-multi-selection-chip"
               [selectable]="selectable"

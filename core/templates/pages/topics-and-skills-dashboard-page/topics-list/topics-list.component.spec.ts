@@ -194,6 +194,42 @@ describe('Topics List Component', () => {
     ]);
   });
 
+  [false, true].forEach(isEnabled => {
+    describe(
+      isEnabled ? 'with feature enabled' : 'with feature disabled',
+      () => {
+        it('should provide accessible table headers', () => {
+          mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+            isEnabled;
+          componentInstance.ngOnInit();
+          fixture.detectChanges();
+
+          const table = fixture.nativeElement.querySelector(
+            'table.dashboard-table'
+          ) as HTMLTableElement;
+
+          const headers = Array.from(table.querySelectorAll('th'));
+
+          expect(headers.length).toBe(isEnabled ? 9 : 6);
+
+          headers.forEach(header => {
+            expect(header.getAttribute('scope')).toBe('col');
+            expect(header.textContent?.trim()).toBeTruthy();
+          });
+
+          expect(headers[0].textContent?.trim()).toBe('Serial Number');
+
+          if (isEnabled) {
+            expect(headers[8].textContent?.trim()).toBe('Actions');
+          }
+
+          mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+            false;
+        });
+      }
+    );
+  });
+
   it('should create', () => {
     expect(componentInstance).toBeDefined();
   });

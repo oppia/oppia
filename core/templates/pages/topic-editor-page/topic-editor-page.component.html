@@ -3,24 +3,20 @@
     <div class="navbar-text">
       {{ getNavbarText() }}
     </div>
-    <div class="navbar-icons">
+    <ul class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': isMainEditorTabSelected(), 'dropdown': getTotalWarningsCount()}"
           [attr.dropdown]="getTotalWarningsCount()"
           class="nav-item icon nav-list-item"
           ngbDropdown
-          role="menu"
           (click)="selectMainTab()">
-        <a ngbTooltip="Main Editor"
-           placement="bottom"
-           class="nav-link navbar-tab"
-           tabindex="0"
-           aria-label="Main Editor"
-           role="menuitem"
-           (keydown.enter)="selectMainTab()">
+        <button type="button" ngbTooltip="Main Editor"
+                placement="bottom"
+                class="nav-link navbar-tab"
+                aria-label="Main Editor">
           <i class="fas fa-pen navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': isMainEditorTabSelected() }">
           </i>
-        </a>
+        </button>
         <div ngbDropdownAnchor
              [hidden]="!getTotalWarningsCount()"
              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
@@ -28,7 +24,7 @@
              (mouseleave)="hideWarnings()"
              (click)="selectMainTab()"
              (focus)="warningsAreShown=true"
-             role="menuitem"
+             role="group"
              tabindex="0"
              [attr.aria-label]="getTotalWarningsCount() + ' Warnings'">
           <span class="oppia-editor-warnings-count">
@@ -39,7 +35,7 @@
               tabindex="0"
               (blur)="hideWarnings()"
               class="dropdown-menu topic-warning-container oppia-editor-warnings-box">
-            <span class="oppia-editor-warnings-header">Warnings</span>
+            <li class="oppia-editor-warnings-header">Warnings</li>
             <li class="oppia-editor-warnings-text oppia-editor-wrapped-warning-text"
                 *ngFor="let issue of validationIssues">
               <hr class="oppia-editor-warnings-separator">
@@ -57,38 +53,30 @@
       <li *ngIf="isInTopicEditorTabs()"
           [ngClass]="{'navbar-tab-active': getActiveTabName() === 'questions'}"
           class="nav-item icon nav-list-item"
-          role="menu"
           (click)="selectQuestionsTab()">
-        <a class="nav-link  navbar-tab e2e-test-questions-tab-button e2e-test-topic-questions-tab"
-           ngbTooltip="Questions Editor"
-           placement="bottom"
-           aria-label="Question editor"
-           role="menuitem"
-           tabindex="0"
-           (keydown.enter)="selectQuestionsTab()">
+        <button type="button" class="nav-link  navbar-tab e2e-test-questions-tab-button e2e-test-topic-questions-tab"
+                ngbTooltip="Questions Editor"
+                placement="bottom"
+                aria-label="Question editor">
           <i class="fas fa-book-open navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'questions'}">
           </i>
-        </a>
+        </button>
       </li>
 
       <li [ngClass]="{'navbar-tab-active': isInPreviewTab()}"
           class="nav-item icon nav-list-item e2e-test-topic-preview-tab"
-          role="menu"
           (click)="openTopicViewer()">
-        <a class="nav-link navbar-tab e2e-test-preview-tab-button"
-           ngbTooltip="Preview"
-           placement="bottom"
-           tabindex="0"
-           aria-label="Preview button"
-           role="menuitem"
-           (keydown.enter)="openTopicViewer()">
+        <button type="button" class="nav-link navbar-tab e2e-test-preview-tab-button"
+                ngbTooltip="Preview"
+                placement="bottom"
+                aria-label="Preview button">
           <i class="fas fa-play navbar-tab-icon e2e-test-topic-preview-button"
              [ngClass]="{'navbar-tab-active-icon': isInPreviewTab()}">
           </i>
-        </a>
+        </button>
       </li>
-    </div>
+    </ul>
   </div>
 </div>
 <div class="topic-editor-main e2e-test-topic-editor-container" *ngIf="topic">

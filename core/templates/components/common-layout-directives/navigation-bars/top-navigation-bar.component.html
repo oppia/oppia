@@ -341,10 +341,11 @@
         (mouseleave)="closeSubmenuIfNotMobile($event)">
       <div class="oppia-navbar-button-container dropdown langbtnContainer">
         <button ngbDropdownToggle
+                [attr.aria-label]="((windowIsNarrow ? currentLanguageCode : currentLanguageText) || '') + ((windowIsNarrow ? currentLanguageCode : currentLanguageText) ? ': ' : '') + ('I18N_TOPNAV_LANGUAGE_SELECTOR_ARIA_LABEL' | translate)"
                 class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button e2e-test-language-dropdown langbtn"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
                 [ngClass]="{'oppia-language-dropdown-button-embedded': pageIsIframed}">
-          <i class="fas fa-globe language-icon langi"></i>
+          <i class="fas fa-globe language-icon langi" aria-hidden="true"></i>
           <span class="mobile-view-language-code lngcd" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
           <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>

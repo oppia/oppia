@@ -18,11 +18,13 @@
 
 import {ENTER} from '@angular/cdk/keycodes';
 import {
+  AfterViewChecked,
   Component,
   ElementRef,
   EventEmitter,
   Input,
   Output,
+  Renderer2,
   ViewChild,
 } from '@angular/core';
 import {FormControl} from '@angular/forms';
@@ -36,7 +38,7 @@ import {map, startWith} from 'rxjs/operators';
   templateUrl: './multi-selection-field.component.html',
   styleUrls: ['./multi-selection-field.component.css'],
 })
-export class MultiSelectionFieldComponent {
+export class MultiSelectionFieldComponent implements AfterViewChecked {
   @Input() selections: string[] = [];
   @Output() selectionsChange: EventEmitter<string[]> = new EventEmitter();
 
@@ -56,10 +58,12 @@ export class MultiSelectionFieldComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('chipList') chipList!: MatChipList;
+  @ViewChild('chipList', {read: ElementRef})
+  chipListElement!: ElementRef<HTMLElement>;
   @ViewChild('newSelectionInput')
   newSelectionInput!: ElementRef<HTMLInputElement>;
 
-  constructor() {
+  constructor(private renderer: Renderer2) {
     this.filteredSelections = this.formCtrl.valueChanges.pipe(
       startWith(null),
       map((interest: string | null) =>
@@ -77,6 +81,32 @@ export class MultiSelectionFieldComponent {
       }
     });
     this.readOnlySelections = cloneDeep(this.selections);
+  }
+
+  ngAfterViewChecked(): void {
+    // Angular Material adds listbox-specific attributes even when
+    // the chip list is empty. Keep its accessibility semantics valid.
+    const element = this.chipListElement.nativeElement;
+    const isEmpty = this.chipList.empty;
+
+    const attributes: {[name: string]: string | null} = {
+      role: isEmpty ? 'group' : 'listbox',
+      'aria-multiselectable': isEmpty ? null : String(this.chipList.multiple),
+      'aria-orientation': isEmpty ? null : this.chipList.ariaOrientation,
+      'aria-required': isEmpty ? null : String(this.chipList.required),
+    };
+
+    Object.entries(attributes).forEach(([name, value]) => {
+      if (element.getAttribute(name) === value) {
+        return;
+      }
+
+      if (value === null) {
+        this.renderer.removeAttribute(element, name);
+      } else {
+        this.renderer.setAttribute(element, name, value);
+      }
+    });
   }
 
   validateInput(value: string): boolean {

@@ -236,6 +236,19 @@ describe('Topic editor tab directive', () => {
     component.ngOnDestroy();
   });
 
+  it('should provide valid accessibility attributes for the practice tab checkbox', () => {
+    const element: HTMLElement = fixture.nativeElement;
+    const checkbox = element.querySelector('input.practice-tab-checkbox');
+
+    expect(checkbox).not.toBeNull();
+    expect(checkbox?.getAttribute('type')).toBe('checkbox');
+    expect(checkbox?.getAttribute('aria-label')).toBe(
+      'Show Practice Tab to learners'
+    );
+    expect(checkbox?.hasAttribute('aria-labelled')).toBeFalse();
+    expect(checkbox?.hasAttribute('role')).toBeFalse();
+  });
+
   it('should change list order properly', () => {
     spyOn(topicUpdateService, 'rearrangeSubtopic').and.stub();
     spyOn(component, 'initEditor').and.stub();
