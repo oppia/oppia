@@ -666,6 +666,23 @@ class DocstringParameterCheckerTests(CheckerTestBase):
                 node_with_no_error_message
             )
 
+        node_with_multiline_arg_description = astroid.extract_node(
+            """def func(arg): #@
+                \"\"\"Does nothing.
+
+                Args:
+                    arg: AVeryLongTypeNameThatCausesTheLineToExceedTheLengthLimit.
+                        Description of the argument that starts on a new line.
+                \"\"\"
+                a = True
+        """
+        )
+
+        with self.checker_test_object.assertAddsMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_multiline_arg_description
+            )
+
     def test_well_formated_returns_section(self) -> None:
         node_with_no_error_message = astroid.extract_node(
             """def func(): #@
