@@ -80,6 +80,23 @@ test.describe('Logged-in User', function () {
     await loggedInUser1.selectAndOpenTopic('Addition and Subtraction');
     await loggedInUser1.navigateToRevisionTabInTopic();
     await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
+    // Only the first section is expanded when the study guide is opened.
+    await loggedInUser1.expectExpandedStudyGuideSectionsToBe([
+      'Adding With Your Fingers',
+    ]);
+    await loggedInUser1.expectHighlightedStudyGuideSectionToBe(null);
+    await loggedInUser1.expectScreenshotToMatch('finalSubtopicViewerView');
+    await loggedInUser1.clickOnExpandWorkedexampleButton();
+    await loggedInUser1.expectScreenshotToMatch(
+      'finalSubtopicViewerViewSolutionExpanded'
+    );
+
+    // Expanding a section does not collapse the sections that are open.
+    await loggedInUser1.toggleStudyGuideSection('Using an Addition Table');
+    await loggedInUser1.expectExpandedStudyGuideSectionsToBe([
+      'Adding With Your Fingers',
+      'Using an Addition Table',
+    ]);
     await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSections(
       'Adding Numbers',
       [
@@ -87,16 +104,33 @@ test.describe('Logged-in User', function () {
         ['Using an Addition Table', 'To add two single-digit...'],
       ]
     );
-    await loggedInUser1.expectScreenshotToMatch('finalSubtopicViewerView');
-    await loggedInUser1.clickOnExpandWorkedexampleButton();
-    await loggedInUser1.expectScreenshotToMatch(
-      'finalSubtopicViewerViewSolutionExpanded'
+
+    // Collapsing a section does not collapse the other sections.
+    await loggedInUser1.toggleStudyGuideSection('Adding With Your Fingers');
+    await loggedInUser1.expectExpandedStudyGuideSectionsToBe([
+      'Using an Addition Table',
+    ]);
+
+    // A link to a specific section opens the study guide with only that
+    // section expanded and highlighted.
+    await loggedInUser1.openCurrentStudyGuideAtSection(2);
+    await loggedInUser1.expectExpandedStudyGuideSectionsToBe([
+      'Using an Addition Table',
+    ]);
+    await loggedInUser1.expectHighlightedStudyGuideSectionToBe(
+      'Using an Addition Table'
     );
+
+    // The next study guide opens in its default state.
     await loggedInUser1.clickOnNextStudyGuideButton();
     await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSections(
       'Subtracting Numbers',
       [['Common Mistakes', 'Some common mistakes students make are...']]
     );
+    await loggedInUser1.expectExpandedStudyGuideSectionsToBe([
+      'Common Mistakes',
+    ]);
+    await loggedInUser1.expectHighlightedStudyGuideSectionToBe(null);
     await loggedInUser1.clickOnStudyGuideMenuButton();
     await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
     await loggedInUser1.clickOnPracticeButton();
