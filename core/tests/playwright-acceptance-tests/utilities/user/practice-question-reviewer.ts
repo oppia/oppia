@@ -19,10 +19,15 @@
 import {Page} from '@playwright/test';
 import {showMessage} from '../common/show-message';
 import {Contributor} from './contributor';
+import {INTERACTION_TYPES} from './exploration-editor';
 
 const opportunityButtonSelector = '.e2e-test-opportunity-list-item-button';
 const reviewButtonPrefix = 'e2e-test-question-suggestion-review';
+const reviewModalHeaderSelector = `.${reviewButtonPrefix}-modal-header`;
 const editButtonSelector = `.${reviewButtonPrefix}-edit-button`;
+const removeInteractionButtonSelector = '.e2e-test-delete-interaction';
+const confirmDeleteInteractionButtonSelector =
+  '.e2e-test-confirm-delete-interaction';
 const questionSuggestionEditorModalSelector =
   '.e2e-test-question-suggestion-editor-modal';
 const editQuestionPencilIconSelector =
@@ -126,6 +131,61 @@ export class PracticeQuestionReviewer extends Contributor {
     await this.expectToastMessage('Updated question.');
     await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
     showMessage(`Question updated to "${question}".`);
+  }
+
+  /**
+   * Checks if the question review modal is present.
+   * @param {boolean} visible - Whether the modal should be visible.
+   */
+  async expectQuestionReviewModalToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(reviewModalHeaderSelector, visible);
+  }
+
+  /**
+   * Replaces the question interaction with a number input in the review.
+   */
+  async editQuestionInteractionInReview(): Promise<void> {
+    await this.clickOnElementWithSelector(editButtonSelector);
+    const questionEditorModal = await this.expectElementToBeVisible(
+      questionSuggestionEditorModalSelector
+    );
+    if (!questionEditorModal) {
+      throw new Error('Question editor modal not found.');
+    }
+
+    // Remove the existing interaction.
+    const removeInteractionButton = await questionEditorModal.waitForSelector(
+      removeInteractionButtonSelector
+    );
+    await this.clickOnElement(removeInteractionButton);
+    await this.clickOnElementWithSelector(
+      confirmDeleteInteractionButtonSelector
+    );
+    await this.expectElementToBeVisible(
+      confirmDeleteInteractionButtonSelector,
+      false
+    );
+
+    await this.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
+    await this.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      '100',
+      'Perfect!',
+      undefined,
+      true
+    );
+    await this.addHintToState('Test Hint');
+    await this.addSolutionToState(
+      '100',
+      'As said in the question itself.',
+      true
+    );
+
+    await this.clickOnElementWithSelector(saveQuestionButtonSelector);
+    await this.expectToastMessage('Updated question.');
+    await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
   }
 }
 
