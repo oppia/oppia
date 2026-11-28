@@ -714,7 +714,7 @@ export class StoryUpdateService {
   setStoryNodeExplorationId(
     story: Story,
     nodeId: string,
-    newExplorationId: string
+    newExplorationId: string | null
   ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldExplorationId = storyNode.getExplorationId();
