@@ -21,6 +21,7 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
+    email_manager,
     skill_services,
     story_domain,
     story_fetchers,
@@ -28,6 +29,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
+    user_services,
 )
 
 from typing import Dict, List, TypedDict
@@ -263,6 +265,20 @@ class StoryPublishHandler(
                 self.user_id,
                 story_publication_action,
             )
+            if (
+                story_publication_action
+                == topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
+            ):
+                topic = topic_fetchers.get_topic_by_id(topic_id)
+                email_manager.send_mail_to_notify_curriculum_admins_about_temporarily_unpublished_story(
+                    user_services.get_user_ids_by_role(
+                        feconf.ROLE_ID_CURRICULUM_ADMIN
+                    ),
+                    story_id,
+                    story.title,
+                    topic.name,
+                    user_services.get_username(self.user_id),
+                )
 
         self.render_json(self.values)
 

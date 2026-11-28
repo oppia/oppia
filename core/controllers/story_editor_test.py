@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import (
+    email_manager,
     skill_services,
     story_domain,
     story_services,
@@ -128,15 +129,21 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
             if reference.story_id == self.story_id:
                 self.assertEqual(reference.story_is_published, True)
 
-        self.put_json(
-            '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {
-                'story_publication_action': (
-                    topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
-                )
-            },
-            csrf_token=csrf_token,
-        )
+        with self.swap_with_checks(
+            email_manager,
+            'send_mail_to_notify_curriculum_admins_about_temporarily_unpublished_story',
+            lambda *args: None,
+            called=False,
+        ):
+            self.put_json(
+                '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
+                {
+                    'story_publication_action': (
+                        topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+                    )
+                },
+                csrf_token=csrf_token,
+            )
 
         topic = topic_fetchers.get_topic_by_id(self.topic_id)
         for reference in topic.canonical_story_references:
@@ -167,15 +174,29 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
             csrf_token=csrf_token,
         )
 
-        self.put_json(
-            '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {
-                'story_publication_action': (
-                    topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
-                ),
-            },
-            csrf_token=csrf_token,
-        )
+        with self.swap_with_checks(
+            email_manager,
+            'send_mail_to_notify_curriculum_admins_about_temporarily_unpublished_story',
+            lambda *args: None,
+            expected_args=[
+                (
+                    [self.admin_id],
+                    self.story_id,
+                    'Title',
+                    'Name',
+                    self.CURRICULUM_ADMIN_USERNAME,
+                )
+            ],
+        ):
+            self.put_json(
+                '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
+                {
+                    'story_publication_action': (
+                        topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
+                    ),
+                },
+                csrf_token=csrf_token,
+            )
 
         topic = topic_fetchers.get_topic_by_id(self.topic_id)
         for reference in topic.canonical_story_references:

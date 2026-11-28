@@ -686,6 +686,9 @@ EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
     'notify_curriculum_admins_chapters'
 )
 EMAIL_INTENT_VOICEOVER_REGENERATION = 'voiceover_regeneration'
+EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_STORY_TEMPORARILY_UNPUBLISHED = (
+    'notify_curriculum_admins_story_temporarily_unpublished'
+)
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
