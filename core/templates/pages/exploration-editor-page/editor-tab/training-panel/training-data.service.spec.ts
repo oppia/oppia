@@ -250,7 +250,6 @@ describe('Training Data Service', () => {
               new SubtitledHtml('<p> HTML string </p>', 'Id'),
               false,
               [],
-              null,
               null
             ),
             [],
@@ -272,7 +271,6 @@ describe('Training Data Service', () => {
         new SubtitledHtml('<p> HTML string </p>', 'Id'),
         false,
         [],
-        null,
         null
       ),
     ]);

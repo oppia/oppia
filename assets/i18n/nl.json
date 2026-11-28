@@ -1073,7 +1073,6 @@
   "I18N_MULTIPLE_LESSONS": "Lessen",
   "I18N_NEW_HINT_TITLE": "Tip <[hintIndex]>",
   "I18N_NEXT_LESSON": "Volgende les",
-  "I18N_NO": "Nee",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "Er zijn geen resultaten gevonden voor deze gebruikersnaam.",
   "I18N_ONE_SUBSCRIBER_TEXT": "Je hebt één abonnee.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Partnerschappen",
@@ -1199,7 +1198,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "Bedankt!",
   "I18N_PLAYER_REPORT_TOOLTIP": "Verkenning melden",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "Terug naar bibliotheek",
-  "I18N_PLAYER_RETURN_TO_PARENT": "Terug naar hoofdles",
   "I18N_PLAYER_RETURN_TO_STORY": "Terug naar het verhaal",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "Verzameling delen",
   "I18N_PLAYER_STAY_ANONYMOUS": "Anoniem blijven",
@@ -1275,8 +1273,6 @@
   "I18N_QUESTION_PLAYER_SCORE_CALCULATION": "Deze score is gebaseerd op het aantal hints dat u hebt gebruikt en het aantal foute antwoorden dat u tijdens deze sessie hebt ingevoerd.",
   "I18N_QUESTION_PLAYER_TEST_PASSED": "Sessie afgerond. Goed gedaan!",
   "I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE": "Het lijkt erop dat u hier een beetje vastzit. Laten we de concepten nog eens doornemen via een korte herhaling.",
-  "I18N_REFRESHER_EXPLORATION_MODAL_BODY": "Het lijkt erop dat u moeite hebt met deze vraag. Wilt u een korte verkenning proberen om uw geheugen op te frissen en hier terugkomen nadat uw die hebt voltooid?",
-  "I18N_REFRESHER_EXPLORATION_MODAL_TITLE": "Wilt u een opfriscursus?",
   "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Registratiesessie verlopen",
   "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Sorry, je registratiesessie is verlopen. Klik op \"Doorgaan met registreren\" om het proces opnieuw te starten.",
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Oppia Releasecoördinatorpaneel",
@@ -1779,6 +1775,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "Betekenisvolle projecten",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Uw werk draagt er direct aan bij dat kansarme studenten wereldwijd toegang krijgen tot gratis, kwalitatief hoogwaardig onderwijs.",
   "I18N_WARNING_MODAL_DESCRIPTION": "Hiermee krijg je de volledige oplossing te zien. Weet je het zeker?",
-  "I18N_WARNING_MODAL_TITLE": "Waarschuwing!",
-  "I18N_YES": "Ja"
+  "I18N_WARNING_MODAL_TITLE": "Waarschuwing!"
 }

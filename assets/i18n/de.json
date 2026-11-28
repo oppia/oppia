@@ -366,7 +366,6 @@
   "I18N_MULTIPLE_LESSONS": "Lektionen",
   "I18N_NEW_HINT_TITLE": "Hinweis <[hintIndex]>",
   "I18N_NEXT_LESSON": "Nächste Lektion",
-  "I18N_NO": "Nein",
   "I18N_ONE_SUBSCRIBER_TEXT": "Du hast einen Abonnenten.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Partnerschaften",
   "I18N_PARTNERSHIPS_PAGE_BROCHURE_BUTTON": "Broschüre herunterladen",
@@ -441,7 +440,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "Vielen Dank!",
   "I18N_PLAYER_REPORT_TOOLTIP": "Erforschung melden",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "Zurück zur Bibliothek",
-  "I18N_PLAYER_RETURN_TO_PARENT": "Zurück zur Hauptlektion",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "Diese Sammlung teilen",
   "I18N_PLAYER_STAY_ANONYMOUS": "Anonym bleiben",
   "I18N_PLAYER_SUBMIT_BUTTON": "Absenden",
@@ -609,6 +607,5 @@
   "I18N_VIEW_HINT_WITH_INDEX_BUTTON_TEXT": "Hinweis anzeigen <[index]>",
   "I18N_VIEW_SOLUTION_BUTTON_TEXT": "Lösung anzeigen",
   "I18N_VOLUNTEER_PAGE_BREADCRUMB": "Freiwilliger",
-  "I18N_WARNING_MODAL_TITLE": "Warnung!",
-  "I18N_YES": "Ja"
+  "I18N_WARNING_MODAL_TITLE": "Warnung!"
 }

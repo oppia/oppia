@@ -285,7 +285,6 @@ describe('Exploration editor tab component', () => {
           },
           param_changes: [],
           labelled_as_correct: false,
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
         },
         hints: [],
@@ -338,7 +337,6 @@ describe('Exploration editor tab component', () => {
                   },
                   labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null,
                 },
               },
             ],
@@ -352,7 +350,6 @@ describe('Exploration editor tab component', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
             },
             solution: {
               correct_answer: 'This is the correct answer',
@@ -407,7 +404,6 @@ describe('Exploration editor tab component', () => {
                   },
                   labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null,
                 },
               },
             ],
@@ -421,7 +417,6 @@ describe('Exploration editor tab component', () => {
               missing_prerequisite_skill_id: null,
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
             },
             hints: [],
           },
@@ -846,7 +841,6 @@ describe('Exploration editor tab component', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null,
           },
         },
         'TextInput'
@@ -867,7 +861,6 @@ describe('Exploration editor tab component', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null,
           },
           training_data: [],
           tagged_skill_misconception_id: '',
@@ -897,7 +890,6 @@ describe('Exploration editor tab component', () => {
         labelled_as_correct: false,
         param_changes: [],
         missing_prerequisite_skill_id: null,
-        refresher_exploration_id: null,
       })
     );
 
@@ -911,7 +903,6 @@ describe('Exploration editor tab component', () => {
       missing_prerequisite_skill_id: null,
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null,
     });
     component.saveInteractionDefaultOutcome(displayedValue);
 

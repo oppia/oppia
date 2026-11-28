@@ -1070,7 +1070,6 @@
   "I18N_MULTIPLE_LESSONS": "Lekcie",
   "I18N_NEW_HINT_TITLE": "Pomôcka <[hintIndex]>",
   "I18N_NEXT_LESSON": "Ďalšia lekcia",
-  "I18N_NO": "Nie",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "Nenašli sa žiadne výsledky pre zodpovedajúce používateľské meno.",
   "I18N_ONE_SUBSCRIBER_TEXT": "Máte 1 odberateľa.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Obchodné partnerstvo",
@@ -1196,7 +1195,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "Ďakujeme!",
   "I18N_PLAYER_REPORT_TOOLTIP": "Nahlásiť prieskumnú výpravu",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "Späť do knižnice",
-  "I18N_PLAYER_RETURN_TO_PARENT": "Späť do hlavnej lekcie",
   "I18N_PLAYER_RETURN_TO_STORY": "Späť na príbeh",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "Zdieľať túto kolekciu",
   "I18N_PLAYER_STAY_ANONYMOUS": "Zostať v anonymite",
@@ -1272,8 +1270,6 @@
   "I18N_QUESTION_PLAYER_SCORE_CALCULATION": "Toto skóre vychádza z počtu pomôcok, ktoré ste použili, a nesprávnych odpovedí, ktoré ste zadali počas tejto relácie.",
   "I18N_QUESTION_PLAYER_TEST_PASSED": "Skúška dokončená. Veľmi dobre!",
   "I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE": "Zdá sa, že tu trochu váhate. Poďme si zopakovať pojmy prostredníctvom krátkeho opakovacieho postupu.",
-  "I18N_REFRESHER_EXPLORATION_MODAL_BODY": "Zdá sa, že máte s touto otázkou problém. Chceli by ste vyskúšať krátku lekciu na osvieženie pamäti a potom sa sem vrátiť?",
-  "I18N_REFRESHER_EXPLORATION_MODAL_TITLE": "Chceli by ste si to zopakovať?",
   "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Čas na registráciu uplynul",
   "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Prepáčte, Váš čas na registráciu uplynul. Prosím kliknite na \"Pokračovať v registrácii\" pre zopakovanie procesu.",
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Panel koordinátora vydaní Oppia",
@@ -1776,6 +1772,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "Zmysluplné projekty",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Vaša práca priamo pomáha žiakom s nedostatočnými zdrojmi na celom svete získať prístup k bezplatnému a kvalitnému vzdelaniu.",
   "I18N_WARNING_MODAL_DESCRIPTION": "Toto ukáže celé riešenie. Ste si istý/á?",
-  "I18N_WARNING_MODAL_TITLE": "Pozor!",
-  "I18N_YES": "Áno"
+  "I18N_WARNING_MODAL_TITLE": "Pozor!"
 }

@@ -31,7 +31,7 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-from typing import Dict, Final, List, cast
+from typing import Any, Dict, Final, List, cast
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -486,7 +486,6 @@ class DraftUpgradeBranchUnitTests(test_utils.TestBase):
                         False,
                         [],
                         None,
-                        None,
                     ),
                     [state_domain.RuleSpec(rule_type, {'x': 'x'})],
                     [],
@@ -560,7 +559,6 @@ class DraftUpgradeBranchUnitTests(test_utils.TestBase):
                 state_domain.SubtitledHtml('feedback', '<p>Feedback</p>'),
                 False,
                 [],
-                None,
                 None,
             ),
             [
@@ -670,6 +668,97 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name),
         )
+
+    def test_convert_states_v57_dict_to_v58_dict(self) -> None:
+        outcome_dict_with_refresher: Dict[str, Any] = {
+            'dest': 'state_name',
+            'dest_if_really_stuck': None,
+            'feedback': {
+                'content_id': 'feedback_1',
+                'html': '<p>Try again</p>',
+            },
+            'labelled_as_correct': True,
+            'param_changes': [],
+            'refresher_exploration_id': 'refresher_exp_id',
+            'missing_prerequisite_skill_id': None,
+        }
+        ans_group = {
+            'rule_specs': [],
+            'outcome': outcome_dict_with_refresher,
+            'training_data': [],
+            'tagged_skill_misconception_id': None,
+        }
+        draft_change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+                    'new_value': [ans_group],
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                    ),
+                    'new_value': outcome_dict_with_refresher,
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'New state',
+                    'content_id_for_state_content': 'content',
+                    'content_id_for_default_outcome': 'default_outcome',
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': '<p>New Content</p>',
+                    },
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                    ),
+                    'new_value': None,
+                }
+            ),
+        ]
+        migrated_draft = draft_upgrade_services.DraftUpgradeUtil._convert_states_v57_dict_to_v58_dict(
+            draft_change_list
+        )
+        answer_groups = cast(List[Dict[str, Any]], migrated_draft[0].new_value)
+        self.assertNotIn(
+            'refresher_exploration_id',
+            answer_groups[0]['outcome'],
+        )
+        default_outcome = cast(Dict[str, Any], migrated_draft[1].new_value)
+        self.assertNotIn(
+            'refresher_exploration_id',
+            default_outcome,
+        )
+        self.assertEqual(
+            migrated_draft[2].cmd,
+            exp_domain.CMD_ADD_STATE,
+        )
+        self.assertEqual(
+            migrated_draft[3].property_name,
+            exp_domain.STATE_PROPERTY_CONTENT,
+        )
+        self.assertIsNone(migrated_draft[4].new_value)
 
     def test_convert_states_v56_dict_to_v57_dict_without_state_changes(
         self,
@@ -866,7 +955,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 True,
                 [],
                 'Not None',
-                None,
             ),
             [
                 state_domain.RuleSpec(
@@ -890,7 +978,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('feedback_1', '<p>Feedback</p>'),
                 False,
                 [],
-                None,
                 None,
             ),
             [],
@@ -1195,7 +1282,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 },
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                             },
                             'training_data': [],
@@ -1241,7 +1327,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 },
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                             },
                             'training_data': [],
@@ -1288,7 +1373,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                             'html': '<p>Content</p>',
                         },
                         'dest': 'Introduction',
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False,
                     },
@@ -1310,7 +1394,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         },
                         'dest': 'Introduction',
                         'dest_if_really_stuck': None,
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False,
                     },
@@ -2065,7 +2148,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 },
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                             },
                             'training_data': [],
@@ -2102,7 +2184,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 },
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                             },
                             'training_data': [],
@@ -2250,7 +2331,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 },
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                             },
                             'training_data': [],
@@ -2410,7 +2490,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 },
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                             },
                             'training_data': [],
@@ -2530,7 +2609,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                             'html': html_content,
                         },
                         'dest': 'Introduction',
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False,
                     },
@@ -2651,7 +2729,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 },
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                             },
                             'training_data': [],
@@ -2787,7 +2864,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                             'html': expected_html_content,
                         },
                         'dest': 'Introduction',
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False,
                     },
@@ -3061,7 +3137,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 },
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                             },
                             'training_data': [],
@@ -3108,7 +3183,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 },
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                             },
                             'training_data': [],

@@ -2898,7 +2898,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                             },
                             'labelled_as_correct': True,
                             'param_changes': [],
-                            'refresher_exploration_id': None,
                             'missing_prerequisite_skill_id': None,
                         },
                         'training_data': [],
@@ -2941,7 +2940,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'hints': [

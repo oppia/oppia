@@ -1015,7 +1015,6 @@
   "I18N_MULTIPLE_LESSONS": "수업",
   "I18N_NEW_HINT_TITLE": "힌트 <[hintIndex]>",
   "I18N_NEXT_LESSON": "다음 수업",
-  "I18N_NO": "아니오",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "일치하는 사용자 이름이 없습니다.",
   "I18N_ONE_SUBSCRIBER_TEXT": "당신에게 1명의 구독자가 있습니다.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "파트너십",
@@ -1141,7 +1140,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "감사합니다!",
   "I18N_PLAYER_REPORT_TOOLTIP": "탐구 활동 보고하기",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "라이브러리로 돌아가기",
-  "I18N_PLAYER_RETURN_TO_PARENT": "메인 수업으로 돌아가기",
   "I18N_PLAYER_RETURN_TO_STORY": "이야기로 돌아가기",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "이 모읍집을 공유하기",
   "I18N_PLAYER_STAY_ANONYMOUS": "익명 상태 유지",
@@ -1214,8 +1212,6 @@
   "I18N_QUESTION_PLAYER_SCORE_CALCULATION": "점수는 이번 세션 동안 사용한 힌트 수와 틀린 답의 수를 기준으로 계산됩니다.",
   "I18N_QUESTION_PLAYER_TEST_PASSED": "세션을 마쳤습니다. 고생하셨습니다!",
   "I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE": "여기서 조금 막히신 것 같네요. 간단한 복습 과정을 통해 개념을 다시 한번 살펴보겠습니다.",
-  "I18N_REFRESHER_EXPLORATION_MODAL_BODY": "이 질문에 어려움을 겪고 계신 것 같습니다. 간단한 탐구 활동을 통해 기억을 되살려 보시고, 완료하신 후 다시 여기로 돌아오시겠습니까?",
-  "I18N_REFRESHER_EXPLORATION_MODAL_TITLE": "복습 하시겠습니까?",
   "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "등록 세션 만료",
   "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "죄송합니다. 회원가입 세션이 만료되었습니다. \"회원가입 계속\"을 클릭하여 다시 시작해 주세요.",
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Oppia 배포 코디네이터 패널",
@@ -1701,6 +1697,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "의미 있는 프로젝트",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "여러분의 작업은 전 세계 소외된 학생들이 무료 고품질 교육에 접근하도록 직접 돕습니다.",
   "I18N_WARNING_MODAL_DESCRIPTION": "전체 해답을 표시합니다. 확실한가요?",
-  "I18N_WARNING_MODAL_TITLE": "경고!",
-  "I18N_YES": "예"
+  "I18N_WARNING_MODAL_TITLE": "경고!"
 }

@@ -1280,7 +1280,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -1339,7 +1338,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     {'list_of_values': ['3', '4'], 'parse_with_jinja': True},
                 )
             ],
-            None,
             None,
         )
         error_string = (
@@ -1925,7 +1923,6 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
                   labelled_as_correct: false
                   missing_prerequisite_skill_id: null
                   param_changes: []
-                  refresher_exploration_id: null
                 rule_specs:
                 - inputs:
                     x: InputString
@@ -1945,7 +1942,6 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
                 labelled_as_correct: false
                 missing_prerequisite_skill_id: null
                 param_changes: []
-                refresher_exploration_id: null
               hints:
                 - hint_content:
                     html: hint one,
@@ -1984,7 +1980,6 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
                 labelled_as_correct: false
                 missing_prerequisite_skill_id: null
                 param_changes: []
-                refresher_exploration_id: null
               hints: []
               id: null
               solution: null
@@ -2471,7 +2466,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             False,
             [],
             None,
-            None,
         )
         state1.update_interaction_default_outcome(default_outcome1)
 
@@ -2522,7 +2516,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec('Equals', {'x': 0}),
@@ -2544,7 +2537,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [state_domain.RuleSpec('Equals', {'x': 0})],
                 [],
@@ -2564,7 +2556,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     ),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [
@@ -2681,7 +2672,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -2716,7 +2706,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -2779,7 +2768,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -2814,7 +2802,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -3312,7 +3299,6 @@ interaction:
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
     param_changes: []
-    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -3354,7 +3340,6 @@ interaction:
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
     param_changes: []
-    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -3395,7 +3380,6 @@ interaction:
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
     param_changes: []
-    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -3680,7 +3664,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -3697,7 +3680,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             },
             'labelled_as_correct': False,
             'param_changes': [],
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
         }
 
@@ -4684,7 +4666,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             },
                             'labelled_as_correct': False,
                             'param_changes': [],
-                            'refresher_exploration_id': None,
                             'missing_prerequisite_skill_id': None,
                         },
                         'training_data': [],
@@ -4704,7 +4685,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
             )
@@ -7535,7 +7515,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -9248,7 +9227,6 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                                 'feedback': {
                                     'html': '<p>correct</p>',
@@ -9421,7 +9399,6 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                                 'feedback': {
                                     'html': '<p>correct</p>',
@@ -11001,7 +10978,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11029,7 +11005,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints:
       - hint_content:
           content_id: hint_1
@@ -11106,7 +11081,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -11394,7 +11368,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11422,7 +11395,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints:
       - hint_content:
           content_id: hint_1
@@ -11499,7 +11471,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -11533,7 +11504,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -12693,7 +12663,7 @@ class ExplorationInOldSchemaFormatTests(test_utils.GenericTestBase):
             'category': 'Algebra',
             'author_notes': '',
             'blurb': '',
-            'states_schema_version': 57,
+            'states_schema_version': 58,
             'init_state_name': 'Introduction',
             'language_code': 'en',
             'objective': '',
@@ -12720,7 +12690,6 @@ class ExplorationInOldSchemaFormatTests(test_utils.GenericTestBase):
                             },
                             'labelled_as_correct': False,
                             'param_changes': [],
-                            'refresher_exploration_id': None,
                             'missing_prerequisite_skill_id': None,
                         },
                         'confirmed_unclassified_answers': [],

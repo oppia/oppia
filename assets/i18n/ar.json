@@ -985,7 +985,6 @@
   "I18N_MULTIPLE_LESSONS": "الدروس",
   "I18N_NEW_HINT_TITLE": "تلميح <[hintIndex]>",
   "I18N_NEXT_LESSON": "الدرس التالي",
-  "I18N_NO": "لا",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "لم يتم العثور على نتائج مطابقة لاسم المستخدم.",
   "I18N_ONE_SUBSCRIBER_TEXT": "لديك مشترك واحد.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "شراكات",
@@ -1111,7 +1110,6 @@
   "I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "شكرا!",
   "I18N_PLAYER_REPORT_TOOLTIP": "الإبلاغ عن الاستكشاف",
   "I18N_PLAYER_RETURN_TO_LIBRARY": "العودة إلى المكتبة",
-  "I18N_PLAYER_RETURN_TO_PARENT": "ارجع إلى الدرس الرئيسي",
   "I18N_PLAYER_RETURN_TO_STORY": "العودة إلى القصة",
   "I18N_PLAYER_SHARE_THIS_COLLECTION": "مشاركة هذه المجموعة",
   "I18N_PLAYER_STAY_ANONYMOUS": "البقاء مجهولا",
@@ -1184,8 +1182,6 @@
   "I18N_QUESTION_PLAYER_SCORE_CALCULATION": "تستند هذه النتيجة على عدد التلميحات التي استخدمتها والإجابات غير الصحيحة التي أدخلتها خلال هذه الجلسة.",
   "I18N_QUESTION_PLAYER_TEST_PASSED": "اكتمل الاختبار. أحسنت!",
   "I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE": "يبدو أنك تواجه بعض الصعوبة هنا. فلنقم بمراجعة المفاهيم عن طريق مسار مراجعة قصير.",
-  "I18N_REFRESHER_EXPLORATION_MODAL_BODY": "يبدوا انك تواجه صعوبات مع هذه المعادلة. هل تريد محاولة جولة قصيرة حول الدرس للمراجعه، و العودة للحل بعد ذالك ؟",
-  "I18N_REFRESHER_EXPLORATION_MODAL_TITLE": "هل تريد المراجعة ؟",
   "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "جلسة التسجيل منتهية الصلاحية",
   "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "عذرا، انتهت صلاحية جلسة التسجيل الخاصة بك، الرجاء النقر فوق \"متابعة التسجيل\" لإعادة تشغيل العملية.",
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "لوحة Oppia Release Coordinator",
@@ -1652,6 +1648,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "مشاريع هادفة",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "يساعد عملك الطلاب المحرومين في جميع أنحاء العالم بشكل مباشر في الحصول على تعليم مجاني عالي الجودة.",
   "I18N_WARNING_MODAL_DESCRIPTION": "هذا سيظهر الحل. هل أنت متأكد ؟",
-  "I18N_WARNING_MODAL_TITLE": "تحذير!",
-  "I18N_YES": "نعم"
+  "I18N_WARNING_MODAL_TITLE": "تحذير!"
 }

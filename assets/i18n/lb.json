@@ -360,7 +360,6 @@
   "I18N_MULTIPLE_LESSONS": "Lektiounen",
   "I18N_NEW_HINT_TITLE": "Hiweis <[hintIndex]>",
   "I18N_NEXT_LESSON": "Nächst Lektioun",
-  "I18N_NO": "Nee",
   "I18N_ONE_SUBSCRIBER_TEXT": "Dir hutt 1 Abonnent.",
   "I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_3": "Kann Oppia Fräiwëlleger an eis Géigend schécken?",
   "I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_4": "Kënnen Oppia-Lektiounen a menger Regioun benotzt ginn?",
@@ -544,6 +543,5 @@
   "I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL3": "Strateegescht Denken",
   "I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_SKILL2": "Tester schreiwen",
   "I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "Entwécklung",
-  "I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION": "Iwwersetzung",
-  "I18N_YES": "Jo"
+  "I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION": "Iwwersetzung"
 }

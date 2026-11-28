@@ -51,7 +51,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'objective': '',
         'init_state_name': 'Introduction',
         'author_notes': '',
-        'states_schema_version': 57,
+        'states_schema_version': 58,
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
@@ -93,7 +93,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                     },
                     'default_outcome': {
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'dest': 'Introduction',
                         'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
@@ -108,7 +107,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                             'training_data': [],
                             'outcome': {
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                                 'dest': 'Introduction',
                                 'dest_if_really_stuck': None,
                                 'missing_prerequisite_skill_id': None,
@@ -147,21 +145,21 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     json_encoded_string_representing_an_exploration = (
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, '
         '"next_content_id_index": 7, "tags"'
-        ': [], "states_schema_version": 57, "title": "", "param_specs": {}, "id'
+        ': [], "states_schema_version": 58, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'
         'ard_is_checkpoint": true, "inapplicable_skill_misconception_ids": [], '
         '"interaction": {"solution": null, "answer_gr'
         'oups": [{"tagged_skill_misconception_id": null, "outcome": {"param_cha'
         'nges": [], "feedback": {"content_id": "feedback_4", "html": "<p>This i'
         's great! \\u00ae\\u00ae</p>"}, "dest": "Introduction", "dest_if_really'
-        '_stuck": null, "refresher_exploration_id": null, "missing_prerequisite'
+        '_stuck": null, "missing_prerequisite'
         '_skill_id": null, "labelled_as_correct": false}, "training_data": [], '
         '"rule_specs": [{"rule_type": "Contains", "inputs": {"x": {"normalizedS'
         'trSet": ["\\u00ae\\u00ae"], "contentId": "rule_input_6"}}}]}], "defaul'
         't_outcome": {"param_changes": [], "feedback": '
         '{"content_id": "default_outcome_1", "html": ""}, '
         '"dest": "Introduction", "dest_if_really_stuck":'
-        ' null, "refresher_exploration_id": null, "missing_prerequisite_skill_i'
+        ' null, "missing_prerequisite_skill_i'
         'd": null, "labelled_as_correct": false}, "customization_args": {"rows"'
         ': {"value": 1}, "placeholder": {"value": {"unicode_str": "\\ud83d\\ude'
         '0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", "content_id": "ca_place'

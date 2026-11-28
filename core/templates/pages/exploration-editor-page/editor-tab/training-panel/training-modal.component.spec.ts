@@ -170,7 +170,6 @@ describe('Training Modal Component', () => {
           SubtitledHtml.createDefault('', 'feedback'),
           true,
           [],
-          null,
           null
         ),
       };
@@ -207,7 +206,6 @@ describe('Training Modal Component', () => {
           SubtitledHtml.createDefault('', 'feedback'),
           true,
           [],
-          null,
           null
         ),
       };
@@ -233,7 +231,6 @@ describe('Training Modal Component', () => {
           SubtitledHtml.createDefault('', 'feedback'),
           true,
           [],
-          null,
           null
         ),
       };

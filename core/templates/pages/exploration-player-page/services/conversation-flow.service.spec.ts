@@ -22,6 +22,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   fakeAsync,
+  flush,
   TestBed,
   tick,
   waitForAsync,
@@ -40,6 +41,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {ExplorationModeService} from './exploration-mode.service';
 import {ExplorationEngineService} from './exploration-engine.service';
+import {ExplorationRecommendationsService} from './exploration-recommendations.service';
 import {PageContextService} from '../../../services/page-context.service';
 import {PlayerPositionService} from './player-position.service';
 import {HintsAndSolutionManagerService} from './hints-and-solution-manager.service';
@@ -70,7 +72,6 @@ import {
   InteractionRulesService,
 } from '../services/answer-classification.service';
 import {LearnerAnswerInfoService} from './learner-answer-info.service';
-import {RefresherExplorationConfirmationModalService} from '../services/refresher-exploration-confirmation-modal.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {ChapterProgressService} from './chapter-progress.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
@@ -107,13 +108,13 @@ describe('Conversation flow service', () => {
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let playerTranscriptService: PlayerTranscriptService;
   let progressUrlService: ProgressUrlService;
-  let refresherExplorationConfirmationModalService: RefresherExplorationConfirmationModalService;
   let explorationModeService: ExplorationModeService;
   let conceptCardManagerService: ConceptCardManagerService;
   let fatigueDetectionService: FatigueDetectionService;
   let pageContextService: PageContextService;
   let playerPositionService: PlayerPositionService;
   let explorationEngineService: ExplorationEngineService;
+  let explorationRecommendationsService: ExplorationRecommendationsService;
 
   const createInteraction = (
     interactionType: InteractionSpecsKey | null
@@ -197,9 +198,6 @@ describe('Conversation flow service', () => {
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService
     );
-    refresherExplorationConfirmationModalService = TestBed.inject(
-      RefresherExplorationConfirmationModalService
-    );
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     );
@@ -226,6 +224,9 @@ describe('Conversation flow service', () => {
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    explorationRecommendationsService = TestBed.inject(
+      ExplorationRecommendationsService
+    );
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
   }));
@@ -369,15 +370,6 @@ describe('Conversation flow service', () => {
     expect(conversationFlowService.onPlayerStateChange).toBeDefined();
     expect(conversationFlowService.onOppiaFeedbackAvailable).toBeDefined();
     expect(conversationFlowService.onShowProgressModal).toBeDefined();
-  });
-
-  it('should record leaving for refresher exploration if not in editor', () => {
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-      false
-    );
-    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
-      'StateName'
-    );
   });
 
   it('should move forward by one card when index is valid', () => {
@@ -809,6 +801,59 @@ describe('Conversation flow service', () => {
     conversationFlowService.showUpcomingCard();
   });
 
+  it('should fetch and display recommendations for terminal card when not in story chapter mode', fakeAsync(() => {
+    let terminalCard = new StateCard(
+      'EndState',
+      '',
+      '',
+      createInteraction('EndExploration'),
+      [],
+      ''
+    );
+    terminalCard.markAsCompleted();
+    conversationFlowService.displayedCard = terminalCard;
+    conversationFlowService.setNextStateCard(terminalCard);
+
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+    spyOn(explorationEngineService, 'recordNewCardAdded');
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(2);
+    spyOn(playerTranscriptService, 'getCard');
+    spyOn(
+      conversationFlowService,
+      'isSupplementalCardNonempty'
+    ).and.returnValue(false);
+    spyOn(cardAnimationService, 'canWindowShowTwoCards').and.returnValue(false);
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
+    spyOn(cardAnimationService, 'animateToOneCard');
+    spyOn(playerPositionService, 'changeCurrentQuestion');
+    spyOn(
+      explorationEngineService,
+      'getAuthorRecommendedExpIdsByStateName'
+    ).and.returnValue(['recExpId']);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+      false
+    );
+    spyOn(
+      explorationRecommendationsService,
+      'getRecommendedSummaryDicts'
+    ).and.callFake((expIds, includeAutogenerated, callback) => {
+      callback([{} as ExplorationSummaryDict]);
+    });
+
+    conversationFlowService.showUpcomingCard();
+    flush();
+
+    expect(
+      explorationRecommendationsService.getRecommendedSummaryDicts
+    ).toHaveBeenCalledWith(['recExpId'], true, jasmine.any(Function));
+    expect(conversationFlowService.recommendedExplorationSummaries.length).toBe(
+      1
+    );
+  }));
+
   it('should submit answer and reset current answer state', fakeAsync(() => {
     spyOn(displayedCard, 'updateCurrentAnswer');
     conversationFlowService.displayedCard = displayedCard;
@@ -842,7 +887,6 @@ describe('Conversation flow service', () => {
       answer_groups: [],
       default_outcome: {
         missing_prerequisite_skill_id: null,
-        refresher_exploration_id: null,
         labelled_as_correct: false,
         feedback: {
           content_id: 'default_outcome',
@@ -910,7 +954,6 @@ describe('Conversation flow service', () => {
         nextCard: StateCard | null,
         refreshInteraction: boolean,
         feedbackHtml: string,
-        refresherExplorationId: string | null,
         missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
         taggedSkillMisconceptionId: string | null,
@@ -933,7 +976,6 @@ describe('Conversation flow service', () => {
         stateCard,
         true,
         'feedback',
-        'refresherId',
         '',
         false,
         '',
@@ -947,7 +989,6 @@ describe('Conversation flow service', () => {
         stateCard,
         true,
         '',
-        'refresherId',
         '',
         false,
         '',
@@ -961,7 +1002,6 @@ describe('Conversation flow service', () => {
         stateCard,
         true,
         'feedback',
-        'refresherId',
         '',
         false,
         '',
@@ -975,7 +1015,6 @@ describe('Conversation flow service', () => {
         stateCard,
         true,
         '',
-        'refresherId',
         '',
         false,
         '',
@@ -989,7 +1028,6 @@ describe('Conversation flow service', () => {
         stateCard,
         true,
         'feedback',
-        '',
         'skill_id',
         true,
         '',
@@ -1009,7 +1047,6 @@ describe('Conversation flow service', () => {
         stateCard,
         true,
         'feedback',
-        '',
         'skill_id',
         true,
         '',
@@ -1025,7 +1062,6 @@ describe('Conversation flow service', () => {
         stateCard,
         true,
         'feedback',
-        'refresherId',
         'skill_id',
         true,
         '',
@@ -1078,13 +1114,6 @@ describe('Conversation flow service', () => {
         summaries: [{} as ExplorationSummaryDict],
       })
     );
-    spyOn(
-      refresherExplorationConfirmationModalService,
-      'displayRedirectConfirmationModal'
-    ).and.callFake((_id: string, callback: () => void) => {
-      callback();
-    });
-    spyOn(statsReportingService, 'recordLeaveForRefresherExp');
     spyOn(playerTranscriptService, 'hasEncounteredStateBefore').and.returnValue(
       true
     );
@@ -1135,7 +1164,6 @@ describe('Conversation flow service', () => {
         nextCard: StateCard | null,
         refreshInteraction: boolean,
         feedbackHtml: string,
-        refresherExplorationId: string | null,
         missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
         taggedSkillMisconceptionId: string | null,
@@ -1150,7 +1178,6 @@ describe('Conversation flow service', () => {
         null,
         true,
         'feedback',
-        null,
         null,
         false,
         '',
@@ -1228,7 +1255,6 @@ describe('Conversation flow service', () => {
         nextCard: StateCard | null,
         refreshInteraction: boolean,
         feedbackHtml: string,
-        refresherExplorationId: string | null,
         missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
         taggedSkillMisconceptionId: string | null,
@@ -1243,7 +1269,6 @@ describe('Conversation flow service', () => {
         null,
         true,
         'feedback',
-        null,
         null,
         true,
         '',
@@ -1656,23 +1681,6 @@ describe('Conversation flow service', () => {
     expect(() => {
       conversationFlowService.moveBackByOneCard();
     }).toThrowError('Target card index out of bounds.');
-  });
-
-  it('should return correct value for isRefresherExploration', () => {
-    conversationFlowService.isRefresherExploration = true;
-    expect(conversationFlowService.getIsRefresherExploration()).toBe(true);
-
-    conversationFlowService.isRefresherExploration = false;
-    expect(conversationFlowService.getIsRefresherExploration()).toBe(false);
-  });
-
-  it('should return correct parent exploration IDs', () => {
-    const parentIds = ['exp1', 'exp2'];
-    conversationFlowService.parentExplorationIds = parentIds;
-
-    expect(conversationFlowService.getParentExplorationIds()).toEqual(
-      parentIds
-    );
   });
 
   it('should set and get nextCardIfStuck', () => {

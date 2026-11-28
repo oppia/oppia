@@ -71,7 +71,6 @@ describe('Outcome Feedback Editor Component', () => {
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
 
@@ -100,7 +99,6 @@ describe('Outcome Feedback Editor Component', () => {
         new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
         false,
         [],
-        null,
         null
       );
 

@@ -187,7 +187,6 @@
   "I18N_MODAL_CONTINUE_BUTTON": "Kontynuuj",
   "I18N_MULTIPLE_LESSONS": "Lekcje",
   "I18N_NEXT_LESSON": "Następna lekcja",
-  "I18N_NO": "Nie",
   "I18N_ONE_SUBSCRIBER_TEXT": "Masz 1 subskrybenta.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Związki partnerskie",
   "I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2_HEADING": "Szczegóły usunięcia",
@@ -220,6 +219,5 @@
   "I18N_TOPNAV_LOGOUT": "Wyloguj się",
   "I18N_TOPNAV_PREFERENCES": "Ustawienia",
   "I18N_TOPNAV_SIGN_IN": "Zaloguj",
-  "I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Zaloguj się za pomocą Google",
-  "I18N_YES": "Tak"
+  "I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Zaloguj się za pomocą Google"
 }

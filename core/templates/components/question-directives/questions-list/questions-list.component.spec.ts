@@ -188,7 +188,6 @@ describe('Questions List Component', () => {
                 },
                 labelled_as_correct: true,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
               },
               rule_specs: [],
@@ -219,7 +218,6 @@ describe('Questions List Component', () => {
             param_changes: [],
             labelled_as_correct: true,
             missing_prerequisite_skill_id: null,
-            refresher_exploration_id: null,
           },
           hints: [
             {
