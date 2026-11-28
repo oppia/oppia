@@ -95,7 +95,7 @@ declare module 'guppy-dev/build/guppy-default.min.css';
 declare namespace Guppy {
   export function init(config: GuppyInitConfig): void;
   export let instances: Object;
-  export let active_guppy: Object;
+  export let active_guppy: Guppy | null;
   export let Symbols: GuppySymbols;
   export let Doc: Function;
   export function add_global_symbol(
