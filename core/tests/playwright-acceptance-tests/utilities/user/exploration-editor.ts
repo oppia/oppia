@@ -665,14 +665,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to navigate to the next card in the preview tab.
-   * @param {boolean} skipVerification - Whether to skip verification of the card content.
-   */
-  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
-    await this.continueToNextCardAsExplorationEditor(skipVerification);
-  }
-
-  /**
    * Function for creating an exploration with two cards.
    * @param {string} explorationTitle - The title of the exploration.
    * @param {string} category - The category of the exploration.,
@@ -1145,23 +1137,14 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to navigate to the exploration preview tab.
-   */
-  async navigateToPreviewTab(): Promise<void> {
-    await this.navigateToExplorationEditorPreviewTab();
-  }
-
-  /**
    * Verifies that the preview tab displays the expected card content.
-   * @param {string} _cardName - The name of the card (for parity with Puppeteer signature).
    * @param {string} expectedCardContent - The expected text content.
    */
   async expectPreviewCardContentToBe(
-    _cardName: string,
     expectedCardContent: string
   ): Promise<void> {
     await this.expectElementToBeVisible(stateConversationContent);
-    await this.expectTextContentToContain(
+    await this.expectTextContentToBe(
       stateConversationContent,
       expectedCardContent
     );

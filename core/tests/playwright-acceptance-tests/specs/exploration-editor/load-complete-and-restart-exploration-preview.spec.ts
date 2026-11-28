@@ -82,16 +82,15 @@ test.describe('Exploration Editor', function () {
 
   test('should be able to load, complete and restart an exploration preview', async function () {
     // Navigate to the preview tab and check the content of the first card.
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARD_NAME.INTRODUCTION,
       INTRODUCTION_CARD_CONTENT
     );
 
     // Continue to the next card, enter an answer, and submit it.
-    await explorationEditor.continueToNextCard();
+    await explorationEditor.continueToNextCardAsExplorationEditor();
     await explorationEditor.submitAnswer('-40');
-    await explorationEditor.continueToNextCard();
+    await explorationEditor.continueToNextCardAsExplorationEditor();
 
     // Check the completion message and restart the exploration.
     await explorationEditor.expectPreviewCompletionToastMessage(
@@ -99,7 +98,6 @@ test.describe('Exploration Editor', function () {
     );
     await explorationEditor.restartPreview();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARD_NAME.INTRODUCTION,
       INTRODUCTION_CARD_CONTENT
     );
   });
