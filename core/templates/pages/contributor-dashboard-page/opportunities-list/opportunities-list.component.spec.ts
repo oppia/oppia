@@ -50,6 +50,7 @@ describe('Opportunities List Component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
+  let getActiveTopicNameSpy: jasmine.Spy;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -76,6 +77,10 @@ describe('Opportunities List Component', () => {
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService
     );
+    getActiveTopicNameSpy = spyOn(
+      translationTopicService,
+      'getActiveTopicName'
+    ).and.returnValue('All');
   });
 
   afterEach(() => {
@@ -573,6 +578,39 @@ describe('Opportunities List Component', () => {
       tick();
 
       expect(component.opportunities.length).toEqual(15);
+    }));
+
+    it('should not load opportunities before the active topic is set', fakeAsync(() => {
+      getActiveTopicNameSpy.and.returnValue(undefined);
+      const loadOpportunitiesSpy = spyOn(
+        component,
+        'loadOpportunities'
+      ).and.callThrough();
+
+      component.ngOnInit();
+      tick();
+
+      expect(loadOpportunitiesSpy).not.toHaveBeenCalled();
+      expect(component.loadingOpportunityData).toBeTrue();
+    }));
+
+    it('should load opportunities only once after the active topic is set', fakeAsync(() => {
+      getActiveTopicNameSpy.and.returnValue(undefined);
+      const loadOpportunitiesSpy = spyOn(
+        component,
+        'loadOpportunities'
+      ).and.callThrough();
+      component.init();
+      component.ngOnInit();
+      tick();
+
+      getActiveTopicNameSpy.and.returnValue('All');
+      mockActiveTopicEventEmitter.emit();
+      tick();
+
+      expect(loadOpportunitiesSpy).toHaveBeenCalledTimes(1);
+      expect(component.opportunities).toEqual(explorationOpportunitiesLoad1);
+      expect(component.loadingOpportunityData).toBeFalse();
     }));
 
     it('should navigate to updated last page when current last page is removed', fakeAsync(() => {
