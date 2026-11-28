@@ -1617,7 +1617,9 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
         # May not revert to any version that's not convertible to int.
-        for rev_version in ('abc', ()):
+        # Here we use MyPy ignore because we are assigning an invalid version
+        # to test error handling.
+        for rev_version in ('abc', ()):  # type: ignore[assignment]
             response_dict = self.post_json(
                 '/createhandler/revert/%s' % self.EXP_ID,
                 {'current_version': 2, 'revert_to_version': rev_version},
