@@ -62,10 +62,10 @@ export class ContentTranslationLanguageService {
     this.languageOptions = [];
     allContentLanguageCodesInExploration.push(explorationLanguageCode);
 
-    // The "initialContentLanguageCode" url parameter (set by the topic
-    // viewer's Play button) takes the highest priority regardless of which
-    // lesson player is active, so that the lesson content loads in the text
-    // language that was selected before navigation.
+    // The "initialContentLanguageCode" url parameter, when present on the
+    // lesson URL, takes the highest priority regardless of which lesson
+    // player is active, so that the lesson content loads in the requested
+    // text language.
     const urlParams = this.urlService.getUrlParams();
     if (
       Object.prototype.hasOwnProperty.call(
