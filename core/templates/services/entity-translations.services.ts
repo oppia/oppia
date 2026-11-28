@@ -164,4 +164,25 @@ export class EntityTranslationsService {
   reset(): void {
     this.languageCodeToLatestEntityTranslations = {};
   }
+
+  getDisplayableLanguageCodesForPreview(
+    backendDisplayableLanguageCodes: string[],
+    baseLanguageCode: string
+  ): string[] {
+    const draftLanguageCodes = Object.keys(
+      this.languageCodeToLatestEntityTranslations
+    ).filter(languageCode => {
+      const entityTranslation =
+        this.languageCodeToLatestEntityTranslations[languageCode];
+      return (
+        entityTranslation &&
+        Object.keys(entityTranslation.translationMapping).length > 0
+      );
+    });
+    const displayableLanguageCodes = [
+      ...backendDisplayableLanguageCodes,
+      ...draftLanguageCodes,
+    ].filter(languageCode => languageCode !== baseLanguageCode);
+    return Array.from(new Set(displayableLanguageCodes));
+  }
 }
