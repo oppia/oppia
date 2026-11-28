@@ -25,12 +25,12 @@ import re
 
 from core import feconf, schema_utils, utils
 from core.constants import constants
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
     customization_args_util,
     exp_domain,
     expression_parser,
+    html_cleaner,  # pylint: disable=invalid-import-from
     html_validation_service,
     interaction_registry,
     state_domain,
@@ -2256,7 +2256,7 @@ class Question(translation_domain.BaseTranslatableObject):
             default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             skill_ids,
             [],
             content_id_generator.next_content_id_index,
