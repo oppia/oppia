@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for number with units validation service.
  */
 
-// @ts-nocheck
-
 import {TestBed} from '@angular/core/testing';
 
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
@@ -320,37 +318,18 @@ describe('NumberWithUnitsValidationService', () => {
   );
 
   it('should throw error when rule equivalency check fails', () => {
-    spyOn(NumberWithUnits, 'fromDict').and.returnValue({
-      type: 'real',
-      real: 0.0,
-      // This throws "Type '{ toFloat: () => number; }' is missing the
-      // following properties from type 'Fraction': isNegative, wholeNumber,
-      // numerator, denominator, and 6 more." We need to suppress this error
-      // because we only need to mock the toFloat function for testing.
-      fraction: {
-        toFloat: () => {
-          return 0.0;
-        },
-      },
-      // This throws "Type null is not assignable to type
-      // 'string'." We need to suppress this error
-      // because of the need to test validations. This
-      // function is not used in the validations.
-      // @ts-ignore
-      toMathjsCompatibleString: () => {
-        return null;
-      },
-      toDict: () => {
-        let tmp = new NumberWithUnits(
-          'real',
-          2.02,
-          new Fraction(false, 0, 0, 1),
-          Units.fromRawInputString('m / s^2')
-        );
+    const dummyNumberWithUnits = new NumberWithUnits(
+      'real',
+      2.02,
+      new Fraction(false, 0, 0, 1),
+      Units.fromRawInputString('m / s^2')
+    );
 
-        return tmp.toDict();
-      },
-    });
+    spyOn(NumberWithUnits, 'fromDict').and.returnValue(dummyNumberWithUnits);
+    spyOn(dummyNumberWithUnits, 'toMathjsCompatibleString').and.returnValue(
+      'invalid'
+    );
+
     answerGroups[0].rules = [
       equivalentToTwoByThreeRule,
       equivalentToTwoThousandRule,
@@ -363,9 +342,7 @@ describe('NumberWithUnitsValidationService', () => {
         goodDefaultOutcome
       );
     }).toThrowError(
-      'Unexpected type of argument in function unit ' +
-        '(expected: number or Complex or BigNumber or Fraction or Unit or ' +
-        'string or Array or Matrix or boolean, actual: null, index: 0)\n' +
+      'Unit "invalid" not found.\n' +
         'laterInput: {"type":"real","real":2.02,"fraction":{"isNegative":false,' +
         '"wholeNumber":0,"numerator":0,"denominator":1},"units":[{"unit":"m",' +
         '"exponent":1},{"unit":"s","exponent":-2}]}\n' +

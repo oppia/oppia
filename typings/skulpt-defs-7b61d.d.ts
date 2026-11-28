@@ -150,6 +150,7 @@ interface SkulptInternalPy {
 }
 
 interface SkulptMisceval {
+  asyncToPromise: (suspendablefn: () => void) => Promise<void>;
   [func: string]: Function;
 }
 
