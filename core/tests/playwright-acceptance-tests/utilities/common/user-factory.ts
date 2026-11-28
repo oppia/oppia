@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -18,7 +18,7 @@
  * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
 
-import {Browser, Page} from '@playwright/test';
+import {Browser} from '@playwright/test';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
@@ -38,13 +38,16 @@ import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
 import {BlogPostEditorFactory} from '../user/blog-post-editor';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
-import {Contributor} from '../user/contributor';
-import {TranslationSubmitter} from '../user/translation-submitter';
-import {TranslationReviewerFactory} from '../user/translation-reviewer';
+import {Contributor, ContributorFactory} from '../user/contributor';
 import {
-  TranslationAdmin,
-  TranslationAdminFactory,
-} from '../user/translation-admin';
+  PracticeQuestionSubmitter,
+  PracticeQuestionSubmitterFactory,
+} from '../user/practice-question-submitter';
+import {
+  PracticeQuestionReviewer,
+  PracticeQuestionReviewerFactory,
+} from '../user/practice-question-reviewer';
+import {QuestionAdminFactory} from '../user/question-admin';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -62,7 +65,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
-  [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
+  [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -92,27 +95,15 @@ type BasicRolesUser = LoggedOutUser &
   LoggedInUser &
   ExplorationEditor &
   CurriculumAdmin &
-  TopicManager;
-
-/**
- * Test-only utilities that can be composed onto a user via createNewUser().
- */
-type TestUserUtility = Contributor | TranslationSubmitter;
-
-type TestUserUtilityFactory = (page: Page) => TestUserUtility;
-
-type TestUserUtilityIntersection<
-  TUtilities extends readonly TestUserUtilityFactory[],
-> = [TUtilities[number]] extends [never]
-  ? {}
-  : UnionToIntersection<ReturnType<TUtilities[number]>>;
+  TopicManager &
+  Contributor &
+  PracticeQuestionSubmitter &
+  PracticeQuestionReviewer;
 
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance:
-  | (SuperAdmin & VoiceoverAdmin & BlogAdmin & TranslationAdmin)
-  | null = null;
+let superAdminInstance: (SuperAdmin & VoiceoverAdmin & BlogAdmin) | null = null;
 // The blog admin role is only given to the super admin when a spec needs a
 // blog post editor, so that other specs don't pay for the extra setup.
 let superAdminIsBlogAdmin = false;
@@ -228,23 +219,6 @@ export class UserFactory {
             args as string
           );
           break;
-        case ROLES.TRANSLATION_REVIEWER: {
-          const languageCodes =
-            typeof args === 'string' ? [args] : (args as string[] | undefined);
-          if (!languageCodes || languageCodes.length === 0) {
-            throw new Error(
-              'Language code(s) are required to assign the translation reviewer role.'
-            );
-          }
-          await superAdminInstance.navigateToContributorDashboardAdminPage();
-          for (const languageCode of languageCodes) {
-            await superAdminInstance.addTranslationLanguageReviewRights(
-              user.username,
-              languageCode
-            );
-          }
-          break;
-        }
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -274,19 +248,13 @@ export class UserFactory {
    */
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
-    TUtilities extends readonly TestUserUtilityFactory[] = [],
   >(
     username: string,
     email: string,
     browser: Browser,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
-    args?: string | string[],
-    utilities: TUtilities | undefined = undefined
-  ): Promise<
-    BasicRolesUser &
-      MultipleRoleIntersection<TRoles> &
-      TestUserUtilityIntersection<TUtilities>
-  > {
+    args?: string | string[]
+  ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     const context = await browser.newContext({
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
@@ -300,6 +268,9 @@ export class UserFactory {
       ExplorationEditorFactory(page),
       CurriculumAdminFactory(page),
       TopicManagerFactory(page),
+      ContributorFactory(page),
+      PracticeQuestionSubmitterFactory(page),
+      PracticeQuestionReviewerFactory(page),
     ]);
 
     user.username = username;
@@ -308,21 +279,12 @@ export class UserFactory {
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    const utilityInstances = (utilities ?? []).map(utility =>
-      utility(user.page)
-    ) as BaseUser[];
-    if (utilityInstances.length > 0) {
-      user = UserFactory.composeUserWithRoles(user, utilityInstances);
-    }
-
     return (await UserFactory.assignRolesToUser(
       user,
       roles,
       browser,
       args
-    )) as BasicRolesUser &
-      MultipleRoleIntersection<TRoles> &
-      TestUserUtilityIntersection<TUtilities>;
+    )) as BasicRolesUser & MultipleRoleIntersection<TRoles>;
   };
 
   /**
@@ -361,7 +323,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     browser: Browser
-  ): Promise<SuperAdmin & VoiceoverAdmin & BlogAdmin & TranslationAdmin> {
+  ): Promise<SuperAdmin & VoiceoverAdmin & BlogAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -376,17 +338,7 @@ export class UserFactory {
       SuperAdminFactory(user.page),
       VoiceoverAdminFactory(user.page),
       BlogAdminFactory(user.page),
-      TranslationAdminFactory(user.page),
     ]);
-
-    await superAdminInstance.assignRoleToUser(
-      'superAdm',
-      ROLES.TRANSLATION_ADMIN
-    );
-    await superAdminInstance.expectUserToHaveRole(
-      'superAdm',
-      ROLES.TRANSLATION_ADMIN
-    );
 
     showMessage('Super admin created successfully.');
     return superAdminInstance;

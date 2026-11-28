@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Schema Based Editor Component
  */
 
-// @ts-nocheck
-
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
@@ -74,10 +72,10 @@ describe('Schema based editor component', function () {
     component.localValue = null;
     component.writeValue(null);
 
-    expect(component.localValue).toEqual(null);
+    expect(component.localValue).toBeNull();
 
     component.writeValue(10);
-    expect(component.localValue).toEqual(10);
+    expect(component.localValue as number | null).toEqual(10);
   });
 
   it('should trigger validator change on form status change', fakeAsync(() => {
