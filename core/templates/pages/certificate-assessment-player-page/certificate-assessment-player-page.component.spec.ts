@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CertificateAssessmentPlayerPageComponent.
  */
 
-// @ts-nocheck
-
 import {CommonModule} from '@angular/common';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -28,7 +26,10 @@ import {
 } from '@angular/core/testing';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {
+  MatBottomSheet,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {of} from 'rxjs';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -37,6 +38,7 @@ import {AnswerClassificationResult} from 'domain/classifier/answer-classificatio
 import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {StateBackendDict} from 'domain/state/state.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {InteractionRuleInputs} from 'interactions/rule-input-defs';
 import {InteractionCustomizationArgsBackendDict} from 'interactions/customization-args-defs';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
@@ -209,13 +211,25 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   let formatterSpy: jasmine.SpyObj<ExplorationHtmlFormatterService>;
   let currentInteractionServiceSpy: jasmine.SpyObj<CurrentInteractionService>;
 
+  // Returns a stub of the MatBottomSheetRef that MatBottomSheet.open() returns
+  // for the unanswered-question modal. The component only sets
+  // instance.unansweredQuestionCount and subscribes to afterDismissed(), so
+  // the stub provides just those two members.
+  const createUnansweredQuestionBottomSheetRef = (
+    dismissResult: string | null
+  ): MatBottomSheetRef<UnansweredQuestionModalComponent, string | null> =>
+    ({
+      instance: {} as UnansweredQuestionModalComponent,
+      afterDismissed: () => of(dismissResult),
+    }) as MatBottomSheetRef<UnansweredQuestionModalComponent, string | null>;
+
   const setup = async (
     attempt: CertificateAssessmentAttemptData | null = makeAttempt()
   ): Promise<void> => {
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
-    bottomSheetSpy.open.and.returnValue({
-      afterDismissed: () => of(null),
-    });
+    bottomSheetSpy.open.and.returnValue(
+      createUnansweredQuestionBottomSheetRef(null)
+    );
     modalSpy = jasmine.createSpyObj('NgbModal', ['open']);
     modalSpy.open.and.returnValue(modalRef());
     routerSpy = new MockRouter();
@@ -232,17 +246,20 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     registrySpy.getRulesServiceByInteractionId.and.returnValue({
       Equals: (
         answer: InteractionAnswer,
-        ruleInputs: {x: InteractionAnswer}
+        ruleInputs: InteractionRuleInputs
       ) => {
-        if (Array.isArray(answer) && Array.isArray(ruleInputs.x)) {
+        // The Equals rules used in these tests store the expected answer in
+        // the x input.
+        const expectedAnswer = (ruleInputs as {x: InteractionAnswer}).x;
+        if (Array.isArray(answer) && Array.isArray(expectedAnswer)) {
           const answerArray = answer as InteractionAnswer[];
-          const xArray = ruleInputs.x as InteractionAnswer[];
+          const xArray = expectedAnswer as InteractionAnswer[];
           return (
             answerArray.length === xArray.length &&
             answerArray.every((v, i) => v === xArray[i])
           );
         }
-        return answer === ruleInputs.x;
+        return answer === expectedAnswer;
       },
     });
     classificationSpy = jasmine.createSpyObj('Classification', [
@@ -420,14 +437,15 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should open the unanswered-question modal as a bottom sheet on mobile screens', fakeAsync(() => {
     load();
     dimsSpy.getWidth.and.returnValue(400);
-    const ref = {
-      instance: {} as Record<string, unknown>,
-      afterDismissed: () => of(null),
-    };
+    const ref = createUnansweredQuestionBottomSheetRef(null);
     bottomSheetSpy.open.and.returnValue(ref);
     component.answers.q1 = 1;
     component.submitAssessment();
-    expect(bottomSheetSpy.open).toHaveBeenCalledWith(
+    // MatBottomSheet.open() is overloaded, and Jasmine types the expected
+    // arguments from its last overload, which takes a TemplateRef. The
+    // component calls the overload that takes a component class, so this
+    // check uses the general jasmine.Spy type.
+    expect(bottomSheetSpy.open as jasmine.Spy).toHaveBeenCalledWith(
       UnansweredQuestionModalComponent
     );
   }));
@@ -517,14 +535,15 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should open unanswered-question modal as bottom sheet on mobile', fakeAsync(() => {
     load();
     dimsSpy.getWidth.and.returnValue(400);
-    const ref = {
-      instance: {} as Record<string, unknown>,
-      afterDismissed: () => of(null),
-    };
+    const ref = createUnansweredQuestionBottomSheetRef(null);
     bottomSheetSpy.open.and.returnValue(ref);
     component.answers.q1 = 1;
     component.submitAssessment();
-    expect(bottomSheetSpy.open).toHaveBeenCalledWith(
+    // MatBottomSheet.open() is overloaded, and Jasmine types the expected
+    // arguments from its last overload, which takes a TemplateRef. The
+    // component calls the overload that takes a component class, so this
+    // check uses the general jasmine.Spy type.
+    expect(bottomSheetSpy.open as jasmine.Spy).toHaveBeenCalledWith(
       UnansweredQuestionModalComponent
     );
     expect(ref.instance.unansweredQuestionCount).toBe(2);
@@ -534,10 +553,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     load();
     spyOn(component.assessmentSubmitted, 'emit');
     dimsSpy.getWidth.and.returnValue(400);
-    bottomSheetSpy.open.and.returnValue({
-      instance: {} as Record<string, unknown>,
-      afterDismissed: () => of('submit-anyway'),
-    });
+    bottomSheetSpy.open.and.returnValue(
+      createUnansweredQuestionBottomSheetRef('submit-anyway')
+    );
     component.answers.q1 = 1;
     component.submitAssessment();
     flushMicrotasks();
@@ -547,10 +565,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should return to the last unanswered question when the bottom sheet is dismissed', fakeAsync(() => {
     load();
     dimsSpy.getWidth.and.returnValue(400);
-    bottomSheetSpy.open.and.returnValue({
-      instance: {} as Record<string, unknown>,
-      afterDismissed: () => of(null),
-    });
+    bottomSheetSpy.open.and.returnValue(
+      createUnansweredQuestionBottomSheetRef(null)
+    );
     component.currentQuestionIndex = 0;
     component.answers.q1 = 1;
     component.submitAssessment();

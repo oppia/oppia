@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for mathjax directive
  */
 
-// @ts-nocheck
-
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MathJaxDirective} from './mathjax.directive';
@@ -69,8 +67,12 @@ describe('MathJax directive', () => {
     component = fixture.componentInstance;
     window.MathJax = mockMathJs as unknown as typeof MathJax;
     mockInsertScriptService.loadScript.and.callFake((script, callback) => {
-      // Simulate script loaded.
-      callback();
+      // Simulate script loaded. The callback is optional in the
+      // InsertScriptService.loadScript signature, but the directive always
+      // passes one.
+      callback?.();
+      // The real loadScript returns true when it starts loading a script.
+      return true;
     });
     mockInsertScriptService.hasScriptLoaded.and.returnValue(true);
     // Trigger Angular's change detection.
