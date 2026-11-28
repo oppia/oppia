@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.domain import (
     story_domain,
     story_fetchers,
@@ -32,9 +33,11 @@ from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import story_models
+    from mypy_imports import story_models, user_models
 
-(story_models,) = models.Registry.import_models([models.Names.STORY])
+(story_models, user_models) = models.Registry.import_models(
+    [models.Names.STORY, models.Names.USER]
+)
 
 
 class StoryFetchersUnitTests(test_utils.GenericTestBase):
@@ -823,3 +826,259 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         )
         self.assertEqual(len(arcs_with_stories), 0)
+
+    def _add_node_to_story(
+        self, story_id: str, node_id: str, title: str, exp_id: str
+    ) -> None:
+        """Adds a node linked to the given exploration to the given story.
+
+        Args:
+            story_id: str. The id of the story to add the node to.
+            node_id: str. The id of the new node.
+            title: str. The title of the new node.
+            exp_id: str. The id of the exploration to link to the node.
+        """
+        story_services.update_story(
+            self.USER_ID,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': node_id,
+                        'title': title,
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': node_id,
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+
+    def _publish_two_stories_and_delete_first(self) -> str:
+        """Publishes the story from setUp and a second canonical story with
+        an arc, then deletes the model of the first story so that its id
+        still appears in the topic but no longer resolves to a story.
+
+        Returns:
+            str. The id of the second story.
+        """
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
+        self.publish_exploration(self.user_id_admin, self.EXP_ID_1)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.user_id_admin)
+        self.publish_exploration(self.user_id_admin, self.EXP_ID_2)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id, self.user_id_admin
+        )
+
+        story_id_2 = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id_2, self.USER_ID, self.TOPIC_ID, url_fragment='story-two'
+        )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_2
+        )
+        self._add_node_to_story(
+            story_id_2, self.NODE_ID_1, 'Story 2 node', self.EXP_ID_2
+        )
+        story_services.update_story(
+            self.USER_ID,
+            story_id_2,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'Arc in second story',
+                        'node_ids': [self.NODE_ID_1],
+                    }
+                ),
+            ],
+            'Added arc.',
+        )
+        topic_services.publish_story(
+            self.TOPIC_ID, story_id_2, self.user_id_admin
+        )
+
+        story_models.StoryModel.get(self.story_id).delete(
+            self.USER_ID, 'Delete first story.'
+        )
+        return story_id_2
+
+    def test_get_completed_nodes_in_story_skips_uncompleted_nodes(
+        self,
+    ) -> None:
+        self._add_node_to_story(
+            self.story_id, self.NODE_ID_2, 'Title 2', self.EXP_ID_2
+        )
+        story_services.record_completed_node_in_story_context(
+            self.USER_ID, self.story_id, self.NODE_ID_2
+        )
+
+        completed_nodes = story_fetchers.get_completed_nodes_in_story(
+            self.USER_ID, self.story_id
+        )
+
+        self.assertEqual(
+            [node.id for node in completed_nodes], [self.NODE_ID_2]
+        )
+
+    def test_get_pending_and_all_nodes_excludes_completed_and_draft_nodes(
+        self,
+    ) -> None:
+        self._add_node_to_story(
+            self.story_id, self.NODE_ID_2, 'Title 2', self.EXP_ID_2
+        )
+        story_services.update_story(
+            self.USER_ID,
+            self.story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_STATUS
+                        ),
+                        'node_id': self.NODE_ID_1,
+                        'old_value': None,
+                        'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                    }
+                ),
+            ],
+            'Published node 1.',
+        )
+        story_services.record_completed_node_in_story_context(
+            self.USER_ID, self.story_id, self.NODE_ID_1
+        )
+
+        result = story_fetchers.get_pending_and_all_nodes_in_story(
+            self.USER_ID, self.story_id
+        )
+
+        # Node 1 is completed, so only node 2 is pending.
+        self.assertEqual(
+            [node.id for node in result['pending_nodes']], [self.NODE_ID_2]
+        )
+        # Node 2 is still a draft, so only node 1 is listed in all_nodes.
+        self.assertEqual(
+            [node.id for node in result['all_nodes']], [self.NODE_ID_1]
+        )
+
+    def test_get_user_progress_in_story_chapters_with_no_progress_model(
+        self,
+    ) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.USER_ID)
+
+        user_progress = story_fetchers.get_user_progress_in_story_chapters(
+            'learner_without_progress', [self.story_id]
+        )
+
+        self.assertEqual(
+            user_progress,
+            [
+                {
+                    'exploration_id': self.EXP_ID_1,
+                    'visited_checkpoints_count': 0,
+                    'total_checkpoints_count': 1,
+                    'is_chapter_complete': False,
+                }
+            ],
+        )
+
+    def test_get_user_progress_in_story_chapters_with_no_checkpoint_reached(
+        self,
+    ) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.USER_ID)
+        learner_id = 'learner_without_checkpoint'
+        user_models.ExplorationUserDataModel.create(
+            learner_id, self.EXP_ID_1
+        ).put()
+
+        user_progress = story_fetchers.get_user_progress_in_story_chapters(
+            learner_id, [self.story_id]
+        )
+
+        self.assertEqual(len(user_progress), 1)
+        self.assertEqual(user_progress[0]['visited_checkpoints_count'], 0)
+
+    def test_get_user_progress_in_story_chapters_across_multiple_stories(
+        self,
+    ) -> None:
+        exp_id_3 = 'exp_3'
+        for exp_id in [self.EXP_ID_1, self.EXP_ID_2, exp_id_3]:
+            self.save_new_valid_exploration(exp_id, self.USER_ID)
+
+        story_id_2 = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id_2, self.USER_ID, self.TOPIC_ID, url_fragment='story-two'
+        )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_2
+        )
+        self._add_node_to_story(
+            story_id_2, self.NODE_ID_1, 'Story 2 node 1', self.EXP_ID_2
+        )
+        self._add_node_to_story(
+            story_id_2, self.NODE_ID_2, 'Story 2 node 2', exp_id_3
+        )
+        learner_id = 'learner'
+        story_services.record_completed_node_in_story_context(
+            learner_id, story_id_2, self.NODE_ID_1
+        )
+        story_services.record_completed_node_in_story_context(
+            learner_id, story_id_2, self.NODE_ID_2
+        )
+
+        user_progress = story_fetchers.get_user_progress_in_story_chapters(
+            learner_id, [self.story_id, story_id_2]
+        )
+
+        # NODE_ID_1 is in both stories but completed only in the second, so
+        # exp_1 must stay incomplete while exp_2 is complete. Finding
+        # exp_id_3 means searching past the first story and the first node
+        # of the second story.
+        self.assertEqual(
+            [
+                (progress['exploration_id'], progress['is_chapter_complete'])
+                for progress in user_progress
+            ],
+            [
+                (self.EXP_ID_1, False),
+                (self.EXP_ID_2, True),
+                (exp_id_3, True),
+            ],
+        )
+
+    def test_get_all_nodes_for_topic_skips_deleted_story(self) -> None:
+        self._publish_two_stories_and_delete_first()
+
+        all_nodes = story_fetchers.get_all_nodes_for_topic(
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        )
+
+        self.assertEqual(len(all_nodes), 1)
+        self.assertEqual(all_nodes[0].title, 'Story 2 node')
+
+    def test_get_all_arcs_with_stories_for_topic_skips_deleted_story(
+        self,
+    ) -> None:
+        story_id_2 = self._publish_two_stories_and_delete_first()
+
+        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        )
+
+        self.assertEqual(len(arcs_with_stories), 1)
+        story, arc = arcs_with_stories[0]
+        self.assertEqual(story.id, story_id_2)
+        self.assertEqual(arc.id, 'arc_1')
