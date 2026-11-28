@@ -18,15 +18,144 @@
 
 from __future__ import annotations
 
+from core.domain import user_domain
 from core.platform import models
 
-from typing import List
+from typing import List, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
+
+
+def get_user_subscriptions_from_model(
+    user_subscriptions_model: user_models.UserSubscriptionsModel,
+) -> user_domain.UserSubscriptions:
+    """Returns the UserSubscriptions domain object corresponding to the given
+    UserSubscriptionsModel.
+
+    Args:
+        user_subscriptions_model: UserSubscriptionsModel. The user
+            subscriptions model loaded from the datastore.
+
+    Returns:
+        UserSubscriptions. The corresponding domain object.
+    """
+    # The lists are copied so that changing the domain object does not also
+    # change the (possibly cached) datastore model before it is saved.
+    return user_domain.UserSubscriptions(
+        user_subscriptions_model.id,
+        list(user_subscriptions_model.exploration_ids),
+        list(user_subscriptions_model.collection_ids),
+        list(user_subscriptions_model.general_feedback_thread_ids),
+        list(user_subscriptions_model.creator_ids),
+        user_subscriptions_model.last_checked,
+    )
+
+
+def get_user_subscriptions(
+    user_id: str, strict: bool = False
+) -> user_domain.UserSubscriptions:
+    """Returns the subscriptions of the given user.
+
+    Args:
+        user_id: str. The user ID.
+        strict: bool. Whether to raise an error if the user has no
+            subscriptions stored in the datastore. If False, an empty
+            UserSubscriptions object is returned in that case.
+
+    Returns:
+        UserSubscriptions. The subscriptions of the given user.
+    """
+    user_subscriptions_model = user_models.UserSubscriptionsModel.get(
+        user_id, strict=strict
+    )
+    if user_subscriptions_model is None:
+        return user_domain.UserSubscriptions(user_id, [], [], [], [], None)
+    return get_user_subscriptions_from_model(user_subscriptions_model)
+
+
+def get_user_subscriptions_with_exploration_ids(
+    exploration_ids: List[str],
+) -> List[user_domain.UserSubscriptions]:
+    """Returns the subscriptions of all users who subscribe to at least one
+    of the given explorations.
+
+    Args:
+        exploration_ids: list(str). The exploration IDs. This must not be
+            empty.
+
+    Returns:
+        list(UserSubscriptions). The subscriptions of the matching users.
+    """
+    user_subscriptions_models: Sequence[user_models.UserSubscriptionsModel] = (
+        user_models.UserSubscriptionsModel.query(
+            user_models.UserSubscriptionsModel.exploration_ids.IN(
+                exploration_ids
+            )
+        ).fetch()
+    )
+    return [
+        get_user_subscriptions_from_model(user_subscriptions_model)
+        for user_subscriptions_model in user_subscriptions_models
+    ]
+
+
+def save_user_subscriptions(
+    user_subscriptions: user_domain.UserSubscriptions,
+) -> None:
+    """Validates the given UserSubscriptions object and saves it to the
+    datastore.
+
+    Args:
+        user_subscriptions: UserSubscriptions. The subscriptions to save.
+
+    Raises:
+        ValidationError. The subscriptions are invalid.
+    """
+    save_multiple_user_subscriptions([user_subscriptions])
+
+
+def save_multiple_user_subscriptions(
+    user_subscriptions_list: List[user_domain.UserSubscriptions],
+) -> None:
+    """Validates the given UserSubscriptions objects and saves them to the
+    datastore. Nothing is saved if any of them is invalid.
+
+    Args:
+        user_subscriptions_list: list(UserSubscriptions). The subscriptions
+            to save.
+
+    Raises:
+        ValidationError. One or more of the subscriptions are invalid.
+    """
+    for user_subscriptions in user_subscriptions_list:
+        user_subscriptions.validate()
+
+    # Deleted models are included so that saving keeps their deleted flag,
+    # as the previous model-level code did, instead of overwriting them.
+    existing_models = user_models.UserSubscriptionsModel.get_multi(
+        [
+            user_subscriptions.user_id
+            for user_subscriptions in user_subscriptions_list
+        ],
+        include_deleted=True,
+    )
+    models_to_put = []
+    for user_subscriptions, user_subscriptions_model in zip(
+        user_subscriptions_list, existing_models
+    ):
+        if user_subscriptions_model is None:
+            user_subscriptions_model = user_models.UserSubscriptionsModel(
+                id=user_subscriptions.user_id
+            )
+        user_subscriptions_model.populate(**user_subscriptions.to_dict())
+        models_to_put.append(user_subscriptions_model)
+
+    user_models.UserSubscriptionsModel.update_timestamps_multi(models_to_put)
+    user_models.UserSubscriptionsModel.put_multi(models_to_put)
 
 
 def subscribe_to_thread(user_id: str, feedback_thread_id: str) -> None:
@@ -52,25 +181,9 @@ def subscribe_to_threads(user_id: str, feedback_thread_ids: List[str]) -> None:
         user_id: str. The user ID of the new subscriber.
         feedback_thread_ids: list(str). The IDs of the feedback threads.
     """
-    subscriptions_model = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False
-    )
-    if not subscriptions_model:
-        subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
-
-    # Using sets for efficiency.
-    current_feedback_thread_ids_set = set(
-        subscriptions_model.general_feedback_thread_ids
-    )
-    # Determine which thread_ids are not already in the subscriptions model.
-    feedback_thread_ids_to_add_to_subscriptions_model = list(
-        set(feedback_thread_ids).difference(current_feedback_thread_ids_set)
-    )
-    subscriptions_model.general_feedback_thread_ids.extend(
-        feedback_thread_ids_to_add_to_subscriptions_model
-    )
-    subscriptions_model.update_timestamps()
-    subscriptions_model.put()
+    user_subscriptions = get_user_subscriptions(user_id)
+    user_subscriptions.add_feedback_thread_ids(feedback_thread_ids)
+    save_user_subscriptions(user_subscriptions)
 
 
 def subscribe_to_exploration(user_id: str, exploration_id: str) -> None:
@@ -84,16 +197,10 @@ def subscribe_to_exploration(user_id: str, exploration_id: str) -> None:
         user_id: str. The user ID of the new subscriber.
         exploration_id: str. The exploration ID.
     """
-    subscriptions_model = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False
-    )
-    if not subscriptions_model:
-        subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
-
-    if exploration_id not in subscriptions_model.exploration_ids:
-        subscriptions_model.exploration_ids.append(exploration_id)
-        subscriptions_model.update_timestamps()
-        subscriptions_model.put()
+    user_subscriptions = get_user_subscriptions(user_id)
+    if exploration_id not in user_subscriptions.exploration_ids:
+        user_subscriptions.add_exploration_id(exploration_id)
+        save_user_subscriptions(user_subscriptions)
 
 
 def subscribe_to_creator(user_id: str, creator_id: str) -> None:
@@ -115,27 +222,21 @@ def subscribe_to_creator(user_id: str, creator_id: str) -> None:
     subscribers_model_creator = user_models.UserSubscribersModel.get(
         creator_id, strict=False
     )
-    subscriptions_model_user = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False
-    )
+    user_subscriptions = get_user_subscriptions(user_id)
 
     if not subscribers_model_creator:
         subscribers_model_creator = user_models.UserSubscribersModel(
             id=creator_id
         )
 
-    if not subscriptions_model_user:
-        subscriptions_model_user = user_models.UserSubscriptionsModel(
-            id=user_id
-        )
-
     if user_id not in subscribers_model_creator.subscriber_ids:
         subscribers_model_creator.subscriber_ids.append(user_id)
-        subscriptions_model_user.creator_ids.append(creator_id)
+        user_subscriptions.add_creator_id(creator_id)
+        # The user's subscriptions are saved first because saving validates
+        # them, so an invalid change is caught before anything is written.
+        save_user_subscriptions(user_subscriptions)
         subscribers_model_creator.update_timestamps()
         subscribers_model_creator.put()
-        subscriptions_model_user.update_timestamps()
-        subscriptions_model_user.put()
 
 
 def unsubscribe_from_creator(user_id: str, creator_id: str) -> None:
@@ -149,15 +250,14 @@ def unsubscribe_from_creator(user_id: str, creator_id: str) -> None:
         creator_id: str. The user ID of the creator.
     """
     subscribers_model_creator = user_models.UserSubscribersModel.get(creator_id)
-    subscriptions_model_user = user_models.UserSubscriptionsModel.get(user_id)
+    user_subscriptions = get_user_subscriptions(user_id, strict=True)
 
     if user_id in subscribers_model_creator.subscriber_ids:
         subscribers_model_creator.subscriber_ids.remove(user_id)
-        subscriptions_model_user.creator_ids.remove(creator_id)
+        user_subscriptions.remove_creator_id(creator_id)
+        save_user_subscriptions(user_subscriptions)
         subscribers_model_creator.update_timestamps()
         subscribers_model_creator.put()
-        subscriptions_model_user.update_timestamps()
-        subscriptions_model_user.put()
 
 
 def get_all_creators_subscribed_to(user_id: str) -> List[str]:
@@ -173,17 +273,7 @@ def get_all_creators_subscribed_to(user_id: str) -> List[str]:
         list(str). IDs of all the creators to which this learner has
         subscribed.
     """
-    subscriptions_model = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False
-    )
-    # TODO(#15621): The explicit declaration of type for ndb properties should
-    # be removed. Currently, these ndb properties are annotated with Any return
-    # type. Once we have proper return type we can remove this.
-    if subscriptions_model:
-        creator_ids: List[str] = subscriptions_model.creator_ids
-        return creator_ids
-    else:
-        return []
+    return get_user_subscriptions(user_id).creator_ids
 
 
 def get_all_subscribers_of_creator(user_id: str) -> List[str]:
@@ -224,17 +314,7 @@ def get_exploration_ids_subscribed_to(user_id: str) -> List[str]:
         list(str). IDs of all explorations that the given user
         subscribes to.
     """
-    subscriptions_model = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False
-    )
-    # TODO(#15621): The explicit declaration of type for ndb properties should
-    # be removed. Currently, these ndb properties are annotated with Any return
-    # type. Once we have proper return type we can remove this.
-    if subscriptions_model:
-        exploration_ids: List[str] = subscriptions_model.exploration_ids
-        return exploration_ids
-    else:
-        return []
+    return get_user_subscriptions(user_id).exploration_ids
 
 
 def subscribe_to_collection(user_id: str, collection_id: str) -> None:
@@ -247,16 +327,10 @@ def subscribe_to_collection(user_id: str, collection_id: str) -> None:
         user_id: str. The user ID of the new subscriber.
         collection_id: str. The collection ID.
     """
-    subscriptions_model = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False
-    )
-    if not subscriptions_model:
-        subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
-
-    if collection_id not in subscriptions_model.collection_ids:
-        subscriptions_model.collection_ids.append(collection_id)
-        subscriptions_model.update_timestamps()
-        subscriptions_model.put()
+    user_subscriptions = get_user_subscriptions(user_id)
+    if collection_id not in user_subscriptions.collection_ids:
+        user_subscriptions.add_collection_id(collection_id)
+        save_user_subscriptions(user_subscriptions)
 
 
 def get_collection_ids_subscribed_to(user_id: str) -> List[str]:
@@ -272,14 +346,4 @@ def get_collection_ids_subscribed_to(user_id: str) -> List[str]:
         list(str). IDs of all collections that the given user
         subscribes to.
     """
-    subscriptions_model = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False
-    )
-    # TODO(#15621): The explicit declaration of type for ndb properties should
-    # be removed. Currently, these ndb properties are annotated with Any return
-    # type. Once we have proper return type we can remove this.
-    if subscriptions_model:
-        collection_ids: List[str] = subscriptions_model.collection_ids
-        return collection_ids
-    else:
-        return []
+    return get_user_subscriptions(user_id).collection_ids

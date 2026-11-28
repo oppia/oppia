@@ -60,6 +60,7 @@ from core.domain import (
     state_domain,
     stats_domain,
     stats_services,
+    subscription_services,
     suggestion_services,
     taskqueue_services,
     translation_services,
@@ -1726,21 +1727,20 @@ def delete_explorations_from_user_models(exploration_ids: List[str]) -> None:
     if not exploration_ids:
         return
 
-    subscription_models: Sequence[user_models.UserSubscriptionsModel] = (
-        user_models.UserSubscriptionsModel.query(
-            user_models.UserSubscriptionsModel.exploration_ids.IN(
-                exploration_ids
-            )
-        ).fetch()
+    user_subscriptions_list = (
+        subscription_services.get_user_subscriptions_with_exploration_ids(
+            exploration_ids
+        )
     )
-    for model in subscription_models:
-        model.exploration_ids = [
-            id_ for id_ in model.exploration_ids if id_ not in exploration_ids
+    for user_subscriptions in user_subscriptions_list:
+        user_subscriptions.exploration_ids = [
+            id_
+            for id_ in user_subscriptions.exploration_ids
+            if id_ not in exploration_ids
         ]
-    user_models.UserSubscriptionsModel.update_timestamps_multi(
-        list(subscription_models)
+    subscription_services.save_multiple_user_subscriptions(
+        user_subscriptions_list
     )
-    user_models.UserSubscriptionsModel.put_multi(list(subscription_models))
 
     exp_user_data_models: Sequence[user_models.ExplorationUserDataModel] = (
         user_models.ExplorationUserDataModel.get_all()

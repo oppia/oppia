@@ -1215,6 +1215,169 @@ class LearnerGoals:
         }
 
 
+class UserSubscriptionsDict(TypedDict):
+    """Dictionary representing the UserSubscriptions object."""
+
+    exploration_ids: List[str]
+    collection_ids: List[str]
+    general_feedback_thread_ids: List[str]
+    creator_ids: List[str]
+    last_checked: Optional[datetime.datetime]
+
+
+class UserSubscriptions:
+    """Domain object for UserSubscriptionsModel."""
+
+    def __init__(
+        self,
+        user_id: str,
+        exploration_ids: List[str],
+        collection_ids: List[str],
+        general_feedback_thread_ids: List[str],
+        creator_ids: List[str],
+        last_checked: Optional[datetime.datetime],
+    ) -> None:
+        """Constructs a UserSubscriptions domain object.
+
+        Args:
+            user_id: str. The ID of the user who owns these subscriptions.
+            exploration_ids: list(str). IDs of the explorations that the user
+                subscribes to.
+            collection_ids: list(str). IDs of the collections that the user
+                subscribes to.
+            general_feedback_thread_ids: list(str). IDs of the feedback threads
+                that the user subscribes to.
+            creator_ids: list(str). IDs of the creators that the user
+                subscribes to.
+            last_checked: datetime.datetime|None. When the user last checked
+                their notifications, or None if they never have.
+        """
+        self.user_id = user_id
+        self.exploration_ids = exploration_ids
+        self.collection_ids = collection_ids
+        self.general_feedback_thread_ids = general_feedback_thread_ids
+        self.creator_ids = creator_ids
+        self.last_checked = last_checked
+
+    def add_exploration_id(self, exploration_id: str) -> None:
+        """Subscribes the user to an exploration, unless they are already
+        subscribed to it.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        if exploration_id not in self.exploration_ids:
+            self.exploration_ids.append(exploration_id)
+
+    def add_collection_id(self, collection_id: str) -> None:
+        """Subscribes the user to a collection, unless they are already
+        subscribed to it.
+
+        Args:
+            collection_id: str. The ID of the collection.
+        """
+        if collection_id not in self.collection_ids:
+            self.collection_ids.append(collection_id)
+
+    def add_feedback_thread_ids(self, feedback_thread_ids: List[str]) -> None:
+        """Subscribes the user to the given feedback threads, skipping any
+        thread that the user is already subscribed to.
+
+        Args:
+            feedback_thread_ids: list(str). The IDs of the feedback threads.
+        """
+        for feedback_thread_id in feedback_thread_ids:
+            if feedback_thread_id not in self.general_feedback_thread_ids:
+                self.general_feedback_thread_ids.append(feedback_thread_id)
+
+    def add_creator_id(self, creator_id: str) -> None:
+        """Subscribes the user to a creator, unless they are already
+        subscribed to them.
+
+        Args:
+            creator_id: str. The user ID of the creator.
+        """
+        if creator_id not in self.creator_ids:
+            self.creator_ids.append(creator_id)
+
+    def remove_creator_id(self, creator_id: str) -> None:
+        """Unsubscribes the user from a creator.
+
+        Args:
+            creator_id: str. The user ID of the creator.
+        """
+        self.creator_ids.remove(creator_id)
+
+    def to_dict(self) -> UserSubscriptionsDict:
+        """Returns a dict representation of the UserSubscriptions object.
+
+        Returns:
+            UserSubscriptionsDict. A dict containing the subscription lists
+            and the last_checked time.
+        """
+        return {
+            'exploration_ids': self.exploration_ids,
+            'collection_ids': self.collection_ids,
+            'general_feedback_thread_ids': self.general_feedback_thread_ids,
+            'creator_ids': self.creator_ids,
+            'last_checked': self.last_checked,
+        }
+
+    def validate(self) -> None:
+        """Validates the attributes of the UserSubscriptions object.
+
+        Raises:
+            ValidationError. One or more attributes are invalid.
+        """
+        if not isinstance(self.user_id, str):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, found: %s'
+                % type(self.user_id)
+            )
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+
+        # The user ID format is not checked here because many existing callers
+        # and tests pass placeholder IDs (e.g. 'user_id') to the subscription
+        # services, and a strict check would reject them on save.
+        id_lists: Dict[str, List[str]] = {
+            'exploration_ids': self.exploration_ids,
+            'collection_ids': self.collection_ids,
+            'general_feedback_thread_ids': self.general_feedback_thread_ids,
+            'creator_ids': self.creator_ids,
+        }
+        for field_name, id_list in id_lists.items():
+            if not isinstance(id_list, list):
+                raise utils.ValidationError(
+                    'Expected %s to be a list, found: %s'
+                    % (field_name, type(id_list))
+                )
+            for item_id in id_list:
+                if not isinstance(item_id, str) or not item_id:
+                    raise utils.ValidationError(
+                        'Expected %s to only contain non-empty strings, '
+                        'found: %s' % (field_name, item_id)
+                    )
+            if len(id_list) != len(set(id_list)):
+                raise utils.ValidationError(
+                    'Expected %s list not to have duplicate values, '
+                    'found: %s' % (field_name, id_list)
+                )
+
+        if self.user_id in self.creator_ids:
+            raise utils.ValidationError(
+                'User %s is not allowed to self subscribe.' % self.user_id
+            )
+
+        if self.last_checked is not None and not isinstance(
+            self.last_checked, datetime.datetime
+        ):
+            raise utils.ValidationError(
+                'Expected last_checked to be a datetime or None, found: %s'
+                % type(self.last_checked)
+            )
+
+
 class UserContributionProficiency:
     """Domain object for UserContributionProficiencyModel."""
 

@@ -1248,6 +1248,186 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         self.assertListEqual(learner_goals.topic_ids_to_learn, [])
 
 
+class UserSubscriptionsTests(test_utils.GenericTestBase):
+    """Tests for the UserSubscriptions domain object."""
+
+    ID_LIST_FIELDS: List[str] = [
+        'exploration_ids',
+        'collection_ids',
+        'general_feedback_thread_ids',
+        'creator_ids',
+    ]
+
+    def _create_subscriptions(self) -> user_domain.UserSubscriptions:
+        """Returns a valid UserSubscriptions object for the tests to modify."""
+        return user_domain.UserSubscriptions(
+            'user_id',
+            ['exp_id'],
+            ['collection_id'],
+            ['thread_id'],
+            ['creator_id'],
+            None,
+        )
+
+    def test_initialization(self) -> None:
+        subscriptions = self._create_subscriptions()
+
+        self.assertEqual(subscriptions.user_id, 'user_id')
+        self.assertEqual(subscriptions.exploration_ids, ['exp_id'])
+        self.assertEqual(subscriptions.collection_ids, ['collection_id'])
+        self.assertEqual(
+            subscriptions.general_feedback_thread_ids, ['thread_id']
+        )
+        self.assertEqual(subscriptions.creator_ids, ['creator_id'])
+        self.assertIsNone(subscriptions.last_checked)
+
+    def test_to_dict(self) -> None:
+        subscriptions = self._create_subscriptions()
+
+        self.assertEqual(
+            subscriptions.to_dict(),
+            {
+                'exploration_ids': ['exp_id'],
+                'collection_ids': ['collection_id'],
+                'general_feedback_thread_ids': ['thread_id'],
+                'creator_ids': ['creator_id'],
+                'last_checked': None,
+            },
+        )
+
+    def test_valid_subscriptions_pass_validation(self) -> None:
+        subscriptions = self._create_subscriptions()
+        subscriptions.validate()
+
+        subscriptions.last_checked = datetime.datetime(2026, 11, 28)
+        subscriptions.validate()
+
+    def test_add_exploration_id_skips_existing_id(self) -> None:
+        subscriptions = self._create_subscriptions()
+
+        subscriptions.add_exploration_id('exp_id_2')
+        subscriptions.add_exploration_id('exp_id')
+
+        self.assertEqual(subscriptions.exploration_ids, ['exp_id', 'exp_id_2'])
+
+    def test_add_collection_id_skips_existing_id(self) -> None:
+        subscriptions = self._create_subscriptions()
+
+        subscriptions.add_collection_id('collection_id_2')
+        subscriptions.add_collection_id('collection_id')
+
+        self.assertEqual(
+            subscriptions.collection_ids, ['collection_id', 'collection_id_2']
+        )
+
+    def test_add_feedback_thread_ids_skips_existing_and_repeated_ids(
+        self,
+    ) -> None:
+        subscriptions = self._create_subscriptions()
+
+        subscriptions.add_feedback_thread_ids(
+            ['thread_id', 'thread_id_2', 'thread_id_2']
+        )
+
+        self.assertEqual(
+            subscriptions.general_feedback_thread_ids,
+            ['thread_id', 'thread_id_2'],
+        )
+
+    def test_add_and_remove_creator_id(self) -> None:
+        subscriptions = self._create_subscriptions()
+
+        subscriptions.add_creator_id('creator_id_2')
+        subscriptions.add_creator_id('creator_id')
+        self.assertEqual(
+            subscriptions.creator_ids, ['creator_id', 'creator_id_2']
+        )
+
+        subscriptions.remove_creator_id('creator_id')
+        self.assertEqual(subscriptions.creator_ids, ['creator_id_2'])
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_str_user_id_raises_exception(self) -> None:
+        subscriptions = self._create_subscriptions()
+        subscriptions.user_id = 0  # type: ignore[assignment]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            subscriptions.validate()
+
+    def test_validate_empty_user_id_raises_exception(self) -> None:
+        subscriptions = self._create_subscriptions()
+        subscriptions.user_id = ''
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No user id specified.'
+        ):
+            subscriptions.validate()
+
+    def test_validate_non_list_ids_raises_exception(self) -> None:
+        for field_name in self.ID_LIST_FIELDS:
+            subscriptions = self._create_subscriptions()
+            setattr(subscriptions, field_name, 'not_a_list')
+
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Expected %s to be a list' % field_name,
+            ):
+                subscriptions.validate()
+
+    def test_validate_non_str_or_empty_id_raises_exception(self) -> None:
+        for field_name in self.ID_LIST_FIELDS:
+            for invalid_id in [1, '']:
+                subscriptions = self._create_subscriptions()
+                setattr(subscriptions, field_name, [invalid_id])
+
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Expected %s to only contain non-empty strings'
+                    % field_name,
+                ):
+                    subscriptions.validate()
+
+    def test_validate_duplicate_ids_raises_exception(self) -> None:
+        for field_name in self.ID_LIST_FIELDS:
+            subscriptions = self._create_subscriptions()
+            setattr(subscriptions, field_name, ['some_id', 'some_id'])
+
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Expected %s list not to have duplicate values' % field_name,
+            ):
+                subscriptions.validate()
+
+    def test_validate_self_subscription_raises_exception(self) -> None:
+        subscriptions = self._create_subscriptions()
+        subscriptions.creator_ids = ['creator_id', 'user_id']
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'User user_id is not allowed to self subscribe.',
+        ):
+            subscriptions.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_datetime_last_checked_raises_exception(
+        self,
+    ) -> None:
+        subscriptions = self._create_subscriptions()
+        subscriptions.last_checked = 'yesterday'  # type: ignore[assignment]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected last_checked to be a datetime or None',
+        ):
+            subscriptions.validate()
+
+
 class UserContributionProficiencyTests(test_utils.GenericTestBase):
     """Testing domain object for user contribution scoring model."""
 
