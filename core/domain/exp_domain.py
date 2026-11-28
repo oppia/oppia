@@ -3908,52 +3908,42 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         empty_ans_groups = []
         for rule_to_remove in rules_to_remove_with_try_again_dest_node:
-            removed_try_again_rule = False
             # Every rule to remove was seen earlier in an answer group that
-            # points back to the same state, so the loop always finds it and
-            # ends with the break below instead of running out of groups.
-            for answer_group in reversed(answer_groups):  # pragma: no branch
-                for rule_spec in reversed(answer_group['rule_specs']):
-                    if (
-                        rule_spec == rule_to_remove
-                        and answer_group['outcome']['dest'] == state_name
-                    ):
-                        removed_try_again_rule = True
-                        answer_group['rule_specs'].remove(rule_to_remove)
-                        break
-
+            # points back to the same state, so a matching answer group always
+            # exists.
+            matching_answer_group = next(
+                answer_group
+                for answer_group in reversed(answer_groups)
                 if (
-                    len(answer_group['rule_specs']) == 0
-                    and answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-                if removed_try_again_rule:
-                    break
+                    rule_to_remove in answer_group['rule_specs']
+                    and answer_group['outcome']['dest'] == state_name
+                )
+            )
+            matching_answer_group['rule_specs'].remove(rule_to_remove)
+            if (
+                len(matching_answer_group['rule_specs']) == 0
+                and matching_answer_group not in empty_ans_groups
+            ):
+                empty_ans_groups.append(matching_answer_group)
 
         for rule_to_remove in rules_to_remove_with_diff_dest_node:
-            removed_dest_rule = False
             # Every rule to remove was seen earlier in an answer group that
-            # points to a different state, so the loop always finds it and ends
-            # with the break below instead of running out of groups.
-            for answer_group in reversed(answer_groups):  # pragma: no branch
-                for rule_spec in reversed(answer_group['rule_specs']):
-                    if (
-                        rule_spec == rule_to_remove
-                        and answer_group['outcome']['dest'] != state_name
-                    ):
-                        removed_dest_rule = True
-                        answer_group['rule_specs'].remove(rule_to_remove)
-                        break
-
+            # points to a different state, so a matching answer group always
+            # exists.
+            matching_answer_group = next(
+                answer_group
+                for answer_group in reversed(answer_groups)
                 if (
-                    len(answer_group['rule_specs']) == 0
-                    and answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-                if removed_dest_rule:
-                    break
+                    rule_to_remove in answer_group['rule_specs']
+                    and answer_group['outcome']['dest'] != state_name
+                )
+            )
+            matching_answer_group['rule_specs'].remove(rule_to_remove)
+            if (
+                len(matching_answer_group['rule_specs']) == 0
+                and matching_answer_group not in empty_ans_groups
+            ):
+                empty_ans_groups.append(matching_answer_group)
 
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
