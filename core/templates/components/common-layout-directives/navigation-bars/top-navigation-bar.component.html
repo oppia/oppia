@@ -343,7 +343,9 @@
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button e2e-test-language-dropdown langbtn"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-                [ngClass]="{'oppia-language-dropdown-button-embedded': pageIsIframed}">
+                [ngClass]="{'oppia-language-dropdown-button-embedded': pageIsIframed}"
+                [attr.aria-label]="'Language Selector: ' +
+                  (windowIsNarrow ? currentLanguageCode : currentLanguageText)">
           <i class="fas fa-globe language-icon langi"></i>
           <span class="mobile-view-language-code lngcd" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
           <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>

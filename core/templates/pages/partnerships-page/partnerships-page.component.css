@@ -28,7 +28,7 @@
 }
 
 .oppia-partnerships-h3 {
-  color: #047c74;
+  color: #03655f;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 1.6em;
 }
@@ -43,7 +43,7 @@
 }
 
 .oppia-partnerships-emphasized {
-  color: #047c74;
+  color: #03655f;
   font-weight: bold;
 }
 
@@ -287,7 +287,7 @@
   justify-content: center;
 }
 
-.partner-container h4 {
+.partner-container h3 {
   color: #047c74;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 1.3em;
@@ -452,7 +452,7 @@
   max-width: 800px;
 }
 
-.learner-content h4 {
+.learner-content h3 {
   color: #000;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 1.3em;
@@ -476,7 +476,7 @@
     width: 100%;
   }
 
-  .learner-content h4 {
+  .learner-content h3 {
     font-size: 1em;
   }
 
@@ -501,7 +501,7 @@
     padding: 0;
   }
 
-  .learner-content h4,
+  .learner-content h3,
   .learner-content p {
     text-align: center;
   }
@@ -556,7 +556,7 @@
   text-align: center;
 }
 
-.oppia-partnerships-faqs h3 {
+.oppia-partnerships-faqs h2 {
   margin-bottom: 2.5em;
 }
 
@@ -582,7 +582,7 @@
 }
 
 .oppia-partnerships-faq-card mat-panel-title {
-  color: #047c74;
+  color: #03655f;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 1.3em;
 }

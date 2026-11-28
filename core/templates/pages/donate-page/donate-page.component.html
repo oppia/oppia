@@ -93,7 +93,7 @@
                   </i>
                   <span class="visually-hidden">Previous</span>
                 </button>
-                <ngb-carousel #learnerCarousel [interval]="5000" [showNavigationArrows]="false" [showNavigationIndicators]="false" [animation]="false" (slid)="onLearnerSlideChange($event)">
+                <ngb-carousel role="group" #learnerCarousel [interval]="5000" [showNavigationArrows]="false" [showNavigationIndicators]="false" [animation]="false" (slid)="onLearnerSlideChange($event)">
                   <ng-template ngbSlide *ngFor="let learner of learners; index as i" [id]="i.toString()">
                     <div class="donate-learners-tile">
                       <picture>

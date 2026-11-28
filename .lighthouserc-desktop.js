@@ -90,7 +90,6 @@ module.exports = {
               {maxLength: 2, strategy: 'pessimistic'},
             ],
           },
-          accessibilityMinScore: 0.9,
         },
         {
           matchingUrlPattern: 'http://[^/]+/about$',
@@ -101,7 +100,6 @@ module.exports = {
             tbt: 300,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.88,
           overrides: {
             // Marketing pages use unoptimized JPEG hero images.
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -127,7 +125,6 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.84,
           overrides: {
             // Marketing pages use unoptimized JPEG hero images.
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -182,7 +179,6 @@ module.exports = {
             tbt: 300,
             cls: 0.44,
           },
-          accessibilityMinScore: 0.95,
           overrides: {
             // Marketing pages use unoptimized JPEG hero images.
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -222,7 +218,6 @@ module.exports = {
             tbt: 300,
             cls: 0.51,
           },
-          accessibilityMinScore: 0.91,
           overrides: {
             // Marketing pages use unoptimized JPEG hero images.
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -269,7 +264,6 @@ module.exports = {
             // The YouTube embed can log browser issues to the Issues panel.
             'inspector-issues': ['error', {minScore: 0}],
           },
-          accessibilityMinScore: 0.91,
         },
         {
           matchingUrlPattern: 'http://[^/]+/get-started$',
@@ -280,7 +274,6 @@ module.exports = {
             tbt: 300,
             cls: 0.57,
           },
-          accessibilityMinScore: 0.91,
           overrides: {
             // Marketing pages use unoptimized JPEG hero images.
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -323,7 +316,6 @@ module.exports = {
             tbt: 300,
             cls: 0.29,
           },
-          accessibilityMinScore: 0.91,
           overrides: {
             'offscreen-images': ['error', {minScore: 0}],
             // Marketing pages use unoptimized JPEG hero images.
@@ -350,7 +342,6 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.84,
           overrides: {
             // The partnerships page showcases many partner logos that are
             // not in next-gen formats.
@@ -393,7 +384,6 @@ module.exports = {
             tbt: 300,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.95,
           overrides: {
             // Marketing pages use unoptimized JPEG hero images.
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -422,7 +412,6 @@ module.exports = {
             tbt: 300,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.91,
           overrides: {
             'uses-responsive-images': ['error', {minScore: 0.5}],
             // Marketing pages use unoptimized JPEG hero images.
@@ -438,7 +427,6 @@ module.exports = {
             tbt: 300,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.95,
           overrides: {
             // Marketing pages use unoptimized JPEG hero images.
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -453,7 +441,6 @@ module.exports = {
             tbt: 300,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.95,
           overrides: {
             'offscreen-images': ['error', {minScore: 0}],
             // Marketing pages use unoptimized JPEG hero images.
@@ -469,7 +456,6 @@ module.exports = {
             tbt: 300,
             cls: 0.59,
           },
-          accessibilityMinScore: 0.88,
           overrides: {
             'uses-responsive-images': ['error', {minScore: 0}],
             // Marketing pages use unoptimized JPEG hero images.

@@ -67,7 +67,6 @@ module.exports = {
             tbt: 1245,
             cls: 0.6,
           },
-          accessibilityMinScore: 0.88,
           overrides: {
             'categories:performance': ['error', {minScore: 0}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -93,7 +92,6 @@ module.exports = {
             tbt: 4800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.84,
           overrides: {
             'categories:performance': ['error', {minScore: 0}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -148,7 +146,6 @@ module.exports = {
             tbt: 1463,
             cls: 1.11,
           },
-          accessibilityMinScore: 0.95,
           overrides: {
             'categories:performance': ['error', {minScore: 0}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -188,7 +185,6 @@ module.exports = {
             tbt: 1463,
             cls: 0.78,
           },
-          accessibilityMinScore: 0.91,
           overrides: {
             'categories:performance': ['error', {minScore: 0}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -233,7 +229,6 @@ module.exports = {
             // The YouTube embed can log browser issues to the Issues panel.
             'inspector-issues': ['error', {minScore: 0}],
           },
-          accessibilityMinScore: 0.91,
         },
         {
           matchingUrlPattern: 'http://[^/]+/get-started$',
@@ -244,7 +239,6 @@ module.exports = {
             tbt: 1440,
             cls: 0.98,
           },
-          accessibilityMinScore: 0.91,
           overrides: {
             'categories:performance': ['error', {minScore: 0}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -287,7 +281,6 @@ module.exports = {
             tbt: 1170,
             cls: 0.68,
           },
-          accessibilityMinScore: 0.91,
           overrides: {
             'offscreen-images': ['error', {minScore: 0}],
             'categories:performance': ['error', {minScore: 0}],
@@ -314,7 +307,6 @@ module.exports = {
             tbt: 4800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.88,
           overrides: {
             'errors-in-console': ['error', {minScore: 0}],
             'modern-image-formats': [
@@ -353,7 +345,6 @@ module.exports = {
             tbt: 1155,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.95,
           overrides: {
             'categories:performance': ['error', {minScore: 0}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -382,7 +373,6 @@ module.exports = {
             tbt: 1815,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.91,
           overrides: {
             'uses-responsive-images': ['error', {minScore: 0.5}],
             'categories:performance': ['error', {minScore: 0}],
@@ -398,7 +388,6 @@ module.exports = {
             tbt: 1020,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.95,
           overrides: {
             'categories:performance': ['error', {minScore: 0}],
             'uses-optimized-images': ['error', {minScore: 0.6}],
@@ -413,7 +402,6 @@ module.exports = {
             tbt: 1380,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.95,
           overrides: {
             'offscreen-images': ['error', {minScore: 0}],
             'categories:performance': ['error', {minScore: 0}],
@@ -429,7 +417,6 @@ module.exports = {
             tbt: 1755,
             cls: 1.13,
           },
-          accessibilityMinScore: 0.88,
           overrides: {
             'uses-responsive-images': ['error', {minScore: 0}],
             'categories:performance': ['error', {minScore: 0}],

@@ -152,4 +152,16 @@ describe('CtaSectionComponent', () => {
       '/assets/images/about/testImageName15x.png 1.5x'
     );
   });
+
+  it('should default to the volunteer panel in the mobile CTA accordion', () => {
+    expect(component.openAccordionPanelIndex).toBe(1);
+  });
+
+  it('should toggle the open panel in the mobile CTA accordion', () => {
+    component.toggleAccordionPanel(0);
+    expect(component.openAccordionPanelIndex).toBe(0);
+
+    component.toggleAccordionPanel(0);
+    expect(component.openAccordionPanelIndex).toBeNull();
+  });
 });

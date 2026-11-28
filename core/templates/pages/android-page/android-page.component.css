@@ -224,7 +224,7 @@
 }
 
 .oppia-android-text-color {
-  color: rgb(0, 156, 138);
+  color: #00756b;
 }
 
 .oppia-android-main-text {
@@ -251,7 +251,7 @@
 }
 
 .oppia-android-support-text {
-  color: #009c8a;
+  color: #00756b;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 11px;
 }
