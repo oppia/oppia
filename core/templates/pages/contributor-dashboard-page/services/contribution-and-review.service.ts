@@ -290,6 +290,25 @@ export class ContributionAndReviewService {
     );
     sortedTranslationCards.unshift(...genericCards);
 
+    // Suggestions whose state is not part of the BFS traversal (e.g. the
+    // state was renamed after the suggestion was submitted, or the state is
+    // unreachable) must still be shown to reviewers, so they are appended at
+    // the end instead of being dropped. See issue #27469 for context.
+    const includedStateNames = new Set<string>([
+      ...stateNamesInOrder,
+      AppConstants.DEFAULT_SUGGESTION_STATE_NAME,
+    ]);
+    const remainingCards: SuggestionBackendDict[] = [];
+    translationSuggestionsByState.forEach((cardsForState, stateName) => {
+      if (!includedStateNames.has(stateName)) {
+        remainingCards.push(...cardsForState);
+      }
+    });
+    remainingCards.sort(
+      ContributionAndReviewService.compareTranslationSuggestions
+    );
+    sortedTranslationCards.push(...remainingCards);
+
     return sortedTranslationCards;
   }
 

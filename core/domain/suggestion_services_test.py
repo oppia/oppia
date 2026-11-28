@@ -6304,6 +6304,127 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
+    def _set_state_name_of_suggestion_in_datastore(
+        self, suggestion_id: str, state_name: str
+    ) -> None:
+        """Sets the state name of a suggestion directly in the datastore, to
+        simulate a suggestion whose state was renamed before the fix for
+        issue #27469.
+        """
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
+            suggestion_id
+        )
+        suggestion_model.change_cmd['state_name'] = state_name
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+
+    def test_update_state_names_of_translation_suggestions_in_review_fixes_stale_state_name(  # pylint: disable=line-too-long
+        self,
+    ) -> None:
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_thread_id,
+        ):
+            self.create_translation_suggestion_associated_with_exp(
+                self.EXP_ID, self.author_id
+            )
+        self._set_state_name_of_suggestion_in_datastore(
+            self.THREAD_ID, 'Stale state name'
+        )
+        last_updated_before_fix = suggestion_models.GeneralSuggestionModel.get(
+            self.THREAD_ID
+        ).last_updated
+
+        suggestion_services.update_state_names_of_translation_suggestions_in_review(
+            exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        )
+
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
+        self.assertEqual(suggestion.change_cmd.state_name, 'State 1')
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(
+            suggestion_models.GeneralSuggestionModel.get(
+                self.THREAD_ID
+            ).last_updated,
+            last_updated_before_fix,
+        )
+        # The suggestion can be accepted again now.
+        suggestion.pre_accept_validate()
+
+    def test_update_state_names_of_translation_suggestions_in_review_fixes_state_name_reused_by_another_state(  # pylint: disable=line-too-long
+        self,
+    ) -> None:
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_thread_id,
+        ):
+            self.create_translation_suggestion_associated_with_exp(
+                self.EXP_ID, self.author_id
+            )
+        # Simulate a suggestion whose old state name is now used by another
+        # state (e.g. 'State 1' was renamed and then 'State 2' was renamed to
+        # the old name).
+        self._set_state_name_of_suggestion_in_datastore(
+            self.THREAD_ID, 'State 2'
+        )
+
+        suggestion_services.update_state_names_of_translation_suggestions_in_review(
+            exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        )
+
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
+        self.assertEqual(suggestion.change_cmd.state_name, 'State 1')
+
+    def test_update_state_names_of_translation_suggestions_in_review_skips_valid_and_unresolvable_suggestions(  # pylint: disable=line-too-long
+        self,
+    ) -> None:
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_thread_id,
+        ):
+            self.create_translation_suggestion_associated_with_exp(
+                self.EXP_ID, self.author_id
+            )
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+        # A suggestion whose state name exists in the exploration is not
+        # changed.
+        suggestion_services.update_state_names_of_translation_suggestions_in_review(
+            exploration
+        )
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
+        self.assertEqual(suggestion.change_cmd.state_name, 'State 1')
+
+        # A suggestion for exploration metadata is not changed.
+        self._set_state_name_of_suggestion_in_datastore(
+            self.THREAD_ID, constants.DEFAULT_SUGGESTION_STATE_NAME
+        )
+        suggestion_services.update_state_names_of_translation_suggestions_in_review(
+            exploration
+        )
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
+        self.assertEqual(
+            suggestion.change_cmd.state_name,
+            constants.DEFAULT_SUGGESTION_STATE_NAME,
+        )
+
+        # A suggestion whose content ID no longer exists in the exploration is
+        # not changed.
+        self._set_state_name_of_suggestion_in_datastore(
+            self.THREAD_ID, 'Stale state name'
+        )
+        with self.swap_to_always_return(
+            exploration, 'get_state_name_for_content_id', None
+        ):
+            suggestion_services.update_state_names_of_translation_suggestions_in_review(
+                exploration
+            )
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
+        self.assertEqual(suggestion.change_cmd.state_name, 'Stale state name')
+
     def test_delete_skill_rejects_question_suggestion(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')

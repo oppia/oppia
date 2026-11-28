@@ -1248,6 +1248,49 @@ def auto_reject_translation_suggestions_for_content_ids(
     )
 
 
+def update_state_names_of_translation_suggestions_in_review(
+    exploration: exp_domain.Exploration,
+) -> None:
+    """Updates the state names of in-review translation suggestions for the
+    given exploration whose state name does not match the state that
+    currently contains their content (e.g. because the state was renamed).
+    The current state name is found using the content ID of the suggestion,
+    since content IDs do not change when a state is renamed. See issue #27469
+    for context.
+
+    Suggestions for exploration metadata (which use the default suggestion
+    state name) and suggestions whose content ID no longer exists in the
+    exploration are left unchanged.
+
+    Args:
+        exploration: Exploration. The latest version of the exploration.
+    """
+    suggestions_to_update: List[suggestion_registry.BaseSuggestion] = []
+    for suggestion in get_translation_suggestions_in_review(exploration.id):
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            suggestion, suggestion_registry.SuggestionTranslateContent
+        )
+        state_name = suggestion.change_cmd.state_name
+        if state_name == constants.DEFAULT_SUGGESTION_STATE_NAME:
+            continue
+        new_state_name = exploration.get_state_name_for_content_id(
+            suggestion.change_cmd.content_id
+        )
+        if new_state_name is None or new_state_name == state_name:
+            continue
+        suggestion.change_cmd.state_name = new_state_name
+        suggestions_to_update.append(suggestion)
+
+    if suggestions_to_update:
+        # Only the state name is changed here, so the last_updated time is
+        # kept as it is to preserve the order of suggestions in the review
+        # queue.
+        _update_suggestions(
+            suggestions_to_update, update_last_updated_time=False
+        )
+
+
 def resubmit_rejected_suggestion(
     suggestion_id: str,
     summary_message: str,

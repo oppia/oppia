@@ -1022,9 +1022,7 @@ class TranslatableTextHandler(
             )
             content_id_to_unsubmitted_translatable_item = {}
             for content_id, item in content_id_to_translatable_item.items():
-                if not self._is_content_in_review(
-                    state_name, content_id, suggestions
-                ):
+                if not self._is_content_in_review(content_id, suggestions):
                     content_id_to_unsubmitted_translatable_item[content_id] = (
                         item
                     )
@@ -1039,27 +1037,26 @@ class TranslatableTextHandler(
 
     def _is_content_in_review(
         self,
-        state_name: str,
         content_id: str,
         suggestions: List[suggestion_registry.BaseSuggestion],
     ) -> bool:
         """Returns whether a suggestion exists in suggestions with a
-        change_cmd dict matching the supplied state_name and content_id.
+        change_cmd dict matching the supplied content_id.
+
+        Content IDs are unique within an exploration and do not change when
+        a state is renamed, so the state name is intentionally not compared
+        here. This keeps the check consistent with the one done when a
+        translation suggestion is created. See issue #27469 for context.
 
         Args:
-            state_name: str. Exploration state name.
             content_id: str. Content ID.
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
             bool. True if suggestion exists in suggestions with a change_cmd
-            dict matching state_name and content_id, False otherwise.
+            dict matching content_id, False otherwise.
         """
-        return any(
-            s.change_cmd.state_name == state_name
-            and s.change_cmd.content_id == content_id
-            for s in suggestions
-        )
+        return any(s.change_cmd.content_id == content_id for s in suggestions)
 
 
 class OpportunitiesCountHandlerNormalizedRequestDict(TypedDict):
