@@ -16,8 +16,6 @@
  * @fileoverview Unit test for Language banner service.
  */
 
-// @ts-nocheck
-
 import {TestBed} from '@angular/core/testing';
 import {LanguageBannerService} from './language-banner.service';
 import {CookieService} from 'ngx-cookie';
@@ -64,7 +62,7 @@ describe('LanguageBannerService', () => {
 
   it('should return false if cookie timestamp is outdated', () => {
     cookieService.get.and.returnValue(
-      AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS - 10000
+      String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS - 10000)
     );
 
     const result = service.hasAcceptedCookies();
@@ -74,7 +72,7 @@ describe('LanguageBannerService', () => {
 
   it('should return true if cookies are acknowledged and up-to-date', () => {
     cookieService.get.and.returnValue(
-      AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS + 10000
+      String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS + 10000)
     );
 
     const result = service.hasAcceptedCookies();
