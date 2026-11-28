@@ -23,7 +23,7 @@ import inspect
 import logging
 import re
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     event_services,
     exp_domain,
@@ -119,6 +119,39 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.session_id, 'session_id')
         self.assertEqual(model.exp_version, 1)
         self.assertEqual(model.time_spent_in_state_secs, 2.0)
+
+    def test_get_solution_hit_event_from_model(self) -> None:
+        event_services.SolutionHitEventHandler.record(
+            'exp_id', 1, 'state_name', 'session_id', 2.5
+        )
+        all_models = stats_models.SolutionHitEventLogEntryModel.get_all()
+        model = all_models.get()
+        assert model is not None
+
+        domain_entry = event_services.get_solution_hit_event_from_model(model)
+        self.assertEqual(domain_entry.exp_id, 'exp_id')
+        self.assertEqual(domain_entry.exp_version, 1)
+        self.assertEqual(domain_entry.state_name, 'state_name')
+        self.assertEqual(domain_entry.session_id, 'session_id')
+        self.assertEqual(domain_entry.time_spent_in_state_secs, 2.5)
+        self.assertEqual(
+            domain_entry.event_schema_version,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+
+    def test_record_solution_hit_events_with_invalid_data_raises_error(
+        self,
+    ) -> None:
+        all_models = stats_models.SolutionHitEventLogEntryModel.get_all()
+        self.assertEqual(all_models.count(), 0)
+
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid exp_id'):
+            event_services.SolutionHitEventHandler.record(
+                'invalid@id!', 1, 'state_name', 'session_id', 2.0
+            )
+
+        all_models = stats_models.SolutionHitEventLogEntryModel.get_all()
+        self.assertEqual(all_models.count(), 0)
 
 
 class StartExplorationEventHandlerTests(test_utils.GenericTestBase):

@@ -210,6 +210,15 @@ class SolutionHitEventHandler(BaseEventHandler):
         time_spent_in_state_secs: float,
     ) -> None:
         """Perform in-request processing of recording solution hit events."""
+        solution_hit_event = stats_domain.SolutionHitEventLogEntry(
+            exp_id,
+            exp_version,
+            state_name,
+            session_id,
+            time_spent_in_state_secs,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+        solution_hit_event.validate()
         stats_models.SolutionHitEventLogEntryModel.create(
             exp_id,
             exp_version,
@@ -217,6 +226,28 @@ class SolutionHitEventHandler(BaseEventHandler):
             session_id,
             time_spent_in_state_secs,
         )
+
+
+def get_solution_hit_event_from_model(
+    solution_hit_event_model: stats_models.SolutionHitEventLogEntryModel,
+) -> stats_domain.SolutionHitEventLogEntry:
+    """Returns a SolutionHitEventLogEntry domain object from a model.
+
+    Args:
+        solution_hit_event_model: SolutionHitEventLogEntryModel. The storage
+            model instance.
+
+    Returns:
+        SolutionHitEventLogEntry. The domain object.
+    """
+    return stats_domain.SolutionHitEventLogEntry(
+        solution_hit_event_model.exp_id,
+        solution_hit_event_model.exp_version,
+        solution_hit_event_model.state_name,
+        solution_hit_event_model.session_id,
+        solution_hit_event_model.time_spent_in_state_secs,
+        solution_hit_event_model.event_schema_version,
+    )
 
 
 class StartExplorationEventHandler(BaseEventHandler):

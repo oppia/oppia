@@ -3017,3 +3017,175 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.learner_answer_info, 'Expected created_on to be a datetime'
         )
+
+
+class SolutionHitEventLogEntryTests(test_utils.GenericTestBase):
+    """Tests for SolutionHitEventLogEntry domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.entry = stats_domain.SolutionHitEventLogEntry(
+            'exp_id',
+            1,
+            'state_name',
+            'session_id',
+            2.5,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+
+    def test_valid_entry(self) -> None:
+        self.entry.validate()
+
+    def test_to_dict(self) -> None:
+        self.assertEqual(
+            self.entry.to_dict(),
+            {
+                'exp_id': 'exp_id',
+                'exp_version': 1,
+                'state_name': 'state_name',
+                'session_id': 'session_id',
+                'time_spent_in_state_secs': 2.5,
+                'event_schema_version': (
+                    feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+                ),
+            },
+        )
+
+    def test_exp_id_must_be_string(self) -> None:
+        setattr(self.entry, 'exp_id', 123)
+        self._assert_validation_error(
+            self.entry, 'Expected exp_id to be a string'
+        )
+
+    def test_exp_id_must_match_entity_id_regex(self) -> None:
+        self.entry.exp_id = 'invalid!id'
+        self._assert_validation_error(self.entry, 'Invalid exp_id')
+
+        self.entry.exp_id = 'a' * 13
+        self._assert_validation_error(self.entry, 'Invalid exp_id')
+
+    def test_exp_version_must_be_int(self) -> None:
+        setattr(self.entry, 'exp_version', '1')
+        self._assert_validation_error(
+            self.entry, 'Expected exp_version to be an int'
+        )
+
+    def test_exp_version_must_not_be_bool(self) -> None:
+        setattr(self.entry, 'exp_version', True)
+        self._assert_validation_error(
+            self.entry, 'Expected exp_version to be an int'
+        )
+
+    def test_exp_version_must_be_positive(self) -> None:
+        self.entry.exp_version = 0
+        self._assert_validation_error(
+            self.entry, 'Expected exp_version to be a positive integer'
+        )
+
+        self.entry.exp_version = -1
+        self._assert_validation_error(
+            self.entry, 'Expected exp_version to be a positive integer'
+        )
+
+    def test_state_name_must_be_string(self) -> None:
+        setattr(self.entry, 'state_name', 123)
+        self._assert_validation_error(
+            self.entry, 'Expected state_name to be a non-empty string'
+        )
+
+    def test_state_name_must_not_be_empty(self) -> None:
+        self.entry.state_name = ''
+        self._assert_validation_error(
+            self.entry, 'Expected state_name to be a non-empty string'
+        )
+
+    def test_state_name_must_not_exceed_max_length(self) -> None:
+        self.entry.state_name = 'a' * 51
+        self._assert_validation_error(
+            self.entry, 'Expected state_name to be at most 50 characters'
+        )
+
+    def test_session_id_must_be_string(self) -> None:
+        setattr(self.entry, 'session_id', 123)
+        self._assert_validation_error(
+            self.entry, 'Expected session_id to be a non-empty string'
+        )
+
+    def test_session_id_must_not_be_empty(self) -> None:
+        self.entry.session_id = ''
+        self._assert_validation_error(
+            self.entry, 'Expected session_id to be a non-empty string'
+        )
+
+    def test_time_spent_in_state_secs_must_be_number(self) -> None:
+        setattr(self.entry, 'time_spent_in_state_secs', '2.5')
+        self._assert_validation_error(
+            self.entry,
+            'Expected time_spent_in_state_secs to be a finite number',
+        )
+
+    def test_time_spent_in_state_secs_must_not_be_bool(self) -> None:
+        setattr(self.entry, 'time_spent_in_state_secs', True)
+        self._assert_validation_error(
+            self.entry,
+            'Expected time_spent_in_state_secs to be a finite number',
+        )
+
+    def test_time_spent_in_state_secs_must_not_be_nan_or_inf(self) -> None:
+        self.entry.time_spent_in_state_secs = float('nan')
+        self._assert_validation_error(
+            self.entry,
+            'Expected time_spent_in_state_secs to be a finite number',
+        )
+
+        self.entry.time_spent_in_state_secs = float('inf')
+        self._assert_validation_error(
+            self.entry,
+            'Expected time_spent_in_state_secs to be a finite number',
+        )
+
+        self.entry.time_spent_in_state_secs = float('-inf')
+        self._assert_validation_error(
+            self.entry,
+            'Expected time_spent_in_state_secs to be a finite number',
+        )
+
+    def test_time_spent_in_state_secs_must_be_non_negative(self) -> None:
+        self.entry.time_spent_in_state_secs = -0.1
+        self._assert_validation_error(
+            self.entry,
+            'Expected time_spent_in_state_secs to be at least 0.0',
+        )
+
+    def test_time_spent_in_state_secs_zero_is_valid(self) -> None:
+        self.entry.time_spent_in_state_secs = 0.0
+        self.entry.validate()
+
+    def test_time_spent_in_state_secs_int_is_valid(self) -> None:
+        self.entry.time_spent_in_state_secs = 5
+        self.entry.validate()
+
+    def test_event_schema_version_must_be_int(self) -> None:
+        setattr(self.entry, 'event_schema_version', '1')
+        self._assert_validation_error(
+            self.entry, 'Expected event_schema_version to be an int'
+        )
+
+    def test_event_schema_version_must_not_be_bool(self) -> None:
+        setattr(self.entry, 'event_schema_version', True)
+        self._assert_validation_error(
+            self.entry, 'Expected event_schema_version to be an int'
+        )
+
+    def test_event_schema_version_must_be_within_bounds(self) -> None:
+        self.entry.event_schema_version = 0
+        self._assert_validation_error(
+            self.entry, 'Expected event_schema_version to be between 1 and'
+        )
+
+        self.entry.event_schema_version = (
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION + 1
+        )
+        self._assert_validation_error(
+            self.entry, 'Expected event_schema_version to be between 1 and'
+        )
