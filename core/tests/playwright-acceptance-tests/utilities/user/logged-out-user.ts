@@ -390,6 +390,8 @@ const blogCardTagContainerSelector = '.blog-card-tag-container';
 const blogShareButtonSelector = '.share-blog-post-button';
 const blogSuggestedForYouSectionSelector = '.post-to-recommend-section';
 const blogSuggestedForYouHeadingSelector = '.post-to-recommend-section-heading';
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -1284,6 +1286,16 @@ export class LoggedOutUser extends BaseUser {
         `Expected ${n} hint models, but found ${actualNumberOfHintModels.length}`
       );
     }
+  }
+
+  async expectHintInHintModalToContain(expectedHint: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+
+    await this.expectTextContentToBe(commonModalTitleSelector, 'Hint');
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedHint
+    );
   }
 
   /**
