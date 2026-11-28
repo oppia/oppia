@@ -166,6 +166,7 @@ class EntityVoiceoversBulkHandler(
         entity_version: int,
         language_code: str,
     ) -> None:
+        """Handles GET requests."""
         entity_voiceovers_objects = (
             voiceover_services.fetch_entity_voiceovers_by_language_code(
                 entity_id, entity_type, entity_version, language_code

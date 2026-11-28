@@ -83,6 +83,7 @@ class OpenAccessDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.open_access
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -123,6 +124,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_view_skills
         def get(self, selected_skill_ids: List[str]) -> None:
+            """Handles GET requests."""
             self.render_json({'selected_skill_ids': selected_skill_ids})
 
     def setUp(self) -> None:
@@ -190,6 +192,7 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_submit_assessment_response
         def post(self, attempt_id: str) -> None:
+            """Handles POST requests."""
             self.render_json({'attempt_id': attempt_id})
 
     def setUp(self) -> None:
@@ -340,6 +343,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_download_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -473,6 +477,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_view_exploration_stats
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -602,6 +607,7 @@ class RequireUserIdElseRedirectToHomepageTests(test_utils.GenericTestBase):
 
         @acl_decorators.require_user_id_else_redirect_to_homepage
         def get(self) -> None:
+            """Handles GET requests."""
             self.redirect('/access_page')
 
     def setUp(self) -> None:
@@ -648,6 +654,7 @@ class CertificateAssessmentAttemptResultAccessDecoratorTests(
 
         @acl_decorators.can_access_certificate_assessment_attempt_result
         def get(self, attempt_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'attempt_id': attempt_id})
 
     def setUp(self) -> None:
@@ -744,6 +751,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -838,6 +846,7 @@ class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_exploration_as_logged_in_user
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -933,6 +942,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_collection
         def get(self, collection_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'collection_id': collection_id})
 
     def setUp(self) -> None:
@@ -1039,6 +1049,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_edit_collection
         def get(self, collection_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'collection_id': collection_id})
 
     def setUp(self) -> None:
@@ -1161,6 +1172,7 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.does_classroom_exist
         def get(self, _: str) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -1171,6 +1183,7 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.does_classroom_exist
         def get(self, _: str) -> None:
+            """Handles GET requests."""
             self.render_json('oppia-root.mainpage.html')
 
     def setUp(self) -> None:
@@ -1233,6 +1246,7 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_create_exploration
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -1287,6 +1301,7 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_create_collection
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -1343,6 +1358,7 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_creator_dashboard
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -1394,6 +1410,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_comment_on_feedback_thread
         def get(self, thread_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'thread_id': thread_id})
 
     def setUp(self) -> None:
@@ -1547,6 +1564,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_create_feedback_thread
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -1648,6 +1666,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_view_feedback_thread
         def get(self, thread_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'thread_id': thread_id})
 
     def setUp(self) -> None:
@@ -1786,6 +1805,7 @@ class RateExplorationTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_rate_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -1823,6 +1843,7 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_moderator_page
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -1873,6 +1894,7 @@ class FlagExplorationTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_flag_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -1910,6 +1932,7 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_subscribe_to_users
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -1947,6 +1970,7 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_send_moderator_emails
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -1994,6 +2018,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_release_coordinator_page
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -2081,6 +2106,7 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_blog_admin_page
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -2154,6 +2180,7 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_manage_blog_post_editors
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -2234,6 +2261,7 @@ class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_blog_dashboard
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -2310,6 +2338,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_delete_blog_post
         def get(self, blog_post_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'blog_id': blog_post_id})
 
     def setUp(self) -> None:
@@ -2419,6 +2448,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_edit_blog_post
         def get(self, blog_post_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'blog_id': blog_post_id})
 
     def setUp(self) -> None:
@@ -2525,6 +2555,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_run_any_job
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -2604,6 +2635,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_translation_stats
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -2669,6 +2701,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_manage_memcache
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -2754,6 +2787,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_manage_contributors_role
         def get(self, unused_category: str) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -2888,6 +2922,7 @@ class CanManageFeaturedTranslationLanguagesTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_manage_featured_translation_languages
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -2954,6 +2989,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_delete_any_user
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -3008,6 +3044,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_voiceover_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -3178,12 +3215,14 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_add_voice_artist
         def post(self, entity_type: str, entity_id: str) -> None:
+            """Handles POST requests."""
             self.render_json(
                 {'entity_type': entity_type, 'entity_id': entity_id}
             )
 
         @acl_decorators.can_remove_voice_artist
         def delete(self, entity_type: str, entity_id: str) -> None:
+            """Handles DELETE requests."""
             self.render_json(
                 {'entity_type': entity_type, 'entity_id': entity_id}
             )
@@ -3445,6 +3484,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_edit_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -3552,6 +3592,7 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_manage_own_account
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -3601,6 +3642,7 @@ class AccessAdminPageTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_admin_page
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -3659,6 +3701,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_contributor_dashboard_admin_page
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -3761,6 +3804,7 @@ class UploadExplorationTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_upload_exploration
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({})
 
     def setUp(self) -> None:
@@ -3817,6 +3861,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_delete_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -3913,6 +3958,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_suggest_changes_to_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -3959,6 +4005,7 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_suggest_changes
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({})
 
     def setUp(self) -> None:
@@ -4015,6 +4062,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_resubmit_suggestion
         def get(self, suggestion_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'suggestion_id': suggestion_id})
 
     def setUp(self) -> None:
@@ -4112,6 +4160,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
             acl_decorators.open_access
         )
         def get(self, target_id: str, suggestion_id: str) -> None:
+            """Handles GET requests."""
             self.render_json(
                 {'target_id': target_id, 'suggestion_id': suggestion_id}
             )
@@ -4321,6 +4370,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_view_reviewable_suggestions
         def get(self, target_type: str, suggestion_type: str) -> None:
+            """Handles GET requests."""
             self.render_json(
                 {'target_type': target_type, 'suggestion_type': suggestion_type}
             )
@@ -4466,6 +4516,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_publish_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -4553,6 +4604,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_modify_exploration_roles
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -4626,6 +4678,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_publish_collection
         def get(self, collection_id: str) -> None:
+            """Handles GET requests."""
             return self.render_json({'collection_id': collection_id})
 
     class MockUnpublishHandler(
@@ -4639,6 +4692,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_unpublish_collection
         def get(self, collection_id: str) -> None:
+            """Handles GET requests."""
             return self.render_json({'collection_id': collection_id})
 
     def setUp(self) -> None:
@@ -4761,6 +4815,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_learner_dashboard
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -4812,6 +4867,7 @@ class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_learner_groups
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -4864,6 +4920,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_edit_topic
         def get(self, topic_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'topic_id': topic_id})
 
     def setUp(self) -> None:
@@ -4944,6 +5001,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_delete_topic
         def get(self, topic_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'topic_id': topic_id})
 
     def setUp(self) -> None:
@@ -5020,6 +5078,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_view_any_topic_editor
         def get(self, topic_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'topic_id': topic_id})
 
     def setUp(self) -> None:
@@ -5102,6 +5161,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_edit_story
         def get(self, story_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'story_id': story_id})
 
     def setUp(self) -> None:
@@ -5216,6 +5276,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_delete_story
         def get(self, story_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'story_id': story_id})
 
     def setUp(self) -> None:
@@ -5316,6 +5377,7 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_topics_and_skills_dashboard
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -5391,6 +5453,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_add_new_story_to_topic
         def get(self, topic_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'topic_id': topic_id})
 
     def setUp(self) -> None:
@@ -5498,6 +5561,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_story_viewer_page_as_logged_in_user
         def get(self, story_url_fragment: str) -> None:
+            """Handles GET requests."""
             self.render_json({'story_url_fragment': story_url_fragment})
 
     class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -5510,6 +5574,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_story_viewer_page_as_logged_in_user
         def get(self, _: str) -> None:
+            """Handles GET requests."""
             self.render_template('oppia-root.mainpage.html')
 
     def setUp(self) -> None:
@@ -5717,6 +5782,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_story_viewer_page
         def get(self, story_url_fragment: str) -> None:
+            """Handles GET requests."""
             self.render_json({'story_url_fragment': story_url_fragment})
 
     class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -5729,6 +5795,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_story_viewer_page
         def get(self, _: str) -> None:
+            """Handles GET requests."""
             self.render_template('oppia-root.mainpage.html')
 
     def setUp(self) -> None:
@@ -5932,6 +5999,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         def get(
             self, unused_topic_url_fragment: str, subtopic_url_fragment: str
         ) -> None:
+            """Handles GET requests."""
             self.render_json({'subtopic_url_fragment': subtopic_url_fragment})
 
     class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -5948,6 +6016,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             unused_topic_url_fragment: str,
             unused_subtopic_url_fragment: str,
         ) -> None:
+            """Handles GET requests."""
             self.render_template('subtopic-viewer-page-root.component.html')
 
     def setUp(self) -> None:
@@ -6259,6 +6328,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_topic_viewer_page
         def get(self, topic_name: str) -> None:
+            """Handles GET requests."""
             self.render_json({'topic_name': topic_name})
 
     class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -6384,6 +6454,7 @@ class CreateSkillTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_create_skill
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({})
 
     def setUp(self) -> None:
@@ -6446,6 +6517,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_manage_question_skill_status
         def get(self, skill_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'skill_id': skill_id})
 
     def setUp(self) -> None:
@@ -6525,6 +6597,7 @@ class CreateTopicTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_create_topic
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({})
 
     def setUp(self) -> None:
@@ -6583,6 +6656,7 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_manage_rights_for_topic
         def get(self, topic_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'topic_id': topic_id})
 
     def setUp(self) -> None:
@@ -6648,6 +6722,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_change_topic_publication_status
         def get(self, topic_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({topic_id: topic_id})
 
     def setUp(self) -> None:
@@ -6727,6 +6802,7 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_perform_tasks_in_taskqueue
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({})
 
     def setUp(self) -> None:
@@ -6786,6 +6862,7 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_perform_cron_tasks
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({})
 
     def setUp(self) -> None:
@@ -6844,6 +6921,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_edit_skill
         def get(self, skill_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'skill_id': skill_id})
 
     def setUp(self) -> None:
@@ -6923,6 +7001,7 @@ class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_delete_skill
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': True})
 
     def setUp(self) -> None:
@@ -6978,6 +7057,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_edit_question
         def get(self, question_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'question_id': question_id})
 
     def setUp(self) -> None:
@@ -7138,6 +7218,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_view_question_editor
         def get(self, question_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'question_id': question_id})
 
     def setUp(self) -> None:
@@ -7252,6 +7333,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_delete_question
         def get(self, question_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'question_id': question_id})
 
     def setUp(self) -> None:
@@ -7349,6 +7431,7 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_question
         def get(self, question_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'question_id': question_id})
 
     def setUp(self) -> None:
@@ -7400,6 +7483,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_entity
         def get(self, entity_type: str, entity_id: str) -> None:
+            """Handles GET requests."""
             self.render_json(
                 {'entity_type': entity_type, 'entity_id': entity_id}
             )
@@ -7519,6 +7603,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_edit_entity
         def get(self, entity_type: str, entity_id: str) -> None:
+            """Handles GET requests."""
             return self.render_json(
                 {'entity_type': entity_type, 'entity_id': entity_id}
             )
@@ -7806,6 +7891,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_save_exploration
         def get(self, exploration_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
@@ -7953,6 +8039,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_update_suggestion
         def get(self, suggestion_id: str) -> None:
+            """Handles GET requests."""
             self.render_json({'suggestion_id': suggestion_id})
 
     def setUp(self) -> None:
@@ -8376,6 +8463,7 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
 
         @acl_decorators.is_from_oppia_android
         def post(self) -> None:
+            """Handles POST requests."""
             self.render_json({})
 
     REPORT_JSON = {
@@ -8550,6 +8638,7 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_classroom_admin_page
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -8614,6 +8703,7 @@ class CanAccessVoiceoverAdminPageDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_voiceover_admin_page
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -8680,6 +8770,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
         @acl_decorators.is_from_oppia_android_build
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'secret': self.request.headers.get('X-ApiKey')})
 
     def setUp(self) -> None:
@@ -8764,6 +8855,7 @@ class CanAccessTechnicalFeedbackDashboardPageDecoratorTests(
 
         @acl_decorators.can_access_technical_feedback_dashboard
         def get(self) -> None:
+            """Handles GET requests."""
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -8873,6 +8965,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         @acl_decorators.can_access_platform_feedback_reports
         def get(self, dashboard: str, dashboard_id: str) -> None:
+            """Handles GET requests."""
             del dashboard
             del dashboard_id
             self.render_json({'success': 1})
