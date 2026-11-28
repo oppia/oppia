@@ -19,6 +19,8 @@
  * EC.EE. Preview Math interactions.
  */
 
+import {expect, test} from '@playwright/test';
+
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
@@ -38,13 +40,35 @@ const CARD_NAMES = {
   NINTH: '9th Card',
 };
 
-describe('Exploration Editor', function () {
+test.describe.configure({mode: 'serial', timeout: 600000});
+
+test.describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor & LoggedInUser & LoggedOutUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({
+    browser,
+    viewport,
+    isMobile,
+    hasTouch,
+    userAgent,
+  }) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser,
+      [],
+      undefined,
+      {viewport, isMobile, hasTouch, userAgent}
+    );
+
+    // Verify the factory's context uses the project's responsive viewport.
+    expect(viewport).not.toBeNull();
+    if (!viewport) {
+      throw new Error('The math preview suite requires a configured viewport.');
+    }
+    expect(explorationEditor.viewport).toEqual(viewport);
+    expect(explorationEditor.isViewportAtMobileWidth()).toBe(
+      process.env.MOBILE === 'true'
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -54,7 +78,7 @@ describe('Exploration Editor', function () {
 
   // Math interactions require heavy MathJax rendering and take significantly
   // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
-  it('should be able to preview "Fraction Input" interaction', async function () {
+  test('should be able to preview "Fraction Input" interaction', async function () {
     // Add Fraction Input Interaction.
     await explorationEditor.updateCardContent('Enter a fraction: 1/2.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
@@ -77,18 +101,18 @@ describe('Exploration Editor', function () {
     await explorationEditor.saveExplorationDraft();
 
     // Submit a wrong answer.
-    await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.submitAnswerInInputField('1/3');
-    await explorationEditor.expectResponseFeedbackToBe(
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
+    await explorationEditor.submitAnswer('1/3');
+    await explorationEditor.expectOppiaFeedbackToBe(
       'Wrong Answer. Please try again'
     );
     // Submit a blank answer.
-    await explorationEditor.submitAnswerInInputField('');
+    await explorationEditor.submitAnswer('');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Please enter a valid fraction (e.g., 5/3 or 1 2/3)'
     );
     // Submit answer with invalid characters.
-    await explorationEditor.submitAnswerInInputField('1/2a');
+    await explorationEditor.submitAnswer('1/2a');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Please only use numerical digits, spaces or forward slashes (/)'
     );
@@ -101,17 +125,17 @@ describe('Exploration Editor', function () {
       await explorationEditor.closeHintModal();
     }
     // Submit correct answer.
-    await explorationEditor.submitAnswerInInputField('1/2');
-    await explorationEditor.expectResponseFeedbackToBe('Perfect!');
+    await explorationEditor.submitAnswer('1/2');
+    await explorationEditor.expectOppiaFeedbackToBe('Perfect!');
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
-  }, 600000);
+  });
 
   // Math interactions require heavy MathJax rendering and take significantly
   // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
-  it('should be able to preview "Set Input" interaction', async function () {
+  test('should be able to preview "Set Input" interaction', async function () {
     // Add Set Input Interaction.
     await explorationEditor.updateCardContent('Enter a set.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.SET_INPUT);
@@ -135,14 +159,14 @@ describe('Exploration Editor', function () {
     );
 
     // Preview tab.
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
       CARD_NAMES.SECOND,
       'Enter a set.'
     );
     // Submit wrong answer. Also, verifies clicking on "Add Item" adds new item.
     await explorationEditor.submitInputSetAnswer(['5', '6']);
-    await explorationEditor.expectResponseFeedbackToBe(
+    await explorationEditor.expectOppiaFeedbackToBe(
       'Wrong Answer. Please try again'
     );
     // View Hint.
@@ -157,10 +181,10 @@ describe('Exploration Editor', function () {
     }
     // Submit correct answer.
     await explorationEditor.submitInputSetAnswer(['1', '2', '3']);
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
+    await explorationEditor.expectOppiaFeedbackToBe('Great!');
     // Submit an answer with duplicate values.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitInputSetAnswer(['1', '1'], false);
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Oops, it looks like your answer has duplicates!'
@@ -169,17 +193,17 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
-  }, 600000);
+  });
 
   // Math interactions require heavy MathJax rendering and take significantly
   // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
-  it('should be able to preview "Numeric Expression" interaction', async function () {
+  test('should be able to preview "Numeric Expression" interaction', async function () {
     // Add a numeric expression interaction.
     await explorationEditor.updateCardContent('Enter a numeric expression.');
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.NUMERIC_EXPRESSION
     );
-    await explorationEditor.updateNumericExpressionLearnerAnswerInResponseModal(
+    await explorationEditor.updateMathExpressionLearnerAnswerInResponseModal(
       'matches exactly with',
       'sqrt2'
     );
@@ -194,16 +218,16 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addHintToState('The hint is sqrt2');
     // Add solution.
-    await explorationEditor.addNumbericInteractionSolutionToState(
+    await explorationEditor.addMathExpressionSolutionToState(
       'sqrt2',
       'as given in the question.'
     );
     await explorationEditor.saveExplorationDraft();
 
     // Submit a wrong answer.
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitExpressionAnswer('sqrt3');
-    await explorationEditor.expectResponseFeedbackToBe(
+    await explorationEditor.expectOppiaFeedbackToBe(
       'Wrong Answer. Please try again'
     );
     // View Hint.
@@ -218,12 +242,12 @@ describe('Exploration Editor', function () {
     }
     // Submit correct answer.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitExpressionAnswer('sqrt2');
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
+    await explorationEditor.expectOppiaFeedbackToBe('Great!');
     // Submit an answer with non-numeric value.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitExpressionAnswer('hello');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'It looks like you have entered some variables. Please enter numbers only.'
@@ -232,22 +256,22 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
-  }, 600000);
+  });
 
   // Math interactions require heavy MathJax rendering and take significantly
   // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
-  it('should be able to preview "Algebric Expression" intreaction', async function () {
-    // Add a algebric expression interaction.
-    await explorationEditor.updateCardContent('Enter a algebric expression.');
+  test('should be able to preview "Algebraic Expression" interaction', async function () {
+    // Add an algebraic expression interaction.
+    await explorationEditor.updateCardContent('Enter an algebraic expression.');
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.ALGEBRAIC_EXPRESSION,
       false
     );
-    await explorationEditor.customizeAlgebricExpressionInputInteraction(
-      'ab',
+    await explorationEditor.customizeAlgebraicExpressionInputInteraction(
+      ['a', 'b'],
       false
     );
-    await explorationEditor.updateAlgebricExpressionLearnerAnswerInResponseModal(
+    await explorationEditor.updateMathExpressionLearnerAnswerInResponseModal(
       'matches exactly with',
       'a+b'
     );
@@ -262,16 +286,16 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addHintToState('The hint is a+b');
     // Add solution.
-    await explorationEditor.addAlgebricExpressionSolutionToState(
+    await explorationEditor.addMathExpressionSolutionToState(
       'a+b',
       'as given in the question.'
     );
     await explorationEditor.saveExplorationDraft();
 
     // Submit a wrong answer.
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitExpressionAnswer('a-b');
-    await explorationEditor.expectResponseFeedbackToBe(
+    await explorationEditor.expectOppiaFeedbackToBe(
       'Wrong Answer. Please try again'
     );
     // View Hint.
@@ -284,12 +308,12 @@ describe('Exploration Editor', function () {
     }
     // Submit a correct answer.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitExpressionAnswer('a+b');
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
+    await explorationEditor.expectOppiaFeedbackToBe('Great!');
     // Submit a blank answer.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitExpressionAnswer('');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Please enter an answer before submitting.'
@@ -303,15 +327,15 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
-  }, 600000);
+  });
 
   // Math interactions require heavy MathJax rendering and take significantly
   // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
-  it('should be able to preview "Math Equation" interaction', async function () {
+  test('should be able to preview "Math Equation" interaction', async function () {
     // Add a math equation interaction.
     await explorationEditor.updateCardContent('Enter a math equation.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.MATH_EQUATION);
-    await explorationEditor.updateMathEquationLearnerAnswerInResponseModal(
+    await explorationEditor.updateMathExpressionLearnerAnswerInResponseModal(
       'matches exactly with',
       '5x=2+3'
     );
@@ -326,16 +350,16 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addHintToState('The hint is 5x=2+3');
     // Add solution.
-    await explorationEditor.addMathEquationSolutionToState(
+    await explorationEditor.addMathExpressionSolutionToState(
       '5x=2+3',
       'as given in the question.'
     );
     await explorationEditor.saveExplorationDraft();
 
     // Submit wrong answer.
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitExpressionAnswer('5x=2+1');
-    await explorationEditor.expectResponseFeedbackToBe(
+    await explorationEditor.expectOppiaFeedbackToBe(
       'Wrong Answer. Please try again'
     );
     // Submit a blank answer.
@@ -355,12 +379,12 @@ describe('Exploration Editor', function () {
     }
     // Submit correct answer.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitExpressionAnswer('5x=2+3');
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
+    await explorationEditor.expectOppiaFeedbackToBe('Great!');
     // Submit an expression.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
     await explorationEditor.submitExpressionAnswer('5x');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'It looks like you have entered an expression. Please enter an equation instead.'
@@ -369,11 +393,11 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
-  }, 600000);
+  });
 
   // Math interactions require heavy MathJax rendering and take significantly
   // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
-  it('should be able to preview "Number With Units" interaction', async function () {
+  test('should be able to preview "Number With Units" interaction', async function () {
     // Add a number with units input interaction.
     await explorationEditor.updateCardContent('Enter a number with units.');
     await explorationEditor.addInteraction(
@@ -403,13 +427,13 @@ describe('Exploration Editor', function () {
     await explorationEditor.saveExplorationDraft();
 
     // Submit a wrong answer.
-    await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.submitAnswerInInputField('200km');
-    await explorationEditor.expectResponseFeedbackToBe(
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
+    await explorationEditor.submitAnswer('200km');
+    await explorationEditor.expectOppiaFeedbackToBe(
       'Wrong Answer. Please try again'
     );
     // Submit a blank answer.
-    await explorationEditor.submitAnswerInInputField('');
+    await explorationEditor.submitAnswer('');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Enter an answer to continue'
     );
@@ -424,17 +448,18 @@ describe('Exploration Editor', function () {
       await explorationEditor.closeHintModal();
     }
     // Submit a correct answer.
-    await explorationEditor.submitAnswerInInputField('0');
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
+    // The response rule and solution both specify 100km.
+    await explorationEditor.submitAnswer('100km');
+    await explorationEditor.expectOppiaFeedbackToBe('Great!');
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
-  }, 600000);
+  });
 
   // Math interactions require heavy MathJax rendering and take significantly
   // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
-  it('should be able to preview "Ratio Expression Input" interaction', async function () {
+  test('should be able to preview "Ratio Expression Input" interaction', async function () {
     // Add a ratio expression input interaction.
     await explorationEditor.updateCardContent('Enter a ratio expression.');
     await explorationEditor.addInteraction(
@@ -463,13 +488,13 @@ describe('Exploration Editor', function () {
     await explorationEditor.saveExplorationDraft();
 
     // Submit wrong answer.
-    await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.submitAnswerInInputField('5:6');
-    await explorationEditor.expectResponseFeedbackToBe(
+    await explorationEditor.navigateToExplorationEditorPreviewTab();
+    await explorationEditor.submitAnswer('5:6');
+    await explorationEditor.expectOppiaFeedbackToBe(
       'Wrong Answer. Please try again'
     );
     // Submit an answer not in ratio format.
-    await explorationEditor.submitAnswerInInputField('1');
+    await explorationEditor.submitAnswer('1');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Please enter a valid ratio (e.g. 1:2 or 1:2:3).'
     );
@@ -482,11 +507,11 @@ describe('Exploration Editor', function () {
       await explorationEditor.closeHintModal();
     }
     // Submit correct answer.
-    await explorationEditor.submitAnswerInInputField('1:2');
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
-  }, 600000);
+    await explorationEditor.submitAnswer('1:2');
+    await explorationEditor.expectOppiaFeedbackToBe('Great!');
+  });
 
-  it('should render Arabic text as a continuous string', async function () {
+  test('should render Arabic text as a continuous string', async function () {
     // Navigate to editor tab and update the current card's content
     // with a math formula containing Arabic text.
     await explorationEditor.navigateToEditorTab();
@@ -494,7 +519,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.saveExplorationDraft();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

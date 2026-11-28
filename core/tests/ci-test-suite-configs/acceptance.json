@@ -382,8 +382,8 @@
     },
     {
       "name": "exploration-creator/preview-math-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/complete-some-practice-question",
