@@ -200,7 +200,8 @@ export class ReleaseCoordinator extends BaseUser {
           const saveButton = await featureFlags[i].$(saveButtonSelector);
           if (saveButton) {
             await this.waitForElementToBeClickable(saveButton);
-            await saveButton.click();
+            await this.waitForElementToStabilize(saveButton);
+            await this.clickOnElement(saveButton);
           } else {
             throw new Error(
               `Save button not found for feature flag: "${featureName}"`
@@ -299,6 +300,8 @@ export class ReleaseCoordinator extends BaseUser {
           await featureFlags[i].waitForSelector(saveButtonSelector);
           const saveButton = await featureFlags[i].$(saveButtonSelector);
           if (saveButton) {
+            await this.waitForElementToBeClickable(saveButton);
+            await this.waitForElementToStabilize(saveButton);
             await this.clickOnElement(saveButton);
           } else {
             throw new Error(

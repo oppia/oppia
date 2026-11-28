@@ -394,8 +394,9 @@ const mobileReadyToPublishButton = '.ready-to-publish-mobile-option';
 const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
 const mobileSaveStoryChangesDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
+const storyNavDropdownOptionsSelector = '.story-nav-story-nav-dropdown-options';
 const mobilePublishStoryButton =
-  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
+  'div.navbar-mobile-options .story-nav-dropdown-option.e2e-test-mobile-publish-button';
 const storyNodeSelector = 'tr.story-node';
 const publishChapterButton = '.e2e-test-publish-chapters-button';
 const chapterStatusSelector = '.e2e-test-chapter-status';
@@ -5633,15 +5634,100 @@ export class TopicManager extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
-      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
-      if (elements.length < 2) {
-        throw new Error('Not enough elements collapsible headers found,');
+      const isDropdownVisible = await this.isElementVisible(
+        publishUptoChaptersDropdownSelector,
+        true,
+        1000
+      );
+      if (!isDropdownVisible) {
+        await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+        const elements = await this.page.$$(
+          mobileCollapsibleCardHeaderSelector
+        );
+        if (elements.length < 2) {
+          throw new Error('Not enough elements collapsible headers found,');
+        }
+        await elements[1].click();
       }
-      await elements[1].click();
     }
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedVal: string) => {
+          const selectEl = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          if (!selectEl) {
+            return false;
+          }
+          const option = selectEl.querySelector(
+            `option[value="${expectedVal}"]`
+          ) as HTMLOptionElement | null;
+          return option !== null;
+        },
+        {timeout: 10000},
+        publishUptoChaptersDropdownSelector,
+        dropdownValue
+      );
+    } catch (error) {
+      const errorWithMessage = error as Error;
+      const newError = new Error(
+        `Option with value '${dropdownValue}' in publish-up-to dropdown was ` +
+          'not found within 10s. Original error: ' +
+          errorWithMessage.message
+      );
+      newError.stack = errorWithMessage.stack;
+      throw newError;
+    }
+
     await this.clickOnElementWithSelector(publishUptoChaptersDropdownSelector);
     await this.select(publishUptoChaptersDropdownSelector, dropdownValue);
+
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedVal: string) => {
+          const selectEl = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          return selectEl !== null && selectEl.value === expectedVal;
+        },
+        {timeout: 10000},
+        publishUptoChaptersDropdownSelector,
+        dropdownValue
+      );
+    } catch (error) {
+      const errorWithMessage = error as Error;
+      const newError = new Error(
+        `Publish-up-to dropdown value failed to update to '${dropdownValue}' ` +
+          'within 10s. Original error: ' +
+          errorWithMessage.message
+      );
+      newError.stack = errorWithMessage.stack;
+      throw newError;
+    }
+
+    if (dropdownValue !== '-1') {
+      try {
+        await this.page.waitForFunction(
+          (selector: string) => {
+            const button = document.querySelector(
+              selector
+            ) as HTMLButtonElement | null;
+            return button !== null && !button.disabled;
+          },
+          {timeout: 10000},
+          publishChapterButton
+        );
+      } catch (error) {
+        const errorWithMessage = error as Error;
+        const newError = new Error(
+          `Publish Chapters button failed to become enabled for dropdown value '${dropdownValue}' ` +
+            'within 10s. Original error: ' +
+            errorWithMessage.message
+        );
+        newError.stack = errorWithMessage.stack;
+        throw newError;
+      }
+    }
   }
 
   /**
@@ -5655,14 +5741,81 @@ export class TopicManager extends BaseUser {
     chapStatus: string = 'Published'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
-      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
-      if (elements.length < 2) {
-        throw new Error('Not enough elements collapsible headers found,');
+      const isChapterListVisible = await this.isElementVisible(
+        storyNodeSelector,
+        true,
+        1000
+      );
+      if (!isChapterListVisible) {
+        await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+        const elements = await this.page.$$(
+          mobileCollapsibleCardHeaderSelector
+        );
+        if (elements.length < 2) {
+          throw new Error('Not enough elements collapsible headers found,');
+        }
+        await elements[1].click();
       }
-      await elements[1].click();
     }
     await this.page.waitForSelector(storyNodeSelector);
+
+    try {
+      await this.page.waitForFunction(
+        (
+          nodeSelector: string,
+          titleSelector: string,
+          statusSelector: string,
+          expectedTitles: string[],
+          expectedStatus: string
+        ) => {
+          const rows = Array.from(document.querySelectorAll(nodeSelector));
+          const matchedTitles = new Set<string>();
+
+          for (const row of rows) {
+            const title = row.querySelector(titleSelector)?.textContent?.trim();
+            if (title && expectedTitles.includes(title)) {
+              const status = row
+                .querySelector(statusSelector)
+                ?.textContent?.trim();
+              if (status !== expectedStatus) {
+                return false;
+              }
+              matchedTitles.add(title);
+            }
+          }
+
+          return expectedTitles.every(t => matchedTitles.has(t));
+        },
+        {timeout: 10000},
+        storyNodeSelector,
+        chapterTitleSelector,
+        chapterStatusSelector,
+        chapterNames,
+        chapStatus
+      );
+    } catch {
+      const currentStatuses = await this.page.$$eval<
+        {title: string | undefined; status: string | undefined}[]
+      >(
+        storyNodeSelector,
+        (nodes, titleSel: unknown, statusSel: unknown) => {
+          if (typeof titleSel !== 'string' || typeof statusSel !== 'string') {
+            throw new Error('Selectors must be strings');
+          }
+          return nodes.map(node => ({
+            title: node.querySelector(titleSel)?.textContent?.trim(),
+            status: node.querySelector(statusSel)?.textContent?.trim(),
+          }));
+        },
+        chapterTitleSelector,
+        chapterStatusSelector
+      );
+      throw new Error(
+        `Timed out waiting for chapters [${chapterNames.join(', ')}] to reach ` +
+          `status "${chapStatus}". Current chapters in DOM: ` +
+          JSON.stringify(currentStatuses)
+      );
+    }
 
     const rows = await this.page.$$(storyNodeSelector);
     const found = new Set<string>();
@@ -5702,7 +5855,10 @@ export class TopicManager extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
-      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.page.waitForSelector(
+        `${mobilePublishStoryButton}:not(.disabled)`,
+        {visible: true}
+      );
       await this.clickOnElementWithSelector(mobilePublishStoryButton);
     } else {
       await this.waitForElementToBeClickable(publishChapterButton);
@@ -5717,7 +5873,103 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     await this.openStoryEditor(storyName, topicName);
     await this.publishStoryDraftChapterUpto(dropdownValue);
-    await this.publishStoryDraftSerialChapter();
+    await Promise.all([
+      this.page.waitForResponse(response => {
+        if (
+          !response.url().includes('/story_editor_handler/data/') ||
+          response.request().method() !== 'PUT' ||
+          response.status() !== 200
+        ) {
+          return false;
+        }
+        const postData = response.request().postData();
+        return (
+          postData !== undefined &&
+          postData.includes('"commit_message":"Published chapters"')
+        );
+      }),
+      this.publishStoryDraftSerialChapter(),
+    ]);
+    await this.waitForPageToFullyLoad();
+    await this.closeStoryEditorMobileNavbarOptions();
+
+    const targetIndex = Number(dropdownValue);
+    if (targetIndex >= 0) {
+      if (this.isViewportAtMobileWidth()) {
+        const isChapterListVisible = await this.isElementVisible(
+          storyNodeSelector,
+          true,
+          1000
+        );
+        if (!isChapterListVisible) {
+          await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+          const elements = await this.page.$$(
+            mobileCollapsibleCardHeaderSelector
+          );
+          if (elements.length >= 2) {
+            await elements[1].click();
+          }
+        }
+      }
+
+      try {
+        await this.page.waitForFunction(
+          (
+            nodeSel: string,
+            statusSel: string,
+            targetIdx: number,
+            expected: string
+          ) => {
+            const rows = document.querySelectorAll(nodeSel);
+            if (targetIdx >= rows.length) {
+              return false;
+            }
+            for (let i = 0; i <= targetIdx; i++) {
+              const status = rows[i]
+                .querySelector(statusSel)
+                ?.textContent?.trim();
+              if (status !== expected) {
+                return false;
+              }
+            }
+            return true;
+          },
+          {timeout: 15000},
+          storyNodeSelector,
+          chapterStatusSelector,
+          targetIndex,
+          'Published'
+        );
+      } catch {
+        const chapterDetails = await this.page.$$eval<
+          {index: number; title: string; status: string}[]
+        >(
+          storyNodeSelector,
+          (rows, titleSel: unknown, statusSel: unknown) => {
+            if (typeof titleSel !== 'string' || typeof statusSel !== 'string') {
+              throw new Error('Selectors must be strings');
+            }
+            return rows.map((row, i) => ({
+              index: i,
+              title: row.querySelector(titleSel)?.textContent?.trim() || '',
+              status: row.querySelector(statusSel)?.textContent?.trim() || '',
+            }));
+          },
+          chapterTitleSelector,
+          chapterStatusSelector
+        );
+        const targetChapter = chapterDetails[targetIndex];
+        const actualStatus = targetChapter
+          ? targetChapter.status
+          : 'chapter index out of range';
+        const chapterTitle = targetChapter ? targetChapter.title : 'unknown';
+        throw new Error(
+          `Failed to publish chapter at index ${targetIndex} ("${chapterTitle}"). ` +
+            `Expected status "Published", but observed status was "${actualStatus}". ` +
+            `All chapters in DOM: ${JSON.stringify(chapterDetails)}`
+        );
+      }
+    }
   }
 
   /**
@@ -5910,6 +6162,15 @@ export class TopicManager extends BaseUser {
   async closeStoryEditorMobileNavbarOptions(): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
       return;
+    }
+    if (
+      await this.isElementVisible(storyNavDropdownOptionsSelector, true, 1000)
+    ) {
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
+      await this.expectElementToBeVisible(
+        storyNavDropdownOptionsSelector,
+        false
+      );
     }
     if (await this.isElementVisible(navigationContainerSelector, true, 1000)) {
       await this.clickOnElementWithSelector(mobileOptionsSelector);
