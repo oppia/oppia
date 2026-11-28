@@ -188,8 +188,6 @@ const nextCardArrowButton = '.e2e-test-next-button';
 const previousCardButton = '.e2e-test-back-button';
 const previewRestartButton = '.e2e-test-preview-restart-button';
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
-const multipleChoiceInteractionButton =
-  'div.e2e-test-interaction-tile-MultipleChoiceInput';
 const multipleChoiceOptionSelector = '.e2e-test-multiple-choice-option';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 const formErrorContainer = '.e2e-test-form-error-container';
@@ -198,8 +196,6 @@ const uploadImageButton = '.e2e-test-upload-image';
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 const useTheUploadImageButton = '.e2e-test-use-image';
 const feedbackResponseRemoveSelector = '.e2e-test-close-help-card-button';
-const ruleEditorInResponseModalSeclector = 'oppia-rule-editor';
-const dragAndDropItemSelector = '.e2e-test-drag-and-drop-sort-item';
 
 // Question editor selectors.
 const multipleChoiceInteractionButton =
@@ -635,44 +631,6 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(saveUploadedAudioButton, false);
   }
 
-  async addMultipleChoiceInteraction(options: string[]): Promise<void> {
-    await this.page.locator(addInteractionButton).waitFor({
-      state: 'visible',
-    });
-    await this.clickOnElementWithSelector(addInteractionButton);
-
-    await this.expectModalTitleToBe('Choose Interaction');
-    await this.page.locator(multipleChoiceInteractionButton).waitFor({
-      state: 'visible',
-    });
-    await this.clickOnElementWithSelector(multipleChoiceInteractionButton);
-
-    await this.expectCustomizeInteractionTitleToBe(
-      'Customize Interaction (Multiple Choice)'
-    );
-
-    for (let i = 0; i < options.length - 1; i++) {
-      await this.page
-        .locator(addResponseOptionButton)
-        .waitFor({state: 'visible'});
-      await this.clickOnElementWithSelector(addResponseOptionButton);
-    }
-
-    const responseInputs = this.page.locator(stateContentInputField);
-    for (let i = 0; i < options.length; i++) {
-      const input = responseInputs.nth(i);
-      await input.waitFor({state: 'visible'});
-      await input.click();
-      await this.page.keyboard.type(options[i]);
-    }
-
-    await this.clickOnElementWithSelector(saveInteractionButton);
-    await this.page.waitForSelector(addInteractionModalSelector, {
-      state: 'hidden',
-    });
-    showMessage('Multiple Choice interaction has been added successfully.');
-  }
-
   /**
    * Changes tab in interaction selection modal.
    * @param {INTERACTION_TYPES} interactionType - Interaction type to change tab.
@@ -994,144 +952,6 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
 
-  async customizeItemSelectionInteraction(
-    options: string[],
-    minimumNumberOfSelections?: number,
-    maximumNumberOfSelections?: number
-  ): Promise<void> {
-    await this.page.waitForSelector(customizeInteractionBodySelector);
-
-    await this.page
-      .locator(`${customizeInteractionBodySelector} input`)
-      .first()
-      .waitFor({state: 'visible'});
-
-    // Update minimum number of selections.
-    if (minimumNumberOfSelections) {
-      const inputElement = this.page
-        .locator(`${customizeInteractionBodySelector} input`)
-        .first();
-
-      await inputElement.fill(String(minimumNumberOfSelections));
-
-      await expect(inputElement).toHaveValue(String(minimumNumberOfSelections));
-    }
-
-    // Update maximum number of selections.
-    if (maximumNumberOfSelections) {
-      const inputElement = this.page
-        .locator(`${customizeInteractionBodySelector} input`)
-        .nth(1);
-
-      await inputElement.fill(String(maximumNumberOfSelections));
-
-      await expect(inputElement).toHaveValue(String(maximumNumberOfSelections));
-    }
-
-    // Add options.
-    for (let i = 0; i < options.length - 1; i++) {
-      await this.page.locator(addResponseOptionButton).waitFor({
-        state: 'visible',
-      });
-      await this.clickOnElementWithSelector(addResponseOptionButton);
-    }
-
-    const responseInputs = this.page.locator(stateContentInputField);
-    for (let i = 0; i < options.length; i++) {
-      const input = responseInputs.nth(i);
-      await input.waitFor({state: 'visible'});
-      await input.click();
-      await this.page.keyboard.type(options[i]);
-    }
-
-    await this.clickOnElementWithSelector(saveInteractionButton);
-    await this.page.locator(addInteractionModalSelector).waitFor({
-      state: 'hidden',
-    });
-    showMessage('Item Selection interaction has been customized successfully.');
-  }
-
-  /**
-   * Updates the rule in the response modal.
-   * @param rule The rule to update the response modal to.
-   */
-  async updateRuleInResponseModalTo(rule: string): Promise<void> {
-    const responseBox = this.page.locator(responseModalBodySelector);
-
-    await responseBox.waitFor({
-      state: 'visible',
-    });
-
-    const selectInput = responseBox.locator('mat-select');
-    await selectInput.click();
-
-    const ruleOptions = this.page.locator('mat-option');
-
-    await ruleOptions.first().waitFor({
-      state: 'visible',
-    });
-
-    const optionCount = await ruleOptions.count();
-
-    for (let i = 0; i < optionCount; i++) {
-      const option = ruleOptions.nth(i);
-      const optionText = await option.textContent();
-
-      if (optionText?.includes(rule)) {
-        await option.click();
-        break;
-      }
-    }
-
-    await this.page.waitForFunction(
-      ({selector, value}) => {
-        const element = document.querySelector(selector);
-        return element?.textContent?.trim().includes(value);
-      },
-      {
-        selector: `${responseModalBodySelector} mat-select`,
-        value: rule,
-      }
-    );
-  }
-
-  /**
-   * Update the item selection learners answer in the response modal.
-   * @param rule The rule to update.
-   * @param optionsSelections The options selections to update.
-   */
-  async updateItemSelectionLearnersAnswerInResponseModal(
-    rule:
-      | 'is equal to'
-      | 'is proper subset of'
-      | 'contains at least one of'
-      | 'omits atleast on of',
-    optionsSelections: string[]
-  ): Promise<void> {
-    const responseBox = this.page.locator(responseModalBodySelector);
-
-    await responseBox.waitFor({
-      state: 'visible',
-    });
-
-    // Update Rule.
-    await this.updateRuleInResponseModalTo(rule);
-
-    // Select given options.
-    const options = responseBox.locator('mat-checkbox');
-
-    for (let i = 0; i < (await options.count()); i++) {
-      const option = options.nth(i);
-      const optionText = (await option.textContent())?.trim() ?? '';
-
-      if (optionsSelections.includes(optionText)) {
-        // Click the visible inner container; the native input is hidden.
-        await option.locator('.mat-checkbox-inner-container').click();
-        await expect(option.locator('input')).toBeChecked();
-      }
-    }
-  }
-
   /**
    * Selects multiple options from the item selection input.
    * This function will uncheck any currently checked options that are not in
@@ -1199,75 +1019,6 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
-  /**
-   * Customizes the drag and drop sort interaction.
-   * @param {string[]} options - The options to be selected.
-   */
-  async customizeDragAndDropSortInteraction(options: string[]): Promise<void> {
-    for (let i = 0; i < options.length - 1; i++) {
-      await this.page.locator(addResponseOptionButton).waitFor({
-        state: 'visible',
-      });
-      await this.clickOnElementWithSelector(addResponseOptionButton);
-    }
-
-    const responseInputs = this.page.locator(stateContentInputField);
-
-    for (let i = 0; i < options.length; i++) {
-      const responseInput = responseInputs.nth(i);
-
-      // The editor is contenteditable, so select the text and type it.
-      await responseInput.click({clickCount: 3});
-      await this.page.keyboard.type(options[i]);
-    }
-
-    await this.clickOnElementWithSelector(saveInteractionButton);
-
-    await this.page.locator(addInteractionModalSelector).waitFor({
-      state: 'hidden',
-    });
-  }
-
-  /**
-   * Updates rule and options in response modal for Drag and Drop Sort interaction.
-   * @param rule Rule to update.
-   * @param optionsSelections Options selections to update.
-   */
-  async updateDragAndDropSortLearnersAnswerInResponseModal(
-    rule: string,
-    optionsSelections: string[] | number[]
-  ): Promise<void> {
-    // Update Rule.
-    await this.updateRuleInResponseModalTo(rule);
-
-    // Update Options Selections.
-    const ruleBox = this.page.locator(ruleEditorInResponseModalSeclector);
-
-    await ruleBox.waitFor({
-      state: 'visible',
-    });
-
-    const ruleType =
-      typeof optionsSelections[0] === 'number' ? 'ordering' : 'comparasion';
-
-    if (ruleType === 'ordering') {
-      const selectBoxes = ruleBox.locator('select');
-      const selectBoxCount = await selectBoxes.count();
-
-      if (selectBoxCount !== optionsSelections.length) {
-        throw new Error(
-          `Expected ${optionsSelections.length} select boxes, but found ${selectBoxCount}.`
-        );
-      }
-
-      for (let i = 0; i < selectBoxCount; i++) {
-        await selectBoxes.nth(i).selectOption(optionsSelections[i].toString());
-      }
-    } else {
-      throw new Error('Rule currently not supported');
-    }
-  }
-
   async submitDragAndDropSortAnswer(answerItems: string[]): Promise<void> {
     await this.page.locator(dragAndDropItemSelector).first().waitFor({
       state: 'visible',
@@ -1329,29 +1080,6 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.clickOnSubmitAnswerButtonInExplorationEditorPage();
-  }
-
-  /**
-   * Function to drag and drop an item in the drag and drop sort solution.
-   * @param {number} startX - The starting x coordinate of the item.
-   * @param {number} startY - The starting y coordinate of the item.
-   * @param {number} endX - The ending x coordinate of the item.
-   * @param {number} endY - The ending y coordinate of the item.
-   */
-  async dragAndDropItem(
-    startX: number,
-    startY: number,
-    endX: number,
-    endY: number
-  ): Promise<void> {
-    await this.page.mouse.move(startX, startY);
-    await this.page.waitForTimeout(1000);
-    await this.page.mouse.down();
-    await this.page.waitForTimeout(1000);
-    await this.page.mouse.move(endX, endY, {steps: 10});
-    await this.page.waitForTimeout(1000);
-    await this.page.mouse.up();
-    await this.page.waitForTimeout(1000);
   }
 
   /**
