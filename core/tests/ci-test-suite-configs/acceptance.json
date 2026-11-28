@@ -167,8 +167,8 @@
     },
     {
       "name": "lesson-creator/modify-an-existing-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/modify-an-existing-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/lesson-creator/modify-an-existing-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "lesson-creator/save-and-publish-the-exploration",

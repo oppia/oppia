@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {Page, ElementHandle, Download, expect} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -73,6 +73,12 @@ const explorationStateGraphModalSelector =
   '.e2e-test-exploration-state-graph-modal';
 const mobileStateGraphResizeButton = '.e2e-test-mobile-graph-resize-button';
 const currentCardNameContainerSelector = '.e2e-test-state-name-container';
+
+const cardContentSelector =
+  '.e2e-test-state-editor .e2e-test-state-content-display';
+const editCardContentButtonSelector = '.e2e-test-edit-content-pencil-button';
+const stateNodeSelector = '.e2e-test-node-label';
+const closeModalButtonSelector = '.e2e-test-modal-close-button';
 
 const stateEditSelector = '.e2e-test-state-edit-content';
 const stateResponsesSelector = '.e2e-test-default-response-tab';
@@ -238,8 +244,219 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
 } as const;
 
 const addTitleBar = 'input#explorationTitle';
+const ROLES_SAVE_TIMEOUT_MSECS = 90000;
 
 export class ExplorationEditor extends BaseUser {
+  private lostChangesDownload?: Download;
+
+  /**
+   * Waits until pending draft changes finish autosaving.
+   */
+  async waitForAutosaveToComplete(): Promise<void> {
+    await this.expectElementToBeVisible('.e2e-test-autosave-indicator', false);
+  }
+
+  /**
+   * Assigns manager permissions to the specified exploration contributor.
+   */
+  async assignUserToManagerRole(username: string): Promise<void> {
+    await this.expandSettingsTabSection('Roles');
+    await this.clickOnElementWithSelector('.e2e-test-edit-roles');
+    await this.typeInInputField('.e2e-test-role-username', username);
+    await this.clickOnElementWithSelector('.e2e-test-role-select');
+    await this.selectMatOption('Manager (can edit permissions)');
+    await this.expectElementToBeVisible('button.e2e-test-save-role:enabled');
+    await this.clickOnElementWithSelector('button.e2e-test-save-role');
+    // Role names are refreshed from the backend after permissions are saved.
+    // Backend permissions update also triggers contributor notifications that
+    // can take additional time to finish.
+    await this.expectElementToBeVisible(
+      `.e2e-test-owner-role-names span:text-is("${username}")`,
+      true,
+      this.page,
+      ROLES_SAVE_TIMEOUT_MSECS
+    );
+  }
+
+  /**
+   * Verifies the save button state in the current viewport.
+   */
+  async expectSaveDraftButtonToBeDisabled(
+    disabled: boolean = true
+  ): Promise<void> {
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.page.isVisible(mobileNavbarOptions))
+    ) {
+      await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+    }
+    const selector = this.isViewportAtMobileWidth()
+      ? mobileSaveChangesButtonSelector
+      : saveChangesButton;
+    await this.expectElementToBeVisible(
+      `${selector}:${disabled ? 'disabled' : 'enabled'}`
+    );
+  }
+
+  /**
+   * Verifies the version mismatch modal and its exact heading.
+   */
+  async expectLostChangesModalToBeVisible(
+    isVisible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      '.e2e-test-lost-changes-modal',
+      isVisible
+    );
+    if (isVisible) {
+      await this.expectTextContentToBe(
+        '.e2e-test-lost-changes-modal .e2e-test-modal-header',
+        'Error Saving Exploration'
+      );
+    }
+  }
+
+  /**
+   * Discards the lost draft and waits for the application to reload.
+   */
+  async discardLostChanges(): Promise<void> {
+    await this.expectLostChangesModalToBeVisible();
+    await Promise.all([
+      this.page.waitForEvent('load'),
+      this.clickOnElementWithSelector(errorSavingExplorationModal),
+    ]);
+    await this.expectLostChangesModalToBeVisible(false);
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+  }
+
+  /**
+   * Captures the exported changes before the application discards the draft.
+   */
+  async exportAndDiscardLostChanges(): Promise<void> {
+    await this.expectLostChangesModalToBeVisible();
+    const [download] = await Promise.all([
+      this.page.waitForEvent('download'),
+      this.page.waitForEvent('load'),
+      this.clickOnElementWithSelector(
+        '.e2e-test-discard-and-export-lost-changes-button'
+      ),
+    ]);
+    this.lostChangesDownload = download;
+    await this.expectLostChangesModalToBeVisible(false);
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+  }
+
+  /**
+   * Verifies the lost changes file has finished downloading and removes it.
+   */
+  async expectLostChangesFileToBeDownloaded(): Promise<void> {
+    const download = this.lostChangesDownload;
+    if (!download) {
+      throw new Error('No lost changes download was captured.');
+    }
+    try {
+      expect(download.suggestedFilename()).toBe('lostChanges.txt');
+      expect(await download.failure()).toBeNull();
+    } finally {
+      await download.delete();
+      this.lostChangesDownload = undefined;
+    }
+  }
+
+  /**
+   * Renames the active state and verifies the updated name.
+   */
+  async updateStateName(newStateName: string): Promise<void> {
+    await this.clickOnElementWithSelector(currentCardNameContainerSelector);
+    await this.clearAllTextFrom('.e2e-test-state-name-input');
+    await this.typeInInputField('.e2e-test-state-name-input', newStateName);
+    await this.clickOnElementWithSelector('button.e2e-test-state-name-submit');
+    await this.expectElementToBeVisible('.e2e-test-state-name-input', false);
+    await this.waitForAutosaveToComplete();
+    await this.waitForPageToFullyLoad();
+    await this.expectStateNameToBe(newStateName);
+  }
+
+  /**
+   * Verifies the active state name without including the edit icon.
+   */
+  async expectStateNameToBe(expectedStateName: string): Promise<void> {
+    await this.expectTextContentToBe(
+      `${currentCardNameContainerSelector} strong`,
+      expectedStateName
+    );
+  }
+
+  /**
+   * Verifies that the current card content matches the expected text.
+   */
+  async expectCardContentToBe(expectedContent: string): Promise<void> {
+    await this.expectTextContentToBe(cardContentSelector, expectedContent);
+  }
+
+  /**
+   * Verifies that the card content edit pencil is visible.
+   */
+  async expectEditCardContentPencilButtonToBeVisible(
+    isVisible: boolean = true
+  ): Promise<void> {
+    // Wait for the card to render before checking that its edit control is absent.
+    await this.expectElementToBeVisible(cardContentSelector);
+    await this.expectElementToBeVisible(
+      editCardContentButtonSelector,
+      isVisible
+    );
+  }
+
+  /**
+   * Verifies that the exploration graph contains the specified card.
+   */
+  async expectExplorationGraphToContainCard(cardName: string): Promise<void> {
+    const isMobile = this.isViewportAtMobileWidth();
+    if (isMobile) {
+      if (!(await this.page.isVisible(explorationStateGraphModalSelector))) {
+        await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+      }
+      await this.expectElementToBeVisible(explorationStateGraphModalSelector);
+    }
+
+    const selector = isMobile
+      ? `${explorationStateGraphModalSelector} ${stateNodeSelector}`
+      : stateNodeSelector;
+    await this.expectElementToBeVisible(
+      isMobile
+        ? `${explorationStateGraphModalSelector} .e2e-test-node`
+        : '.e2e-test-node'
+    );
+    const truncatedName =
+      cardName.length > 15 ? `${cardName.slice(0, 12)}...` : cardName;
+    await this.page.waitForFunction(
+      ({
+        nodeSelector,
+        name,
+        truncated,
+      }: {
+        nodeSelector: string;
+        name: string;
+        truncated: string;
+      }) => {
+        const labels = Array.from(document.querySelectorAll(nodeSelector)).map(
+          label => label.textContent?.trim()
+        );
+        return labels.includes(name) || labels.includes(truncated);
+      },
+      {nodeSelector: selector, name: cardName, truncated: truncatedName}
+    );
+
+    if (isMobile) {
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
   /**
    * Navigate to creator dashboard page.
    */
@@ -990,6 +1207,25 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
+    // Selecting the active card does not trigger navigation on mobile and
+    // triggers a redundant fade/re-init cycle on desktop.
+    const headingName = !cardName.trimEnd().endsWith('...')
+      ? cardName
+      : cardName.trimEnd().slice(0, -3);
+    await this.expectElementToBeVisible(
+      `${currentCardNameContainerSelector} strong`
+    );
+    const currentCardHeading = await this.getTextContent(
+      `${currentCardNameContainerSelector} strong`
+    );
+    if (
+      currentCardHeading === cardName ||
+      (cardName.trimEnd().endsWith('...') &&
+        currentCardHeading.startsWith(headingName))
+    ) {
+      return;
+    }
+
     if (this.isViewportAtMobileWidth()) {
       // Check if the state graph modal is already open before clicking the
       // resize button.
@@ -1054,9 +1290,6 @@ export class ExplorationEditor extends BaseUser {
     );
     await this.clickOnElement(nodeBackground);
 
-    const headingName = !cardName.trimEnd().endsWith('...')
-      ? cardName
-      : cardName.trimEnd().slice(0, -3);
     try {
       await this.page.waitForFunction(
         ({selector, value}: {selector: string; value: string}) => {
@@ -1221,6 +1454,12 @@ export class ExplorationEditor extends BaseUser {
   async updateCardContent(content: string): Promise<void> {
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
+    // Keep the editor clear of the fixed navigation bar before checking
+    // whether it is clickable.
+    const contentEditor = await this.getElementInParent(stateContentInputField);
+    await contentEditor.evaluate(element => {
+      element.scrollIntoView({block: 'center'});
+    });
     await this.clearAllTextFrom(stateContentInputField);
     await this.typeInInputField(stateContentInputField, `${content}`);
     await this.clickOnElementWithSelector(saveContentButton);
