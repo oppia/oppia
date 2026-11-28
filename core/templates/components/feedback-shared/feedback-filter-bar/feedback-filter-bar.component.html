@@ -4,7 +4,8 @@
     <div class="oppia-feedback-filter-bar-stats">
       <span class="oppia-feedback-filter-bar-stats-label">Status:</span>
       <select class="oppia-feedback-filter-bar-select e2e-test-feedback-filter-status-select"
-              [(ngModel)]="selectedStatus">
+              [(ngModel)]="selectedStatus"
+              aria-label="Status">
         <option *ngFor="let s of statusOptions" [value]="s">
           {{ statusLabels[s] }}
         </option>
@@ -14,7 +15,8 @@
     <div class="oppia-feedback-filter-bar-stats" *ngIf="config.showTeamFilter">
       <span class="oppia-feedback-filter-bar-stats-label">Technical Team:</span>
       <select class="oppia-feedback-filter-bar-select e2e-test-feedback-filter-technical-team-select"
-              [(ngModel)]="selectedTechnicalTeam">
+              [(ngModel)]="selectedTechnicalTeam"
+              aria-label="Technical Team">
         <option *ngFor="let t of teamOptions" [value]="t">
           {{ teamLabels[t] }}
         </option>
@@ -24,7 +26,8 @@
     <div class="oppia-feedback-filter-bar-stats" *ngIf="config.showCreatorFeedbackTypeFilter">
       <span class="oppia-feedback-filter-bar-stats-label">Feedback Type:</span>
       <select class="oppia-feedback-filter-bar-select e2e-test-feedback-filter-creator-feedback-type-select"
-              [(ngModel)]="selectedCreatorFeedbackType">
+              [(ngModel)]="selectedCreatorFeedbackType"
+              aria-label="Feedback Type">
         <option *ngFor="let t of creatorFeedbackTypeOptions" [value]="t">
           {{ creatorFeedbackTypeLabels[t] }}
         </option>
