@@ -38,7 +38,7 @@ from core.platform.speech_synthesis import dev_mode_speech_synthesis_services
 from core.tests import test_utils
 
 import bs4
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -48,6 +48,17 @@ if MYPY:  # pragma: no cover
 
 
 class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
+    def test_is_rule_input_content_id(self) -> None:
+        self.assertTrue(
+            voiceover_services.is_rule_input_content_id('rule_input_141')
+        )
+        self.assertTrue(
+            voiceover_services.is_rule_input_content_id('rule_inputs_141')
+        )
+        self.assertFalse(
+            voiceover_services.is_rule_input_content_id('content_141')
+        )
+
     def test_should_able_to_convert_oppia_link_tag_to_p_tag(self) -> None:
         content_html = (
             '<p><oppia-noninteractive-link ng-version="11.2.14" '
@@ -697,6 +708,37 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(entity_voiceovers_models), 1)
+
+    def test_should_skip_rule_input_content_during_regeneration(self) -> None:
+        errors_while_voiceover_regeneration = voiceover_regeneration_services.regenerate_voiceovers_of_exploration(
+            'exp_id',
+            2,
+            # Here we use cast because this test intentionally passes a
+            # non-string value to verify rule-input content is skipped.
+            cast(
+                Dict[str, str],
+                {'rule_input_141': ['answer', 'list']},
+            ),
+            'en-US',
+        )
+
+        self.assertEqual(errors_while_voiceover_regeneration, [])
+        self.assertEqual(
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                'exp_id', 'exploration', 2
+            ),
+            [],
+        )
+
+    def test_should_reject_direct_rule_input_voiceover_regeneration(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            ValueError, 'Rule input content IDs are not eligible'
+        ):
+            voiceover_regeneration_services.regenerate_voiceover_for_exploration_content(
+                'exp_id', 2, 'Introduction', 'rule_input_141', 'en-US'
+            )
 
     def test_should_return_errors_if_voiceover_regeneration_fails(self) -> None:
         exploration_id = 'exp_id'
