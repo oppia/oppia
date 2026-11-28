@@ -115,6 +115,40 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
                 middleware({'key': 'value'}, test_response), test_response
             )
 
+    def test_path_that_is_not_utf8_returns_404(self) -> None:
+        # The bytes of "/%C0" are not valid UTF-8, so webapp2 would fail to
+        # decode the path while routing and return a 500.
+        wsgi_app_was_called = False
+
+        def wsgi_app_mock(
+            environ: Dict[str, str], response: webtest.TestResponse
+        ) -> webtest.TestResponse:
+            """Mock WSGI app that records whether it was called.
+
+            Args:
+                environ: dict. Environment variables.
+                response: webtest.TestResponse. Response to return.
+
+            Returns:
+                webtest.TestResponse. Response.
+            """
+            nonlocal wsgi_app_was_called
+            wsgi_app_was_called = True
+            return response
+
+        app = webtest.TestApp(
+            main.NdbWsgiMiddleware(cast(webapp2.WSGIApplication, wsgi_app_mock))
+        )
+        response = app.get('/%C0', expect_errors=True)
+
+        self.assertEqual(response.status_int, 404)
+        self.assertFalse(wsgi_app_was_called)
+
+    def test_path_that_is_not_utf8_returns_404_from_main_app(self) -> None:
+        response = webtest.TestApp(main.app).get('/%C0', expect_errors=True)
+
+        self.assertEqual(response.status_int, 404)
+
 
 class MainRoutingTests(test_utils.GenericTestBase):
     """Test the routing helper functions in main.py."""

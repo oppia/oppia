@@ -267,15 +267,21 @@ class BaseHandler(
         # used Any type here.
         self.values: Dict[str, Any] = {}
 
-        # This try-catch block is intended to log cases where getting the
-        # request payload errors with ValueError: Invalid boundary in multipart
-        # form: b''. This is done to gather sufficient data to help debug the
-        # error if it arises in the future.
+        # Getting the payload of a malformed multipart request raises a
+        # ValueError (e.g. "Invalid boundary in multipart form: b''"). It is
+        # logged with the request method and path only: formatting the whole
+        # request decodes its raw body, which fails for a body that is not
+        # UTF-8 and would hide the original error. The request is answered
+        # with a 400 in dispatch().
+        self.payload_parse_error: Optional[ValueError] = None
         try:
             payload_json_string = self.request.get('payload')
         except ValueError as e:
-            logging.error('%s: request %s', e, self.request)
-            raise e
+            logging.error(
+                '%s: request %s %s', e, self.request.method, self.request.path
+            )
+            self.payload_parse_error = e
+            payload_json_string = None
         # TODO(#13155): Remove the if-else part once all the handlers have had
         # schema validation implemented.
         if payload_json_string:
@@ -464,6 +470,10 @@ class BaseHandler(
 
         schema_validation_succeeded = True
         try:
+            if self.payload_parse_error is not None:
+                raise self.InvalidInputException(
+                    'The request payload could not be parsed.'
+                )
             self.validate_and_normalize_args()
 
         # TODO(#13155): Remove NotImplementedError once all the handlers

@@ -84,7 +84,7 @@ from core.platform.auth import firebase_auth_services
 
 import google.cloud.logging
 import webapp2
-from typing import Dict, Optional, Type, TypeVar
+from typing import Callable, Dict, Optional, Type, TypeVar, cast
 from webapp2_extras import routes
 
 MYPY = False
@@ -1767,6 +1767,23 @@ class NdbWsgiMiddleware:
     def __call__(
         self, environ: Dict[str, str], start_response: webapp2.Response
     ) -> webapp2.Response:
+        # The WSGI server gives PATH_INFO as the percent-decoded bytes of the
+        # path in a latin-1 string. If those bytes are not valid UTF-8 (e.g.
+        # for "/%C0"), webapp2 fails to decode the path while matching the
+        # routes, before any handler runs, and the request ends in a 500.
+        # Such a path cannot name any page, so it gets a 404 here.
+        try:
+            environ.get('PATH_INFO', '').encode('latin-1').decode('utf-8')
+        except UnicodeError:
+            not_found_response = webapp2.Response()
+            not_found_response.status = 404
+            # Here we use cast because a webapp2 Response is a WSGI app, i.e.
+            # a callable, but the webapp2 stubs do not declare __call__.
+            return cast(
+                Callable[[Dict[str, str], webapp2.Response], webapp2.Response],
+                not_found_response,
+            )(environ, start_response)
+
         global_cache = datastore_services.RedisCache(
             cache_services.get_cloud_ndb_redis_client()
         )
