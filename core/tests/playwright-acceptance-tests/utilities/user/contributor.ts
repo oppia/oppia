@@ -17,17 +17,21 @@
  * common to all the users of the contributor dashboard.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {expect, ElementHandle, Locator, Page} from '@playwright/test';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditor} from './exploration-editor';
 
 const contributionTabSelector = '.e2e-test-contribution-tab';
 const activeTabNameSelector = '.e2e-test-active-tab-name';
-const opportunityItemSelector = '.e2e-test-opportunity-list-item';
-const opportunityItemHeadingSelector =
+const activeTabDescriptionSelector = '.e2e-test-active-tab-description';
+const usernameSelector = '.e2e-test-username';
+export const opportunityItemSelector = '.e2e-test-opportunity-list-item';
+export const opportunityItemHeadingSelector =
   '.e2e-test-opportunity-list-item-heading';
-const opportunitySubHeadingSelector =
+export const opportunitySubHeadingSelector =
   '.e2e-test-opportunity-list-item-subheading';
+export const opportunityTranslateButtonSelector =
+  '.e2e-test-opportunity-list-item-button';
 const contributionTabClass = 'e2e-test-contribution-tab';
 const activeElementClass = 'e2e-test-active';
 const activeNavbarButtonClass = 'oppia-contributions-active-navbar';
@@ -47,8 +51,130 @@ const desktopElementSelector = '.e2e-test-desktop-element';
 const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
 const reviewCommentTextareaSelector = '.e2e-test-suggestion-review-message';
 const rteDisplaySelector = '.e2e-test-state-content-display';
+const languageSelector = '.e2e-test-language-selector';
+const selectedLanguageSelector = '.e2e-test-language-selector-selected';
+const featuredLanguageOptionSelector = '.e2e-test-featured-language';
+const languageOptionSelector = '.e2e-test-language-selector-option';
+const featuredLanguageContainerSelector =
+  '.e2e-test-featured-language-container';
+const featuredLanguageTooltipSelector = '.e2e-test-featured-language-tooltip';
+const featuredLanguageExplanationSelector =
+  '.e2e-test-language-selector-featured-explanation';
+const languageDropdownToggleArrowSelector =
+  '.e2e-test-language-dropdown-toggle-arrow';
+const languageDropdownSelector = '.e2e-test-language-selector-dropdown';
 
 export class Contributor extends ExplorationEditor {
+  /**
+   * Verifies the username shown in the contributor dashboard.
+   *
+   * The dashboard hides this element on narrow viewports; callers should
+   * perform the desktop-only check when the viewport requires it.
+   */
+  async expectUsernameToBe(expectedUsername: string): Promise<void> {
+    await expect(this.page.locator(usernameSelector)).toHaveText(
+      expectedUsername
+    );
+  }
+
+  /** Verifies the active contribution tab name. */
+  async expectActiveTabNameToBe(tabName: string): Promise<void> {
+    await expect(this.page.locator(activeTabNameSelector)).toHaveText(tabName);
+  }
+
+  /** Verifies the active contribution tab description. */
+  async expectActiveTabDescriptionToBe(description: string): Promise<void> {
+    await expect(this.page.locator(activeTabDescriptionSelector)).toContainText(
+      description
+    );
+  }
+
+  /** Verifies whether the current tab contains translation opportunities. */
+  async expectTranslationOpportunitiesToBePresent(
+    present: boolean = true
+  ): Promise<void> {
+    const opportunities = this.page.locator(opportunityItemSelector);
+    if (present) {
+      await expect(opportunities.first()).toBeVisible();
+    } else {
+      await expect(opportunities).toHaveCount(0);
+    }
+  }
+
+  /** Opens the language filter dropdown. */
+  async clickOnLanguageFilterDropdown(): Promise<void> {
+    await this.clickOnElementWithSelector(languageSelector);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(languageOptionSelector);
+  }
+
+  /** Selects a language from the translation opportunity filter. */
+  async selectLanguageFilter(language: string): Promise<void> {
+    await this.clickOnLanguageFilterDropdown();
+
+    const languageOptions = this.page.locator(
+      `${featuredLanguageOptionSelector}, ${languageOptionSelector}`
+    );
+    const matchingOption = languageOptions.filter({hasText: language}).first();
+
+    await matchingOption.waitFor({state: 'visible'});
+    await matchingOption.click();
+    await this.expectTextContentToContain(selectedLanguageSelector, language);
+  }
+
+  /** Verifies the selected language filter. */
+  async expectSelectedFilterLanguageToBe(language: string): Promise<void> {
+    await expect(this.page.locator(selectedLanguageSelector)).toContainText(
+      language
+    );
+  }
+
+  /** Verifies that all expected featured languages are listed. */
+  async expectFeaturedLanguagesToContain(
+    expectedLanguages: string[]
+  ): Promise<void> {
+    await expect(
+      this.page.locator(featuredLanguageContainerSelector)
+    ).toBeVisible();
+
+    const featuredLanguages = this.page.locator(featuredLanguageOptionSelector);
+    for (const language of expectedLanguages) {
+      await expect(
+        featuredLanguages.filter({hasText: language}).first()
+      ).toBeVisible();
+    }
+  }
+
+  /** Verifies the explanation shown for a featured language. */
+  async mouseOverFeaturedLanguageTooltip(
+    index: number,
+    tooltipMessage: string
+  ): Promise<void> {
+    await expect(
+      this.page.locator(featuredLanguageContainerSelector)
+    ).toBeVisible();
+    await this.page.locator(featuredLanguageTooltipSelector).nth(index).hover();
+    await expect(
+      this.page.locator(featuredLanguageExplanationSelector)
+    ).toHaveText(tooltipMessage);
+    await this.page.locator(languageDropdownToggleArrowSelector).click();
+    await expect(this.page.locator(languageDropdownSelector)).toBeHidden();
+  }
+
+  /** Selects a subject in the translation opportunity filter. */
+  async selectSubjectInTranslateTextTab(subject: string): Promise<void> {
+    await this.page.locator(topicSelector).click();
+    const option = this.page
+      .locator(topicOptionSelector)
+      .filter({hasText: subject})
+      .first();
+    await expect(option).toBeVisible();
+    await option.click();
+    await expect(this.page.locator(selectedTopicSelector)).toContainText(
+      subject
+    );
+  }
+
   /**
    * Checks if the opportunity is visible and matches the expected values.
    * @param {string} heading - The expected heading of the opportunity.
@@ -484,6 +610,35 @@ export class Contributor extends ExplorationEditor {
     await this.expectTextContentToBe(rteDisplaySelector, question);
   }
 }
+
+/** Returns an opportunity card matching the supplied heading and subheading. */
+export const getTranslationOpportunityCard = async function (
+  page: Page,
+  heading: string,
+  subheading: string
+): Promise<Locator> {
+  await page
+    .locator(opportunityItemSelector)
+    .first()
+    .waitFor({state: 'visible'});
+
+  const opportunityItem = page
+    .locator(opportunityItemSelector)
+    .filter({
+      has: page
+        .locator(opportunityItemHeadingSelector)
+        .filter({hasText: heading}),
+    })
+    .filter({
+      has: page
+        .locator(opportunitySubHeadingSelector)
+        .filter({hasText: subheading}),
+    })
+    .first();
+
+  await opportunityItem.waitFor({state: 'visible'});
+  return opportunityItem;
+};
 
 export const ContributorFactory = (page: Page): Contributor => {
   return new Contributor(page);

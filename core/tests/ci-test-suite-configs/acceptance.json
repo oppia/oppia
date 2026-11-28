@@ -537,8 +537,8 @@
     },
     {
       "name": "translation-submitter/translate-exploration-in-target-language",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/translate-exploration-in-target-language.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/translation-submitter/translate-exploration-in-target-language.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "translation-submitter/auto-translate-feature",
