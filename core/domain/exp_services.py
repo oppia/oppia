@@ -40,7 +40,6 @@ from core.constants import constants
 from core.domain import (
     activity_services,
     caching_services,
-    change_domain,
     draft_upgrade_services,
     email_manager,
     email_subscription_services,
@@ -140,17 +139,6 @@ class UserExplorationDataDict(TypedDict):
     email_preferences: user_domain.UserExplorationPrefsDict
     next_content_id_index: int
     exploration_metadata: exp_domain.ExplorationMetadataDict
-
-
-class SnapshotsMetadataDict(TypedDict):
-    """Dictionary representing the snapshot metadata for exploration model."""
-
-    committer_id: str
-    commit_message: str
-    commit_cmds: List[Dict[str, change_domain.AcceptableChangeDictTypes]]
-    commit_type: str
-    version_number: int
-    created_on_ms: float
 
 
 # The maximum number of iterations allowed for populating the results of a
@@ -1824,31 +1812,96 @@ def delete_explorations_from_activities(exploration_ids: List[str]) -> None:
 
 
 # Operations on exploration snapshots.
+def get_exploration_snapshot_metadata_from_model(
+    model: exp_models.ExplorationSnapshotMetadataModel,
+) -> exp_domain.ExplorationSnapshotMetadata:
+    """Returns an ExplorationSnapshotMetadata domain object given an
+    ExplorationSnapshotMetadataModel loaded from the datastore.
+
+    Args:
+        model: ExplorationSnapshotMetadataModel. The snapshot metadata model
+            loaded from the datastore.
+
+    Returns:
+        ExplorationSnapshotMetadata. The corresponding domain object.
+    """
+    return exp_domain.ExplorationSnapshotMetadata(
+        model.get_unversioned_instance_id(),
+        int(model.get_version_string()),
+        model.committer_id,
+        model.commit_type,
+        model.commit_message,
+        model.commit_cmds,
+        model.commit_cmds_user_ids,
+        model.content_user_ids,
+        model.created_on,
+        model.last_updated,
+        model.deleted,
+    )
+
+
 def get_exploration_snapshots_metadata(
-    exploration_id: str, allow_deleted: bool = False
-) -> List[SnapshotsMetadataDict]:
-    """Returns the snapshots for this exploration, as dicts, up to and including
-    the latest version of the exploration.
+    exploration_id: str,
+    version_numbers: Optional[Sequence[int]] = None,
+    allow_deleted: bool = False,
+) -> List[exp_domain.ExplorationSnapshotMetadata]:
+    """Returns the snapshots for this exploration, as domain objects.
 
     Args:
         exploration_id: str. The id of the exploration whose snapshots_metadata
             is required.
-        allow_deleted: bool. Whether to allow retrieval of deleted snapshots.
+        version_numbers: list(int)|None. Optional list of version numbers to
+            fetch. If None, snapshots for all versions from 1 to the current
+            version are fetched.
+        allow_deleted: bool. Whether to allow retrieval of snapshots for a
+            deleted exploration.
 
     Returns:
-        list(dict). List of dicts, each representing a recent snapshot. Each
-        dict has the following keys: committer_id, commit_message, commit_cmds,
-        commit_type, created_on_ms, version_number. The version numbers are
-        consecutive and in ascending order. There are exploration.version_number
-        items in the returned list.
-    """
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    current_version = exploration.version
-    version_nums = list(range(1, current_version + 1))
+        list(ExplorationSnapshotMetadata). List of domain objects, each
+        representing a snapshot of the exploration.
 
-    return exp_models.ExplorationModel.get_snapshots_metadata(
-        exploration_id, version_nums, allow_deleted=allow_deleted
+    Raises:
+        Exception. The exploration does not exist or has been deleted (when
+            allow_deleted is False).
+        Exception. The snapshot metadata model for a version does not exist.
+    """
+    exp_model = exp_models.ExplorationModel.get_by_id(exploration_id)
+    if exp_model is None:
+        raise exp_models.ExplorationModel.EntityNotFoundError(
+            'Entity for class ExplorationModel with id %s not found'
+            % exploration_id
+        )
+    if not allow_deleted:
+        exp_model._require_not_marked_deleted()  # pylint: disable=protected-access
+
+    if version_numbers is None:
+        version_nums = list(range(1, exp_model.version + 1))
+    else:
+        version_nums = list(version_numbers)
+
+    snapshot_ids = [
+        exp_models.ExplorationModel.get_snapshot_id(exploration_id, version_num)
+        for version_num in version_nums
+    ]
+    snapshot_metadata_models = (
+        exp_models.ExplorationSnapshotMetadataModel.get_multi(
+            snapshot_ids, include_deleted=True
+        )
     )
+    snapshots_metadata: List[exp_domain.ExplorationSnapshotMetadata] = []
+    for version_num, snapshot_model in zip(
+        version_nums, snapshot_metadata_models
+    ):
+        if snapshot_model is None:
+            raise Exception(
+                'Invalid version number %s for exploration with id %s'
+                % (version_num, exploration_id)
+            )
+        snapshots_metadata.append(
+            get_exploration_snapshot_metadata_from_model(snapshot_model)
+        )
+
+    return snapshots_metadata
 
 
 def get_last_updated_by_human_ms(exp_id: str) -> float:
@@ -1867,8 +1920,10 @@ def get_last_updated_by_human_ms(exp_id: str) -> float:
     last_human_update_ms: float = 0
     snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
     for snapshot_metadata in reversed(snapshots_metadata):
-        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
-            last_human_update_ms = snapshot_metadata['created_on_ms']
+        if snapshot_metadata.committer_id != feconf.MIGRATION_BOT_USER_ID:
+            last_human_update_ms = utils.get_time_in_millisecs(
+                snapshot_metadata.created_on
+            )
             break
 
     return last_human_update_ms
@@ -2541,17 +2596,15 @@ def compute_exploration_contributors_summary(
     contributors_summary: Dict[str, int] = collections.defaultdict(int)
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
-        committer_id = snapshot_metadata['committer_id']
-        is_revert = snapshot_metadata['commit_type'] == 'revert'
+        committer_id = snapshot_metadata.committer_id
+        is_revert = snapshot_metadata.commit_type == 'revert'
         if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
         if current_version == 1:
             break
 
         if is_revert:
-            version_number = snapshot_metadata['commit_cmds'][0][
-                'version_number'
-            ]
+            version_number = snapshot_metadata.commit_cmds[0]['version_number']
             # Ruling out the possibility of any other type for mypy
             # type checking.
             assert isinstance(version_number, int)
@@ -3144,13 +3197,13 @@ def get_composite_change_list(
         )
 
     version_nums = list(range(from_version + 1, to_version + 1))
-    snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
-        exp_id, version_nums, allow_deleted=False
+    snapshots_metadata = get_exploration_snapshots_metadata(
+        exp_id, version_numbers=version_nums, allow_deleted=False
     )
 
     composite_change_list_dict = []
     for snapshot in snapshots_metadata:
-        composite_change_list_dict += snapshot['commit_cmds']
+        composite_change_list_dict += snapshot.commit_cmds
 
     composite_change_list = [
         exp_domain.ExplorationChange(change)
@@ -3560,13 +3613,13 @@ def regenerate_missing_stats_for_exploration(
             stats_services.create_stats_model(exp_stats_for_version)
         raise Exception('No ExplorationStatsModels found')
 
-    snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
-        exp_id, exp_versions
+    snapshots = get_exploration_snapshots_metadata(
+        exp_id, version_numbers=exp_versions
     )
     change_lists = []
     for snapshot in snapshots:
         change_list_for_snapshot = []
-        for commit_cmd in snapshot['commit_cmds']:
+        for commit_cmd in snapshot.commit_cmds:
             try:
                 change_list_for_snapshot.append(
                     exp_domain.ExplorationChange(commit_cmd)

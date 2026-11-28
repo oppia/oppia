@@ -1099,15 +1099,61 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
-        snapshots = exp_services.get_exploration_snapshots_metadata(exp_id)
 
-        # Patch `snapshots` to use the editor's display name.
-        for snapshot in snapshots:
-            snapshot.update({'committer_id': 'owner'})
+        # Inject a known domain-object list into the service call used by the
+        # handler, perform the HTTP request, and then assert those same input
+        # objects retain their original committer IDs (proving nonmutation).
+        created_on = datetime.datetime(2025, 1, 1, 12, 0, 0)
+        last_updated = datetime.datetime(2025, 1, 2, 15, 30, 0)
+        injected_snapshot = exp_domain.ExplorationSnapshotMetadata(
+            exp_id,
+            1,
+            owner_id,
+            'create',
+            'Initial commit',
+            [{'cmd': 'create_new'}],
+            ['cmd_user_1'],
+            ['content_user_1'],
+            created_on,
+            last_updated,
+            False,
+        )
+        known_snapshots = [injected_snapshot]
 
-        response = self.get_json('/createhandler/snapshots/%s' % (exp_id))
+        with self.swap_to_always_return(
+            exp_services,
+            'get_exploration_snapshots_metadata',
+            known_snapshots,
+        ):
+            response = self.get_json('/createhandler/snapshots/%s' % exp_id)
 
-        self.assertEqual(response['snapshots'], snapshots)
+        # Assert that the exact domain object passed into the handler was NOT mutated.
+        self.assertEqual(injected_snapshot.committer_id, owner_id)
+        self.assertEqual(known_snapshots[0].committer_id, owner_id)
+
+        # Check exact six response keys, username substitution and milliseconds values.
+        expected_response = [
+            {
+                'committer_id': self.OWNER_USERNAME,
+                'commit_message': 'Initial commit',
+                'commit_cmds': [{'cmd': 'create_new'}],
+                'commit_type': 'create',
+                'version_number': 1,
+                'created_on_ms': utils.get_time_in_millisecs(created_on),
+            }
+        ]
+        self.assertEqual(response['snapshots'], expected_response)
+        self.assertEqual(
+            set(response['snapshots'][0].keys()),
+            {
+                'committer_id',
+                'commit_message',
+                'commit_cmds',
+                'commit_type',
+                'version_number',
+                'created_on_ms',
+            },
+        )
 
         exp_services.update_exploration(
             owner_id,
@@ -1142,14 +1188,23 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
         )
 
         snapshots = exp_services.get_exploration_snapshots_metadata(exp_id)
-
-        # Patch `snapshots` to use the editor's display name.
-        for snapshot in snapshots:
-            snapshot.update({'committer_id': 'owner'})
+        expected_snapshots = [
+            {
+                'committer_id': 'owner',
+                'commit_message': snapshot.commit_message,
+                'commit_cmds': snapshot.commit_cmds,
+                'commit_type': snapshot.commit_type,
+                'version_number': snapshot.version,
+                'created_on_ms': utils.get_time_in_millisecs(
+                    snapshot.created_on
+                ),
+            }
+            for snapshot in snapshots
+        ]
 
         response = self.get_json('/createhandler/snapshots/%s' % (exp_id))
 
-        self.assertEqual(response['snapshots'], snapshots)
+        self.assertEqual(response['snapshots'], expected_snapshots)
 
         self.logout()
 
