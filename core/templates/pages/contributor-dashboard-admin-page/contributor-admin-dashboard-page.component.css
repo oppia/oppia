@@ -71,6 +71,14 @@
 .oppia-dashboard-container {
   max-width: 960px;
 }
+/* The dashboard column shrinks to fit its widest child, so without a fixed
+   width a long featured-language explanation would widen the whole column.
+   This matches the 960px width used by the rest of the dashboard, and the
+   viewport-based cap keeps it on-screen on narrow screens. */
+.featured-translation-languages-container {
+  max-width: calc(100vw - 32px);
+  width: 960px;
+}
 .filter-sub-container {
   display: flex;
   flex-direction: row;

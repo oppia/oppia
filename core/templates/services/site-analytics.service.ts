@@ -713,29 +713,6 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerInProgressClassroomLessonEngagedWithEvent(
-    classroomName: string,
-    topicName: string
-  ): void {
-    this._sendEventToGoogleAnalytics(
-      'classroom_lesson_in_progress_engaged_with',
-      {
-        classroom_name: classroomName,
-        topic_name: topicName,
-      }
-    );
-  }
-
-  registerNewClassroomLessonEngagedWithEvent(
-    classroomName: string,
-    topicName: string
-  ): void {
-    this._sendEventToGoogleAnalytics('new_classroom_lesson_engaged_with', {
-      classroom_name: classroomName,
-      topic_name: topicName,
-    });
-  }
-
   registerDiagnosticTestStartedEvent(classroomName: string): void {
     this._sendEventToGoogleAnalytics('diagnostic_test_started', {
       classroom_name: classroomName,
