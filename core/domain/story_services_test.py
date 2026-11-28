@@ -1206,6 +1206,29 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story.story_contents.arcs[0].description, 'Updated desc'
         )
 
+    def test_update_story_ignores_create_new_change(self) -> None:
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        changelist = [
+            story_domain.StoryChange(
+                {'cmd': story_domain.CMD_CREATE_NEW, 'title': 'New title'}
+            )
+        ]
+
+        story_services.update_story(
+            self.USER_ID,
+            self.STORY_ID,
+            changelist,
+            'Applied create_new change.',
+        )
+
+        updated_story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(updated_story.title, story.title)
+        self.assertEqual(updated_story.description, story.description)
+        self.assertEqual(
+            updated_story.story_contents.to_dict(),
+            story.story_contents.to_dict(),
+        )
+
     def test_update_story_with_meta_tag_content(self) -> None:
         changelist = [
             story_domain.StoryChange(

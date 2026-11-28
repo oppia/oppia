@@ -536,6 +536,17 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             expected_exploration_summary_dict, (actual_exploration_summary_dict)
         )
 
+    def test_get_library_groups_includes_only_activities_in_the_given_language(
+        self,
+    ) -> None:
+        library_groups = summary_services.get_library_groups(['en'])
+
+        self.assertEqual(len(library_groups), 1)
+        self.assertEqual(len(library_groups[0]['activity_summary_dicts']), 1)
+        self.assertEqual(
+            library_groups[0]['activity_summary_dicts'][0]['id'], '3'
+        )
+
     def test_get_library_groups_excludes_deleted_collections(self) -> None:
         """A public collection in a group category should be returned by
         get_library_groups(), but a soft-deleted collection should not.
@@ -654,6 +665,31 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             featured_activity_summaries[0],
         )
 
+    def test_featured_activities_skip_references_to_nonexistent_explorations(
+        self,
+    ) -> None:
+        activity_services.update_featured_activity_references(
+            [
+                activity_domain.ActivityReference(
+                    constants.ACTIVITY_TYPE_EXPLORATION, 'nonexistent_exp_id'
+                ),
+                activity_domain.ActivityReference(
+                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2
+                ),
+            ]
+        )
+
+        featured_activity_summaries = (
+            summary_services.get_featured_activity_summary_dicts(
+                [constants.DEFAULT_LANGUAGE_CODE]
+            )
+        )
+
+        self.assertEqual(
+            [summary['id'] for summary in featured_activity_summaries],
+            [self.EXP_ID_2],
+        )
+
     def test_language_code_filter(self) -> None:
         """Note that both EXP_ID_1 is in Spanish and EXP_ID_2 is in English."""
         activity_services.update_featured_activity_references(
@@ -763,6 +799,21 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection_summaries), 2)
         for collection_summary in collection_summaries:
             self.assertIn(collection_summary['id'], collection_id_list)
+
+    def test_get_displayable_collection_summary_dicts_matching_ids_skips_unknown_ids(
+        self,
+    ) -> None:
+        self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+
+        collection_summaries = summary_services.get_displayable_collection_summary_dicts_matching_ids(
+            ['nonexistent_collection_id', self.COLLECTION_ID]
+        )
+
+        self.assertEqual(
+            [summary['id'] for summary in collection_summaries],
+            [self.COLLECTION_ID],
+        )
 
     def test_get_learner_collection_dict_by_id_without_user_id(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -1512,6 +1563,22 @@ class CollectionNodeMetadataDictsTest(
             }
         ]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_private_exps_of_the_same_user_are_returned(self) -> None:
+        metadata_dicts = summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID5], self.albert
+        )
+
+        self.assertEqual(
+            metadata_dicts,
+            [
+                {
+                    'id': self.EXP_ID5,
+                    'objective': 'An objective 5',
+                    'title': 'Exploration 5 Albert title',
+                }
+            ],
+        )
 
     def test_public_exps_of_another_user_are_returned(self) -> None:
         metadata_dicts = summary_services.get_exploration_metadata_dicts(
