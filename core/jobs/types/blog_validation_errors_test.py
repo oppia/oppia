@@ -198,3 +198,68 @@ class ModelMutatedDuringJobErrorTests(
             'id="validblogid1"): last_updated=%r is later than the audit job\'s'
             ' start time' % (model.last_updated),
         )
+
+
+class InconsistentBlogPostPublishedStatusErrorTests(
+    base_validation_errors_test.AuditErrorsTestBase
+):
+
+    def test_message_when_marked_published(self) -> None:
+        blog_post_rights_model = blog_models.BlogPostRightsModel(
+            id='validblogid1',
+            editor_ids=['user'],
+            blog_post_is_published=True,
+        )
+
+        error = blog_validation_errors.InconsistentBlogPostPublishedStatusError(
+            blog_post_rights_model, 'BlogPostModel'
+        )
+
+        self.assertEqual(
+            error.stderr,
+            'InconsistentBlogPostPublishedStatusError in '
+            'BlogPostRightsModel(id="validblogid1"): BlogPostModel.published_on'
+            ' is not set, but blog_post_is_published=True',
+        )
+
+    def test_message_when_marked_unpublished(self) -> None:
+        blog_post_rights_model = blog_models.BlogPostRightsModel(
+            id='validblogid1',
+            editor_ids=['user'],
+            blog_post_is_published=False,
+        )
+
+        error = blog_validation_errors.InconsistentBlogPostPublishedStatusError(
+            blog_post_rights_model, 'BlogPostSummaryModel'
+        )
+
+        self.assertEqual(
+            error.stderr,
+            'InconsistentBlogPostPublishedStatusError in '
+            'BlogPostRightsModel(id="validblogid1"): '
+            'BlogPostSummaryModel.published_on is set, but '
+            'blog_post_is_published=False',
+        )
+
+
+class BlogPostAuthorNotEditorErrorTests(
+    base_validation_errors_test.AuditErrorsTestBase
+):
+
+    def test_message(self) -> None:
+        blog_post_rights_model = blog_models.BlogPostRightsModel(
+            id='validblogid1',
+            editor_ids=['user'],
+            blog_post_is_published=False,
+        )
+
+        error = blog_validation_errors.BlogPostAuthorNotEditorError(
+            blog_post_rights_model, 'author'
+        )
+
+        self.assertEqual(
+            error.stderr,
+            'BlogPostAuthorNotEditorError in BlogPostRightsModel('
+            'id="validblogid1"): author_id=%s of the blog post is not in '
+            'editor_ids' % utils.quoted('author'),
+        )
