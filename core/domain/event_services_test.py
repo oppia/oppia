@@ -23,7 +23,7 @@ import inspect
 import logging
 import re
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     event_services,
     exp_domain,
@@ -280,6 +280,51 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.exploration_version, 1)
         self.assertEqual(model.params, {})
         self.assertEqual(model.play_type, feconf.PLAY_TYPE_PLAYTEST)
+
+    def test_get_state_hit_event_from_model(self) -> None:
+        event_services.StateHitEventHandler.record(
+            'exp_id',
+            1,
+            'state_name',
+            'session_id',
+            {'param1': 'val1'},
+            feconf.PLAY_TYPE_NORMAL,
+        )
+        all_models = stats_models.StateHitEventLogEntryModel.get_all()
+        model = all_models.get()
+        assert model is not None
+
+        domain_entry = event_services.get_state_hit_event_from_model(model)
+        self.assertEqual(domain_entry.event_type, feconf.EVENT_TYPE_STATE_HIT)
+        self.assertEqual(domain_entry.exp_id, 'exp_id')
+        self.assertEqual(domain_entry.exp_version, 1)
+        self.assertEqual(domain_entry.state_name, 'state_name')
+        self.assertEqual(domain_entry.session_id, 'session_id')
+        self.assertEqual(domain_entry.params, {'param1': 'val1'})
+        self.assertEqual(domain_entry.play_type, feconf.PLAY_TYPE_NORMAL)
+        self.assertEqual(
+            domain_entry.event_schema_version,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+
+    def test_record_state_hit_events_with_invalid_data_raises_error(
+        self,
+    ) -> None:
+        all_models = stats_models.StateHitEventLogEntryModel.get_all()
+        self.assertEqual(all_models.count(), 0)
+
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid exp_id'):
+            event_services.StateHitEventHandler.record(
+                'invalid@id!',
+                1,
+                'state_name',
+                'session_id',
+                {},
+                feconf.PLAY_TYPE_NORMAL,
+            )
+
+        all_models = stats_models.StateHitEventLogEntryModel.get_all()
+        self.assertEqual(all_models.count(), 0)
 
 
 class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
