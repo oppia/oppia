@@ -73,7 +73,9 @@ class GroupedSkillOpportunityDict(TypedDict):
     question_ids: Iterable[str]
 
 
-class SkillOpportunityModelValidationJob(base_validation_jobs.BaseValidationJob):
+class SkillOpportunityModelValidationJob(
+    base_validation_jobs.BaseValidationJob
+):
     """Validates SkillOpportunityModel instances."""
 
     def run(self) -> beam.PCollection[Dict[str, List[str]]]:

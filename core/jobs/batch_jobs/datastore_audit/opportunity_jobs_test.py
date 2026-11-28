@@ -348,13 +348,7 @@ class SkillOpportunityModelValidationJobTests(job_test_utils.JobTestBase):
             )
         )
         self.assert_job_output_is(
-            [
-                {
-                    'ModelDomainObjectValidateError': [
-                        expected_domain_error.stderr
-                    ]
-                }
-            ]
+            [{'ModelDomainObjectValidateError': [expected_domain_error.stderr]}]
         )
 
     def test_inconsistent_timestamps_produces_error(self) -> None:
