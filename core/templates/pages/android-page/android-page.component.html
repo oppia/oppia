@@ -117,7 +117,7 @@
                   type="button"
                   class="oppia-android-carousel-item"
                   [ngClass]="{'oppia-android-carousel-item-active': featuresShown === featureIndex}"
-                  [attr.aria-label]="'I18N_ANDROID_PAGE_FEATURE_TEXT_' + (featureIndex + 1) | translate"
+                  [attr.aria-label]="['I18N_ANDROID_PAGE_FEATURE_TEXT_1', 'I18N_ANDROID_PAGE_FEATURE_TEXT_2', 'I18N_ANDROID_PAGE_FEATURE_TEXT_3', 'I18N_ANDROID_PAGE_FEATURE_TEXT_4'][featureIndex] | translate"
                   [attr.aria-pressed]="featuresShown === featureIndex"
                   (click)="changeFeaturesShown(featureIndex)">
           </button>
@@ -179,7 +179,7 @@
                     type="button"
                     class="oppia-android-carousel-item"
                     [ngClass]="{'oppia-android-carousel-item-active': featuresShown === featureIndex}"
-                    [attr.aria-label]="'I18N_ANDROID_PAGE_FEATURE_TEXT_' + (featureIndex + 1) | translate"
+                    [attr.aria-label]="['I18N_ANDROID_PAGE_FEATURE_TEXT_1', 'I18N_ANDROID_PAGE_FEATURE_TEXT_2', 'I18N_ANDROID_PAGE_FEATURE_TEXT_3', 'I18N_ANDROID_PAGE_FEATURE_TEXT_4'][featureIndex] | translate"
                     [attr.aria-pressed]="featuresShown === featureIndex"
                     (click)="changeFeaturesShown(featureIndex)">
             </button>

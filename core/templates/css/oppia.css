@@ -630,6 +630,15 @@ p:last-child {
   padding: 10px 15px;
   position: relative;
 }
+
+/* Links inside translated paragraph content are injected via innerHTML, so
+   they cannot carry the inline-links class in every locale. Underline them
+   here so they remain distinguishable from surrounding text (WCAG 1.4.1). */
+.oppia-get-started p a,
+.oppia-partnerships-faq-card p a {
+  text-decoration: underline;
+}
+
 .oppia-activity-summary-tile a:focus,
 .oppia-activity-summary-tile-mobile a:focus {
   box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
