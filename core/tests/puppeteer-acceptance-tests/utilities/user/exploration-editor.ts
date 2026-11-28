@@ -66,6 +66,9 @@ const feedbackToggle = 'label.e2e-test-enable-fallbacks';
 const editRoleButton = '.e2e-test-edit-roles';
 const addUsernameInputBox = '#newMemberUsername';
 const addRoleDropdown = 'mat-select.e2e-test-role-select';
+const roleSelectValueSelector =
+  'mat-select.e2e-test-role-select .mat-select-value';
+const selectOverlayBackdrop = '.cdk-overlay-backdrop';
 const managerRoleOption = 'Manager (can edit permissions)';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
@@ -3714,6 +3717,76 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Selects the given role in an already open Roles form.
+   *
+   * The Roles form preselects the manager role, so opening the dropdown when
+   * that role is already selected only leaves a Material overlay backdrop
+   * behind. That backdrop then blocks the Save button, so the dropdown is only
+   * opened when a different role actually needs to be chosen.
+   * @param {string} roleName - The visible label of the role to select.
+   */
+  async selectRoleInRolesForm(roleName: string): Promise<void> {
+    const currentRole = await this.page.$eval(roleSelectValueSelector, el =>
+      (el.textContent || '').replace(/\s+/g, ' ').trim()
+    );
+    if (currentRole.includes(roleName)) {
+      // The Save button is enabled by the username input's blur handler, which
+      // clicking the dropdown used to trigger as a side effect. Since the
+      // dropdown stays closed, move focus off the username so that the button
+      // becomes clickable.
+      await this.page.keyboard.press('Tab');
+      return;
+    }
+
+    await this.clickOnElementWithSelector(addRoleDropdown);
+    // Prefer clicking the actual mat-option element to avoid overlay/span
+    // elements blocking the text node.
+    await this.page.waitForSelector('mat-option');
+    const roleOptions = await this.page.$$('mat-option');
+    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
+      elements.map(element =>
+        (element.textContent || '').replace(/\s+/g, ' ').trim()
+      )
+    );
+    const roleIndex = roleOptionTexts.indexOf(roleName);
+    if (roleIndex === -1) {
+      // Close the dropdown so its backdrop does not block later interactions.
+      await this.page.keyboard.press('Escape');
+      throw new Error(
+        `Could not find option with text ${roleName}. ` +
+          `Available options: ${roleOptionTexts.join(', ')}`
+      );
+    }
+    await roleOptions[roleIndex].click();
+    await this.page.waitForSelector('mat-option', {visible: false});
+
+    // The closing animation can outlive the option, leaving a transparent
+    // backdrop over the form. Wait for it to detach before touching Save.
+    try {
+      await this.page.waitForSelector(selectOverlayBackdrop, {
+        hidden: true,
+        timeout: 5000,
+      });
+    } catch {
+      await this.page.keyboard.press('Escape');
+      await this.page.waitForSelector(selectOverlayBackdrop, {
+        hidden: true,
+        timeout: 5000,
+      });
+    }
+
+    const selectedRole = await this.page.$eval(roleSelectValueSelector, el =>
+      (el.textContent || '').replace(/\s+/g, ' ').trim()
+    );
+    if (!selectedRole.includes(roleName)) {
+      throw new Error(
+        `Expected role "${roleName}" to be selected, but the dropdown shows ` +
+          `"${selectedRole}".`
+      );
+    }
+  }
+
+  /**
    * Assigns a role of manager to any guest user.
    */
   async assignUserToManagerRole(username: string): Promise<void> {
@@ -3723,20 +3796,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(editRoleButton);
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
-    await this.clickOnElementWithSelector(addRoleDropdown);
-    // Prefer clicking the actual mat-option element to avoid overlay/span
-    // elements blocking the text node.
-    await this.page.waitForSelector('mat-option');
-    const roleOptions = await this.page.$$('mat-option');
-    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
-      elements.map(element => element.textContent?.trim())
-    );
-    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
-    if (roleIndex === -1) {
-      throw new Error(`Could not find option with text ${managerRoleOption}`);
-    }
-    await roleOptions[roleIndex].click();
-    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.selectRoleInRolesForm(managerRoleOption);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
@@ -3755,20 +3815,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeClickable(addUsernameInputBox);
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
-    await this.clickOnElementWithSelector(addRoleDropdown);
-    // Prefer clicking the actual mat-option element to avoid overlay/span
-    // elements blocking the text node.
-    await this.page.waitForSelector('mat-option');
-    const roleOptions = await this.page.$$('mat-option');
-    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
-      elements.map(element => element.textContent?.trim())
-    );
-    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
-    if (roleIndex === -1) {
-      throw new Error(`Could not find option with text ${managerRoleOption}`);
-    }
-    await roleOptions[roleIndex].click();
-    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.selectRoleInRolesForm(managerRoleOption);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
@@ -5460,24 +5507,33 @@ export class ExplorationEditor extends BaseUser {
   async expectUserToBeExplorationManager(username: string): Promise<void> {
     // Verify the username is listed in the Managers section (the definitive check per CUJ).
     await this.expectElementToBeVisible(rolesContentSelector);
-    const owners = await this.page.$$(ownersListSelector);
-    if (owners.length === 0) {
-      throw new Error('Managers list is empty or not found.');
-    }
+    try {
+      await this.page.waitForFunction(
+        (ownersSelector: string, expectedUsername: string) => {
+          const owners = Array.from(document.querySelectorAll(ownersSelector));
+          return owners.some(
+            owner => (owner.textContent ?? '').trim() === expectedUsername
+          );
+        },
+        {timeout: 30000},
+        ownersListSelector,
+        username
+      );
+    } catch {
+      const ownerUsernames = await this.page.$$eval(
+        ownersListSelector,
+        elements =>
+          elements
+            .map(element => element.textContent?.trim() || '')
+            .filter(Boolean)
+      );
 
-    const ownerUsernames = await this.page.$$eval(
-      ownersListSelector,
-      elements =>
-        elements
-          .map(element => element.textContent?.trim() || '')
-          .filter(Boolean)
-    );
-
-    if (!ownerUsernames.includes(username)) {
+      const listedManagers =
+        ownerUsernames.length > 0
+          ? ownerUsernames.join(', ')
+          : 'the managers list is empty';
       throw new Error(
-        `Expected user "${username}" to be listed as manager, but not found in: ${ownerUsernames.join(
-          ', '
-        )}`
+        `Expected user "${username}" to be listed as manager, but not found in: ${listedManagers}`
       );
     }
 
