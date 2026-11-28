@@ -57,8 +57,8 @@
     },
     {
       "name": "interested-volunteer/apply-to-become-a-volunteer",
-      "module": "core/tests/playwright-acceptance-tests/specs/interested-volunteer/apply-to-become-a-volunteer.spec.ts",
-      "framework": "playwright"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-volunteer/apply-to-become-a-volunteer.spec.ts",
+      "framework": "puppeteer"
     },
     {
       "name": "interested-donor/learn-about-the-organization",
@@ -277,8 +277,8 @@
     },
     {
       "name": "logged-out-user/click-all-links-on-privacy-policy-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-privacy-policy-page.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/click-all-links-on-privacy-policy-page.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/click-all-links-on-terms-page",
@@ -317,8 +317,8 @@
     },
     {
       "name": "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "super-admin/load-dummy-data-in-dev-mode",
@@ -342,8 +342,8 @@
     },
     {
       "name": "voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-creator/create-an-exploration-with-all-interactions",
@@ -672,13 +672,13 @@
     },
     {
       "name": "practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "practice-question-reviewer/review-submitted-questions",

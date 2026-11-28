@@ -531,9 +531,9 @@ class DocstringParameterChecker(checkers.BaseChecker):
             \s*  \*{{0,2}}(\w+)          # identifier potentially with asterisks
             \s*  ( [:]
                 \s*
-                ({type}|\S*|[\s\S]*)
+                ({type}|\S*|[\s\S]*?)
                 (?:,\s+optional)?
-                [.]+\s )+ \s*
+                [.]+(?:\s+|\n\s*) )+ \s*
             \s*  [A-Z0-9](.*)[.\]}}\)]+$     # beginning of optional description
         """.format(
                 type=_check_docs_utils.GoogleDocstring.re_multiple_type,
