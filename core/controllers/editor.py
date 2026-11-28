@@ -1003,19 +1003,29 @@ class ExplorationSnapshotsHandler(
             exploration_id
         )
 
-        # Patch `snapshots` to use the editor's display name.
         snapshots_committer_ids = [
-            snapshot['committer_id'] for snapshot in snapshots
+            snapshot.committer_id for snapshot in snapshots
         ]
         committer_usernames = user_services.get_usernames(
             snapshots_committer_ids, strict=True
         )
-        for index, snapshot in enumerate(snapshots):
-            snapshot['committer_id'] = committer_usernames[index]
+        response_snapshots = [
+            {
+                'committer_id': committer_usernames[index],
+                'commit_message': snapshot.commit_message,
+                'commit_cmds': snapshot.commit_cmds,
+                'commit_type': snapshot.commit_type,
+                'version_number': snapshot.version,
+                'created_on_ms': utils.get_time_in_millisecs(
+                    snapshot.created_on
+                ),
+            }
+            for index, snapshot in enumerate(snapshots)
+        ]
 
         self.render_json(
             {
-                'snapshots': snapshots,
+                'snapshots': response_snapshots,
             }
         )
 

@@ -1157,45 +1157,44 @@ title: Old Title
             exp_id
         )
 
-        # These are used to verify the correct history has been recorded after
-        # both migration and reversion.
-        commit_dict_5 = {
-            'committer_id': 'committer_id_v4',
-            'commit_message': 'Reverted exploration to version 1',
-            'version_number': 5,
-        }
-        commit_dict_4 = {
-            'committer_id': feconf.MIGRATION_BOT_USERNAME,
-            'commit_message': 'Update exploration states from schema version 41 to %d.'
-            % feconf.CURRENT_STATE_SCHEMA_VERSION,
-            'commit_cmds': [
-                {
-                    'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                    'from_version': '41',
-                    'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION),
-                }
-            ],
-            'version_number': 4,
-        }
-
         # Ensure there have been 5 commits.
         self.assertEqual(len(snapshots_metadata), 5)
 
         # Ensure the correct commit logs were entered during both migration and
         # reversion. Also, ensure the correct commit command was written during
         # migration.
-        # These asserts check whether one dict is subset of the other.
-        # The format is assertDictEqual(a, {**a, **b}) where a is the superset
-        # and b is the subset.
-        self.assertDictEqual(
-            snapshots_metadata[3], {**snapshots_metadata[3], **commit_dict_4}
+        self.assertEqual(
+            snapshots_metadata[3].committer_id, feconf.MIGRATION_BOT_USERNAME
         )
-        self.assertDictEqual(
-            snapshots_metadata[4], {**snapshots_metadata[4], **commit_dict_5}
+        self.assertEqual(
+            snapshots_metadata[3].commit_message,
+            'Update exploration states from schema version 41 to %d.'
+            % feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
+        self.assertEqual(
+            snapshots_metadata[3].commit_cmds,
+            [
+                {
+                    'cmd': (
+                        exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION
+                    ),
+                    'from_version': '41',
+                    'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION),
+                }
+            ],
+        )
+        self.assertEqual(snapshots_metadata[3].version, 4)
+
+        self.assertEqual(snapshots_metadata[4].committer_id, 'committer_id_v4')
+        self.assertEqual(
+            snapshots_metadata[4].commit_message,
+            'Reverted exploration to version 1',
+        )
+        self.assertEqual(snapshots_metadata[4].version, 5)
+
         self.assertLess(
-            snapshots_metadata[3]['created_on_ms'],
-            snapshots_metadata[4]['created_on_ms'],
+            snapshots_metadata[3].created_on,
+            snapshots_metadata[4].created_on,
         )
 
         # Ensure that if a converted, then reverted, then converted exploration
