@@ -121,13 +121,6 @@ def _create_topic(
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     topic.version += 1
     generate_topic_summary(topic.id)
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
-        None,
-    ):
-        opportunity_services.create_translation_opportunity(
-            {feconf.ENTITY_TYPE_TOPIC: [topic.id]}, topic_ids=[topic.id]
-        )
 
 
 def find_superseded_skill_in_topic(
@@ -1459,9 +1452,11 @@ def _save_topic(
         feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
         None,
     ):
-        opportunity_services.create_translation_opportunity(
-            {feconf.ENTITY_TYPE_TOPIC: [topic.id]}, topic_ids=[topic.id]
-        )
+        topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
+        if topic_rights is not None and topic_rights.topic_is_published:
+            opportunity_services.create_translation_opportunity(
+                {feconf.ENTITY_TYPE_TOPIC: [topic.id]}, topic_ids=[topic.id]
+            )
 
 
 def update_topic_and_subtopic_pages(
@@ -2273,6 +2268,13 @@ def publish_topic(topic_id: str, committer_id: str) -> None:
     save_topic_rights(
         topic_rights, committer_id, 'Published the topic', commit_cmds
     )
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
+        None,
+    ):
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_TOPIC: [topic_id]}, topic_ids=[topic_id]
+        )
 
 
 def unpublish_topic(topic_id: str, committer_id: str) -> None:
@@ -2306,6 +2308,9 @@ def unpublish_topic(topic_id: str, committer_id: str) -> None:
     ]
     save_topic_rights(
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds
+    )
+    opportunity_services.delete_translation_opportunities(
+        {feconf.ENTITY_TYPE_TOPIC: [topic_id]}
     )
 
 

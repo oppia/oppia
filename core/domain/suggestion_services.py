@@ -342,6 +342,14 @@ def create_suggestion(
                 raise utils.InvalidInputException(
                     'No topic with the given id exists: %s' % target_id
                 )
+            topic_rights = topic_fetchers.get_topic_rights(
+                target_id, strict=False
+            )
+            if topic_rights is None or not topic_rights.topic_is_published:
+                raise Exception(
+                    'Cannot create translation suggestion for an unpublished '
+                    'topic.'
+                )
             contents = (
                 topic.get_translatable_contents_collection().content_id_to_translatable_content
             )

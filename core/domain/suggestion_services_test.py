@@ -885,6 +885,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id,
             name='Topic to translate',
             description='Description to translate',
+            url_fragment='topic-trans-test',
+        )
+        topic_services.save_topic_rights(
+            topic_domain.TopicRights(topic.id, [self.author_id], True),
+            self.author_id,
+            'Publish topic',
+            [
+                topic_domain.TopicRightsChange(
+                    {'cmd': topic_domain.CMD_PUBLISH_TOPIC}
+                )
+            ],
         )
         opportunity_services.create_translation_opportunity(
             {feconf.ENTITY_TYPE_TOPIC: [topic.id]}, topic_ids=[topic.id]
@@ -967,6 +978,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id,
             name='Current topic name',
             description='Current topic description',
+            url_fragment='outdated-topic-trans',
+        )
+        topic_services.save_topic_rights(
+            topic_domain.TopicRights(topic.id, [self.author_id], True),
+            self.author_id,
+            'Publish topic',
+            [
+                topic_domain.TopicRightsChange(
+                    {'cmd': topic_domain.CMD_PUBLISH_TOPIC}
+                )
+            ],
         )
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -1033,6 +1055,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id,
             name='Topic name',
             description='Topic description',
+            url_fragment='long-topic-trans',
+        )
+        topic_services.save_topic_rights(
+            topic_domain.TopicRights(topic.id, [self.author_id], True),
+            self.author_id,
+            'Publish topic',
+            [
+                topic_domain.TopicRightsChange(
+                    {'cmd': topic_domain.CMD_PUBLISH_TOPIC}
+                )
+            ],
         )
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -1055,6 +1088,44 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.author_id,
                 change_dict,
                 'Long topic name translation',
+            )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES
+        ]
+    )
+    def test_cannot_create_topic_translation_suggestion_for_unpublished_topic(
+        self,
+    ) -> None:
+        topic = self.save_new_topic(
+            'unpublished_topic_test',
+            self.author_id,
+            name='Unpublished topic',
+            description='Unpublished description',
+            url_fragment='unpub-topic-test',
+        )
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.TOPIC_NAME_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': topic.name,
+            'translation_html': 'Translated topic name',
+            'data_format': 'unicode',
+        }
+        with self.assertRaisesRegex(
+            Exception,
+            'Cannot create translation suggestion for an unpublished topic.',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_TOPIC,
+                topic.id,
+                topic.version,
+                self.author_id,
+                change_dict,
+                'Unpublished topic translation',
             )
 
     @test_utils.enable_feature_flags(

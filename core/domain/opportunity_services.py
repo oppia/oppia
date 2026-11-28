@@ -2355,9 +2355,11 @@ def regenerate_opportunities_related_to_topic(
         feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
         None,
     ):
-        create_translation_opportunity(
-            {feconf.ENTITY_TYPE_TOPIC: [topic_id]}, topic_ids=[topic_id]
-        )
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
+        if topic_rights is not None and topic_rights.topic_is_published:
+            create_translation_opportunity(
+                {feconf.ENTITY_TYPE_TOPIC: [topic_id]}, topic_ids=[topic_id]
+            )
 
     return len(exploration_opportunity_summary_list)
 
