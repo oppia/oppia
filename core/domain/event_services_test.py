@@ -23,7 +23,7 @@ import inspect
 import logging
 import re
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     event_services,
     exp_domain,
@@ -160,7 +160,7 @@ class MaybeLeaveExplorationEventHandlerTests(test_utils.GenericTestBase):
         event_services.MaybeLeaveExplorationEventHandler.record(
             'exp_id',
             1,
-            'state_name',
+            'state name',
             'session_id',
             2,
             {},
@@ -181,11 +181,94 @@ class MaybeLeaveExplorationEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(model.exploration_id, 'exp_id')
         self.assertEqual(model.exploration_version, 1)
-        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.state_name, 'state name')
         self.assertEqual(model.session_id, 'session_id')
         self.assertEqual(model.client_time_spent_in_secs, 2)
         self.assertEqual(model.params, {})
         self.assertEqual(model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+    def test_recording_leave_event_with_non_string_params(self) -> None:
+        # The reader controller accepts int, float, dict and list param
+        # values as well as strings, so these must pass validation.
+        params = {
+            'str_param': 'value',
+            'int_param': 3,
+            'float_param': 1.5,
+            'dict_param': {'key': 'value'},
+            'list_param': ['value'],
+        }
+        event_services.MaybeLeaveExplorationEventHandler.record(
+            'exp_id',
+            1,
+            'state name',
+            'session_id',
+            2.5,
+            params,
+            feconf.PLAY_TYPE_NORMAL,
+        )
+
+        model = (
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.get_all().get()
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert model is not None
+        self.assertEqual(model.params, params)
+
+    def test_get_maybe_leave_exp_event_from_model(self) -> None:
+        event_services.MaybeLeaveExplorationEventHandler.record(
+            'exp_id',
+            1,
+            'state name',
+            'session_id',
+            2.5,
+            {'param1': 'val1'},
+            feconf.PLAY_TYPE_NORMAL,
+        )
+        model = (
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.get_all().get()
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert model is not None
+
+        domain_entry = event_services.get_maybe_leave_exp_event_from_model(
+            model
+        )
+        self.assertEqual(
+            domain_entry.event_type, feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
+        )
+        self.assertEqual(domain_entry.exploration_id, 'exp_id')
+        self.assertEqual(domain_entry.exploration_version, 1)
+        self.assertEqual(domain_entry.state_name, 'state name')
+        self.assertEqual(domain_entry.session_id, 'session_id')
+        self.assertEqual(domain_entry.client_time_spent_in_secs, 2.5)
+        self.assertEqual(domain_entry.params, {'param1': 'val1'})
+        self.assertEqual(domain_entry.play_type, feconf.PLAY_TYPE_NORMAL)
+        self.assertEqual(
+            domain_entry.event_schema_version,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+
+    def test_recording_leave_event_with_invalid_data_raises_error(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid exploration_id'
+        ):
+            event_services.MaybeLeaveExplorationEventHandler.record(
+                'invalid@id!',
+                1,
+                'state name',
+                'session_id',
+                2.5,
+                {},
+                feconf.PLAY_TYPE_NORMAL,
+            )
+
+        # Nothing is saved when validation fails.
+        all_models = (
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.get_all()
+        )
+        self.assertEqual(all_models.count(), 0)
 
 
 class CompleteExplorationEventHandlerTests(test_utils.GenericTestBase):
