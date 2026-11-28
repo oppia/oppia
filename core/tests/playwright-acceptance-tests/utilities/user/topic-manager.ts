@@ -1040,6 +1040,13 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Navigates to the topics and skills dashboard page.
+   */
+  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
+  }
+
+  /**
    * Open the skill editor page for a skill.
    * @param {string} skillName - The name of the skill to be opened in the editor.
    */

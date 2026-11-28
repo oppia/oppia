@@ -127,8 +127,8 @@
     },
     {
       "name": "exploration-editor/modify-translations-through-modal",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-editor/publish-the-exploration-with-an-interaction",
