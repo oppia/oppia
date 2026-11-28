@@ -19,6 +19,10 @@
                 </option>
               </select>
             </div>
+            <div *ngIf="displayedQuestions.length === 0"
+                 class="no-questions-message e2e-test-no-questions-message">
+              {{ PREVIEW_MESSAGES.NO_QUESTIONS_TO_DISPLAY }}
+            </div>
             <div *ngFor="let question of displayedQuestions; index as idx" class="question-list-item e2e-test-preview-question">
               <div (click)="selectQuestionToPreview(idx)">
                 <div class="question-data">
@@ -42,6 +46,22 @@
             </div>
           </div>
         </div>
+        <div class="oppia-skill-preview-pagination">
+          <span class="oppia-skill-preview-pagination-label">
+            Page {{ currentPage + 1 }}
+          </span>
+          <button class="oppia-skill-preview-pagination-btn"
+                  [disabled]="currentPage <= 0"
+                  (click)="previousPage()">
+            <i class="fas fa-angle-left"></i> Prev
+          </button>
+          <button class="oppia-skill-preview-pagination-btn"
+                  [disabled]="totalPageCountIsKnown && currentPage + 1 >= totalPageCount"
+                  (click)="nextPage()">
+            Next
+            <i class="fas fa-angle-right"></i>
+          </button>
+        </div>
         <div class="skill-description-box">
           <div class="skill-description">
             <div class="content-text-box">
@@ -61,7 +81,7 @@
       </div>
       <div class="skill-question-container">
         <div><span class="headings">Preview</span></div>
-        <div class="preview-box" *ngIf="displayCardIsInitialized">
+        <div class="preview-box" *ngIf="displayCardIsInitialized; else noQuestionSelected">
           <oppia-tutor-card [displayedCard]="displayedCard"
                             [avatarImageIsShown]="false">
           </oppia-tutor-card>
@@ -77,6 +97,11 @@
             </div>
           </div>
         </div>
+        <ng-template #noQuestionSelected>
+          <div class="preview-box preview-empty-message e2e-test-no-question-selected">
+            {{ PREVIEW_MESSAGES.NO_QUESTION_SELECTED }}
+          </div>
+        </ng-template>
       </div>
     </div>
   </div>

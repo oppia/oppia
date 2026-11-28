@@ -58,8 +58,27 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   questionsFetched!: boolean;
   skill!: Skill;
   htmlData!: string;
-  questionDicts!: QuestionBackendDict[];
-  displayedQuestions!: QuestionBackendDict[];
+  questionDicts: QuestionBackendDict[] = [];
+  totalPageCount: number = 0;
+  currentPage: number = 0;
+  // The page whose questions are currently displayed. It is only updated when
+  // a fetch response actually replaces questionDicts, so a failed request can
+  // be rolled back to the page whose questions are still shown.
+  appliedPage: number = 0;
+  // The highest page index whose questions have been applied, or -1 when no
+  // page has been applied yet. An empty response only proves that every page
+  // before the requested one exists when the requested page directly follows
+  // a page confirmed this way. A page requested in between may have been
+  // skipped (for example by two quick Next clicks), so it is not counted.
+  highestAppliedPage: number = -1;
+  // Whether totalPageCount reflects the real number of pages. It stays false
+  // when the count request fails, in which case the end of the list is
+  // detected from a page response that is shorter than a full page.
+  totalPageCountIsKnown: boolean = false;
+  // Questions matching the active filters. It starts empty rather than
+  // undefined so the template can compare its length before the first page
+  // has been fetched (for example when a skill has no questions).
+  displayedQuestions: QuestionBackendDict[] = [];
   displayCardIsInitialized: boolean = false;
   ALLOWED_QUESTION_INTERACTIONS: string[] = [];
   QUESTION_COUNT: number = 20;
@@ -70,8 +89,20 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     NUMERIC_INPUT: 'Numeric Input',
     ITEM_SELECTION: 'Item Selection',
   };
+  // Messages shown when the preview tab has nothing to show. Keeping them
+  // here means the wording is defined once and reused by the template and
+  // the tests.
+  PREVIEW_MESSAGES = {
+    NO_QUESTION_SELECTED: 'No question selected.',
+    NO_QUESTIONS_TO_DISPLAY: 'There are no questions to display',
+  };
 
   directiveSubscriptions = new Subscription();
+  // Incrementing id assigned to each question fetch. A response is only
+  // applied when its id still matches the most recent request, so stale
+  // responses are ignored even when an earlier and a newer request target
+  // the same page.
+  latestFetchRequestId: number = 0;
 
   ngOnInit(): void {
     const that = this;
@@ -90,16 +121,19 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.htmlData = this.skill
       ? this.skill.getConceptCard().getExplanation().html
       : 'loading review material';
-
+    this.fetchQuestionsForPage(this.currentPage);
     this.questionBackendApiService
-      .fetchQuestionsAsync([this.skillId], this.QUESTION_COUNT, false)
+      .fetchTotalQuestionCountForSkillIdsAsync([this.skillId])
       .then(response => {
-        this.questionsFetched = true;
-        this.questionDicts = response;
-        this.displayedQuestions = response;
-        if (this.questionDicts.length) {
-          this.selectQuestionToPreview(0);
-        }
+        this.totalPageCount = Math.ceil(response / this.QUESTION_COUNT);
+        this.totalPageCountIsKnown = true;
+      })
+      .catch(() => {
+        // A failed count request must not lock pagination. Leave
+        // totalPageCountIsKnown unchanged so a page response that already
+        // established the last page is not undone; while the count is still
+        // unknown, the end of the list is detected from a page response that
+        // is shorter than a full page.
       });
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(() => {})
@@ -107,6 +141,114 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.currentInteractionService.setOnSubmitFn(() => {
       this.conversationFlowService.onOppiaFeedbackAvailable.emit();
     });
+  }
+
+  private fetchQuestionsForPage(page: number): void {
+    const requestId = ++this.latestFetchRequestId;
+    this.questionBackendApiService
+      .fetchQuestionsAsync([this.skillId], this.QUESTION_COUNT, false, page)
+      .then(response => {
+        // Ignore the response if a newer fetch has been started since this
+        // one, even when both target the same page.
+        if (requestId !== this.latestFetchRequestId) {
+          return;
+        }
+        // A non-initial page with no questions does not exist. This is
+        // recovered regardless of whether the total page count is known,
+        // because the count request can resolve while this fetch is still
+        // pending; only when the count is unknown does the empty response
+        // also establish the count. The applied page and its questions stay
+        // displayed instead of being replaced by an empty list.
+        if (response.length === 0 && page > 0) {
+          // The requested index is only an exact page count when the page
+          // right before it is known to exist. Otherwise the page between
+          // the last applied page and this one was never applied, so its
+          // existence is unconfirmed and must not be counted. Leaving the
+          // count unknown keeps the end of the list detected by a later
+          // response instead of freezing a count that is too high.
+          if (
+            !this.totalPageCountIsKnown &&
+            this.highestAppliedPage >= page - 1
+          ) {
+            this.totalPageCount = page;
+            this.totalPageCountIsKnown = true;
+          }
+          this.currentPage = this.appliedPage;
+          // The request completed, so stop showing the loading state even
+          // though the requested page has no questions.
+          this.questionsFetched = true;
+          return;
+        }
+        // When the total page count is unknown, a response with fewer
+        // questions than requested marks the end of the list.
+        if (
+          !this.totalPageCountIsKnown &&
+          response.length < this.QUESTION_COUNT
+        ) {
+          if (response.length === 0) {
+            // An empty first page means the skill has no questions, so the
+            // total page count is exactly zero.
+            this.totalPageCount = 0;
+            this.totalPageCountIsKnown = true;
+            this.questionsFetched = true;
+            return;
+          }
+          this.totalPageCount = page + 1;
+          this.totalPageCountIsKnown = true;
+        }
+        this.questionsFetched = true;
+        this.questionDicts = response;
+        // Remember the page whose questions are now shown, so a later failed
+        // request rolls back here instead of to a page whose fetch never
+        // completed.
+        this.appliedPage = page;
+        this.highestAppliedPage = Math.max(this.highestAppliedPage, page);
+        // Re-apply the active text and interaction filters to the newly
+        // fetched page before selecting a question to preview, so the filters
+        // stay applied on every page.
+        this.applyFilters();
+        if (this.displayedQuestions.length) {
+          this.selectQuestionToPreview(0);
+        } else {
+          // The accepted page has no questions matching the active filters.
+          // Invalidate any preview left over from the previously applied
+          // page, so the pane does not keep showing a question that is no
+          // longer in the list.
+          this.displayCardIsInitialized = false;
+        }
+      })
+      .catch(() => {
+        if (requestId !== this.latestFetchRequestId) {
+          return;
+        }
+        // Restore the page whose questions are still displayed rather than
+        // the page the failed request started from, which may itself be a
+        // pending request that never applied its response.
+        this.currentPage = this.appliedPage;
+        // The request has completed (with an error), so clear the loading
+        // state even when no page has been applied yet.
+        this.questionsFetched = true;
+      });
+  }
+
+  previousPage(): void {
+    if (0 < this.currentPage) {
+      this.currentPage -= 1;
+      this.fetchQuestionsForPage(this.currentPage);
+    }
+  }
+
+  nextPage(): void {
+    // Paging forward stays available while the total page count is unknown,
+    // so a failed count request does not block the user from viewing more
+    // questions.
+    if (
+      !this.totalPageCountIsKnown ||
+      this.currentPage < this.totalPageCount - 1
+    ) {
+      this.currentPage += 1;
+      this.fetchQuestionsForPage(this.currentPage);
+    }
   }
 
   initializeQuestionCard(card: StateCard): void {

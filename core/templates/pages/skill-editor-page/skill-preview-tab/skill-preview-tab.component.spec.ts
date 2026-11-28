@@ -21,6 +21,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
+  flushMicrotasks,
   TestBed,
   waitForAsync,
 } from '@angular/core/testing';
@@ -124,8 +125,21 @@ const questionDict = {
 };
 
 class MockQuestionBackendApiService {
-  async fetchQuestionsAsync() {
+  totalQuestionCount = 0;
+
+  async fetchQuestionsAsync(
+    skillIds: string[],
+    questionCount: number,
+    questionsSortedByDifficulty: boolean,
+    page: number = 0
+  ): Promise<QuestionBackendDict[]> {
     return Promise.resolve([questionDict as unknown as QuestionBackendDict]);
+  }
+
+  async fetchTotalQuestionCountForSkillIdsAsync(
+    skillIds: string[]
+  ): Promise<number> {
+    return Promise.resolve(this.totalQuestionCount);
   }
 }
 
@@ -140,6 +154,7 @@ describe('Skill Preview Tab Component', () => {
   let mockInteractionRule: InteractionRulesService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let windowDimensionsService: WindowDimensionsService;
+  let mockQuestionBackendApiService: MockQuestionBackendApiService;
 
   let displayedCard = new StateCard(
     '',
@@ -231,6 +246,9 @@ describe('Skill Preview Tab Component', () => {
     conversationFlowService = TestBed.inject(ConversationFlowService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    mockQuestionBackendApiService = TestBed.inject(
+      QuestionBackendApiService
+    ) as unknown as MockQuestionBackendApiService;
     questionPlayerEngineService =
       questionPlayerEngineService as unknown as jasmine.SpyObj<QuestionPlayerEngineService>;
     let skillId = 'df432fe';
@@ -245,10 +263,10 @@ describe('Skill Preview Tab Component', () => {
       ) => {}
     );
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue(skillId);
-    component.ngOnInit();
   });
 
   it('should initialize the variables', () => {
+    component.ngOnInit();
     expect(component.questionTextFilter).toEqual('');
     expect(component.displayCardIsInitialized).toEqual(false);
     expect(component.questionsFetched).toEqual(false);
@@ -374,5 +392,679 @@ describe('Skill Preview Tab Component', () => {
     currentInteractionService.onSubmit('answer', mockInteractionRule);
 
     expect(component.questionsFetched).toBe(false);
+  }));
+
+  it('should fetch the first page and compute the total page count', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fetchSpy = spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValue(Promise.resolve([questionDict1]));
+    mockQuestionBackendApiService.totalQuestionCount = 45;
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(fetchSpy).toHaveBeenCalledWith(['df432fe'], 20, false, 0);
+    expect(component.totalPageCount).toBe(3);
+    expect(component.questionsFetched).toBe(true);
+    expect(component.displayedQuestions).toEqual([questionDict1]);
+    expect(component.selectQuestionToPreview).toHaveBeenCalledWith(0);
+  }));
+
+  it('should keep filters applied when paging through questions', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fetchSpy = spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      Promise.resolve([questionDict1]),
+      Promise.resolve([questionDict3]),
+      Promise.resolve([questionDict1])
+    );
+    mockQuestionBackendApiService.totalQuestionCount = 40;
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    component.questionTextFilter = 'question1';
+    component.applyFilters();
+    expect(component.displayedQuestions).toEqual([questionDict1]);
+
+    component.nextPage();
+    flushMicrotasks();
+
+    expect(component.currentPage).toBe(1);
+    expect(fetchSpy).toHaveBeenCalledWith(['df432fe'], 20, false, 1);
+    // The active filter is re-applied to the newly fetched page, so the
+    // non-matching question is filtered out.
+    expect(component.displayedQuestions).toEqual([]);
+
+    component.questionTextFilter = 'question3';
+    component.applyFilters();
+    expect(component.displayedQuestions).toEqual([questionDict3]);
+
+    component.previousPage();
+    flushMicrotasks();
+
+    expect(component.currentPage).toBe(0);
+    expect(fetchSpy).toHaveBeenCalledWith(['df432fe'], 20, false, 0);
+  }));
+
+  it('should clear the preview when the fetched page has no matching questions', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      Promise.resolve([questionDict1]),
+      Promise.resolve([questionDict3])
+    );
+    mockQuestionBackendApiService.totalQuestionCount = 40;
+
+    component.ngOnInit();
+    flushMicrotasks();
+    component.questionTextFilter = 'question1';
+    component.applyFilters();
+    // Simulates a preview that was initialized for the first page.
+    component.displayCardIsInitialized = true;
+
+    component.nextPage();
+    flushMicrotasks();
+
+    // The filter excludes every question on the new page, so the preview from
+    // the previous page must not stay displayed next to the empty list.
+    expect(component.displayedQuestions).toEqual([]);
+    expect(component.displayCardIsInitialized).toBe(false);
+  }));
+
+  it('should select the first question when the fetched page has matching questions', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      Promise.resolve([questionDict1]),
+      Promise.resolve([questionDict3])
+    );
+    mockQuestionBackendApiService.totalQuestionCount = 40;
+
+    component.ngOnInit();
+    flushMicrotasks();
+    component.displayCardIsInitialized = true;
+
+    component.nextPage();
+    flushMicrotasks();
+
+    expect(component.displayedQuestions).toEqual([questionDict3]);
+    expect(component.selectQuestionToPreview).toHaveBeenCalledWith(0);
+    // The preview state is left to the newly selected question, not cleared.
+    expect(component.displayCardIsInitialized).toBe(true);
+  }));
+
+  it('should not page before the first or past the last page', () => {
+    const fetchSpy = spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValue(Promise.resolve([]));
+    component.currentPage = 0;
+    component.totalPageCount = 2;
+    component.totalPageCountIsKnown = true;
+
+    component.previousPage();
+    expect(component.currentPage).toBe(0);
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    component.currentPage = 1;
+    component.nextPage();
+    expect(component.currentPage).toBe(1);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('should ignore a stale response from an older page fetch', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    let resolveFirstPage: (value: QuestionBackendDict[]) => void = () => {};
+    const firstPagePromise = new Promise<QuestionBackendDict[]>(resolve => {
+      resolveFirstPage = resolve;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(firstPagePromise, Promise.resolve([questionDict3]));
+    component.questionTextFilter = '';
+    component.interactionFilter = component.INTERACTION_TYPES.ALL;
+    component.currentPage = 0;
+    component.totalPageCount = 3;
+
+    component.nextPage();
+    component.nextPage();
+    flushMicrotasks();
+    expect(component.questionDicts).toEqual([questionDict3]);
+
+    // Resolving the stale first page must not overwrite the current page.
+    resolveFirstPage([questionDict1]);
+    flushMicrotasks();
+    expect(component.questionDicts).toEqual([questionDict3]);
+  }));
+
+  it('should ignore a stale response that targets the current page', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    let resolveFirstPage: (value: QuestionBackendDict[]) => void = () => {};
+    const firstPagePromise = new Promise<QuestionBackendDict[]>(resolve => {
+      resolveFirstPage = resolve;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      // The first page 0 fetch, which stays pending.
+      firstPagePromise,
+      // The page 1 fetch.
+      Promise.resolve([questionDict3]),
+      // The second page 0 fetch, which supersedes the first one.
+      Promise.resolve([questionDict4])
+    );
+    component.questionTextFilter = '';
+    component.interactionFilter = component.INTERACTION_TYPES.ALL;
+    component.currentPage = 1;
+    component.totalPageCount = 2;
+
+    component.previousPage();
+    flushMicrotasks();
+    component.nextPage();
+    flushMicrotasks();
+    expect(component.currentPage).toBe(1);
+
+    component.previousPage();
+    flushMicrotasks();
+    expect(component.currentPage).toBe(0);
+    expect(component.questionDicts).toEqual([questionDict4]);
+
+    // The stale page 0 response must not overwrite the newer page 0 response,
+    // even though both requests target the same page.
+    resolveFirstPage([questionDict1]);
+    flushMicrotasks();
+    expect(component.questionDicts).toEqual([questionDict4]);
+  }));
+
+  it('should restore the previous page when a page fetch fails', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    let rejectPageFetch: (reason: string) => void = () => {};
+    const failedPagePromise = new Promise<QuestionBackendDict[]>(
+      (resolve, reject) => {
+        rejectPageFetch = reject;
+      }
+    );
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(Promise.resolve([questionDict1]), failedPagePromise);
+    mockQuestionBackendApiService.totalQuestionCount = 40;
+
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.totalPageCount).toBe(2);
+    expect(component.questionDicts).toEqual([questionDict1]);
+
+    component.nextPage();
+    rejectPageFetch('Error loading questions.');
+    flushMicrotasks();
+
+    // The failed fetch must not leave page 0's questions under page 1.
+    expect(component.currentPage).toBe(0);
+    expect(component.questionDicts).toEqual([questionDict1]);
+  }));
+
+  it('should roll back to the applied page when a pending page fetch fails', fakeAsync(() => {
+    let rejectSecondPage: (reason: string) => void = () => {};
+    // The first page 1 fetch never resolves, so page 1 never gets applied.
+    const pendingFirstPage = new Promise<QuestionBackendDict[]>(() => {});
+    const failedSecondPage = new Promise<QuestionBackendDict[]>(
+      (resolve, reject) => {
+        rejectSecondPage = reject;
+      }
+    );
+    spyOn(component, 'selectQuestionToPreview');
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      Promise.resolve([questionDict1]),
+      pendingFirstPage,
+      failedSecondPage
+    );
+    mockQuestionBackendApiService.totalQuestionCount = 60;
+
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.currentPage).toBe(0);
+    expect(component.questionDicts).toEqual([questionDict1]);
+
+    // Two rapid paging requests: page 1 stays pending, page 2 fails.
+    component.nextPage();
+    component.nextPage();
+    flushMicrotasks();
+    expect(component.currentPage).toBe(2);
+
+    rejectSecondPage('Error loading questions.');
+    flushMicrotasks();
+
+    // The rollback must target page 0, whose questions are still shown, and
+    // not page 1, whose fetch never completed.
+    expect(component.currentPage).toBe(0);
+    expect(component.questionDicts).toEqual([questionDict1]);
+  }));
+
+  it('should ignore a failed response from an older fetch', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    let rejectOldFetch: (reason: string) => void = () => {};
+    const oldFetchPromise = new Promise<QuestionBackendDict[]>(
+      (resolve, reject) => {
+        rejectOldFetch = reject;
+      }
+    );
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(oldFetchPromise, Promise.resolve([questionDict3]));
+    component.questionTextFilter = '';
+    component.interactionFilter = component.INTERACTION_TYPES.ALL;
+    component.currentPage = 0;
+    component.totalPageCount = 3;
+
+    // Start a page 1 fetch that will fail later, then a newer page 2 fetch.
+    component.nextPage();
+    component.nextPage();
+    flushMicrotasks();
+    expect(component.currentPage).toBe(2);
+    expect(component.questionDicts).toEqual([questionDict3]);
+
+    // The stale failure must not roll the page back.
+    rejectOldFetch('Error loading questions.');
+    flushMicrotasks();
+    expect(component.currentPage).toBe(2);
+    expect(component.questionDicts).toEqual([questionDict3]);
+  }));
+
+  it('should keep paging forward when the question count request fails', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fullPageOfQuestions = new Array(component.QUESTION_COUNT).fill(
+      questionDict1
+    );
+    const fetchSpy = spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValue(Promise.resolve(fullPageOfQuestions));
+    let rejectCountFetch: (reason: string) => void = () => {};
+    const failedCountPromise = new Promise<number>((resolve, reject) => {
+      rejectCountFetch = reject;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(failedCountPromise);
+
+    component.ngOnInit();
+    rejectCountFetch('Error fetching question count.');
+    flushMicrotasks();
+
+    // The total is unknown and page 0 is full, so paging must stay available.
+    expect(component.totalPageCountIsKnown).toBe(false);
+    expect(component.totalPageCount).toBe(0);
+    expect(component.questionsFetched).toBe(true);
+
+    component.nextPage();
+    flushMicrotasks();
+
+    expect(component.currentPage).toBe(1);
+    expect(fetchSpy).toHaveBeenCalledWith(['df432fe'], 20, false, 1);
+  }));
+
+  it('should detect the last page when the question count is unknown', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fetchSpy = spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      Promise.resolve(new Array(component.QUESTION_COUNT).fill(questionDict1)),
+      Promise.resolve([questionDict3])
+    );
+    let rejectCountFetch: (reason: string) => void = () => {};
+    const failedCountPromise = new Promise<number>((resolve, reject) => {
+      rejectCountFetch = reject;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(failedCountPromise);
+
+    component.ngOnInit();
+    rejectCountFetch('Error fetching question count.');
+    flushMicrotasks();
+
+    component.nextPage();
+    flushMicrotasks();
+
+    // A response with fewer questions than requested marks the last page.
+    expect(component.currentPage).toBe(1);
+    expect(component.totalPageCount).toBe(2);
+    expect(component.totalPageCountIsKnown).toBe(true);
+    expect(component.questionDicts).toEqual([questionDict3]);
+
+    component.nextPage();
+    expect(component.currentPage).toBe(1);
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  }));
+
+  it('should stay on the last applied page when the next page is empty and the count is unknown', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      Promise.resolve(new Array(component.QUESTION_COUNT).fill(questionDict1)),
+      Promise.resolve([])
+    );
+    let rejectCountFetch: (reason: string) => void = () => {};
+    const failedCountPromise = new Promise<number>((resolve, reject) => {
+      rejectCountFetch = reject;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(failedCountPromise);
+
+    component.ngOnInit();
+    rejectCountFetch('Error fetching question count.');
+    flushMicrotasks();
+    const appliedQuestions = component.questionDicts;
+
+    component.nextPage();
+    flushMicrotasks();
+
+    // The requested page does not exist, so the component stays on page 0.
+    expect(component.currentPage).toBe(0);
+    expect(component.totalPageCount).toBe(1);
+    expect(component.totalPageCountIsKnown).toBe(true);
+    expect(component.questionDicts).toEqual(appliedQuestions);
+  }));
+
+  it('should record the page count when the page before an empty page exists', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fullPageOfQuestions = new Array(component.QUESTION_COUNT).fill(
+      questionDict1
+    );
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      Promise.resolve(fullPageOfQuestions),
+      Promise.resolve(fullPageOfQuestions),
+      Promise.resolve([])
+    );
+    let rejectCountFetch: (reason: string) => void = () => {};
+    const failedCountPromise = new Promise<number>((resolve, reject) => {
+      rejectCountFetch = reject;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(failedCountPromise);
+
+    component.ngOnInit();
+    rejectCountFetch('Error fetching question count.');
+    flushMicrotasks();
+    component.nextPage();
+    flushMicrotasks();
+    component.nextPage();
+    flushMicrotasks();
+
+    // Page 1 was applied, so the empty page 2 proves that pages 0 and 1 exist
+    // and can be recorded as the exact page count.
+    expect(component.totalPageCount).toBe(2);
+    expect(component.totalPageCountIsKnown).toBe(true);
+    expect(component.currentPage).toBe(1);
+  }));
+
+  it('should not count a page that was requested but never applied', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fullPageOfQuestions = new Array(component.QUESTION_COUNT).fill(
+      questionDict1
+    );
+    let resolvePageOne: (value: QuestionBackendDict[]) => void = () => {};
+    const pageOnePromise = new Promise<QuestionBackendDict[]>(resolve => {
+      resolvePageOne = resolve;
+    });
+    let resolvePageTwo: (value: QuestionBackendDict[]) => void = () => {};
+    const pageTwoPromise = new Promise<QuestionBackendDict[]>(resolve => {
+      resolvePageTwo = resolve;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      Promise.resolve(fullPageOfQuestions),
+      pageOnePromise,
+      pageTwoPromise
+    );
+    let rejectCountFetch: (reason: string) => void = () => {};
+    const failedCountPromise = new Promise<number>((resolve, reject) => {
+      rejectCountFetch = reject;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(failedCountPromise);
+
+    component.ngOnInit();
+    rejectCountFetch('Error fetching question count.');
+    flushMicrotasks();
+
+    // Two quick Next clicks request pages 1 and 2 without waiting for page 1.
+    component.nextPage();
+    component.nextPage();
+    resolvePageTwo([]);
+    flushMicrotasks();
+    resolvePageOne(fullPageOfQuestions);
+    flushMicrotasks();
+
+    // The page 1 response is discarded as stale, so an empty page 2 says
+    // nothing about whether page 1 exists. Recording 2 here would imply that
+    // both pages 0 and 1 exist and leave Next enabled past the real end.
+    expect(component.totalPageCountIsKnown).toBe(false);
+    expect(component.totalPageCount).toBe(0);
+    expect(component.currentPage).toBe(0);
+    expect(component.questionDicts).toEqual(fullPageOfQuestions);
+  }));
+
+  it('should stay on the applied page when the next page is empty and the count becomes known', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fullPageOfQuestions = new Array(component.QUESTION_COUNT).fill(
+      questionDict1
+    );
+    let resolvePageOne: (value: QuestionBackendDict[]) => void = () => {};
+    const pageOnePromise = new Promise<QuestionBackendDict[]>(resolve => {
+      resolvePageOne = resolve;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(Promise.resolve(fullPageOfQuestions), pageOnePromise);
+    let resolveCount: (value: number) => void = () => {};
+    const countPromise = new Promise<number>(resolve => {
+      resolveCount = resolve;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(countPromise);
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    // Next is still enabled because the count request is pending, and the
+    // count resolves while the page 1 request is in flight.
+    component.nextPage();
+    resolveCount(component.QUESTION_COUNT);
+    flushMicrotasks();
+
+    resolvePageOne([]);
+    flushMicrotasks();
+
+    // The empty page 1 must not replace page 0 or leave "Page 2" displayed,
+    // even though the total page count was already known when it arrived.
+    expect(component.currentPage).toBe(0);
+    expect(component.questionDicts).toEqual(fullPageOfQuestions);
+    expect(component.displayedQuestions).toEqual(fullPageOfQuestions);
+    expect(component.questionsFetched).toBe(true);
+    expect(component.totalPageCount).toBe(1);
+    expect(component.totalPageCountIsKnown).toBe(true);
+  }));
+
+  it('should finish loading when the first page is empty and the count is unknown', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    spyOn(mockQuestionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
+      Promise.resolve([])
+    );
+    let rejectCountFetch: (reason: string) => void = () => {};
+    const failedCountPromise = new Promise<number>((resolve, reject) => {
+      rejectCountFetch = reject;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(failedCountPromise);
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    // An empty first page means the skill has no questions. The request has
+    // completed, so the loading state must clear even though the total count
+    // is unknown and no questions are displayed.
+    expect(component.questionsFetched).toBe(true);
+    expect(component.currentPage).toBe(0);
+    expect(component.totalPageCount).toBe(0);
+    expect(component.questionDicts).toEqual([]);
+
+    rejectCountFetch('Error fetching question count.');
+    flushMicrotasks();
+  }));
+
+  it('should clear the loading state when the first page fetch fails', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    let rejectPageFetch: (reason: string) => void = () => {};
+    const failedPagePromise = new Promise<QuestionBackendDict[]>(
+      (resolve, reject) => {
+        rejectPageFetch = reject;
+      }
+    );
+    spyOn(mockQuestionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
+      failedPagePromise
+    );
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(Promise.resolve(0));
+
+    component.ngOnInit();
+    rejectPageFetch('Error loading questions.');
+    flushMicrotasks();
+
+    // A failed initial fetch must not leave the component stuck in the
+    // loading state.
+    expect(component.questionsFetched).toBe(true);
+    expect(component.currentPage).toBe(0);
+    expect(component.questionDicts).toEqual([]);
+  }));
+
+  it('should show a message when no question is selected', () => {
+    // Let Angular run the lifecycle hook before overriding the state under
+    // test, otherwise the initial change detection resets it.
+    fixture.detectChanges();
+    component.questionsFetched = true;
+    component.displayedQuestions = [questionDict1];
+    fixture.detectChanges();
+
+    const emptyPreview = fixture.nativeElement.querySelector(
+      '.preview-empty-message'
+    );
+    expect(emptyPreview.textContent.trim()).toBe(
+      component.PREVIEW_MESSAGES.NO_QUESTION_SELECTED
+    );
+
+    component.initializeQuestionCard(displayedCard);
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.preview-empty-message')
+    ).toBeNull();
+  });
+
+  it('should show a message when there are no questions to display', () => {
+    // Let Angular run the lifecycle hook before overriding the state under
+    // test, otherwise the initial change detection resets it.
+    fixture.detectChanges();
+    component.questionsFetched = true;
+    component.displayedQuestions = [];
+    fixture.detectChanges();
+
+    const noQuestionsMessage = fixture.nativeElement.querySelector(
+      '.no-questions-message'
+    );
+    expect(noQuestionsMessage.textContent.trim()).toBe(
+      component.PREVIEW_MESSAGES.NO_QUESTIONS_TO_DISPLAY
+    );
+
+    component.displayedQuestions = [questionDict1];
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.no-questions-message')
+    ).toBeNull();
+  });
+
+  it('should show a message when the skill has no questions', fakeAsync(() => {
+    spyOn(mockQuestionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
+      Promise.resolve([])
+    );
+    mockQuestionBackendApiService.totalQuestionCount = 0;
+
+    fixture.detectChanges();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    const noQuestionsMessage = fixture.nativeElement.querySelector(
+      '.no-questions-message'
+    );
+    expect(noQuestionsMessage).not.toBeNull();
+    expect(noQuestionsMessage.textContent.trim()).toBe(
+      component.PREVIEW_MESSAGES.NO_QUESTIONS_TO_DISPLAY
+    );
+    expect(
+      fixture.nativeElement.querySelector('.preview-empty-message')
+    ).not.toBeNull();
+  }));
+
+  it('should show a message when the first page is empty and the count is unknown', fakeAsync(() => {
+    spyOn(mockQuestionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
+      Promise.resolve([])
+    );
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(new Promise<number>(() => {}));
+
+    fixture.detectChanges();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(component.questionsFetched).toBe(true);
+    const noQuestionsMessage = fixture.nativeElement.querySelector(
+      '.no-questions-message'
+    );
+    expect(noQuestionsMessage).not.toBeNull();
+    expect(noQuestionsMessage.textContent.trim()).toBe(
+      component.PREVIEW_MESSAGES.NO_QUESTIONS_TO_DISPLAY
+    );
   }));
 });
