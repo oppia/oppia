@@ -143,7 +143,7 @@ describe('Lesson Creator', function () {
     await lessonCreator.openExplorationInExplorationEditor(
       'What are the Place Values'
     );
-    await lessonCreator.navigateToFeedbackTab();
+    await lessonCreator.acceptFeedbackPromptModal();
     await lessonCreator.expectNewExplorationFeedbackTab();
     await lessonCreator.verifyNewExplorationEditorFeedbacktabFilterRowContents();
     await lessonCreator.verifyDefaultNewExplorationFeedbackTabFilter();

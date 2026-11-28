@@ -245,6 +245,7 @@ const tagsField = '.e2e-test-chip-list-tags';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const goToFeedbackButtonSelector = '.e2e-test-go-to-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
 const feedbackSelector = '.e2e-test-exploration-feedback';
@@ -2985,6 +2986,17 @@ export class ExplorationEditor extends BaseUser {
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
     await this.dismissWelcomeModal(false);
+  }
+
+  /**
+   * Function to accept the feedback prompt modal and navigate to feedback tab.
+   */
+  async acceptFeedbackPromptModal(): Promise<void> {
+    await this.page.waitForSelector(goToFeedbackButtonSelector, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
+    await this.waitForNetworkIdle();
   }
 
   /**
