@@ -8,21 +8,24 @@
       <button mat-button class="oppia-learner-hint-solution-button e2e-test-view-hint"
               *ngIf="hintIndex === 0 && isHintButtonVisible(hintIndex)"
               [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
+              [attr.aria-label]="'I18N_VIEW_HINT_WITH_INDEX_BUTTON_TEXT' | translate: {index: hintIndex + 1}"
               (click)="displayHintModal(hintIndex)">
-        <i class="fas fa-lightbulb"></i>
+        <i class="fas fa-lightbulb" aria-hidden="true"></i>
       </button>
       <button mat-button class="oppia-learner-hint-solution-button e2e-test-view-hint"
               *ngIf="hintIndex && isHintButtonVisible(hintIndex)"
               [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
+              [attr.aria-label]="'I18N_VIEW_HINT_WITH_INDEX_BUTTON_TEXT' | translate: {index: hintIndex + 1}"
               (click)="displayHintModal(hintIndex)">
-        <i class="fas fa-lightbulb"></i>
+        <i class="fas fa-lightbulb" aria-hidden="true"></i>
       </button>
     </li>
     <li *ngIf="isSolutionButtonVisible()">
       <button mat-button class="oppia-learner-hint-solution-button e2e-test-view-solution"
               [ngClass]="{'viewed': isSolutionConsumed()}"
+              [attr.aria-label]="'I18N_VIEW_SOLUTION_BUTTON_TEXT' | translate"
               (click)="onClickSolutionButton()">
-        <i class="fas fa-lightbulb oppia-lightbulb-yellow"></i>
+        <i class="fas fa-lightbulb oppia-lightbulb-yellow" aria-hidden="true"></i>
       </button>
     </li>
   </ul>

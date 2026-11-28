@@ -551,4 +551,24 @@ describe('HintAndSolutionButtonsComponent', () => {
     expect(component.isSolutionConsumed()).toBe(true);
     expect(component.isSolutionConsumed()).toBe(false);
   });
+
+  it('should hide the decorative lightbulb icons from screen readers', () => {
+    spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
+    spyOn(hintsAndSolutionManagerService, 'isHintViewable').and.returnValue(
+      true
+    );
+    spyOn(hintsAndSolutionManagerService, 'isSolutionViewable').and.returnValue(
+      true
+    );
+    component.displayedCard = newCard;
+
+    fixture.detectChanges();
+
+    const icons = fixture.nativeElement.querySelectorAll(
+      '.oppia-learner-hint-solution-button i'
+    );
+    expect(icons.length).toBe(2);
+    expect(icons[0].getAttribute('aria-hidden')).toBe('true');
+    expect(icons[1].getAttribute('aria-hidden')).toBe('true');
+  });
 });
