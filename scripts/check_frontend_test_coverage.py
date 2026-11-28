@@ -56,8 +56,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'ck-editor-4-widgets.initializer.ts',
     'core/templates/components/forms/custom-forms-directives/'
     'object-editor.directive.ts',
-    'core/templates/components/state-directives/rule-editor/'
-    'rule-type-selector.directive.ts',
     'core/templates/domain/question/question-update.service.ts',
     'core/templates/domain/question/question.model.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
