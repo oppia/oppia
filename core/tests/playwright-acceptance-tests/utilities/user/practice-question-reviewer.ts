@@ -30,6 +30,8 @@ const editQuestionPencilIconSelector =
 const saveQuestionButtonSelector = '.e2e-test-save-question-button';
 const rteTextAreaSelector = '.e2e-test-rte';
 const saveRTEButtonSelector = '.e2e-test-save-state-content';
+const reviewModalHeaderSelector =
+  '.e2e-test-question-suggestion-review-modal-header';
 
 export class PracticeQuestionReviewer extends Contributor {
   /**
@@ -76,6 +78,16 @@ export class PracticeQuestionReviewer extends Contributor {
 
     await this.clickOnElementWithSelector(buttonSelector);
     await this.expectToastMessage('Submitted suggestion review.');
+  }
+
+  /**
+   * Checks if the question review modal is present.
+   * @param {boolean} visible - Whether the modal should be visible.
+   */
+  async expectQuestionReviewModalToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(reviewModalHeaderSelector, visible);
   }
 
   /**
