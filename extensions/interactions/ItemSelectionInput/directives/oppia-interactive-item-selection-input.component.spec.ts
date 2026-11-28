@@ -201,6 +201,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
 
         component.submitMultipleChoiceAnswer(dummyMouseEvent, 0);
         expect(currentTargetButton.classList.contains('selected')).toBe(true);
+        expect(selectedButton.classList.contains('selected')).toBe(false);
 
         expect(component.userSelections).toEqual({
           'choice 1': true,
@@ -257,6 +258,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
 
         component.submitMultipleChoiceAnswer(dummyMouseEvent, 0);
         expect(currentTargetButton.classList.contains('selected')).toBe(true);
+        expect(selectedButton.classList.contains('selected')).toBe(false);
 
         expect(component.userSelections).toEqual({
           'choice 1': true,

@@ -216,7 +216,7 @@ export class InteractiveCodeReplComponent
     // Evaluate the program asynchronously using Skulpt.
     Sk.misceval
       .asyncToPromise(() => {
-        return Sk.importMainWithBody('<stdin>', false, codeInput, true);
+        Sk.importMainWithBody('<stdin>', false, codeInput, true);
       })
       .then(
         () => {
