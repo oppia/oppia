@@ -2725,6 +2725,9 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_review_translation_for_language_codes = (
         datastore_services.StringProperty(repeated=True, indexed=True)
     )
+    can_submit_translation_for_language_codes = (
+        datastore_services.StringProperty(repeated=True, indexed=True)
+    )
     can_review_voiceover_for_language_codes = datastore_services.StringProperty(
         repeated=True, indexed=True
     )
@@ -2781,6 +2784,9 @@ class UserContributionRightsModel(base_models.BaseModel):
             'can_review_translation_for_language_codes': (
                 rights_model.can_review_translation_for_language_codes
             ),
+            'can_submit_translation_for_language_codes': (
+                rights_model.can_submit_translation_for_language_codes
+            ),
             'can_review_voiceover_for_language_codes': (
                 rights_model.can_review_voiceover_for_language_codes
             ),
@@ -2802,6 +2808,7 @@ class UserContributionRightsModel(base_models.BaseModel):
             super(cls, cls).get_export_policy(),
             **{
                 'can_review_translation_for_language_codes': base_models.EXPORT_POLICY.EXPORTED,
+                'can_submit_translation_for_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'can_review_voiceover_for_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'can_review_questions': base_models.EXPORT_POLICY.EXPORTED,
                 'can_submit_questions': base_models.EXPORT_POLICY.EXPORTED,
@@ -2824,6 +2831,25 @@ class UserContributionRightsModel(base_models.BaseModel):
             cls.can_review_translation_for_language_codes == language_code
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
+
+    @classmethod
+    def get_translation_submitter_user_ids(
+        cls, language_code: str
+    ) -> List[str]:
+        """Returns the IDs of the users who have rights to submit translations
+        in the given language code.
+
+        Args:
+            language_code: str. The code of the language.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to submit
+            translations in the given language code.
+        """
+        submitter_keys = cls.query(
+            cls.can_submit_translation_for_language_codes == language_code
+        ).fetch(keys_only=True)
+        return [submitter_key.id() for submitter_key in submitter_keys]
 
     @classmethod
     def get_voiceover_reviewer_user_ids(cls, language_code: str) -> List[str]:

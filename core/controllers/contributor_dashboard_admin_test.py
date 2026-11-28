@@ -31,7 +31,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models, user_models
 
-(suggestion_models, user_models) = models.Registry.import_models(
+suggestion_models, user_models = models.Registry.import_models(
     [models.Names.SUGGESTION, models.Names.USER]
 )
 
@@ -352,6 +352,97 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
             'hi.',
         )
 
+    def test_add_and_remove_translation_submitter(self) -> None:
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            '/contributionrightshandler/submit_translation',
+            {'username': 'translator', 'language_code': 'hi'},
+            csrf_token=csrf_token,
+        )
+        self.assertTrue(
+            user_services.can_submit_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'
+            )
+        )
+
+        self.delete_json(
+            '/contributionrightshandler/submit_translation',
+            params={'username': 'translator', 'language_code': 'hi'},
+        )
+        self.assertFalse(
+            user_services.can_submit_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'
+            )
+        )
+
+    def test_cannot_add_or_remove_translation_submitter_without_language_code(
+        self,
+    ) -> None:
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/contributionrightshandler/submit_translation',
+            {'username': 'translator'},
+            csrf_token=csrf_token,
+            expected_status_int=500,
+        )
+        self.assertEqual(
+            response['error'],
+            'The language_code cannot be None if the submit category is '
+            '\'translation\'',
+        )
+
+        response = self.delete_json(
+            '/contributionrightshandler/submit_translation',
+            params={'username': 'translator'},
+            expected_status_int=500,
+        )
+        self.assertEqual(
+            response['error'],
+            'The language_code cannot be None if the submit category is '
+            '\'translation\'',
+        )
+
+    def test_assigning_same_language_for_translation_submission_raise_error(
+        self,
+    ) -> None:
+        user_services.allow_user_to_submit_translation_in_language(
+            self.translation_reviewer_id, 'hi'
+        )
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/contributionrightshandler/submit_translation',
+            {'username': 'translator', 'language_code': 'hi'},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
+        self.assertEqual(
+            response['error'],
+            'User translator already has rights to submit translation in '
+            'language code hi',
+        )
+
+    def test_remove_unassigned_translation_submitter_raise_error(self) -> None:
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+
+        response = self.delete_json(
+            '/contributionrightshandler/submit_translation',
+            params={'username': 'translator', 'language_code': 'hi'},
+            expected_status_int=400,
+        )
+
+        self.assertEqual(
+            response['error'],
+            'translator does not have rights to submit translation in language '
+            'hi.',
+        )
+
     def test_remove_question_reviewer(self) -> None:
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         self.assertTrue(
@@ -566,10 +657,19 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             '/contributionrightsdatahandler', params={'username': 'reviewer'}
         )
         self.assertEqual(
-            list(response.keys()), ['can_review_translation_for_language_codes']
+            sorted(response.keys()),
+            sorted(
+                [
+                    'can_review_translation_for_language_codes',
+                    'can_submit_translation_for_language_codes',
+                ]
+            ),
         )
         self.assertEqual(
             response['can_review_translation_for_language_codes'], []
+        )
+        self.assertEqual(
+            response['can_submit_translation_for_language_codes'], []
         )
 
         user_services.allow_user_to_review_translation_in_language(
@@ -582,7 +682,13 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             '/contributionrightsdatahandler', params={'username': 'reviewer'}
         )
         self.assertEqual(
-            list(response.keys()), ['can_review_translation_for_language_codes']
+            sorted(response.keys()),
+            sorted(
+                [
+                    'can_review_translation_for_language_codes',
+                    'can_submit_translation_for_language_codes',
+                ]
+            ),
         )
         self.assertEqual(
             response['can_review_translation_for_language_codes'], ['hi']

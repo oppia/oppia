@@ -8487,6 +8487,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             [
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             ],
         )
@@ -8694,6 +8695,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             [
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             ],
         )

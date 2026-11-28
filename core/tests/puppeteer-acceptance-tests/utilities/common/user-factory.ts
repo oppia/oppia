@@ -94,6 +94,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
+  [ROLES.TRANSLATION_SUBMITTER]: TranslationSubmitterFactory,
   [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
   [ROLES.COLLECTION_EDITOR]: CollectionEditorFactory,
   [ROLES.TECH_TEAM_LEAD]: TechTeamLeadFactory,
@@ -101,6 +102,7 @@ const USER_ROLE_MAPPING = {
 
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
   ROLES.TRANSLATION_REVIEWER,
+  ROLES.TRANSLATION_SUBMITTER,
   ROLES.VOICEOVER_SUBMITTER,
 ];
 
@@ -177,7 +179,9 @@ export class UserFactory {
    *     assignment function. For Topic Manager, it should be the topic
    *     name (as string). For Translation Coordinator, it should be the
    *     array of language code (as string[]). For Voiceover Submitter,
-   *     it should be the exploration ID (as string).
+   *     it should be the exploration ID (as string). For Translation
+   *     Reviewer and Translation Submitter, it should be the language code
+   *     or array of language codes.
    * @returns {TUser & MultipleRoleIntersection<TRoles>} - The user with
    *     the roles assigned.
    */
@@ -230,6 +234,18 @@ export class UserFactory {
           }
           for (const language of args as string[]) {
             await superAdminInstance.addTranslationLanguageReviewRights(
+              user.username,
+              language
+            );
+          }
+          break;
+        case ROLES.TRANSLATION_SUBMITTER:
+          await superAdminInstance.navigateToContributorDashboardAdminPage();
+          if (typeof args === 'string') {
+            args = [args];
+          }
+          for (const language of args as string[]) {
+            await superAdminInstance.addTranslationSubmitRights(
               user.username,
               language
             );

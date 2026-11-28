@@ -56,7 +56,7 @@ if MYPY:  # pragma: no cover
     )
 
 datastore_services = models.Registry.import_datastore_services()
-(auth_models, user_models, audit_models, suggestion_models) = (
+auth_models, user_models, audit_models, suggestion_models = (
     models.Registry.import_models(
         [
             models.Names.AUTH,
@@ -2667,8 +2667,7 @@ class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
 
     EXP_ID: Final = 'exp_id0'
 
-    SAMPLE_EXPLORATION_YAML: Final = (
-        """
+    SAMPLE_EXPLORATION_YAML: Final = """
 author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -2829,7 +2828,6 @@ states_schema_version: 42
 tags: []
 title: Title
 """
-    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -4748,6 +4746,53 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_can_submit_translation_suggestions(self) -> None:
+        self.assertFalse(
+            user_services.can_submit_translation_suggestions(self.translator_id)
+        )
+
+        user_services.allow_user_to_submit_translation_in_language(
+            self.translator_id, 'hi'
+        )
+
+        self.assertTrue(
+            user_services.can_submit_translation_suggestions(self.translator_id)
+        )
+        self.assertTrue(
+            user_services.can_submit_translation_suggestions(
+                self.translator_id, language_code='hi'
+            )
+        )
+        self.assertFalse(
+            user_services.can_submit_translation_suggestions(
+                self.translator_id, language_code='ar'
+            )
+        )
+
+    def test_remove_translation_submit_rights_in_language(self) -> None:
+        user_services.allow_user_to_submit_translation_in_language(
+            self.translator_id, 'hi'
+        )
+        user_services.allow_user_to_submit_translation_in_language(
+            self.translator_id, 'ar'
+        )
+
+        user_services.remove_translation_submit_rights_in_language(
+            self.translator_id, 'hi'
+        )
+
+        self.assertFalse(
+            user_services.can_submit_translation_suggestions(
+                self.translator_id, language_code='hi'
+            )
+        )
+        # Rights in other languages are kept.
+        self.assertTrue(
+            user_services.can_submit_translation_suggestions(
+                self.translator_id, language_code='ar'
+            )
+        )
+
     def test_remove_question_review_rights(self) -> None:
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         self.assertTrue(
@@ -4830,6 +4875,24 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         )
         usernames = user_services.get_contributor_usernames(
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            language_code='hi',
+        )
+        self.assertEqual(usernames, [self.TRANSLATOR_USERNAME])
+
+    def test_get_contributor_usernames_for_submit_translation_returns_correctly(
+        self,
+    ) -> None:
+        usernames = user_services.get_contributor_usernames(
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
+            language_code='hi',
+        )
+        self.assertEqual(usernames, [])
+
+        user_services.allow_user_to_submit_translation_in_language(
+            self.translator_id, 'hi'
+        )
+        usernames = user_services.get_contributor_usernames(
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
             language_code='hi',
         )
         self.assertEqual(usernames, [self.TRANSLATOR_USERNAME])
