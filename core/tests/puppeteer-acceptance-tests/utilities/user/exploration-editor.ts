@@ -4065,12 +4065,74 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Waits until a dropdown matching the given selector contains an option
+   * whose value or trimmed text matches the expected option.
+   *
+   * @param {string} selector - The CSS selector of the dropdown select element.
+   * @param {string | string[]} expectedOption - The option value, trimmed text,
+   *   or list of acceptable options to wait for.
+   */
+  protected async waitForDropdownOptionToAppear(
+    selector: string,
+    expectedOption: string | string[]
+  ): Promise<void> {
+    const targetList = Array.isArray(expectedOption)
+      ? expectedOption
+      : [expectedOption];
+
+    await this.page.waitForFunction(
+      (sel: string, targets: string[]) => {
+        const select = document.querySelector(sel) as HTMLSelectElement | null;
+        return (
+          select !== null &&
+          Array.from(select.options).some(
+            option =>
+              targets.includes(option.value) ||
+              targets.includes(option.text.trim())
+          )
+        );
+      },
+      {},
+      selector,
+      targetList
+    );
+  }
+
+  /**
+   * Waits until the dropdown's selected value matches the expected value.
+   *
+   * @param {string} selector - The CSS selector of the dropdown select element.
+   * @param {string} expectedValue - The expected selected option value.
+   */
+  protected async waitForDropdownSelectedValue(
+    selector: string,
+    expectedValue: string
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      (sel: string, expectedVal: string) => {
+        const select = document.querySelector(sel) as HTMLSelectElement | null;
+        return select !== null && select.value === expectedVal;
+      },
+      {},
+      selector,
+      expectedValue
+    );
+  }
+
+  /**
    * Function to select destination for default response.
    * @param cardName - The name of the card to which learners will be directed.
    */
   async selectDestinationAndSave(cardName: string): Promise<void> {
     await this.waitForElementToBeClickable(destinationCardSelector);
+    // Wait for Angular's updateOptionNames() to asynchronously populate
+    // the dropdown options before attempting selection.
+    await this.waitForDropdownOptionToAppear(destinationCardSelector, [
+      '/',
+      'A New Card Called...',
+    ]);
     await this.select(destinationCardSelector, '/');
+    await this.waitForDropdownSelectedValue(destinationCardSelector, '/');
     await this.page.waitForSelector(addStateInput, {
       visible: true,
     });
@@ -4087,7 +4149,11 @@ export class ExplorationEditor extends BaseUser {
    */
   async selectExistingDestinationAndSave(cardName: string): Promise<void> {
     await this.waitForElementToBeClickable(destinationCardSelector);
+    // Wait for Angular's updateOptionNames() to asynchronously populate
+    // the dropdown options before attempting selection.
+    await this.waitForDropdownOptionToAppear(destinationCardSelector, cardName);
     await this.select(destinationCardSelector, cardName);
+    await this.waitForDropdownSelectedValue(destinationCardSelector, cardName);
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
@@ -4350,15 +4416,64 @@ export class ExplorationEditor extends BaseUser {
         );
       }
 
+      // Wait for Angular's updateOptionNames() to asynchronously populate
+      // the dropdown options before attempting selection.
+      await this.waitForDropdownOptionToAppear(
+        destinationSelectorDropdown,
+        destinationValue
+      );
       await this.page.select(destinationSelectorDropdown, destinationValue);
+      await this.waitForDropdownSelectedValue(
+        destinationSelectorDropdown,
+        destinationValue
+      );
       await this.page.click(saveDestinationButtonSelector);
       await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
 
     if (directToCardWhenStuck) {
       await this.clickOnElementWithSelector(outcomeDestWhenStuckSelector);
-      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
-      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
+      // Wait for Angular's updateOptionNames() to asynchronously populate
+      // the dropdown options before attempting selection.
+      await this.waitForDropdownOptionToAppear(
+        destinationWhenStuckSelectorDropdown,
+        'A New Card Called...'
+      );
+
+      const newCardOptionValue = await this.page.$eval(
+        destinationWhenStuckSelectorDropdown,
+        (element: Element) => {
+          if (!(element instanceof HTMLSelectElement)) {
+            return null;
+          }
+          const option = Array.from(element.options).find(
+            opt => opt.text.trim() === 'A New Card Called...'
+          );
+          return option ? option.value : null;
+        }
+      );
+
+      if (!newCardOptionValue) {
+        throw new Error(
+          'Option "A New Card Called..." was not found in the stuck destination dropdown.'
+        );
+      }
+
+      await this.select(
+        destinationWhenStuckSelectorDropdown,
+        newCardOptionValue
+      );
+
+      // Verify that the selection succeeded and wait for the new-card input to be visible.
+      await this.waitForDropdownSelectedValue(
+        destinationWhenStuckSelectorDropdown,
+        newCardOptionValue
+      );
+      await this.expectElementToBeVisible(
+        addDestinationStateWhenStuckInput,
+        true
+      );
+
       await this.typeInInputField(
         addDestinationStateWhenStuckInput,
         directToCardWhenStuck
