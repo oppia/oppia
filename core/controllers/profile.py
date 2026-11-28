@@ -183,30 +183,17 @@ class BulkEmailWebhookEndpoint(
 
         user_id = user_settings.user_id
         user_email_preferences = user_services.get_email_preferences(user_id)
-        if self.normalized_request['type'] == 'subscribe':
-            user_services.update_email_preferences(
-                user_id,
-                True,
-                user_email_preferences.can_receive_editor_role_email,
-                user_email_preferences.can_receive_feedback_message_email,
-                user_email_preferences.can_receive_subscription_email,
-                can_receive_contributor_dashboard_email=(
-                    user_email_preferences.can_receive_contributor_dashboard_email
-                ),
-                bulk_email_db_already_updated=True,
-            )
-        elif self.normalized_request['type'] == 'unsubscribe':
-            user_services.update_email_preferences(
-                user_id,
-                False,
-                user_email_preferences.can_receive_editor_role_email,
-                user_email_preferences.can_receive_feedback_message_email,
-                user_email_preferences.can_receive_subscription_email,
-                can_receive_contributor_dashboard_email=(
-                    user_email_preferences.can_receive_contributor_dashboard_email
-                ),
-                bulk_email_db_already_updated=True,
-            )
+        user_services.update_email_preferences(
+            user_id,
+            self.normalized_request['type'] == 'subscribe',
+            user_email_preferences.can_receive_editor_role_email,
+            user_email_preferences.can_receive_feedback_message_email,
+            user_email_preferences.can_receive_subscription_email,
+            can_receive_contributor_dashboard_email=(
+                user_email_preferences.can_receive_contributor_dashboard_email
+            ),
+            bulk_email_db_already_updated=True,
+        )
         self.render_json({})
 
 
@@ -734,21 +721,19 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             zfile.writestr('oppia_takeout_data.json', user_data_json_string)
             for image in user_images:
                 if image.b64_image_data.startswith(utils.PNG_DATA_URL_PREFIX):
-                    decoded_png = utils.convert_data_url_to_binary(
-                        image.b64_image_data, 'png'
+                    image_format = 'png'
+                else:
+                    assert image.b64_image_data.startswith(
+                        utils.DATA_URL_FORMAT_PREFIX % 'webp'
                     )
-                    zfile.writestr(
-                        'images/' + image.image_export_path, decoded_png
-                    )
-                elif image.b64_image_data.startswith(
-                    utils.DATA_URL_FORMAT_PREFIX % 'webp'
-                ):
-                    decoded_webp = utils.convert_data_url_to_binary(
-                        image.b64_image_data, 'webp'
-                    )
-                    zfile.writestr(
-                        'images/' + image.image_export_path, decoded_webp
-                    )
+                    image_format = 'webp'
+
+                decoded_image = utils.convert_data_url_to_binary(
+                    image.b64_image_data, image_format
+                )
+                zfile.writestr(
+                    'images/' + image.image_export_path, decoded_image
+                )
 
         # Render file for download.
         self.render_downloadable_file(

@@ -25,6 +25,7 @@ import zipfile
 
 from core import feconf, utils
 from core.constants import constants
+from core.controllers import profile
 from core.domain import (
     exp_domain,
     exp_services,
@@ -303,6 +304,19 @@ class UserContributionsTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A
         )
+        self.assertEqual(response_dict['created_exp_summary_dicts'], [])
+        self.assertEqual(response_dict['edited_exp_summary_dicts'], [])
+
+    def test_missing_contributions_record(self) -> None:
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+
+        with self.swap(
+            user_services, 'get_user_contributions', lambda unused_user_id: None
+        ):
+            response_dict = self.get_json(
+                '/profilehandler/data/%s' % self.USERNAME_A
+            )
+
         self.assertEqual(response_dict['created_exp_summary_dicts'], [])
         self.assertEqual(response_dict['edited_exp_summary_dicts'], [])
 
@@ -1426,6 +1440,47 @@ class SignupTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_returning_user_accepts_updated_terms(self) -> None:
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_settings = user_services.get_user_settings(user_id, strict=True)
+        user_settings.last_agreed_to_terms = (
+            feconf.TERMS_PAGE_LAST_UPDATED_UTC - datetime.timedelta(days=1)
+        )
+        user_settings.default_dashboard = constants.DASHBOARD_TYPE_CREATOR
+        user_services.save_user_settings(user_settings)
+
+        self.assertTrue(user_services.has_ever_registered(user_id))
+        self.assertFalse(user_services.has_fully_registered_account(user_id))
+
+        self.login(self.EDITOR_EMAIL)
+        signup_email_user_ids: list[str] = []
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(
+            profile.email_manager,
+            'send_post_signup_email',
+            signup_email_user_ids.append,
+        ):
+            self.post_json(
+                feconf.SIGNUP_DATA_URL,
+                {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': False,
+                },
+                csrf_token=csrf_token,
+            )
+
+        updated_settings = user_services.get_user_settings(user_id, strict=True)
+        self.assertTrue(user_services.has_fully_registered_account(user_id))
+        self.assertEqual(updated_settings.username, self.EDITOR_USERNAME)
+        self.assertEqual(
+            updated_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR
+        )
+        self.assertEqual(signup_email_user_ids, [])
+        self.logout()
+
     def test_user_settings_of_non_existing_user(self) -> None:
         self.login(self.OWNER_EMAIL)
         self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
@@ -2125,6 +2180,23 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
 
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(user_settings.has_viewed_lesson_info_modal_once, True)
+
+    def test_false_lesson_info_modal_value_keeps_saved_flag(self) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        user_services.set_user_has_viewed_lesson_info_modal_once(user_id)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/userinfohandler/data',
+            {'user_has_viewed_lesson_info_modal_once': False},
+            csrf_token=csrf_token,
+        )
+
+        self.assertDictEqual({'success': True}, response)
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertTrue(user_settings.has_viewed_lesson_info_modal_once)
 
     def test_no_user_info_provided_if_user_is_not_logged_in(self) -> None:
         csrf_token = self.get_new_csrf_token()
