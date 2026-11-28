@@ -265,6 +265,22 @@ export class DiagnosticTestTopicTrackerModel {
     this.removeTopicIdsFromTopicIdToSuccessorsDict(topicIdsToRemove);
   }
 
+  recordTopicSkipped(skippedTopicId: string): void {
+    // A topic is skipped when no questions can be shown for it, e.g. because
+    // its diagnostic test skills are shared with a topic that was already
+    // tested and all their questions were shown there. Nothing is learned
+    // about the learner from a skipped topic, so it is neither passed nor
+    // failed: only the topic itself is removed, and its ancestors and
+    // successors stay eligible. The ancestor and successor lists of the
+    // other topics are transitive, so removing the skipped topic from them
+    // keeps the relations between the remaining topics intact.
+    this._pendingTopicIdsToTest = this._pendingTopicIdsToTest.filter(
+      topicId => topicId !== skippedTopicId
+    );
+    this.removeTopicIdsFromTopicIdToAncestorsDict([skippedTopicId]);
+    this.removeTopicIdsFromTopicIdToSuccessorsDict([skippedTopicId]);
+  }
+
   removeTopicIdsFromTopicIdToAncestorsDict(topicIdsToRemove: string[]): void {
     // Removing the given topic IDs from the topic ID to the ancestor
     // topic IDs dict.

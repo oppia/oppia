@@ -347,4 +347,34 @@ describe('Diagnostic test topic tracker model', () => {
       ).toEqual(expectedTopicIdToSuccessorTopicIds);
     }
   );
+  it('should remove only a skipped topic and keep its relatives pending', () => {
+    // A --> B --> C, and B is skipped (no questions could be shown for it).
+    const topicTracker = new DiagnosticTestTopicTrackerModel({
+      topicA: [],
+      topicB: ['topicA'],
+      topicC: ['topicB'],
+    });
+
+    topicTracker.recordTopicSkipped('topicB');
+
+    expect(topicTracker.getPendingTopicIdsToTest()).toEqual([
+      'topicA',
+      'topicC',
+    ]);
+    // A skipped topic is not a failed topic.
+    expect(topicTracker.getFailedTopicIds()).toEqual([]);
+    // The relation between A and C is kept, without B.
+    expect(topicTracker.getTopicIdToAncestorTopicIds()).toEqual({
+      topicA: [],
+      topicC: ['topicA'],
+    });
+    expect(topicTracker.getTopicIdToSuccessorTopicIds()).toEqual({
+      topicA: ['topicC'],
+      topicC: [],
+    });
+
+    // Passing C still removes its ancestor A, so the test can finish.
+    topicTracker.recordTopicPassed('topicC');
+    expect(topicTracker.getPendingTopicIdsToTest()).toEqual([]);
+  });
 });
