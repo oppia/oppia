@@ -3017,3 +3017,172 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.learner_answer_info, 'Expected created_on to be a datetime'
         )
+
+
+class ExplorationAnnotationsTests(test_utils.GenericTestBase):
+    """Tests the ExplorationAnnotations domain object."""
+
+    def _get_exploration_annotations(
+        self,
+    ) -> stats_domain.ExplorationAnnotations:
+        return stats_domain.ExplorationAnnotations(
+            'exp_id1',
+            '1',
+            5,
+            4,
+            {
+                'Home': {
+                    'first_entry_count': 5,
+                    'total_entry_count': 10,
+                    'no_answer_count': 2,
+                }
+            },
+        )
+
+    def test_to_dict(self) -> None:
+        expected_dict: stats_domain.ExplorationAnnotationsDict = {
+            'exploration_id': 'exp_id1',
+            'version': '1',
+            'num_starts': 5,
+            'num_completions': 4,
+            'state_hit_counts': {
+                'Home': {
+                    'first_entry_count': 5,
+                    'total_entry_count': 10,
+                    'no_answer_count': 2,
+                }
+            },
+        }
+        observed_exploration_annotations = self._get_exploration_annotations()
+        self.assertDictEqual(
+            expected_dict, observed_exploration_annotations.to_dict()
+        )
+
+    def test_validate_for_annotations_with_correct_data(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.validate()
+
+    def test_validate_with_empty_state_hit_counts(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.state_hit_counts = {}
+        exploration_annotations.validate()
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[assignment] is used to
+    # test method validate() input type.
+    def test_validate_with_int_exploration_id(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.exploration_id = 10  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Expected exploration_id to be a non-empty string'),
+        ):
+            exploration_annotations.validate()
+
+    def test_validate_with_empty_exploration_id(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.exploration_id = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Expected exploration_id to be a non-empty string'),
+        ):
+            exploration_annotations.validate()
+
+    def test_validate_with_empty_version(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.version = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Expected version to be a non-empty string'),
+        ):
+            exploration_annotations.validate()
+
+    def test_validate_with_negative_num_starts(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.num_starts = -1
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('%s cannot have negative values' % ('num_starts')),
+        ):
+            exploration_annotations.validate()
+
+    def test_validate_with_completions_greater_than_starts(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.num_completions = 10
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            (
+                'Expected num_completions to be less than or equal to '
+                'num_starts'
+            ),
+        ):
+            exploration_annotations.validate()
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[assignment] is used to
+    # test method validate() input type.
+    def test_validate_with_non_dict_state_hit_counts(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.state_hit_counts = []  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected state_hit_counts to be a dict')
+        ):
+            exploration_annotations.validate()
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[assignment] is used to
+    # test method validate() input type.
+    def test_validate_with_non_dict_hit_counts_value(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.state_hit_counts = {
+            'Home': 10
+        }  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Expected hit counts for state Home to be a dict'),
+        ):
+            exploration_annotations.validate()
+
+    def test_validate_with_missing_hit_count_property(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.state_hit_counts = {
+            'Home': {
+                'first_entry_count': 5,
+                'total_entry_count': 10,
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Expected hit counts for state Home to contain no_answer_count'),
+        ):
+            exploration_annotations.validate()
+
+    def test_validate_with_non_int_hit_count(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.state_hit_counts = {
+            'Home': {
+                'first_entry_count': '5',
+                'total_entry_count': 10,
+                'no_answer_count': 2,
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Expected first_entry_count for state Home to be an int'),
+        ):
+            exploration_annotations.validate()
+
+    def test_validate_with_negative_hit_count(self) -> None:
+        exploration_annotations = self._get_exploration_annotations()
+        exploration_annotations.state_hit_counts = {
+            'Home': {
+                'first_entry_count': 5,
+                'total_entry_count': -1,
+                'no_answer_count': 2,
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('total_entry_count for state Home cannot have negative values'),
+        ):
+            exploration_annotations.validate()

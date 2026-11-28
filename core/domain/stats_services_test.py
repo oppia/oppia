@@ -3627,3 +3627,46 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_QUESTION, self.state_reference_question
         )
         self.assertEqual(learner_answer_details, None)
+
+
+class ExplorationAnnotationsServicesTests(test_utils.GenericTestBase):
+    """Tests the exploration annotations services functions."""
+
+    def test_get_exploration_annotations_from_model(self) -> None:
+        """Test the get_exploration_annotations_from_model method."""
+        stats_models.ExplorationAnnotationsModel.create(
+            'exp_id1',
+            '1',
+            5,
+            4,
+            {
+                'Home': {
+                    'first_entry_count': 5,
+                    'total_entry_count': 10,
+                    'no_answer_count': 2,
+                }
+            },
+        )
+        model = stats_models.ExplorationAnnotationsModel.get(
+            stats_models.ExplorationAnnotationsModel.get_entity_id(
+                'exp_id1', 1
+            )
+        )
+        exploration_annotations = (
+            stats_services.get_exploration_annotations_from_model(model)
+        )
+        self.assertEqual(exploration_annotations.exploration_id, 'exp_id1')
+        self.assertEqual(exploration_annotations.version, '1')
+        self.assertEqual(exploration_annotations.num_starts, 5)
+        self.assertEqual(exploration_annotations.num_completions, 4)
+        self.assertEqual(
+            exploration_annotations.state_hit_counts,
+            {
+                'Home': {
+                    'first_entry_count': 5,
+                    'total_entry_count': 10,
+                    'no_answer_count': 2,
+                }
+            },
+        )
+        exploration_annotations.validate()

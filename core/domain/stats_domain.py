@@ -418,6 +418,143 @@ class ExplorationStats:
         )
 
 
+class ExplorationAnnotationsDict(TypedDict):
+    """Dict representation of the ExplorationAnnotations domain object."""
+
+    exploration_id: str
+    version: str
+    num_starts: int
+    num_completions: int
+    state_hit_counts: Dict[str, Dict[str, int]]
+
+
+class ExplorationAnnotations:
+    """Domain object representing exploration-level statistics stored by the
+    ExplorationAnnotationsModel batch model.
+    """
+
+    def __init__(
+        self,
+        exploration_id: str,
+        version: str,
+        num_starts: int,
+        num_completions: int,
+        state_hit_counts: Dict[str, Dict[str, int]],
+    ) -> None:
+        """Constructs an ExplorationAnnotations domain object.
+
+        Args:
+            exploration_id: str. ID of the exploration.
+            version: str. Version of the exploration.
+            num_starts: int. Number of students who started the exploration.
+            num_completions: int. Number of students who completed the
+                exploration.
+            state_hit_counts: dict. A dict mapping the state names of an
+                exploration to their hit counts: first_entry_count,
+                total_entry_count and no_answer_count.
+        """
+        self.exploration_id = exploration_id
+        self.version = version
+        self.num_starts = num_starts
+        self.num_completions = num_completions
+        self.state_hit_counts = state_hit_counts
+
+    def to_dict(self) -> ExplorationAnnotationsDict:
+        """Returns a dict representation of the domain object."""
+        exploration_annotations_dict: ExplorationAnnotationsDict = {
+            'exploration_id': self.exploration_id,
+            'version': self.version,
+            'num_starts': self.num_starts,
+            'num_completions': self.num_completions,
+            'state_hit_counts': self.state_hit_counts,
+        }
+        return exploration_annotations_dict
+
+    def validate(self) -> None:
+        """Validates the ExplorationAnnotations domain object."""
+
+        exploration_annotations_properties: List[
+            Literal['num_starts', 'num_completions']
+        ] = [
+            'num_starts',
+            'num_completions',
+        ]
+
+        if not isinstance(self.exploration_id, str) or not self.exploration_id:
+            raise utils.ValidationError(
+                'Expected exploration_id to be a non-empty string, received '
+                '%s' % (self.exploration_id)
+            )
+
+        if not isinstance(self.version, str) or not self.version:
+            raise utils.ValidationError(
+                'Expected version to be a non-empty string, received %s'
+                % (self.version)
+            )
+
+        exploration_annotations_dict = self.to_dict()
+        for stat_property in exploration_annotations_properties:
+            if not isinstance(
+                exploration_annotations_dict[stat_property], int
+            ):
+                raise utils.ValidationError(
+                    'Expected %s to be an int, received %s'
+                    % (
+                        stat_property,
+                        exploration_annotations_dict[stat_property],
+                    )
+                )
+            if exploration_annotations_dict[stat_property] < 0:
+                raise utils.ValidationError(
+                    '%s cannot have negative values' % (stat_property)
+                )
+
+        if self.num_completions > self.num_starts:
+            raise utils.ValidationError(
+                'Expected num_completions to be less than or equal to '
+                'num_starts, received %s > %s'
+                % (self.num_completions, self.num_starts)
+            )
+
+        if not isinstance(self.state_hit_counts, dict):
+            raise utils.ValidationError(
+                'Expected state_hit_counts to be a dict, received %s'
+                % (self.state_hit_counts)
+            )
+
+        required_hit_count_properties = [
+            'first_entry_count',
+            'total_entry_count',
+            'no_answer_count',
+        ]
+        for state_name, hit_counts in self.state_hit_counts.items():
+            if not isinstance(hit_counts, dict):
+                raise utils.ValidationError(
+                    'Expected hit counts for state %s to be a dict, received '
+                    '%s' % (state_name, hit_counts)
+                )
+            for hit_count_property in required_hit_count_properties:
+                if hit_count_property not in hit_counts:
+                    raise utils.ValidationError(
+                        'Expected hit counts for state %s to contain %s'
+                        % (state_name, hit_count_property)
+                    )
+                if not isinstance(hit_counts[hit_count_property], int):
+                    raise utils.ValidationError(
+                        'Expected %s for state %s to be an int, received %s'
+                        % (
+                            hit_count_property,
+                            state_name,
+                            hit_counts[hit_count_property],
+                        )
+                    )
+                if hit_counts[hit_count_property] < 0:
+                    raise utils.ValidationError(
+                        '%s for state %s cannot have negative values'
+                        % (hit_count_property, state_name)
+                    )
+
+
 class StateStats:
     """Domain object representing analytics data for an exploration's state.
     Instances of these domain objects pertain to the exploration ID and version

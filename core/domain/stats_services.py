@@ -922,6 +922,29 @@ def get_exploration_stats_from_model(
     )
 
 
+def get_exploration_annotations_from_model(
+    exploration_annotations_model: stats_models.ExplorationAnnotationsModel,
+) -> stats_domain.ExplorationAnnotations:
+    """Gets an ExplorationAnnotations domain object from an
+    ExplorationAnnotationsModel instance.
+
+    Args:
+        exploration_annotations_model: ExplorationAnnotationsModel.
+            Exploration annotations model in datastore.
+
+    Returns:
+        ExplorationAnnotations. The domain object for exploration
+        annotations.
+    """
+    return stats_domain.ExplorationAnnotations(
+        exploration_annotations_model.exploration_id,
+        exploration_annotations_model.version,
+        exploration_annotations_model.num_starts,
+        exploration_annotations_model.num_completions,
+        exploration_annotations_model.state_hit_counts,
+    )
+
+
 def get_playthrough_from_model(
     playthrough_model: stats_models.PlaythroughModel,
 ) -> stats_domain.Playthrough:
