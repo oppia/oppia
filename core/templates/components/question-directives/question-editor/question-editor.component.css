@@ -2,6 +2,10 @@
   padding-bottom: 5vh;
 }
 
+.oppia-sticky-question-editor oppia-state-editor {
+  display: block;
+}
+
 question-editor oppia-outcome-feedback-editor {
   min-width: 100%;
 }
