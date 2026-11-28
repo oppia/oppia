@@ -72,8 +72,8 @@
     },
     {
       "name": "interested-parent/attempt-to-contact-the-organization",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/attempt-to-contact-the-organization.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-parent/attempt-to-contact-the-organization.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-parent/check-the-tos-and-privacy-pages",
