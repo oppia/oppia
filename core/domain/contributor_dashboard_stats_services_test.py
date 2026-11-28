@@ -22,6 +22,7 @@ import datetime
 
 from core import feconf
 from core.domain import contributor_dashboard_stats_services, topic_domain
+from core.storage.base_model import gae_models as base_models
 from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.suggestion import gae_models as suggestion_models
 from core.storage.topic import gae_models as topic_models
@@ -285,7 +286,7 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
         )
         topic.last_updated = past_time
         topic.update_timestamps(update_last_updated_time=False)
-        topic_models.base_models.BaseModel.put_multi([topic])
+        base_models.BaseModel.put_multi([topic])
 
         exp_opp = opportunity_models.ExplorationOpportunitySummaryModel(
             id='exp_geom',
