@@ -104,6 +104,7 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
             language_codes_needing_voice_artists=[],
         )
         self.exp_opp.last_updated = future_time
+        self.exp_opp.update_timestamps(update_last_updated_time=False)
         self.exp_opp.put()
 
         self.exp_opp_2 = opportunity_models.ExplorationOpportunitySummaryModel(
@@ -249,9 +250,9 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         stalled_topic_id = 'stalled_topic_id'
-        past_time = datetime.datetime.now(
-            datetime.timezone.utc
-        ).replace(tzinfo=None) - datetime.timedelta(days=40)
+        past_time = datetime.datetime.now(datetime.timezone.utc).replace(
+            tzinfo=None
+        ) - datetime.timedelta(days=40)
 
         topic = topic_models.TopicModel(
             id=stalled_topic_id,
@@ -283,7 +284,8 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
             [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
         topic.last_updated = past_time
-        topic.put()
+        topic.update_timestamps(update_last_updated_time=False)
+        topic_models.base_models.BaseModel.put_multi([topic])
 
         exp_opp = opportunity_models.ExplorationOpportunitySummaryModel(
             id='exp_geom',
@@ -299,6 +301,7 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
             language_codes_needing_voice_artists=[],
         )
         exp_opp.last_updated = past_time
+        exp_opp.update_timestamps(update_last_updated_time=False)
         exp_opp.put()
 
         stats = (
@@ -309,5 +312,7 @@ class ContributorDashboardStatsServicesTest(test_utils.GenericTestBase):
         )
         self.assertTrue(geom_stat['is_stalled'])
         self.assertTrue(
-            geom_stat['translation_stats_by_language']['hi']['is_topic_completed']
+            geom_stat['translation_stats_by_language']['hi'][
+                'is_topic_completed'
+            ]
         )

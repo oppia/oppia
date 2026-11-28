@@ -201,10 +201,7 @@ def get_contributor_dashboard_stats() -> ContributorDashboardStatsDict:
     all_suggestions = list(suggestion_models.GeneralSuggestionModel.get_all())
     for sug in all_suggestions:
         if sug.status == suggestion_models.STATUS_IN_REVIEW:
-            if (
-                sug.suggestion_type
-                == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-            ):
+            if sug.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
                 exp_id = sug.target_id
                 lang_code = sug.change_cmd.get('language_code', '')
                 if exp_id and lang_code:
