@@ -7128,6 +7128,25 @@ export default {
         }
       ]
     },
+    "CONTRIBUTOR_DASHBOARD_STATS": {
+      "ROUTE": "contributor-dashboard-stats",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "TITLE": "Contributor Dashboard Stats",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Track lesson translations and practice question coverage across topics and languages on Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Track lesson translations and practice question coverage across topics and languages on Oppia."
+        }
+      ]
+    },
     "CONTACT": {
       "ROUTE": "contact",
       "TITLE": "I18N_CONTACT_PAGE_TITLE",

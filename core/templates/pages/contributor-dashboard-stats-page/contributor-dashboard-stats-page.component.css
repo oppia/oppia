@@ -1,0 +1,480 @@
+/* Oppia Contributor Dashboard Stats Page Styles */
+
+:host {
+  background-color: #f6f6f6;
+  display: block;
+  min-height: 100vh;
+}
+
+.oppia-dashboard-container {
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 0 16px 60px;
+}
+
+/* Floating KPI Stats Card overlapping the background banner */
+.oppia-stats-aggregated-container {
+  padding-top: 65px;
+  position: relative;
+  z-index: 10;
+}
+
+.oppia-stats-kpi-card {
+  align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-around;
+  padding: 24px 16px;
+  width: 100%;
+}
+
+.stats-item {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.stat-description {
+  color: #667085;
+  font-family: Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  text-transform: capitalize;
+}
+
+.stat-value {
+  color: #00645c;
+  font-family: "Capriola", Roboto, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+}
+
+.stat-divider {
+  background-color: #e4e7ec;
+  height: 48px;
+  width: 1px;
+}
+
+/* Main Content Container */
+.oppia-stats-main-content {
+  margin-top: 32px;
+}
+
+/* Tab Navigation */
+.oppia-stats-tabs {
+  border-bottom: 2px solid #e4e7ec;
+  display: flex;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+
+.stats-tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #667085;
+  cursor: pointer;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: -2px;
+  padding: 10px 4px;
+  transition: all 0.2s ease-in-out;
+}
+
+.stats-tab-btn:hover {
+  color: #00645c;
+}
+
+.stats-tab-btn.active {
+  border-bottom-color: #00645c;
+  color: #00645c;
+  font-weight: 700;
+}
+
+/* Filter Card */
+.oppia-stats-filter-card {
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+}
+
+.filter-group {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.filter-label {
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.filter-select,
+.filter-input {
+  background-color: #fff;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  color: #344054;
+  font-size: 14px;
+  height: 38px;
+  padding: 6px 12px;
+  width: 100%;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  border-color: #00645c;
+  box-shadow: 0 0 0 2px rgba(0, 100, 92, 0.2);
+  outline: none;
+}
+
+/* Section Header Bar with Go to CD Button */
+.oppia-stats-section-header {
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #e4e7ec;
+  border-left: 5px solid #00645c;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 14px 20px;
+}
+
+.section-title {
+  color: #101828;
+  font-family: Roboto, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.oppia-goto-cd-btn {
+  background-color: #00645c;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.oppia-goto-cd-btn:hover {
+  background-color: #004d47;
+  color: #fff;
+}
+
+/* Loading & Empty States */
+.oppia-loading-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.loading-text {
+  color: #667085;
+  font-size: 15px;
+}
+
+.oppia-empty-state {
+  background-color: #fff;
+  border: 1px dashed #d0d5dd;
+  border-radius: 8px;
+  color: #667085;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+/* Topics Card List */
+.topics-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topic-progress-card {
+  background-color: #fff;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  padding: 20px;
+  transition: box-shadow 0.2s ease;
+}
+
+.topic-progress-card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+}
+
+.topic-card-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.topic-card-title {
+  color: #101828;
+  font-family: Roboto, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Badges */
+.topic-badge {
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+}
+
+.badge-in-progress {
+  background-color: #eff8ff;
+  color: #175cd3;
+}
+
+.badge-not-started {
+  background-color: #f2f4f7;
+  color: #475467;
+}
+
+.badge-needs-review {
+  background-color: #fffaeb;
+  color: #b54708;
+}
+
+.badge-near-complete {
+  background-color: #ecfdf3;
+  color: #027a48;
+}
+
+.badge-stalled {
+  background-color: #fef3f2;
+  color: #b42318;
+}
+
+.badge-completed {
+  background-color: #ecfdf3;
+  color: #027a48;
+}
+
+.stalled-text {
+  color: #b42318;
+}
+
+.stalled-tag {
+  color: #d92d20;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Progress Section */
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-bar-row {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+}
+
+.progress-track {
+  background-color: #eaecf0;
+  border-radius: 6px;
+  flex: 1;
+  height: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-track.track-subtle {
+  height: 8px;
+}
+
+.progress-fill {
+  border-radius: 6px;
+  height: 100%;
+  transition: width 0.4s ease-in-out;
+}
+
+.fill-blue {
+  background-color: #1570ef;
+}
+
+.fill-green {
+  background-color: #12b76a;
+}
+
+.fill-full {
+  width: 100%;
+}
+
+.progress-pct {
+  color: #344054;
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 45px;
+  text-align: right;
+}
+
+.pct-green {
+  color: #027a48;
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 100px;
+}
+
+/* Topic Meta Line */
+.topic-meta-line {
+  color: #667085;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 13px;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.topic-meta-line strong {
+  color: #344054;
+}
+
+.meta-separator {
+  color: #d0d5dd;
+}
+
+/* Drilldown Expander Toggle */
+.topic-drilldown-toggle {
+  color: #00645c;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 14px;
+  text-decoration: underline;
+  user-select: none;
+}
+
+.topic-drilldown-toggle:hover {
+  color: #004d47;
+}
+
+/* Expanded Breakdown Details Table */
+.topic-expanded-details {
+  border-top: 1px solid #eaecf0;
+  margin-top: 14px;
+  padding-top: 14px;
+}
+
+.oppia-details-table {
+  font-size: 13px;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.oppia-details-table th {
+  background-color: #f8f9fa;
+  color: #475467;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+.oppia-details-table td {
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+
+/* Completed Topics Accordion */
+.completed-accordion-container {
+  background-color: #fff;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  margin-top: 24px;
+  overflow: hidden;
+}
+
+.completed-accordion-header {
+  align-items: center;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 20px;
+  user-select: none;
+}
+
+.completed-title {
+  color: #344054;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.accordion-chevron {
+  color: #667085;
+  font-size: 12px;
+}
+
+.completed-topics-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+}
+
+.completed-card {
+  border: 1px solid #d1fadf;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .oppia-stats-kpi-card {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .stat-divider {
+    display: none;
+  }
+
+  .stats-item {
+    flex: 1 1 40%;
+  }
+
+  .oppia-stats-filter-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .oppia-stats-section-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .oppia-goto-cd-btn {
+    width: 100%;
+  }
+}

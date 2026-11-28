@@ -287,6 +287,15 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CONTRIBUTOR_DASHBOARD_STATS.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/contributor-dashboard-stats-page' +
+          '/contributor-dashboard-stats-page.module'
+      ).then(m => m.ContributorDashboardStatsPageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER.ROUTE,
     loadChildren: () =>
       import(

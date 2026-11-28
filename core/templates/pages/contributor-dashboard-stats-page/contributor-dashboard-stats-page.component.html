@@ -1,0 +1,297 @@
+<background-banner></background-banner>
+
+<div class="oppia-dashboard-container position-relative">
+  <!-- Overlapping Floating KPI Stats Card -->
+  <div class="oppia-stats-aggregated-container" *ngIf="summaryStats">
+    <div class="oppia-stats-kpi-card">
+      <div class="stats-item">
+        <span class="stat-description">Total Topics</span>
+        <h2 class="stat-value">{{ summaryStats.total_topics_count }}</h2>
+      </div>
+      <div class="stat-divider"></div>
+
+      <div class="stats-item">
+        <span class="stat-description">Total Lessons</span>
+        <h2 class="stat-value">{{ summaryStats.total_chapters_count }}</h2>
+      </div>
+      <div class="stat-divider"></div>
+
+      <div class="stats-item">
+        <span class="stat-description">Fully Translated Topics</span>
+        <h2 class="stat-value">{{ summaryStats.fully_translated_topics_count }}</h2>
+      </div>
+      <div class="stat-divider"></div>
+
+      <div class="stats-item">
+        <span class="stat-description">Practice Questions</span>
+        <h2 class="stat-value">{{ summaryStats.total_questions_count }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="oppia-stats-main-content">
+    <!-- Tab Navigation -->
+    <div class="oppia-stats-tabs">
+      <button type="button"
+              class="stats-tab-btn"
+              [ngClass]="{'active': activeTab === 'translations'}"
+              (click)="setActiveTab('translations')">
+        Translation Progress
+      </button>
+      <button type="button"
+              class="stats-tab-btn"
+              [ngClass]="{'active': activeTab === 'questions'}"
+              (click)="setActiveTab('questions')">
+        Practice Questions Progress
+      </button>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="oppia-stats-filter-card">
+      <div class="filter-group" *ngIf="activeTab === 'translations'">
+        <label class="filter-label">Target Language:</label>
+        <select class="form-control filter-select"
+                [ngModel]="selectedLanguageCode"
+                (ngModelChange)="onLanguageChange($event)">
+          <option *ngFor="let lang of supportedLanguages" [value]="lang.language_code">
+            {{ lang.language_name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Filter by Topic:</label>
+        <input type="text"
+               class="form-control filter-input"
+               placeholder="All Topics"
+               [(ngModel)]="searchQuery"
+               (input)="onSearchChange()">
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Progress Status:</label>
+        <select class="form-control filter-select"
+                [ngModel]="activeFilter"
+                (ngModelChange)="setFilter($event)">
+          <option value="all">All Statuses</option>
+          <option value="near-complete">Near Completion</option>
+          <option value="needs-review">Needs Reviewers</option>
+          <option value="needs-contributor">Needs Submissions</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Section Header Bar with Go to Contributor Dashboard -->
+    <div class="oppia-stats-section-header">
+      <div class="section-title-wrap">
+        <h2 class="section-title" *ngIf="activeTab === 'translations'">
+          Translations for {{ getSelectedLanguageName() }}
+        </h2>
+        <h2 class="section-title" *ngIf="activeTab === 'questions'">
+          Practice Questions Coverage
+        </h2>
+      </div>
+      <a href="/contributor-dashboard" class="btn oppia-goto-cd-btn">
+        Go to Contributor Dashboard &rarr;
+      </a>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="oppia-loading-container">
+      <div class="spinner-border text-success" role="status"></div>
+      <span class="loading-text">Loading community stats...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && getActionableTopics().length === 0 && getCompletedTopics().length === 0"
+         class="oppia-empty-state">
+      <p>No topics found matching the current filters.</p>
+    </div>
+
+    <!-- Topics List (Actionable Topics) -->
+    <div class="topics-card-list" *ngIf="!isLoading">
+      <div class="topic-progress-card" *ngFor="let topic of getActionableTopics()">
+        <div class="topic-card-header">
+          <span class="topic-card-title">{{ topic.topic_name }}</span>
+          <span class="topic-badge" [ngClass]="'badge-' + getTopicStatus(topic)">
+            <span *ngIf="getTopicStatus(topic) === 'stalled'">Stalled</span>
+            <span *ngIf="getTopicStatus(topic) === 'needs-review'">Needs Reviewers</span>
+            <span *ngIf="getTopicStatus(topic) === 'in-progress'">In Progress</span>
+            <span *ngIf="getTopicStatus(topic) === 'not-started'">Not Started</span>
+            <span *ngIf="getTopicStatus(topic) === 'completed'">Completed</span>
+          </span>
+        </div>
+
+        <!-- Translation View: Dual Metric Progress (Submissions & Reviews) -->
+        <div *ngIf="activeTab === 'translations' && getTranslationStatsForTopic(topic) as tStats"
+             class="progress-section">
+          <!-- Submission Progress Bar -->
+          <div class="progress-bar-row">
+            <div class="progress-track">
+              <div class="progress-fill fill-blue" [style.width.%]="tStats.submission_progress_percentage"></div>
+            </div>
+            <span class="progress-pct">{{ tStats.submission_progress_percentage }}%</span>
+          </div>
+
+          <!-- Reviews Progress Bar (Viren requirement: clear dual tracking) -->
+          <div class="progress-bar-row mt-1" *ngIf="tStats.submission_progress_percentage > 0">
+            <div class="progress-track track-subtle">
+              <div class="progress-fill fill-green" [style.width.%]="tStats.progress_percentage"></div>
+            </div>
+            <span class="progress-pct pct-green">{{ tStats.progress_percentage }}% (reviewed)</span>
+          </div>
+
+          <!-- Metadata line matching prototype -->
+          <div class="topic-meta-line">
+            <span>Lessons: <strong>{{ tStats.completed_chapters_count }} Completed · {{ tStats.in_progress_chapters_count }} In Progress</strong></span>
+            <span class="meta-separator">•</span>
+            <span>Cards Translated: <strong>{{ tStats.submitted_cards_count }} / {{ tStats.total_cards_count }}</strong></span>
+            <span class="meta-separator">•</span>
+            <span>Reviews Done: <strong>{{ tStats.translated_cards_count }} / {{ tStats.total_cards_count }}</strong></span>
+            <span class="meta-separator">•</span>
+            <span [ngClass]="{'stalled-text': topic.is_stalled}">
+              Last activity: <strong>{{ topic.last_progress_date }}</strong>
+              <span *ngIf="topic.is_stalled" class="stalled-tag">(Inactive >30d)</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Practice Questions View -->
+        <div *ngIf="activeTab === 'questions' && topic.question_stats as qStats"
+             class="progress-section">
+          <!-- Submission Progress Bar -->
+          <div class="progress-bar-row">
+            <div class="progress-track">
+              <div class="progress-fill fill-blue" [style.width.%]="qStats.submission_progress_percentage"></div>
+            </div>
+            <span class="progress-pct">{{ qStats.submission_progress_percentage }}%</span>
+          </div>
+
+          <!-- Reviews Progress Bar -->
+          <div class="progress-bar-row mt-1" *ngIf="qStats.submission_progress_percentage > 0">
+            <div class="progress-track track-subtle">
+              <div class="progress-fill fill-green" [style.width.%]="qStats.progress_percentage"></div>
+            </div>
+            <span class="progress-pct pct-green">{{ qStats.progress_percentage }}% (reviewed)</span>
+          </div>
+
+          <div class="topic-meta-line">
+            <span>Skills: <strong>{{ qStats.completed_skills_count }} Completed · {{ qStats.in_progress_skills_count }} In Progress</strong></span>
+            <span class="meta-separator">•</span>
+            <span>Questions Created: <strong>{{ qStats.total_questions_submitted }} / {{ qStats.target_questions_count }}</strong></span>
+            <span class="meta-separator">•</span>
+            <span>Reviews Done: <strong>{{ qStats.total_questions_reviewed }} / {{ qStats.target_questions_count }}</strong></span>
+            <span class="meta-separator">•</span>
+            <span [ngClass]="{'stalled-text': topic.is_stalled}">
+              Last activity: <strong>{{ topic.last_progress_date }}</strong>
+              <span *ngIf="topic.is_stalled" class="stalled-tag">(Inactive >30d)</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Drill-down Expander Toggle -->
+        <div class="topic-drilldown-toggle" (click)="toggleTopicDetails(topic.topic_id)">
+          <span>{{ isTopicExpanded(topic.topic_id) ? 'Hide details ▲' : 'View details breakdown ▼' }}</span>
+        </div>
+
+        <!-- Expanded Breakdown Details -->
+        <div class="topic-expanded-details" *ngIf="isTopicExpanded(topic.topic_id)">
+          <!-- Chapters Table for Translations -->
+          <div *ngIf="activeTab === 'translations' && getTranslationStatsForTopic(topic) as expStats">
+            <table class="table table-sm oppia-details-table">
+              <thead>
+                <tr>
+                  <th>Chapter / Story</th>
+                  <th>Total Cards</th>
+                  <th>Submitted</th>
+                  <th>Reviewed</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let chapter of expStats.chapters">
+                  <td>{{ chapter.chapter_title }}</td>
+                  <td>{{ chapter.content_count }}</td>
+                  <td>{{ chapter.submitted_count }}</td>
+                  <td>{{ chapter.reviewed_count }}</td>
+                  <td>
+                    <span class="badge"
+                          [ngClass]="{
+                            'bg-success': chapter.status === 'Completed',
+                            'bg-warning text-dark': chapter.status === 'In-Progress' && chapter.submitted_count > chapter.reviewed_count,
+                            'bg-info text-dark': chapter.status === 'In-Progress' && chapter.submitted_count <= chapter.reviewed_count,
+                            'bg-secondary': chapter.status === 'Not Started'
+                          }">
+                      {{ chapter.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Skills Table for Questions -->
+          <div *ngIf="activeTab === 'questions' && topic.question_stats as expQStats">
+            <table class="table table-sm oppia-details-table">
+              <thead>
+                <tr>
+                  <th>Skill Description</th>
+                  <th>Questions Added</th>
+                  <th>Reviewed</th>
+                  <th>Required Target</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let skill of expQStats.skills">
+                  <td>{{ skill.skill_description }}</td>
+                  <td>{{ skill.submitted_questions_count }}</td>
+                  <td>{{ skill.reviewed_questions_count }}</td>
+                  <td>{{ skill.target_questions_count }}</td>
+                  <td>
+                    <span class="badge"
+                          [ngClass]="{
+                            'bg-success': skill.status === 'Completed',
+                            'bg-warning text-dark': skill.status === 'In-Progress' && skill.submitted_questions_count > skill.reviewed_questions_count,
+                            'bg-primary': skill.status === 'In-Progress' && skill.submitted_questions_count <= skill.reviewed_questions_count,
+                            'bg-secondary': skill.status === 'Not Started'
+                          }">
+                      {{ skill.status === 'Completed' ? 'Satisfied' : (skill.submitted_questions_count > skill.reviewed_questions_count && skill.submitted_questions_count >= skill.target_questions_count ? 'Needs Review' : (skill.target_questions_count - skill.submitted_questions_count) + ' needed') }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Topics Accordion -->
+    <div class="completed-accordion-container" *ngIf="getCompletedTopics().length > 0">
+      <div class="completed-accordion-header" (click)="toggleCompletedAccordion()">
+        <span class="completed-title">
+          Completed Topics ({{ getCompletedTopics().length }})
+        </span>
+        <span class="accordion-chevron">{{ showCompletedAccordion ? '▲' : '▼' }}</span>
+      </div>
+
+      <div class="completed-topics-body" *ngIf="showCompletedAccordion">
+        <div class="topic-progress-card completed-card" *ngFor="let topic of getCompletedTopics()">
+          <div class="topic-card-header">
+            <span class="topic-card-title">{{ topic.topic_name }}</span>
+            <span class="topic-badge badge-completed">100% Completed</span>
+          </div>
+          <div class="progress-bar-row">
+            <div class="progress-track">
+              <div class="progress-fill fill-green fill-full"></div>
+            </div>
+            <span class="progress-pct pct-green">100%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
