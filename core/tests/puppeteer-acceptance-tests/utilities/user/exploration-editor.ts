@@ -8568,39 +8568,47 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card at index ${index} not found.`);
     }
 
-    await this.page.waitForFunction(
-      (
-        cardElement: Element,
-        ratingSelector: string,
-        feedbackSelector: string,
-        viewsSelector: string,
-        expectedRatingText: string,
-        expectedFeedbackText: string,
-        expectedViewsText: string
-      ) => {
-        const getStatisticText = (selector: string): string => {
-          return (
-            (
-              cardElement.querySelector(selector) as HTMLElement | null
-            )?.textContent?.trim() || ''
-          );
-        };
+    try {
+      await this.page.waitForFunction(
+        (
+          cardElement: Element,
+          ratingSelector: string,
+          feedbackSelector: string,
+          viewsSelector: string,
+          expectedRatingText: string,
+          expectedFeedbackText: string,
+          expectedViewsText: string
+        ) => {
+          const getStatisticText = (selector: string): string => {
+            return (
+              (
+                cardElement.querySelector(selector) as HTMLElement | null
+              )?.textContent?.trim() || ''
+            );
+          };
 
-        return (
-          getStatisticText(ratingSelector) === expectedRatingText &&
-          getStatisticText(feedbackSelector) === expectedFeedbackText &&
-          getStatisticText(viewsSelector) === expectedViewsText
-        );
-      },
-      {},
-      card,
-      explorationGridRatingSelector,
-      explorationGridFeedbackSelector,
-      explorationGridViewsSelector,
-      expectedRating,
-      expectedOpenFeedback,
-      expectedViews
-    );
+          return (
+            getStatisticText(ratingSelector) === expectedRatingText &&
+            getStatisticText(feedbackSelector) === expectedFeedbackText &&
+            getStatisticText(viewsSelector) === expectedViewsText
+          );
+        },
+        {},
+        card,
+        explorationGridRatingSelector,
+        explorationGridFeedbackSelector,
+        explorationGridViewsSelector,
+        expectedRating,
+        expectedOpenFeedback,
+        expectedViews
+      );
+    } catch (error) {
+      // On timeout, fall through so the checks below report the
+      // values that were actually found.
+      if (!(error instanceof puppeteer.errors.TimeoutError)) {
+        throw error;
+      }
+    }
 
     const cardDetails = await this.page.evaluate(
       (
@@ -8684,33 +8692,41 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Row at index ${index} not found.`);
     }
 
-    await this.page.waitForFunction(
-      (
-        rowElement: Element,
-        expectedRatingText: string,
-        expectedOpenThreadsText: string,
-        expectedPlaysText: string
-      ) => {
-        const getCellText = (cellSelector: string): string => {
-          return (
-            (
-              rowElement.querySelector(cellSelector) as HTMLElement | null
-            )?.textContent?.trim() || ''
-          );
-        };
+    try {
+      await this.page.waitForFunction(
+        (
+          rowElement: Element,
+          expectedRatingText: string,
+          expectedOpenThreadsText: string,
+          expectedPlaysText: string
+        ) => {
+          const getCellText = (cellSelector: string): string => {
+            return (
+              (
+                rowElement.querySelector(cellSelector) as HTMLElement | null
+              )?.textContent?.trim() || ''
+            );
+          };
 
-        return (
-          getCellText('td:nth-child(2)') === expectedRatingText &&
-          getCellText('td:nth-child(3)') === expectedPlaysText &&
-          getCellText('td:nth-child(4)') === expectedOpenThreadsText
-        );
-      },
-      {},
-      row,
-      expectedRating,
-      expectedOpenThreads,
-      expectedPlays
-    );
+          return (
+            getCellText('td:nth-child(2)') === expectedRatingText &&
+            getCellText('td:nth-child(3)') === expectedPlaysText &&
+            getCellText('td:nth-child(4)') === expectedOpenThreadsText
+          );
+        },
+        {},
+        row,
+        expectedRating,
+        expectedOpenThreads,
+        expectedPlays
+      );
+    } catch (error) {
+      // On timeout, fall through so the checks below report the
+      // values that were actually found.
+      if (!(error instanceof puppeteer.errors.TimeoutError)) {
+        throw error;
+      }
+    }
 
     const rowDetails = await this.page.evaluate((rowElement: Element) => {
       const getCellText = (cellSelector: string): string => {

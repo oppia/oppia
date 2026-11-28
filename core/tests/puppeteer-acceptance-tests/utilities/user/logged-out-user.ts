@@ -1091,7 +1091,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async returnToLibraryFromExplorationCompletion(): Promise<void> {
     await this.expectElementToBeVisible(returnToLibraryButtonSelector);
-    await this.clickOnElementWithSelector(returnToLibraryButtonSelector);
+    await this.clickAndWaitForNavigation(returnToLibraryButtonSelector, true);
   }
 
   /**
