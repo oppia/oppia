@@ -109,6 +109,7 @@ const contributorDashboardMenuLink =
 const contributorDashboardContainerSelector =
   '.e2e-test-oppia-contributor-home';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
+const blogDashboardMenuLink = '.e2e-test-blog-dashboard-link';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
@@ -1212,6 +1213,19 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     const navigationUtils = new NavigationUtils(this);
     await navigationUtils.navigateToModeratorPage(verifyUrl);
+  }
+
+  /**
+   * Navigates to the Blog Dashboard using the profile dropdown in the navbar.
+   */
+  async navigateToBlogDashboardUsingProfileDropdown(): Promise<void> {
+    await this.scrollToTopOfPage();
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.expectElementToBeVisible(blogDashboardMenuLink);
+    await this.clickOnElementWithSelector(blogDashboardMenuLink);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
