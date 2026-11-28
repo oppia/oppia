@@ -33,6 +33,7 @@ import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {SidebarStatusService} from 'services/sidebar-status.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {BackgroundMaskService} from 'services/stateful/background-mask.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {BaseContentComponent} from './base-content.component';
@@ -103,6 +104,11 @@ describe('Base Content Component', () => {
         hash: hash,
       },
       document: {
+        body: {
+          style: {
+            overflowY: 'auto',
+          },
+        },
         addEventListener(event: string, callback: () => void) {
           callback();
         },
@@ -226,10 +232,20 @@ describe('Base Content Component', () => {
     expect(bottomNavbarStatusService.isBottomNavbarEnabled).toHaveBeenCalled();
   });
 
-  it('should close sidebar on swipe', () => {
-    spyOn(sidebarStatusService, 'closeSidebar');
+  it('should close sidebar on swipe and restore body scrolling', () => {
+    spyOn(
+      TestBed.inject(WindowDimensionsService),
+      'isWindowNarrow'
+    ).and.returnValue(true);
+    sidebarStatusService.openSidebar();
+    windowRef.nativeWindow.document.body.style.overflowY = 'hidden';
+    spyOn(sidebarStatusService, 'closeSidebar').and.callThrough();
+
     componentInstance.closeSidebarOnSwipe();
+
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
+    expect(sidebarStatusService.isSidebarShown()).toBeFalse();
+    expect(windowRef.nativeWindow.document.body.style.overflowY).toBe('auto');
   });
 
   it('should toggle mobile nav options', () => {
