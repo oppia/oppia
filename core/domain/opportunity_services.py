@@ -560,9 +560,7 @@ def _build_opportunity_for_non_exploration_entity(
     Returns:
         TranslationOpportunity. The constructed opportunity domain object.
     """
-    # Story and Topic do not extend BaseTranslatableObject, so
-    # get_content_count() is not available for them. Content count defaults
-    # to 0 for non-translatable entities.
+    # Entities without translatable content have a zero content count.
     content_count = (
         entity.get_content_count()
         if isinstance(entity, translation_domain.BaseTranslatableObject)
@@ -1549,11 +1547,13 @@ def _get_translation_opportunity_cards_from_models(
             if exp_summary is not None:
                 exp_summary_map[exp_summary.id] = exp_summary
 
-    exp_and_skill_entity_ids = exp_entity_ids + skill_entity_ids
-    if exp_and_skill_entity_ids:
+    translatable_entity_ids = (
+        exp_entity_ids + skill_entity_ids + topic_entity_ids
+    )
+    if translatable_entity_ids:
         in_review_counts = (
             _build_entity_id_to_translation_suggestion_in_review_count(
-                exp_and_skill_entity_ids, language_code
+                translatable_entity_ids, language_code
             )
         )
 
@@ -2350,6 +2350,16 @@ def regenerate_opportunities_related_to_topic(
         create_translation_opportunity(
             {feconf.ENTITY_TYPE_EXPLORATION: exp_ids}, topic_ids=[topic_id]
         )
+
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
+        None,
+    ):
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
+        if topic_rights is not None and topic_rights.topic_is_published:
+            create_translation_opportunity(
+                {feconf.ENTITY_TYPE_TOPIC: [topic_id]}, topic_ids=[topic_id]
+            )
 
     return len(exploration_opportunity_summary_list)
 

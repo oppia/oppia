@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core import feconf, utils
-from core.domain import topic_domain
+from core.domain import topic_domain, translation_fetchers
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import topic_migration_jobs
 from core.jobs.types import job_run_result
@@ -29,9 +29,11 @@ from typing import Final, Type
 
 MYPY = False
 if MYPY:
-    from mypy_imports import topic_models
+    from mypy_imports import topic_models, translation_models
 
-(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
+(topic_models, translation_models) = models.Registry.import_models(
+    [models.Names.TOPIC, models.Names.TRANSLATION]
+)
 
 
 class MigrateTopicJobTests(job_test_utils.JobTestBase):
@@ -179,6 +181,74 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             self.assertEqual(
                 migrated_topic_model.story_reference_schema_version,
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            )
+
+    def test_unmigrated_topic_carries_forward_translations(self) -> None:
+        with self.story_reference_schema_version_swap, self.update_story_reference_swap:  # pylint: disable=line-too-long
+            unmigrated_topic_model = self.create_model(
+                topic_models.TopicModel,
+                id=self.TOPIC_1_ID,
+                name='topic title',
+                description='description',
+                canonical_name='topic title',
+                subtopic_schema_version=3,
+                story_reference_schema_version=1,
+                next_subtopic_id=1,
+                language_code='cs',
+                url_fragment='topic',
+                page_title_fragment_for_web='fragm',
+            )
+            unmigrated_topic_model.update_timestamps()
+            unmigrated_topic_model.commit(
+                feconf.SYSTEM_COMMITTER_ID,
+                'Create topic',
+                [{'cmd': topic_domain.CMD_CREATE_NEW}],
+            )
+
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.ENTITY_TYPE_TOPIC,
+                self.TOPIC_1_ID,
+                1,
+                'hi',
+                {
+                    feconf.TOPIC_NAME_CONTENT_ID: {
+                        'content_format': 'unicode',
+                        'content_value': 'Translated Topic Title',
+                        'needs_update': False,
+                    }
+                },
+            ).put()
+
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stdout='TOPIC PROCESSED SUCCESS: 1'
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='TOPIC MIGRATED SUCCESS: 1'
+                    ),
+                ]
+            )
+
+            migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
+            self.assertEqual(migrated_topic_model.version, 2)
+
+            migrated_translation = translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.TOPIC,
+                self.TOPIC_1_ID,
+                2,
+                'hi',
+            )
+            self.assertEqual(
+                migrated_translation.translations[
+                    feconf.TOPIC_NAME_CONTENT_ID
+                ].content_value,
+                'Translated Topic Title',
+            )
+            self.assertFalse(
+                migrated_translation.translations[
+                    feconf.TOPIC_NAME_CONTENT_ID
+                ].needs_update,
             )
 
     def test_topic_summary_of_unmigrated_topic_is_updated(self) -> None:

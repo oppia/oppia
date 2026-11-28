@@ -18,10 +18,16 @@
 
 from __future__ import annotations
 
+import copy
 import logging
 
 from core import feconf
-from core.domain import topic_domain, topic_fetchers, topic_services
+from core.domain import (
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_services,
+)
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms, results_transforms
@@ -268,6 +274,15 @@ class MigrateTopicJob(base_jobs.JobBase):
             sequence(BaseModel). Sequence of models which should be put into
             the datastore.
         """
+        old_topic = topic_fetchers.get_topic_from_model(topic_model)
+        new_version_topic = copy.deepcopy(migrated_topic)
+        new_version_topic.version = topic_model.version + 1
+        with datastore_services.get_ndb_context():
+            translation_models_to_put = (
+                translation_services.compute_carried_forward_topic_translations(
+                    old_topic, new_version_topic
+                )
+            )
         updated_topic_model = topic_services.populate_topic_model_fields(
             topic_model, migrated_topic
         )
@@ -289,6 +304,7 @@ class MigrateTopicJob(base_jobs.JobBase):
             # Here, we are narrowing down the type from object to BaseModel.
             assert isinstance(model, base_models.BaseModel)
             models_to_put_values.append(model)
+        models_to_put_values.extend(translation_models_to_put)
         datastore_services.update_timestamps_multi(list(models_to_put_values))
         return models_to_put_values
 

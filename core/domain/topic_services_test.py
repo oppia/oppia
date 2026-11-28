@@ -25,6 +25,7 @@ from unittest import mock
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
+    exp_domain,
     exp_services,
     feature_flag_services,
     fs_services,
@@ -45,6 +46,8 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
+    translation_fetchers,
+    translation_services,
     user_services,
 )
 from core.platform import models
@@ -56,8 +59,15 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models, topic_models
 
-opportunity_models, topic_models, story_models = models.Registry.import_models(
-    [models.Names.OPPORTUNITY, models.Names.TOPIC, models.Names.STORY]
+opportunity_models, suggestion_models, topic_models, story_models = (
+    models.Registry.import_models(
+        [
+            models.Names.OPPORTUNITY,
+            models.Names.SUGGESTION,
+            models.Names.TOPIC,
+            models.Names.STORY,
+        ]
+    )
 )
 
 
@@ -137,6 +147,255 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES,
+        ]
+    )
+    def test_topic_edit_carries_forward_and_invalidates_changed_translation(
+        self,
+    ) -> None:
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                        'old_subtopic_id': None,
+                        'new_subtopic_id': self.subtopic_id,
+                        'skill_id': 'skill_1',
+                    }
+                ),
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': (
+                            topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+                        ),
+                        'old_value': self.test_list,
+                        'new_value': ['skill_1'],
+                    }
+                ),
+            ],
+            'Prepare topic for publishing.',
+        )
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        for content_id, translated_value in (
+            (feconf.TOPIC_NAME_CONTENT_ID, 'Translated name'),
+            (feconf.TOPIC_DESCRIPTION_CONTENT_ID, 'Translated description'),
+        ):
+            translation_services.add_new_translation(
+                feconf.TranslatableEntityType.TOPIC,
+                topic.id,
+                topic.version,
+                'hi',
+                content_id,
+                translation_domain.TranslatedContent(
+                    translated_value,
+                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                    False,
+                ),
+            )
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                        'old_value': topic.description,
+                        'new_value': 'Updated description',
+                    }
+                )
+            ],
+            'Updated topic description.',
+        )
+
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.TOPIC,
+            self.TOPIC_ID,
+            updated_topic.version,
+            'hi',
+        ).translations
+        self.assertFalse(
+            translations[feconf.TOPIC_NAME_CONTENT_ID].needs_update
+        )
+        self.assertTrue(
+            translations[feconf.TOPIC_DESCRIPTION_CONTENT_ID].needs_update
+        )
+        opportunity = opportunity_models.TranslationOpportunityModel.get(
+            'topic.%s' % self.TOPIC_ID
+        )
+        self.assertEqual(opportunity.content_count, 2)
+        self.assertEqual(opportunity.translation_counts['hi'], 1)
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                        'old_value': updated_topic.description,
+                        'new_value': '',
+                    }
+                )
+            ],
+            'Clear topic description.',
+        )
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.TOPIC,
+            self.TOPIC_ID,
+            updated_topic.version,
+            'hi',
+        ).translations
+        self.assertIn(feconf.TOPIC_NAME_CONTENT_ID, translations)
+        self.assertNotIn(feconf.TOPIC_DESCRIPTION_CONTENT_ID, translations)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES,
+        ]
+    )
+    def test_topic_edit_auto_rejects_pending_translation_suggestions(
+        self,
+    ) -> None:
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                        'old_subtopic_id': None,
+                        'new_subtopic_id': self.subtopic_id,
+                        'skill_id': 'skill_1',
+                    }
+                ),
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': (
+                            topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+                        ),
+                        'old_value': self.test_list,
+                        'new_value': ['skill_1'],
+                    }
+                ),
+            ],
+            'Prepare topic for publishing.',
+        )
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.TOPIC_NAME_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': topic.name,
+            'translation_html': 'Translated topic name',
+            'data_format': 'unicode',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_TOPIC,
+            topic.id,
+            topic.version,
+            self.user_id_a,
+            change_dict,
+            'Topic name translation',
+        )
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+                        'old_value': topic.name,
+                        'new_value': 'Brand New Topic Name',
+                    }
+                )
+            ],
+            'Update topic name.',
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.status, suggestion_models.STATUS_REJECTED
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES,
+        ]
+    )
+    def test_new_topic_creates_metadata_translation_opportunity(self) -> None:
+        topic = self.save_new_topic(
+            'new_topic_translation',
+            self.user_id_admin,
+            name='New topic for translation',
+            description='New topic description',
+            url_fragment='new-topic-trans',
+        )
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'topic.%s' % topic.id, strict=False
+            )
+        )
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                        'old_subtopic_id': None,
+                        'new_subtopic_id': self.subtopic_id,
+                        'skill_id': 'skill_1',
+                    }
+                ),
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': (
+                            topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+                        ),
+                        'old_value': self.test_list,
+                        'new_value': ['skill_1'],
+                    }
+                ),
+            ],
+            'Prepare topic for publishing.',
+        )
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+        opportunity = opportunity_models.TranslationOpportunityModel.get(
+            'topic.%s' % self.TOPIC_ID
+        )
+        self.assertEqual(opportunity.topic_ids, [self.TOPIC_ID])
+        self.assertEqual(opportunity.content_count, 2)
+
+        topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_admin)
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'topic.%s' % self.TOPIC_ID, strict=False
+            )
         )
 
     def test_raises_error_if_guest_user_trying_to_deassign_roles_from_topic(
@@ -2915,7 +3174,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+            feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES,
         ]
     )
     def test_delete_topic_with_new_models(self) -> None:
@@ -2962,6 +3222,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model_6_before.content_count, 1)
 
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
+
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'topic.%s' % self.TOPIC_ID, strict=False
+            )
+        )
 
         model_5 = opportunity_models.TranslationOpportunityModel.get(
             'skill.skill_id_5', strict=False

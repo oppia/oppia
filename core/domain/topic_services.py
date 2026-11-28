@@ -47,6 +47,7 @@ from core.domain import (
     suggestion_services,
     topic_domain,
     topic_fetchers,
+    translation_services,
     user_domain,
     user_services,
 )
@@ -1420,6 +1421,7 @@ def _save_topic(
             % (topic_model.version, topic.version)
         )
 
+    old_topic = topic_fetchers.get_topic_by_id(topic.id, version=topic.version)
     topic_model_to_commit = populate_topic_model_fields(topic_model, topic)
     change_dicts = [change.to_dict() for change in change_list]
     topic_model_to_commit.commit(committer_id, commit_message, change_dicts)
@@ -1427,6 +1429,34 @@ def _save_topic(
         caching_services.CACHE_NAMESPACE_TOPIC, None, [topic.id]
     )
     topic.version += 1
+    translation_services.carry_forward_topic_translations(old_topic, topic)
+
+    old_contents = (
+        old_topic.get_translatable_contents_collection().content_id_to_translatable_content
+    )
+    new_contents = (
+        topic.get_translatable_contents_collection().content_id_to_translatable_content
+    )
+    obsolete_content_ids = {
+        content_id
+        for content_id, content in old_contents.items()
+        if content_id not in new_contents
+        or new_contents[content_id].content_value != content.content_value
+    }
+    if obsolete_content_ids:
+        suggestion_services.auto_reject_translation_suggestions_for_content_ids(
+            topic.id, obsolete_content_ids
+        )
+
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
+        None,
+    ):
+        topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
+        if topic_rights is not None and topic_rights.topic_is_published:
+            opportunity_services.create_translation_opportunity(
+                {feconf.ENTITY_TYPE_TOPIC: [topic.id]}, topic_ids=[topic.id]
+            )
 
 
 def update_topic_and_subtopic_pages(
@@ -2007,6 +2037,9 @@ def delete_topic(
             topic_id
         )
     )
+    opportunity_services.delete_translation_opportunities(
+        {feconf.ENTITY_TYPE_TOPIC: [topic_id]}
+    )
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
@@ -2235,6 +2268,13 @@ def publish_topic(topic_id: str, committer_id: str) -> None:
     save_topic_rights(
         topic_rights, committer_id, 'Published the topic', commit_cmds
     )
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value,
+        None,
+    ):
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_TOPIC: [topic_id]}, topic_ids=[topic_id]
+        )
 
 
 def unpublish_topic(topic_id: str, committer_id: str) -> None:
@@ -2268,6 +2308,9 @@ def unpublish_topic(topic_id: str, committer_id: str) -> None:
     ]
     save_topic_rights(
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds
+    )
+    opportunity_services.delete_translation_opportunities(
+        {feconf.ENTITY_TYPE_TOPIC: [topic_id]}
     )
 
 
